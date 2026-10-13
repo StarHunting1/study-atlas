@@ -7,7 +7,7 @@ export function localSearch(q: string): Hit[] {
   const ccAlias: Record<string, string[]> = { CAN: ["canada"], GBR: ["uk", "england", "britain"], AUS: ["australia"] };
   return [
     ...countries.filter((c) => m([...Object.values(c.name), ...ccAlias[c.code]])).map((c) => ({ type: "country" as const, id: c.code })),
-    ...cities.filter((c) => m([...Object.values(c.name), ...c.areas, ...c.schools, ...Object.values(c.blurb), ...Object.values(c.climate), ...Object.values(c.student), ...(ccAlias[c.country] ?? []), ...countries.filter((k) => k.code === c.country).flatMap((k) => Object.values(k.name))]))
+    ...cities.filter((c) => m([...Object.values(c.name), ...c.areas, ...(c.profile.education.universities.value ?? []).map((u) => u.name), ...Object.values(c.blurb), ...Object.values(c.profile.climate.overview.value ?? {}), ...Object.values(c.profile.living.studentLife.value ?? {}), ...(ccAlias[c.country] ?? []), ...countries.filter((k) => k.code === c.country).flatMap((k) => Object.values(k.name))]))
       .map((c) => ({ type: "city" as const, id: c.id })),
   ];
 }
