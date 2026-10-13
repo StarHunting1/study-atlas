@@ -56,3 +56,31 @@ New country: add it to `countries.ts` (ISO alpha-3 code) and a search alias in `
 `cities` (city/<id>.ts fields), `facts` (city_id, field path e.g. `cost.rent`, status, value JSON, period,
 checked_at, note_en, note_ja) and `fact_sources` (fact_id, url, publisher, terms), then build the same
 `City` objects. AI search can index the same facts and must only cite `verified` ones as facts.
+
+## Schools (Ver.1.4)
+```
+data/schools/types.ts         LanguageSchool / University, LanguageCourse / UniversityProgram, Price
+data/schools/universities.ts  real universities from Ver.1.0 summaries: names & links "unverified", everything else "pending"
+data/schools/samples.ts       FICTIONAL sample schools (demo: true, status "sample") for testing only
+data/schools/index.ts         read API: listSchools(kind, { includeSamples }), getSchool, optionsOf (+ validation)
+```
+`Price` records amount, `currency`, billing `unit` (week / month / term / year / course / once), `feeYear`,
+`applicability` (nationality / residence / fee category), `tax` (included / excluded / notApplicable / unknown)
+and `includes`. The UI shows an amount only for `verified` fees, or for fictional `sample` fees when
+"Show sample data" is on; anything else is "data coming soon". `priceIssues()` (comparability.ts) lists why
+fees cannot be compared at face value (unverified, currency, unit, fee year, tax, applicability, includes, course length).
+No real language schools are registered yet.
+
+## Budget simulator
+`lib/budget.ts` is pure: items left empty are "missing" (never 0), each item keeps its currency and unit
+(week / month / year / once, or % for contingency) and is scaled to the stay (month = 52/12 weeks). Foreign
+currencies need a manual rate with the date it was entered. Items linked to a school fee (`SchoolLink`) read the
+fee from school data on every calculation, so official fees registered later flow in automatically.
+
+## Visa and AI search (structure only)
+- `data/visa.ts`: `VisaFactors` (destination, nationality, residence, purpose, length, age, entry date) and a
+  `VisaRule` shape keyed on all of them. `visaRules` is empty on purpose: no automatic decisions. `visaLinks`
+  holds official pages per country, marked "unverified" until checked.
+- `data/knowledge.ts`: `KnowledgeDocument` (url, publisher, source language, jurisdiction, topics, status,
+  checkedAt, retrievedAt, terms) and `knowledgeDocuments()`, which collects every source referenced by the data.
+  A future multilingual AI search indexes these and may state as fact only what comes from verified documents.
