@@ -22,20 +22,12 @@ export const PROBE_PAGES: string[] = [
 
 /** Pages printed as full text (capped) so a reviewer can see which row/heading each figure belongs to. */
 export const TEXT_PAGES: string[] = [
-  "https://www.translink.ca/transit-fares/u-pass-bc",
-  "https://tfgm.com/tickets-and-passes/fare-zones/tram",
-  "https://tfgm.com/tickets-and-passes/tram-tickets",
-  "https://tfgm.com/tickets-and-passes/discounted-and-free-travel/young-people",
-  "https://www.manchester.ac.uk/study/international/accommodation/",
-  "https://www.manchester.ac.uk/study/accommodation/student-accommodation/search/",
+  "https://tfgm.com/tickets-and-passes/contactless",
+  "https://vancouver.housing.ubc.ca/applications/fees-payments/",
+  "https://www.ubc.ca/site/legal.html",
 ];
 /** Extra pages probed for links/money lines only. */
-export const LINK_PAGES: string[] = [
-  "https://www.metoffice.gov.uk/research/climate/maps-and-data/location-specific-long-term-averages",
-  "https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages/gcqrs1hmp",
-  "https://climate.weather.gc.ca/climate_normals/station_select_1991_2020_e.html?searchType=stnName&txtStationName=vancouver",
-  "https://vancouver.housing.ubc.ca/",
-];
+export const LINK_PAGES: string[] = [];
 
 export const robotsFor = makeRobots((u) => fetchText(u, { accept: "text/plain" }), USER_AGENT);
 
