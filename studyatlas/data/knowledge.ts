@@ -2,6 +2,7 @@ import type { Localized } from "@/lib/i18n";
 import type { Status } from "./schema";
 import { cities, countries } from "./registry";
 import { visaLinks } from "./visa";
+import collected from "./collected/snapshot.json";
 /*
  * Knowledge registry for future multilingual AI search. Each document is an official page or dataset that
  * facts are taken from. An AI search layer would fetch/index these (respecting each site's terms), answer in the
@@ -35,5 +36,8 @@ export function knowledgeDocuments(): KnowledgeDocument[] {
   };
   cities.forEach((c) => walk(c.profile, "", c.country));
   countries.forEach((c) => (visaLinks[c.code] ?? []).forEach((l) => add({ url: l.link.value!, title: l.label, sourceLanguage: "en", jurisdiction: c.code, topics: ["visa"], status: l.link.status })));
+  // Pages and datasets fetched by the collector (collector/), with the date they were retrieved
+  for (const r of Object.values(collected.records as Record<string, { sourceUrl: string; country: string; field: string; retrievedAt: string; licence?: string; status: Status }>))
+    add({ url: r.sourceUrl, sourceLanguage: "en", jurisdiction: r.country, topics: [r.field], status: r.status, retrievedAt: r.retrievedAt, terms: r.licence });
   return [...docs.values()];
 }

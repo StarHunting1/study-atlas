@@ -1,0 +1,7 @@
+{ "success": true, "result": { "count": 1, "results": [
+  { "id": "00000000-0000-0000-0000-000000000001", "name": "fixture-rental-dataset", "title": "[FIXTURE] Synthetic rental dataset",
+    "title_translated": { "en": "[FIXTURE] Synthetic rental dataset", "fr": "[FIXTURE] Jeu de données synthétique" },
+    "organization": { "title": "[FIXTURE] Test organization" },
+    "metadata_created": "2024-01-01T00:00:00", "metadata_modified": "2026-03-01T00:00:00",
+    "license_title": "[FIXTURE] Test licence", "resources": [ { "format": "CSV", "url": "https://example.com/fixture.csv", "last_modified": null } ] }
+] } }

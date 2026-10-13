@@ -1,0 +1,9 @@
+{
+  "base_path": "/healthcare-immigration-application",
+  "title": "[FIXTURE] Healthcare surcharge",
+  "description": "[FIXTURE] Synthetic healthcare test description.",
+  "document_type": "guide",
+  "first_published_at": "2020-01-01T00:00:00.000+00:00",
+  "public_updated_at": "2026-02-01T00:00:00.000+00:00",
+  "details": { "parts": [ { "title": "Overview", "slug": "overview", "body": "<p>[FIXTURE] Synthetic surcharge text.</p>" } ] }
+}
