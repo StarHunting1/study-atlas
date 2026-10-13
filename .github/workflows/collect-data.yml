@@ -22,6 +22,7 @@ on:
   pull_request:
     paths:
       - "studyatlas/collector/**"
+      - "studyatlas/data/official/**"
       - ".github/workflows/collect-data.yml"
 
 permissions:
@@ -80,6 +81,10 @@ jobs:
           ANTHROPIC_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && secrets.ANTHROPIC_API_KEY || '' }}
           PENDING: ${{ steps.pending.outputs.number && format('--pending {0}/pending-snapshot.json', runner.temp) || '' }}
         run: npx tsx collector/run.ts --sources "$SOURCES" $DRY_RUN $AI_FLAG $PENDING --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Probe official source pages (pull requests only; reviewer aid, nothing stored)
+        if: github.event_name == 'pull_request'
+        run: npx tsx collector/probe.ts | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the collected files as an artifact
         if: always()
