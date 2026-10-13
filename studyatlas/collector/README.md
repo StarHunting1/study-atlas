@@ -24,7 +24,7 @@ data/collected/
 | id | Source | Status | Domain(s) |
 |---|---|---|---|
 | `govuk-content` | GOV.UK Content API (`/api/content/<path>`) | implemented, open, no key | `www.gov.uk` |
-| `canada-open-gov` | Open Government Canada CKAN API (`package_search`) | implemented, open, no key | `open.canada.ca` |
+| `canada-open-gov` | Open Government Canada CKAN API (`package_show`, datasets pinned by id) | implemented, open, no key | `open.canada.ca` |
 | `ons-api` | ONS API (rents, prices) | open API, planned | `api.beta.ons.gov.uk` |
 | `eccc-geomet` | ECCC GeoMet OGC API (climate normals) | open API, planned | `api.weather.gc.ca` |
 | `met-office-datahub` | Met Office DataHub | needs registration / key | `data.hub.api.metoffice.gov.uk` |

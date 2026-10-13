@@ -38,7 +38,7 @@ const fail = (match: RegExp) => async (url: string) => { if (match.test(url)) th
   await t("failed source keeps previous data untouched", async () => {
     const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: fail(/open\.canada\.ca/) });
     assert.equal(r.runs.find((x) => x.sourceId === "canada-open-gov")!.ok, false);
-    assert.deepEqual(r.next.records["canada-open-gov:fixture-rental-dataset"], first.next.records["canada-open-gov:fixture-rental-dataset"]);
+    assert.deepEqual(r.next.records["canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6"], first.next.records["canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6"]);
     assert.equal(r.next.runs["canada-open-gov"].lastSuccessAt, T1);
     assert.equal(r.changes.filter((c) => c.id.startsWith("canada")).length, 0);
   });
@@ -46,10 +46,16 @@ const fail = (match: RegExp) => async (url: string) => { if (match.test(url)) th
     const r = await collect({ only: ["govuk-content"], ai: false, fixtures: false, now: T2, prev: first.next, fetcher: fail(/healthcare/) });
     assert.equal(r.runs[0].ok, true); assert.deepEqual(r.next.records["govuk-content:/healthcare-immigration-application"], first.next.records["govuk-content:/healthcare-immigration-application"]); assert.equal(r.changes.length, 0);
   });
-  await t("record no longer returned is kept and flagged, not deleted", async () => {
-    const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: edit(/q=Canadian/, (j) => { j.result.results = []; }) });
-    const rec = r.next.records["canada-open-gov:fixture-climate-normals"]; assert.ok(rec); assert.equal(rec.missingSince, T2);
-    assert.ok(r.changes.some((c) => c.type === "missing" && c.id === "canada-open-gov:fixture-climate-normals"));
+  await t("a pinned dataset failing is kept as is (not flagged missing)", async () => {
+    const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: fail(/51dbf91e/) });
+    assert.deepEqual(r.next.records["canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8"], first.next.records["canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8"]); assert.equal(r.changes.length, 0);
+  });
+  await t("record no longer returned by a successful source is kept and flagged, not deleted", async () => {
+    const old = { ...first.next.records["canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8"], id: "canada-open-gov:retired-dataset" };
+    const prev = { ...first.next, records: { ...first.next.records, [old.id]: old } };
+    const r = await collect({ only, ai: false, fixtures: true, now: T2, prev });
+    assert.equal(r.next.records[old.id].missingSince, T2);
+    assert.ok(r.changes.some((c) => c.type === "missing" && c.id === old.id));
   });
   await t("all sources failing is reported", async () => {
     const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: async () => { throw new Error("offline"); } });
