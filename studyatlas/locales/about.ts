@@ -47,6 +47,7 @@ export const steps: Step[] = [
     },
     features: [
       { text: { en: "Side-by-side table for up to 3 cities", ja: "最大3都市を並べて比較" }, status: "available", href: "/compare" },
+      { text: { en: "School comparison (language schools / universities, up to 3)", ja: "学校比較（語学学校・大学、最大3校）" }, status: "available", href: "/schools" },
       { text: { en: "Rent, living cost, transport, climate, universities, student life", ja: "家賃・生活費・交通・気候・大学・学生生活の比較" }, status: "available", href: "/compare" },
       { text: { en: "Verified cost and rent data with sources", ja: "出典付きの検証済み生活費・家賃データ" }, status: "soon" },
       { text: { en: "Detailed safety, climate and school comparisons", ja: "治安・気候・学校の詳細比較" }, status: "soon" },
@@ -56,11 +57,13 @@ export const steps: Step[] = [
     key: "decide", title: "Decide", label: { en: "Decide", ja: "決める" },
     summary: { en: "Make your decision with budget simulations, favorites and a city-match quiz.", ja: "予算シミュレーションやお気に入り保存、都市診断で、留学先の決定をサポートする。" },
     detail: {
-      en: "Tools to turn your comparison into a decision are on the way: estimate your budget, keep a shortlist of favorites, and find cities that match your priorities.",
-      ja: "比較から決定へ進むためのツールを準備中です。予算の試算、お気に入りの保存、希望条件に合う都市の診断を提供する予定です。",
+      en: "Save your study profile and estimate your total budget with your own figures. Favorites and a city-match quiz are next.",
+      ja: "留学プロフィールを保存し、ご自身で調べた金額で総費用を見積もれます。お気に入り保存や都市診断は今後追加予定です。",
     },
     features: [
-      { text: { en: "Budget simulation", ja: "予算シミュレーション" }, status: "soon" },
+      { text: { en: "Study profile saved in your browser", ja: "ブラウザに保存する留学プロフィール" }, status: "available", href: "/my" },
+      { text: { en: "Budget simulator (manual amounts)", ja: "費用シミュレーター（手動入力）" }, status: "available", href: "/my/budget" },
+      { text: { en: "Visa check: official links and the details to prepare", ja: "ビザ確認：公式リンクと必要情報の整理" }, status: "available", href: "/my/visa" },
       { text: { en: "Save favorites", ja: "お気に入り保存" }, status: "soon" },
       { text: { en: "City-match quiz based on your priorities", ja: "条件に合った都市診断" }, status: "soon" },
     ],
