@@ -7,7 +7,7 @@ import { MAX_COMPARE, useCompare } from "@/lib/store";
 import { pill, pillOff, pillOn } from "@/lib/ui";
 export default function ComparePage() {
   const { t, L } = useI18n(); const { ids, toggle, clear, has, full } = useCompare();
-  const anySample = ids.some((id) => getCity(id)?.cost.isSample);
+  const anySample = ids.some((id) => { const c = getCity(id); return c && Object.values(c.profile.cost).some((f) => f.status === "sample"); });
   return (
     <div className="space-y-6">
       <Link href="/" className="text-sm text-slate-500 hover:text-slate-900">← {t("home")}</Link>

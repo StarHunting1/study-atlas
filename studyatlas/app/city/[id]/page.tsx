@@ -2,21 +2,23 @@
 import Link from "next/link";
 import { notFound, useParams, useRouter } from "next/navigation";
 import { countries, getCity } from "@/data/cities";
+import { sections, statusSummary } from "@/data/fields";
+import { dataText as d } from "@/locales/data";
+import FactView, { StatusBadge } from "@/components/FactView";
+import type { Status } from "@/data/types";
 import { useI18n } from "@/lib/i18n";
 import { useCompare } from "@/lib/store";
 import { panel, pill, pillOff, pillOn } from "@/lib/ui";
 import CityPhoto, { PhotoCredit, useCityPhoto } from "@/components/CityPhoto";
-import SampleBadge from "@/components/SampleBadge";
 import { hasInAppHistory } from "@/lib/history";
 export default function CityPage() {
   const { id } = useParams<{ id: string }>(); const { t, L } = useI18n(); const { has, toggle, full } = useCompare(); const router = useRouter();
   const c = getCity(id); const [photo, onError] = useCityPhoto(c);
   if (!c) { notFound(); return null; }
   const country = countries.find((x) => x.code === c.country)!; const on = has(c.id);
-  const money = (v: number) => <>{v.toLocaleString()} {c.cost.currency}<SampleBadge show={c.cost.isSample} /></>;
+  const summary = statusSummary(c);
   // Opened directly (shared link, new tab, reload) there is no in-app page to return to, so go home instead.
   const back = () => (hasInAppHistory() ? router.back() : router.push("/"));
-  const Box = ({ k, children }: { k: string; children: React.ReactNode }) => <div className={`${panel} p-5`}><h3 className="mb-2 font-semibold">{k}</h3><div className="space-y-1 text-sm text-slate-600">{children}</div></div>;
   return (
     <div className="space-y-6">
       <button onClick={back} className="text-sm text-slate-500 hover:text-slate-900">← {t("back")}</button>
@@ -37,15 +39,27 @@ export default function CityPage() {
         <a href={c.officialUrl} target="_blank" rel="noopener noreferrer" className={`${pill} ${pillOff}`}>{t("official")} ↗</a>
       </div>
       {!on && full && <p className="text-sm text-slate-500">{t("compareFull")}</p>}
-      {c.cost.isSample && <p className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">{t("sampleNote")}</p>}
-      <div className="grid gap-4 md:grid-cols-2">
-        <Box k={t("cost")}><p>{t("monthly")}: {money(c.cost.monthly)}</p><p>{t("rent")}: {money(c.cost.rent)}</p></Box>
-        <Box k={t("transport")}><p>{L(c.transport)}</p><p>{t("transportCost")}: {money(c.cost.transport)}</p></Box>
-        <Box k={t("housing")}>{L(c.housing)}</Box><Box k={t("climate")}>{L(c.climate)}</Box>
-        <Box k={t("student")}>{L(c.student)}</Box><Box k={t("areas")}>{c.areas.join(" · ")}</Box>
-        <Box k={t("schools")}>{c.schools.join(" · ")}</Box>
+      {/* Data status: how much of this page is verified */}
+      <section className={`${panel} p-5`}>
+        <h2 className="text-sm font-semibold text-slate-700">{L(d.statusTitle)}</h2>
+        <div className="mt-2 flex flex-wrap gap-2">{(["verified", "unverified", "sample", "pending"] as Status[]).map((s) => <span key={s} className="flex items-center gap-1 text-sm"><StatusBadge status={s} /><span className="text-slate-600">{summary[s] ?? 0}</span></span>)}</div>
+        <p className="mt-2 text-xs leading-relaxed text-slate-500">{L(d.statusHelp)}</p>
+      </section>
+      <div className="grid gap-4 lg:grid-cols-2">
+        {sections.map((s) => (
+          <section key={s.id} id={s.id} className={`${panel} p-5 ${s.id === "climate" && c.profile.climate.monthly.value ? "lg:col-span-2" : ""}`}>
+            <h2 className="mb-3 text-lg font-semibold text-[#0b2a5b]">{L(s.label)}{s.id === "visa" && <span className="ml-2 text-sm font-normal text-slate-500">{L(d.visaCountry)} {L(country.name)}</span>}</h2>
+            <dl className="divide-y divide-slate-100">
+              {s.fields.map((f) => (
+                <div key={f.id} className="grid gap-1 py-2.5 text-sm sm:grid-cols-[9rem_1fr] sm:gap-3">
+                  <dt className="text-slate-500">{L(f.label)}</dt>
+                  <dd className="text-slate-700"><FactView fact={f.get(c)} kind={f.kind} /></dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        ))}
       </div>
-      <p className="text-xs text-slate-400">{t("updated")}: {c.updated}</p>
     </div>
   );
 }
