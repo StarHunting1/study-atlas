@@ -81,7 +81,7 @@ jobs:
         id: collect
         env:
           SOURCES: ${{ inputs.sources || 'all' }}
-          DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run --force' || '' }}
           AI_FLAG: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && '--ai' || '' }}
           ANTHROPIC_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && secrets.ANTHROPIC_API_KEY || '' }}
           PENDING: ${{ steps.pending.outputs.number && format('--pending {0}/pending-snapshot.json', runner.temp) || '' }}

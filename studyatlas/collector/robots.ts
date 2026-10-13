@@ -29,3 +29,18 @@ export function robotsAllows(txt: string, agent: string, pathAndQuery: string): 
   if (d < 0) return { allowed: true, reason: "no matching Disallow rule" };
   return a >= d ? { allowed: true, reason: "Allow rule takes precedence" } : { allowed: false, reason: "disallowed by robots.txt" };
 }
+
+/** Per-origin cached robots.txt check using the given fetcher (live or fixture). */
+export function makeRobots(fetchText: (url: string) => Promise<{ status: number; body: string }>, agent: string) {
+  const cache = new Map<string, Promise<{ txt: string | null; why: string }>>();
+  return async (url: string): Promise<RobotsVerdict> => {
+    const u = new URL(url);
+    if (!cache.has(u.origin)) cache.set(u.origin, fetchText(`${u.origin}/robots.txt`).then(
+      (r) => ({ txt: r.status >= 500 ? null : r.status >= 400 ? "" : r.body, why: `HTTP ${r.status}` }),
+      (e: Error) => ({ txt: null, why: e.message + ((e as { cause?: Error }).cause ? ` (${(e as { cause?: Error }).cause!.message})` : "") })));
+    const { txt, why } = await cache.get(u.origin)!;
+    if (txt === null) return { allowed: false, reason: `robots.txt unreachable: ${why} (treated as disallow)` };
+    if (txt === "") return { allowed: true, reason: "no robots.txt" };
+    return robotsAllows(txt, agent, u.pathname + u.search);
+  };
+}

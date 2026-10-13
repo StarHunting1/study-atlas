@@ -6,7 +6,7 @@
  * committed: the output only helps a person find and quote the official figures. One request at a time.
  * Pages disallowed by robots.txt are not fetched.
  */
-import { robotsAllows } from "./robots";
+import { makeRobots } from "./robots";
 import { fetchText, htmlToText, postJson, sleep, USER_AGENT } from "./util";
 
 export const PROBE_PAGES: string[] = [
@@ -37,20 +37,7 @@ export const LINK_PAGES: string[] = [
   "https://vancouver.housing.ubc.ca/",
 ];
 
-const robotsCache = new Map<string, string | null>(); const robotsWhy = new Map<string, string>();
-export async function robotsFor(url: string): Promise<{ allowed: boolean; reason: string }> {
-  const u = new URL(url);
-  if (!robotsCache.has(u.origin)) {
-    try {
-      const r = await fetchText(`${u.origin}/robots.txt`, { accept: "text/plain" });
-      robotsCache.set(u.origin, r.status >= 400 && r.status < 500 ? "" : r.status >= 500 ? null : r.body); robotsWhy.set(u.origin, `HTTP ${r.status}`);
-    } catch (e) { robotsCache.set(u.origin, null); robotsWhy.set(u.origin, (e as Error).message + ((e as { cause?: Error }).cause ? ` (${(e as { cause?: Error }).cause?.message})` : "")); }
-  }
-  const txt = robotsCache.get(u.origin);
-  if (txt === null || txt === undefined) return { allowed: false, reason: `robots.txt unreachable: ${robotsWhy.get(u.origin)} (treated as disallow)` };
-  if (txt === "") return { allowed: true, reason: "no robots.txt" };
-  return robotsAllows(txt, USER_AGENT, u.pathname + u.search);
-}
+export const robotsFor = makeRobots((u) => fetchText(u, { accept: "text/plain" }), USER_AGENT);
 
 const MONEY = /(£|\$|CAD|GBP)\s?\d|\d+(\.\d+)?\s?(p\b|pence)/i;
 const LINK_WORDS = /\.pdf|climate-averages\/|stnID|fare|price|pric|cost|rate|fee|ticket|pass|student|concession|u-pass|residence|accommodation|room|rent|average|normal|climate|station|terms|copyright|legal|disclaimer|licen|open data|developer/i;

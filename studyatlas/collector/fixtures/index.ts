@@ -1,5 +1,6 @@
 import { readFileSync } from "node:fs";
 import path from "node:path";
+import { allOfficialData } from "../../data/official";
 /*
  * LOCAL TEST FIXTURES. Synthetic responses shaped like the real APIs, used by `--fixtures` and the tests.
  * Every value is invented and marked "[FIXTURE]"; nothing here came from GOV.UK or open.canada.ca.
@@ -15,4 +16,32 @@ export async function fixtureFetch(url: string): Promise<unknown> {
   const hit = routes.find(([re]) => re.test(url));
   if (!hit) throw new Error(`HTTP 404 for ${url} (no fixture)`);
   return JSON.parse(readFileSync(path.join(DIR, hit[1]), "utf8"));
+}
+
+/* ECCC: invented normals (clearly not real: 1..12 °C, 100 mm every month) */
+const ecccFixture = (url: string) => {
+  const id = Number(/NORMAL_ID=(\d+)/.exec(url)?.[1]); const names: Record<number, string> = { 1: "Mean daily temperature deg C", 5: "Mean daily max temperature deg C", 8: "Mean daily min temperature deg C", 56: "Total precipitation mm" };
+  return { features: Array.from({ length: 13 }, (_, i) => ({ properties: { STATION_NAME: "[FIXTURE] STATION", CLIMATE_IDENTIFIER: "1108447", NORMAL_ID: id, E_NORMAL_ELEMENT_NAME: names[id], MONTH: i + 1, VALUE: id === 56 ? 100 : i + 1, PERIOD_BEGIN: 1981, PERIOD_END: 2010, DATE_CALCULATED: "2000-01-01 00:00:00" } })) };
+};
+export async function fixtureFetchAll(url: string): Promise<unknown> {
+  if (/^https:\/\/api\.weather\.gc\.ca\/collections\/climate-normals\/items/.test(url)) return ecccFixture(url);
+  return fixtureFetch(url);
+}
+/* Statistics Canada WDS: invented metadata (same member names as the real table) and invented rents (1000, 2000, …) */
+export async function fixturePost(url: string, body: unknown): Promise<unknown> {
+  if (/getCubeMetadata$/.test(url)) return [{ status: "SUCCESS", object: { cubeTitleEn: "[FIXTURE]", releaseTime: "2000-01-01T08:30", dimension: [
+    { dimensionNameEn: "Geography", member: [{ memberId: 184, memberNameEn: "Vancouver, British Columbia" }] },
+    { dimensionNameEn: "Type of structure", member: [{ memberId: 3, memberNameEn: "Row and apartment structures of three units and over" }] },
+    { dimensionNameEn: "Type of unit", member: ["Bachelor units", "One bedroom units", "Two bedroom units", "Three bedroom units"].map((n, i) => ({ memberId: i + 1, memberNameEn: n })) },
+  ] } }];
+  if (/getDataFromCubePidCoordAndLatestNPeriods$/.test(url)) return (body as { coordinate: string }[]).map((b, i) => ({ status: "SUCCESS", object: { vectorId: 900000 + i, coordinate: b.coordinate, vectorDataPoint: [{ refPer: "2000-01-01", value: 1000 * (i + 1), decimals: 0, scalarFactorCode: 0, symbolCode: 0, statusCode: 0, releaseTime: "2000-01-01T08:30" }] } }));
+  throw new Error(`HTTP 404 for ${url} (no fixture)`);
+}
+/* Pages: robots.txt allows everything; a page contains "[FIXTURE]" plus the quotes recorded for it in data/official,
+   so the page check finds them. Tests edit the text to simulate a changed page. */
+export async function fixtureText(url: string): Promise<{ status: number; url: string; body: string }> {
+  if (/\/robots\.txt$/.test(url)) return { status: 200, url, body: "User-agent: *\nAllow: /\n" };
+  const quotes = allOfficialData().flatMap((c) => c.points).flatMap((p) => p.evidence).filter((e) => e.url === url).map((e) => `<p>${e.quote}</p>`);
+  if (!quotes.length) return { status: 404, url, body: "" };
+  return { status: 200, url, body: `<html><body><h1>[FIXTURE]</h1>${[...new Set(quotes)].join("\n")}</body></html>` };
 }
