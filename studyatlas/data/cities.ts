@@ -1,7 +1,9 @@
 import type { Localized } from "@/lib/i18n";
 // All cost numbers are DEMO SAMPLES (isSample: true). Replace with verified, sourced data before launch.
+// Photos are self-hosted in public/cities/. Only add a photo whose license has been verified on its source page.
+export type Photo = { src: string; alt: Localized; author: string; license: string; licenseUrl: string; sourceUrl: string };
 export type City = {
-  id: string; country: string; name: Localized; coords: [number, number]; hue: number; officialUrl: string;
+  id: string; country: string; name: Localized; coords: [number, number]; hue: number; officialUrl: string; photo?: Photo;
   blurb: Localized; housing: Localized; transport: Localized; climate: Localized; student: Localized;
   areas: string[]; schools: string[]; updated: string;
   cost: { currency: string; rent: number; monthly: number; transport: number; isSample: true };
