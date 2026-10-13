@@ -15,7 +15,7 @@ const en = {
   photoCredits: "Photo credits", photoNote: "Photos from Wikimedia Commons, resized for this site. Each photo is available under the license shown.", photo: "Photo",
   compareFull: "You can compare up to 3 cities. Remove one to add another.", sampleNote: "Cost figures are demo samples and have not been verified. Check official sources before deciding.",
   aboutTitle: "About StudyAtlas",
-  aboutBody: "StudyAtlas helps students explore study destinations and compare daily life across cities. Version 1.0 searches registered data only; no external web search is connected yet. Cost figures are demo samples until verified sources are added.",
+  aboutBody: "StudyAtlas helps students explore study destinations and compare daily life across cities. Version 1.2 searches registered data only; no external web search is connected yet. Cost figures are demo samples until verified sources are added.",
 } as const;
 export default en;
 export type Dict = Record<keyof typeof en, string>;
