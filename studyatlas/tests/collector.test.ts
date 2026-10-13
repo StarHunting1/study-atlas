@@ -4,7 +4,8 @@ import assert from "node:assert/strict";
 import { collect } from "../collector/run";
 import { fixtureFetch } from "../collector/fixtures";
 import { checkFacts, extract } from "../collector/ai";
-import { emptySnapshot } from "../collector/store";
+import { diffSnapshots, emptySnapshot } from "../collector/store";
+import { execFileSync } from "node:child_process";
 import { toFact } from "../collector/toFact";
 import type Anthropic from "@anthropic-ai/sdk";
 
@@ -90,6 +91,37 @@ const fail = (match: RegExp) => async (url: string) => { if (match.test(url)) th
   await t("toFact maps to the Ver.1.3 Fact shape as unverified", () => {
     const f = toFact(first.next.records["govuk-content:/student-visa"]);
     assert.equal(f.status, "unverified"); assert.equal(f.sources![0].url, "https://www.gov.uk/student-visa"); assert.match(f.note!.ja, /自動取得/);
+  });
+  // --- Open candidate PR (pending snapshot): duplicates and data retention ---
+  await t("same data fetched again while a candidate PR is open: no new changes (no duplicate PR), PR still proposes all 4", async () => {
+    const r = await collect({ only, ai: false, fixtures: true, now: T2, prev: first.next });
+    assert.equal(r.changes.length, 0);
+    assert.equal(diffSnapshots(emptySnapshot(), r.next).filter((c) => c.type === "added").length, 4);
+  });
+  await t("source failing while a candidate PR is open keeps the PR's records (nothing lost)", async () => {
+    const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: fail(/open\.canada\.ca/) });
+    assert.equal(r.changes.length, 0);
+    assert.deepEqual(Object.keys(r.next.records).sort(), Object.keys(first.next.records).sort());
+    assert.equal(diffSnapshots(emptySnapshot(), r.next).length, 4);
+  });
+  await t("a real change on top of an open candidate PR is detected once and added to the same proposal", async () => {
+    const changed = edit(/student-visa/, (j) => { j.description = "[FIXTURE] Updated description."; });
+    const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: changed });
+    assert.equal(r.changes.length, 1);
+    const again = await collect({ only, ai: false, fixtures: false, now: T2, prev: r.next, fetcher: changed });
+    assert.equal(again.changes.length, 0);
+    const proposed = diffSnapshots(emptySnapshot(), again.next);
+    assert.equal(proposed.length, 4); assert.equal((proposed.find((c) => c.id === "govuk-content:/student-visa") as any).record.value.text, "[FIXTURE] Updated description.");
+  });
+  await t("diffSnapshots against an accepted snapshot lists only real differences", async () => {
+    assert.equal(diffSnapshots(first.next, first.next).length, 0);
+    const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: edit(/student-visa/, (j) => { j.description = "x"; }) });
+    assert.deepEqual(diffSnapshots(first.next, r.next).map((c) => [c.type, c.id]), [["changed", "govuk-content:/student-visa"]]);
+  });
+  await t("--ai without ANTHROPIC_API_KEY collects anyway and reports that AI was skipped", () => {
+    const env = { ...process.env }; delete env.ANTHROPIC_API_KEY;
+    const out = execFileSync(process.execPath, ["--import", "tsx", "collector/run.ts", "--fixtures", "--ai"], { env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
+    assert.match(out, /AI step skipped: ANTHROPIC_API_KEY is not set/); assert.match(out, /ok \(2\)/);
   });
   console.log(`${n} collector tests passed`);
 })().catch((e) => { console.error(e); process.exit(1); });

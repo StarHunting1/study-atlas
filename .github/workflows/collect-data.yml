@@ -1,5 +1,7 @@
 # Collects official information (GOV.UK Content API, Open Government Canada) for StudyAtlas.
 # - schedule / manual run: fetch live APIs; if anything changed, open a pull request with the change candidates.
+#   While a candidate PR is still open, runs are compared against it and new changes are added to that same PR
+#   (one open candidate PR at a time: no duplicates, and nothing already proposed is dropped).
 # - pull_request (collector code changes): live fetch as a dry run, report in the job summary, nothing committed.
 # Never merges anything. Collected records stay "unverified" until a person reviews and promotes them.
 name: Collect official data
@@ -26,7 +28,8 @@ permissions:
   contents: read
 
 concurrency:
-  group: collect-data-${{ github.event_name }}-${{ github.ref }}
+  # scheduled and manual runs share one queue so they never race on the candidate PR
+  group: collect-data-${{ github.event_name == 'pull_request' && github.ref || 'main' }}
   cancel-in-progress: false
 
 defaults:
@@ -49,6 +52,25 @@ jobs:
           cache-dependency-path: studyatlas/package-lock.json
       - run: npm ci
 
+      - name: Find an open candidate pull request
+        id: pending
+        if: github.event_name != 'pull_request'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          pr=$(gh pr list --state open --base main --json number,headRefName \
+                --jq '[.[] | select(.headRefName | startswith("data-collect/"))] | sort_by(.number) | .[0] // empty')
+          if [ -n "$pr" ]; then
+            number=$(jq -r .number <<<"$pr"); branch=$(jq -r .headRefName <<<"$pr")
+            git fetch --no-tags origin "+refs/heads/$branch:refs/remotes/origin/$branch"
+            git show "origin/$branch:studyatlas/data/collected/snapshot.json" > "$RUNNER_TEMP/pending-snapshot.json"
+            echo "number=$number" >> "$GITHUB_OUTPUT"
+            echo "branch=$branch" >> "$GITHUB_OUTPUT"
+            echo "Open candidate PR #$number ($branch): this run is compared against it."
+          else
+            echo "No open candidate PR: this run is compared against main."
+          fi
+
       - name: Collect from official APIs
         id: collect
         env:
@@ -56,7 +78,8 @@ jobs:
           DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
           AI_FLAG: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && '--ai' || '' }}
           ANTHROPIC_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && secrets.ANTHROPIC_API_KEY || '' }}
-        run: npx tsx collector/run.ts --sources "$SOURCES" $DRY_RUN $AI_FLAG --summary "$GITHUB_STEP_SUMMARY"
+          PENDING: ${{ steps.pending.outputs.number && format('--pending {0}/pending-snapshot.json', runner.temp) || '' }}
+        run: npx tsx collector/run.ts --sources "$SOURCES" $DRY_RUN $AI_FLAG $PENDING --summary "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the collected files as an artifact
         if: always()
@@ -66,19 +89,42 @@ jobs:
           path: studyatlas/data/collected/
           if-no-files-found: ignore
 
-      - name: Open a pull request with the change candidates
+      - name: Update or open the change-candidate pull request
         if: github.event_name != 'pull_request' && steps.collect.outputs.changes != '0'
         env:
           GH_TOKEN: ${{ github.token }}
+          PR_NUMBER: ${{ steps.pending.outputs.number }}
+          PR_BRANCH: ${{ steps.pending.outputs.branch }}
         run: |
-          branch="data-collect/${GITHUB_RUN_ID}"
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git switch -c "$branch"
-          git add data/collected
-          git commit -m "Data collection: change candidates (run ${GITHUB_RUN_ID})"
-          git push origin "$branch"
-          head -c 60000 data/collected/REPORT.md > /tmp/pr-body.md
-          gh pr create --base main --head "$branch" \
-            --title "Data collection: change candidates ($(date -u +%Y-%m-%d))" \
-            --body-file /tmp/pr-body.md
+          head -c 60000 data/collected/REPORT.md > "$RUNNER_TEMP/pr-body.md"
+          if [ -n "$PR_NUMBER" ]; then
+            # Add a commit to the open candidate PR (no new PR, no force-push)
+            cp -r data/collected "$RUNNER_TEMP/collected"
+            git restore --staged --worktree data/collected && git clean -fdq data/collected
+            git switch -c "$PR_BRANCH" "origin/$PR_BRANCH"
+            rm -rf data/collected && cp -r "$RUNNER_TEMP/collected" data/collected
+            git add data/collected
+            git commit -m "Data collection: new change candidates (run ${GITHUB_RUN_ID})"
+            git push origin "$PR_BRANCH"
+            gh pr edit "$PR_NUMBER" --body-file "$RUNNER_TEMP/pr-body.md"
+            echo "Updated candidate PR #$PR_NUMBER"
+          else
+            branch="data-collect/${GITHUB_RUN_ID}"
+            git switch -c "$branch"
+            git add data/collected
+            git commit -m "Data collection: change candidates (run ${GITHUB_RUN_ID})"
+            git push origin "$branch"
+            gh pr create --base main --head "$branch" \
+              --title "Data collection: change candidates ($(date -u +%Y-%m-%d))" \
+              --body-file "$RUNNER_TEMP/pr-body.md"
+          fi
+
+      - name: Nothing new
+        if: github.event_name != 'pull_request' && steps.collect.outputs.changes == '0'
+        env:
+          PR_NUMBER: ${{ steps.pending.outputs.number }}
+        run: |
+          if [ -n "$PR_NUMBER" ]; then against="open candidate PR #$PR_NUMBER"; else against="main"; fi
+          echo "No changes compared with $against; no pull request created or updated." | tee -a "$GITHUB_STEP_SUMMARY"

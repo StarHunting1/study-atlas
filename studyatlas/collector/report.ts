@@ -2,10 +2,11 @@ import type { Change, Snapshot, Source, SourceRun } from "./types";
 // Markdown report for the GitHub Actions job summary and the change-candidate pull request. Not part of the website.
 const esc = (s: string) => s.replace(/\|/g, "\\|").replace(/\n/g, " ");
 const accessLabel: Record<Source["access"], string> = { implemented: "✅ implemented (open API)", "open-api-planned": "🟡 open API – planned", "needs-key": "🔑 needs key / registration", "needs-terms-review": "⚖️ terms review needed" };
-export function renderReport(o: { sources: Source[]; runs: SourceRun[]; snapshot: Snapshot; changes: Change[]; mode: "live" | "fixtures"; now: string; aiErrors: string[] }) {
+export function renderReport(o: { sources: Source[]; runs: SourceRun[]; snapshot: Snapshot; changes: Change[]; mode: "live" | "fixtures"; now: string; aiErrors: string[]; newSincePending?: number }) {
   const L: string[] = [];
   L.push(`# StudyAtlas data collection report`, "");
   L.push(`- Run: ${o.now} (${o.mode === "live" ? "**live API requests**" : "**local fixtures – not real data**"})`);
+  if (o.newSincePending !== undefined) L.push(`- Compared with the open candidate PR: **${o.newSincePending} new change(s)** in this run. The list below is everything the PR proposes relative to \`main\`.`);
   L.push(`- Collected records are **unverified** candidates. Nothing here changes the published city data until a person reviews and promotes it.`, "");
   L.push(`## Sources`, "", `| Source | Access | This run | Last success | Records | Domains |`, `|---|---|---|---|---|---|`);
   for (const s of o.sources) {
