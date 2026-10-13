@@ -14,6 +14,7 @@ const ja: Dict = {
   notFoundTitle: "ページが見つかりません", notFoundBody: "お探しのページまたは都市は存在しません。",
   mapFailed: "地図を読み込めませんでした。下の一覧または検索から国・都市を選べます。",
   photoCredits: "写真クレジット", photoNote: "写真はWikimedia Commonsより取得し、本サイト用にサイズを調整しています。各写真は記載のライセンスで提供されています。", photo: "写真",
+  compareFull: "比較できるのは最大3都市です。追加するには、いずれかを削除してください。", sampleNote: "費用の数値は未検証のデモデータです。判断の前に公式情報をご確認ください。",
   aboutTitle: "StudyAtlasについて",
   aboutBody: "StudyAtlasは、留学先を探し、都市ごとの生活を比較できるサービスです。Ver.1.0では登録済みデータのみを検索し、外部Web検索はまだ接続されていません。費用の数値は、出典を確認するまでデモ用サンプルです。",
 };

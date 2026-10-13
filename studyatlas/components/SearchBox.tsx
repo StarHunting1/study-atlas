@@ -17,9 +17,9 @@ export default function SearchBox() {
   return (
     <div className="relative mx-auto w-full max-w-xl">
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("search")} aria-label={t("search")}
-        className="w-full rounded-full bg-white px-6 py-4 text-base shadow-lg outline-none ring-1 ring-slate-200 focus:ring-2 focus:ring-sky-400" />
+        type="search" className="w-full rounded-full bg-white px-6 py-4 text-base shadow-sm outline-none ring-1 ring-slate-200 transition focus:shadow-md focus:ring-2 focus:ring-sky-400" />
       {hits && (
-        <ul className="absolute z-20 mt-2 w-full overflow-hidden rounded-2xl bg-white text-left shadow-xl ring-1 ring-slate-200">
+        <ul className="absolute z-40 mt-2 w-full overflow-hidden rounded-2xl bg-white text-left shadow-xl ring-1 ring-slate-200">
           {hits.length === 0 && <li className="px-5 py-3 text-sm text-slate-400">{t("noResults")} · {t("searchHint")}</li>}
           {hits.map((h) => <li key={h.type + h.id}><button className="w-full px-5 py-3 text-left text-sm hover:bg-slate-50" onClick={() => go(h)}>{h.type === "country" ? "🌐" : "📍"} {label(h)}</button></li>)}
         </ul>)}
