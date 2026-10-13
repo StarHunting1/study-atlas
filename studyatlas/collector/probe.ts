@@ -22,27 +22,19 @@ export const PROBE_PAGES: string[] = [
 
 /** Pages printed as full text (capped) so a reviewer can see which row/heading each figure belongs to. */
 export const TEXT_PAGES: string[] = [
-  "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
-  "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
-  "https://www.manchester.ac.uk/study/accommodation/student-accommodation/",
-  "https://tfgm.com/tickets-and-passes/bus-and-tram-tickets",
-  "https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student",
-  "https://tfgm.com/tickets-and-passes/discounted-and-free-travel/young-people/igo",
-  "https://tfgm.com/disclaimer",
-  "https://www.manchester.ac.uk/copyright/",
-  "https://www.metoffice.gov.uk/research/climate/maps-and-data/climate-averages",
-  "https://www.metoffice.gov.uk/policies/legal",
-  "https://climate.weather.gc.ca/climate_normals/results_1991_2020_e.html?stnID=889&autofwd=1",
-  "https://www.canada.ca/en/transparency/terms.html",
-  "https://www.statcan.gc.ca/en/terms-conditions/open-licence",
+  "https://www.translink.ca/transit-fares/u-pass-bc",
+  "https://tfgm.com/tickets-and-passes/fare-zones/tram",
+  "https://tfgm.com/tickets-and-passes/tram-tickets",
+  "https://tfgm.com/tickets-and-passes/discounted-and-free-travel/young-people",
+  "https://www.manchester.ac.uk/study/international/accommodation/",
+  "https://www.manchester.ac.uk/study/accommodation/student-accommodation/search/",
 ];
 /** Extra pages probed for links/money lines only. */
 export const LINK_PAGES: string[] = [
-  "https://www.translink.ca/transit-fares",
-  "https://www.translink.ca/",
-  "https://www.manchester.ac.uk/study/international/accommodation/",
-  "https://tfgm.com/tickets-and-passes",
-  "https://vancouver.housing.ubc.ca/rates-fees/",
+  "https://www.metoffice.gov.uk/research/climate/maps-and-data/location-specific-long-term-averages",
+  "https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-climate-averages/gcqrs1hmp",
+  "https://climate.weather.gc.ca/climate_normals/station_select_1991_2020_e.html?searchType=stnName&txtStationName=vancouver",
+  "https://vancouver.housing.ubc.ca/",
 ];
 
 const robotsCache = new Map<string, string | null>(); const robotsWhy = new Map<string, string>();
@@ -61,7 +53,7 @@ export async function robotsFor(url: string): Promise<{ allowed: boolean; reason
 }
 
 const MONEY = /(£|\$|CAD|GBP)\s?\d|\d+(\.\d+)?\s?(p\b|pence)/i;
-const LINK_WORDS = /fare|price|pric|cost|rate|fee|ticket|pass|student|concession|u-pass|residence|accommodation|room|rent|average|normal|climate|station|terms|copyright|legal|disclaimer|licen|open data|developer/i;
+const LINK_WORDS = /\.pdf|climate-averages\/|stnID|fare|price|pric|cost|rate|fee|ticket|pass|student|concession|u-pass|residence|accommodation|room|rent|average|normal|climate|station|terms|copyright|legal|disclaimer|licen|open data|developer/i;
 
 export function moneyLines(text: string, max = 80) { return [...new Set(text.split("\n").map((l) => l.trim()).filter((l) => l.length < 400 && MONEY.test(l)))].slice(0, max); }
 export function links(html: string, base: string, max = 60) {
@@ -87,7 +79,7 @@ async function probePage(url: string, fullText = false) {
     const updated = /(last (updated|reviewed|modified)[^<]{0,60})/i.exec(htmlToText(r.body))?.[1];
     L.push(`- title: ${title ?? "—"}${updated ? ` · ${updated.trim()}` : ""}`);
     const text = htmlToText(r.body);
-    if (fullText) { L.push("- page text (capped):", "```", text.slice(0, 14000), "```"); return L; }
+    if (fullText) { L.push("- page text (capped):", "```", text.slice(0, 14000), "```", "- links:", ...links(r.body, r.url).map((l) => `  - ${l}`)); return L; }
     L.push("- money lines (verbatim page text):", ...moneyLines(text).map((l) => `  - ${l}`));
     L.push("- links:", ...links(r.body, r.url).map((l) => `  - ${l}`));
   } catch (e) { L.push(`- ❌ ${(e as Error).message}`); }

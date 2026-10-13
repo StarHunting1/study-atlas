@@ -53,6 +53,11 @@ jobs:
           cache-dependency-path: studyatlas/package-lock.json
       - run: npm ci
 
+      - name: Complete TLS chains for hosts that omit their intermediate certificate
+        run: |
+          collector/aia-chain.sh "$RUNNER_TEMP/extra-ca.pem" vancouver.housing.ubc.ca
+          if [ -s "$RUNNER_TEMP/extra-ca.pem" ]; then echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/extra-ca.pem" >> "$GITHUB_ENV"; fi
+
       - name: Find an open candidate pull request
         id: pending
         if: github.event_name != 'pull_request'
