@@ -1,0 +1,12 @@
+{
+  "base_path": "/student-visa",
+  "title": "[FIXTURE] Student visa",
+  "description": "[FIXTURE] Synthetic test description. Not GOV.UK content.",
+  "document_type": "guide",
+  "first_published_at": "2020-01-01T00:00:00.000+00:00",
+  "public_updated_at": "2026-01-01T00:00:00.000+00:00",
+  "details": { "parts": [
+    { "title": "Overview", "slug": "overview", "body": "<p>[FIXTURE] Synthetic overview text for testing.</p>" },
+    { "title": "Fees", "slug": "fees", "body": "<p>[FIXTURE] The synthetic test fee is &pound;123 for each applicant.</p>" }
+  ] }
+}

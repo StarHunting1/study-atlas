@@ -1,0 +1,25 @@
+{
+ "success": true,
+ "result": {
+  "id": "c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
+  "name": "fixture-canada-housing",
+  "title": "[FIXTURE] Synthetic rental dataset",
+  "title_translated": {
+   "en": "[FIXTURE] Synthetic rental dataset",
+   "fr": "[FIXTURE] Jeu de données synthétique"
+  },
+  "organization": {
+   "title": "[FIXTURE] Test organization"
+  },
+  "metadata_created": "2024-01-01T00:00:00",
+  "metadata_modified": "2026-03-01T00:00:00",
+  "license_title": "[FIXTURE] Test licence",
+  "resources": [
+   {
+    "format": "CSV",
+    "url": "https://example.com/fixture.csv",
+    "last_modified": null
+   }
+  ]
+ }
+}

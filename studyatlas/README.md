@@ -7,3 +7,4 @@ Next.js (App Router) + TypeScript + Tailwind + MapLibre GL JS.
 - City data: identity in `data/city/`, researched facts (with source, period, last checked, status) in `data/profiles/`; see [data/README.md](./data/README.md) and the research plan in [data/RESEARCH.md](./data/RESEARCH.md).
 - My Study (Ver.1.4): `/my` profile, `/my/budget` cost simulator, `/my/visa` visa check; `/schools` school comparison. Profile, plans and selections are stored in the browser (localStorage) only and never sent anywhere.
 - Tests: `npm test` (unit tests for the budget engine, conversions and fee comparability).
+- Data collector: `collector/` + `.github/workflows/collect-data.yml` (official APIs → change-candidate PRs, never auto-merged); see [collector/README.md](./collector/README.md).

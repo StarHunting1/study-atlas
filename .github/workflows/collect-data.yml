@@ -1,0 +1,84 @@
+# Collects official information (GOV.UK Content API, Open Government Canada) for StudyAtlas.
+# - schedule / manual run: fetch live APIs; if anything changed, open a pull request with the change candidates.
+# - pull_request (collector code changes): live fetch as a dry run, report in the job summary, nothing committed.
+# Never merges anything. Collected records stay "unverified" until a person reviews and promotes them.
+name: Collect official data
+
+on:
+  workflow_dispatch:
+    inputs:
+      sources:
+        description: "Source ids (comma separated) or 'all'"
+        required: false
+        default: "all"
+      ai:
+        description: "Run AI extraction (needs the ANTHROPIC_API_KEY secret)"
+        type: boolean
+        default: false
+  schedule:
+    - cron: "23 4 * * 1" # Mondays 04:23 UTC
+  pull_request:
+    paths:
+      - "studyatlas/collector/**"
+      - ".github/workflows/collect-data.yml"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: collect-data-${{ github.event_name }}-${{ github.ref }}
+  cancel-in-progress: false
+
+defaults:
+  run:
+    working-directory: studyatlas
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write       # push the change-candidate branch (not used on pull_request)
+      pull-requests: write  # open the change-candidate PR (not used on pull_request)
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: studyatlas/package-lock.json
+      - run: npm ci
+
+      - name: Collect from official APIs
+        id: collect
+        env:
+          SOURCES: ${{ inputs.sources || 'all' }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
+          AI_FLAG: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && '--ai' || '' }}
+          ANTHROPIC_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && secrets.ANTHROPIC_API_KEY || '' }}
+        run: npx tsx collector/run.ts --sources "$SOURCES" $DRY_RUN $AI_FLAG --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Keep the collected files as an artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: collected-${{ github.run_id }}
+          path: studyatlas/data/collected/
+          if-no-files-found: ignore
+
+      - name: Open a pull request with the change candidates
+        if: github.event_name != 'pull_request' && steps.collect.outputs.changes != '0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="data-collect/${GITHUB_RUN_ID}"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add data/collected
+          git commit -m "Data collection: change candidates (run ${GITHUB_RUN_ID})"
+          git push origin "$branch"
+          head -c 60000 data/collected/REPORT.md > /tmp/pr-body.md
+          gh pr create --base main --head "$branch" \
+            --title "Data collection: change candidates ($(date -u +%Y-%m-%d))" \
+            --body-file /tmp/pr-body.md

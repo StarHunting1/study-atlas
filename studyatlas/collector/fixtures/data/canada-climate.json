@@ -1,0 +1,21 @@
+{
+ "success": true,
+ "result": {
+  "id": "51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+  "name": "fixture-canada-climate",
+  "title": "[FIXTURE] Synthetic climate normals",
+  "organization": {
+   "title": "[FIXTURE] Test organization"
+  },
+  "metadata_created": "2024-01-01T00:00:00",
+  "metadata_modified": "2026-03-02T00:00:00",
+  "license_title": "[FIXTURE] Test licence",
+  "resources": [
+   {
+    "format": "CSV",
+    "url": "https://example.com/climate.csv",
+    "last_modified": null
+   }
+  ]
+ }
+}
