@@ -20,17 +20,42 @@ export const PROBE_PAGES: string[] = [
   "https://www.cmhc-schl.gc.ca/",
 ];
 
-const robotsCache = new Map<string, string | null>();
+/** Pages printed as full text (capped) so a reviewer can see which row/heading each figure belongs to. */
+export const TEXT_PAGES: string[] = [
+  "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+  "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+  "https://www.manchester.ac.uk/study/accommodation/student-accommodation/",
+  "https://tfgm.com/tickets-and-passes/bus-and-tram-tickets",
+  "https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student",
+  "https://tfgm.com/tickets-and-passes/discounted-and-free-travel/young-people/igo",
+  "https://tfgm.com/disclaimer",
+  "https://www.manchester.ac.uk/copyright/",
+  "https://www.metoffice.gov.uk/research/climate/maps-and-data/climate-averages",
+  "https://www.metoffice.gov.uk/policies/legal",
+  "https://climate.weather.gc.ca/climate_normals/results_1991_2020_e.html?stnID=889&autofwd=1",
+  "https://www.canada.ca/en/transparency/terms.html",
+  "https://www.statcan.gc.ca/en/terms-conditions/open-licence",
+];
+/** Extra pages probed for links/money lines only. */
+export const LINK_PAGES: string[] = [
+  "https://www.translink.ca/transit-fares",
+  "https://www.translink.ca/",
+  "https://www.manchester.ac.uk/study/international/accommodation/",
+  "https://tfgm.com/tickets-and-passes",
+  "https://vancouver.housing.ubc.ca/rates-fees/",
+];
+
+const robotsCache = new Map<string, string | null>(); const robotsWhy = new Map<string, string>();
 export async function robotsFor(url: string): Promise<{ allowed: boolean; reason: string }> {
   const u = new URL(url);
   if (!robotsCache.has(u.origin)) {
     try {
       const r = await fetchText(`${u.origin}/robots.txt`, { accept: "text/plain" });
-      robotsCache.set(u.origin, r.status >= 400 && r.status < 500 ? "" : r.status >= 500 ? null : r.body);
-    } catch { robotsCache.set(u.origin, null); }
+      robotsCache.set(u.origin, r.status >= 400 && r.status < 500 ? "" : r.status >= 500 ? null : r.body); robotsWhy.set(u.origin, `HTTP ${r.status}`);
+    } catch (e) { robotsCache.set(u.origin, null); robotsWhy.set(u.origin, (e as Error).message + ((e as { cause?: Error }).cause ? ` (${(e as { cause?: Error }).cause?.message})` : "")); }
   }
   const txt = robotsCache.get(u.origin);
-  if (txt === null || txt === undefined) return { allowed: false, reason: "robots.txt unreachable (treated as disallow)" };
+  if (txt === null || txt === undefined) return { allowed: false, reason: `robots.txt unreachable: ${robotsWhy.get(u.origin)} (treated as disallow)` };
   if (txt === "") return { allowed: true, reason: "no robots.txt" };
   return robotsAllows(txt, USER_AGENT, u.pathname + u.search);
 }
@@ -50,7 +75,7 @@ export function links(html: string, base: string, max = 60) {
   return out;
 }
 
-async function probePage(url: string) {
+async function probePage(url: string, fullText = false) {
   const L: string[] = [`## ${url}`];
   const rb = await robotsFor(url); L.push(`- robots.txt: ${rb.allowed ? "allowed" : "NOT allowed"} (${rb.reason})`);
   if (!rb.allowed) return L;
@@ -62,6 +87,7 @@ async function probePage(url: string) {
     const updated = /(last (updated|reviewed|modified)[^<]{0,60})/i.exec(htmlToText(r.body))?.[1];
     L.push(`- title: ${title ?? "—"}${updated ? ` · ${updated.trim()}` : ""}`);
     const text = htmlToText(r.body);
+    if (fullText) { L.push("- page text (capped):", "```", text.slice(0, 14000), "```"); return L; }
     L.push("- money lines (verbatim page text):", ...moneyLines(text).map((l) => `  - ${l}`));
     L.push("- links:", ...links(r.body, r.url).map((l) => `  - ${l}`));
   } catch (e) { L.push(`- ❌ ${(e as Error).message}`); }
@@ -98,7 +124,8 @@ async function probeApis() {
 async function main() {
   const urls = process.argv.slice(2).filter((a) => /^https:\/\//.test(a));
   const out: string[] = ["# Source probe (live requests, reviewer aid — nothing stored)", ""];
-  for (const u of urls.length ? urls : PROBE_PAGES) { out.push(...(await probePage(u)), ""); await sleep(1000); }
+  for (const u of urls.length ? urls : [...PROBE_PAGES, ...LINK_PAGES]) { out.push(...(await probePage(u)), ""); await sleep(1000); }
+  if (!urls.length) for (const u of TEXT_PAGES) { out.push(...(await probePage(u, true)), ""); await sleep(1000); }
   if (!urls.length) out.push(...(await probeApis()));
   console.log(out.join("\n"));
 }
