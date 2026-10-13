@@ -45,7 +45,8 @@ and optional AI output.
 
 ## Running
 ```bash
-npm run collect -- --fixtures            # local fixtures, no network (labelled "not real data")
+npm run collect -- --fixtures            # local fixtures, no network (labelled "not real data"), writes nothing
+npm run collect -- --fixtures --data-dir /tmp/x   # same, but reads/writes a scratch snapshot (used by tests)
 npm run collect -- --dry-run             # live APIs, print report, write nothing
 npm run collect                          # live APIs, write data/collected/* when something changed
 npm run collect -- --sources govuk-content --ai   # with AI extraction (needs ANTHROPIC_API_KEY)
@@ -61,6 +62,9 @@ npm test                                 # includes tests/collector.test.ts
   snapshot (`--pending`): fetching the same data again changes nothing (no duplicate PR); real new changes are added as a
   new commit to the same PR and its description is refreshed; a source that fails keeps the records already proposed.
   After the PR is merged (or closed), the next run compares against `main` again.
+- The report has **New changes in this run** (compared with `main`, or with the open candidate PR) and, while a
+  candidate PR is open, **Already proposed in the open candidate PR** (what that PR adds to `main`; not new).
+  Retrieval times are never compared, so re-fetching unchanged content is never a change.
 - `--ai` without the `ANTHROPIC_API_KEY` secret no longer fails the run: data is collected and the report notes that
   the AI step was skipped.
 - On pull requests that touch the collector, the same job runs as a **dry run** against the live APIs (report in the
