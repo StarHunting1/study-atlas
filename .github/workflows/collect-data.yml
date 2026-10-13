@@ -123,4 +123,8 @@ jobs:
 
       - name: Nothing new
         if: github.event_name != 'pull_request' && steps.collect.outputs.changes == '0'
-        run: echo "No changes compared with ${{ steps.pending.outputs.number && format('open candidate PR #{0}', steps.pending.outputs.number) || 'main' }}; no pull request created or updated." | tee -a "$GITHUB_STEP_SUMMARY"
+        env:
+          PR_NUMBER: ${{ steps.pending.outputs.number }}
+        run: |
+          if [ -n "$PR_NUMBER" ]; then against="open candidate PR #$PR_NUMBER"; else against="main"; fi
+          echo "No changes compared with $against; no pull request created or updated." | tee -a "$GITHUB_STEP_SUMMARY"
