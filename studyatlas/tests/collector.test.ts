@@ -6,6 +6,12 @@ import { fixtureFetch } from "../collector/fixtures";
 import { checkFacts, extract } from "../collector/ai";
 import { diffSnapshots, emptySnapshot } from "../collector/store";
 import { execFileSync } from "node:child_process";
+import { mkdtempSync, readFileSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { merge } from "../collector/store";
+import { renderReport } from "../collector/report";
+import type { Snapshot } from "../collector/types";
 import { toFact } from "../collector/toFact";
 import type Anthropic from "@anthropic-ai/sdk";
 
@@ -122,6 +128,35 @@ const fail = (match: RegExp) => async (url: string) => { if (match.test(url)) th
     const env = { ...process.env }; delete env.ANTHROPIC_API_KEY;
     const out = execFileSync(process.execPath, ["--import", "tsx", "collector/run.ts", "--fixtures", "--ai"], { env, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"] });
     assert.match(out, /AI step skipped: ANTHROPIC_API_KEY is not set/); assert.match(out, /ok \(2\)/);
+  });
+  // --- Same data collected twice in a row (end to end through the CLI, local fixtures) ---
+  await t("CLI: second consecutive collection of the same responses finds 0 changes and rewrites nothing", () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "collect-")); const out = path.join(dir, "gh-output");
+    const run = () => { writeFileSync(out, ""); execFileSync(process.execPath, ["--import", "tsx", "collector/run.ts", "--fixtures", "--data-dir", dir, "--sources", "govuk-content,canada-open-gov"], { env: { ...process.env, GITHUB_OUTPUT: out }, stdio: "ignore" }); return Object.fromEntries(readFileSync(out, "utf8").trim().split("\n").map((l) => l.split("="))); };
+    const first = run(); const snap1 = readFileSync(path.join(dir, "snapshot.json"), "utf8"); const rep1 = readFileSync(path.join(dir, "REPORT.md"), "utf8");
+    assert.equal(first.changes, "4");
+    const second = run();
+    assert.equal(second.changes, "0");
+    assert.equal(readFileSync(path.join(dir, "snapshot.json"), "utf8"), snap1, "snapshot must be byte-identical (no timestamp churn)");
+    assert.equal(readFileSync(path.join(dir, "REPORT.md"), "utf8"), rep1, "report of the first run is kept");
+  });
+  await t("real data on main: a re-fetch that differs only in retrieval time is not a change", () => {
+    const real = JSON.parse(readFileSync("data/collected/snapshot.json", "utf8")) as Snapshot;
+    const recs = Object.values(real.records); if (!recs.length) { console.log("   (skipped: main has no collected records)"); return; }
+    const refetched = recs.map((r) => ({ ...r, retrievedAt: "2030-01-01T00:00:00.000Z" }));
+    const bySource: Record<string, typeof refetched> = {}; refetched.forEach((r) => (bySource[r.sourceId] ??= []).push(r));
+    const runs = Object.keys(bySource).map((id) => ({ sourceId: id, ok: true, attemptedAt: "2030-01-01T00:00:00.000Z", records: bySource[id].length }));
+    const { next, changes } = merge(real, runs, bySource, "2030-01-01T00:00:00.000Z");
+    assert.equal(changes.length, 0);
+    for (const r of recs) assert.equal(next.records[r.id].retrievedAt, r.retrievedAt);
+    assert.equal(diffSnapshots(real, next).length, 0);
+  });
+  await t("report separates new changes from what an open candidate PR already proposes", () => {
+    const rep = renderReport({ sources: [], runs: [], snapshot: first.next, changes: [], proposed: first.changes, mode: "live", now: T2, aiErrors: [] });
+    assert.match(rep, /## New changes in this run \(0\)/); assert.match(rep, /## Already proposed in the open candidate PR \(4\) — not new in this run/);
+    assert.doesNotMatch(rep, /## Changes \(/);
+    const plain = renderReport({ sources: [], runs: [], snapshot: first.next, changes: first.changes, mode: "live", now: T1, aiErrors: [] });
+    assert.match(plain, /## New changes in this run \(4\)/); assert.doesNotMatch(plain, /Already proposed/);
   });
   console.log(`${n} collector tests passed`);
 })().catch((e) => { console.error(e); process.exit(1); });

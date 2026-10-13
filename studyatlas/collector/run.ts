@@ -3,6 +3,7 @@
  *   npx tsx collector/run.ts [--sources all|id,id] [--ai] [--fixtures] [--dry-run] [--summary <file>]
  * --fixtures  read local test files in collector/fixtures/ instead of calling APIs (results are labelled as fixtures)
  * --dry-run   do not write data/collected/* (used on pull requests)
+ * --data-dir <dir>  read/write the snapshot here instead of data/collected (tests; also allows writing with --fixtures)
  * --pending <file>  snapshot of an open, not yet merged candidate PR. The run is compared against it, so the same
  *                   data fetched again produces no new changes (no duplicate PR) and nothing in that PR is lost.
  * Exit code is 0 even when a source fails (failures are reported); 2 when every attempted source failed.
@@ -17,7 +18,7 @@ import { diffSnapshots, emptySnapshot, merge } from "./store";
 import type { CollectedRecord, Snapshot, SourceRun } from "./types";
 import { fetchJson } from "./util";
 
-export const DATA_DIR = path.resolve(process.cwd(), "data/collected");
+export const DEFAULT_DATA_DIR = path.resolve(process.cwd(), "data/collected");
 const arg = (name: string) => { const i = process.argv.indexOf(`--${name}`); return i >= 0 ? process.argv[i + 1] : undefined; };
 const flag = (name: string) => process.argv.includes(`--${name}`);
 
@@ -52,6 +53,7 @@ async function main() {
   // Missing key: collect anyway without AI (reported), instead of failing the whole run
   let ai = flag("ai"); let aiUnavailable: string | undefined;
   if (ai && !process.env.ANTHROPIC_API_KEY) { aiUnavailable = "AI step skipped: ANTHROPIC_API_KEY is not set (add it as a GitHub Secret)."; console.warn(`::warning::${aiUnavailable}`); ai = false; }
+  const dataDirArg = arg("data-dir"); const DATA_DIR = dataDirArg ? path.resolve(dataDirArg) : DEFAULT_DATA_DIR;
   const snapPath = path.join(DATA_DIR, "snapshot.json");
   const accepted: Snapshot = existsSync(snapPath) ? JSON.parse(readFileSync(snapPath, "utf8")) : emptySnapshot();
   const pendingPath = arg("pending");
@@ -59,12 +61,13 @@ async function main() {
   const now = new Date().toISOString();
   // Compare with the open candidate PR when there is one, otherwise with the accepted snapshot on main
   const { runs, attempted, next, changes, aiErrors } = await collect({ only, ai, fixtures, now, prev: pending ?? accepted, aiUnavailable });
-  // The report and candidates.json always describe everything the PR proposes relative to main
+  // candidates.json always holds everything the (new or updated) PR proposes relative to main
   const proposed = diffSnapshots(accepted, next);
-  const report = renderReport({ sources: sources.filter((s) => !only || only.includes(s.id)), runs, snapshot: next, changes: proposed, mode: fixtures ? "fixtures" : "live", now, aiErrors, newSincePending: pending ? changes.length : undefined });
+  const report = renderReport({ sources: sources.filter((s) => !only || only.includes(s.id)), runs, snapshot: next, changes, proposed: pending ? proposed : undefined, mode: fixtures ? "fixtures" : "live", now, aiErrors });
   console.log(report);
   const summary = arg("summary"); if (summary) appendFileSync(summary, report + "\n");
-  if (!dry && !fixtures) {
+  // Fixture runs never touch the real data directory; they may write only to an explicit --data-dir (tests)
+  if (!dry && (!fixtures || dataDirArg)) {
     mkdirSync(DATA_DIR, { recursive: true });
     // Only write when something changed, so unchanged runs do not open pull requests
     if (changes.length) {
