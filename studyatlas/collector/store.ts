@@ -35,3 +35,15 @@ export function merge(prev: Snapshot, runs: SourceRun[], fetched: Record<string,
   const sorted = Object.fromEntries(Object.entries(records).sort(([a], [b]) => a.localeCompare(b)));
   return { next: { updatedAt: changes.length ? now : prev.updatedAt, records: sorted, runs: runState }, changes };
 }
+
+/** Every difference between an accepted snapshot (main) and a newer one: what a candidate PR proposes in total. */
+export function diffSnapshots(base: Snapshot, next: Snapshot): Change[] {
+  const out: Change[] = [];
+  for (const [id, r] of Object.entries(next.records)) {
+    const old = base.records[id];
+    if (!old) out.push({ type: "added", id, record: r });
+    else if (r.missingSince && !old.missingSince) out.push({ type: "missing", id, record: old });
+    else { const fields = diffRecord(old, r); if (fields.length) out.push({ type: "changed", id, before: old, after: r, fields }); }
+  }
+  return out;
+}

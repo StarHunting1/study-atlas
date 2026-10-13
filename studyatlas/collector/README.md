@@ -57,6 +57,12 @@ npm test                                 # includes tests/collector.test.ts
 - One step per run, sources fetched one by one; a failing source is reported and its previous data is kept.
 - When something changed, the job pushes `data-collect/<run id>` and opens a PR against `main` with the report as the
   body. **Nothing is merged automatically.**
+- **One open candidate PR at a time.** While a `data-collect/*` PR is open, each run is compared against that PR's
+  snapshot (`--pending`): fetching the same data again changes nothing (no duplicate PR); real new changes are added as a
+  new commit to the same PR and its description is refreshed; a source that fails keeps the records already proposed.
+  After the PR is merged (or closed), the next run compares against `main` again.
+- `--ai` without the `ANTHROPIC_API_KEY` secret no longer fails the run: data is collected and the report notes that
+  the AI step was skipped.
 - On pull requests that touch the collector, the same job runs as a **dry run** against the live APIs (report in the
   job summary, nothing committed) — this is how API connectivity is checked from GitHub's runners.
 
