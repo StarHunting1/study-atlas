@@ -1,0 +1,125 @@
+{
+  "generatedAt": "2026-10-13T18:21:23.850Z",
+  "changes": [
+    {
+      "type": "added",
+      "id": "govuk-content:/student-visa",
+      "record": {
+        "id": "govuk-content:/student-visa",
+        "sourceId": "govuk-content",
+        "country": "GBR",
+        "field": "visa.official",
+        "label": {
+          "en": "Student visa (GOV.UK)",
+          "ja": "学生ビザ（GOV.UK）"
+        },
+        "value": {
+          "text": "Apply for a Student visa to study in the UK if you're 16 or over - eligibility, extend or switch your visa, how much it costs and how long it takes"
+        },
+        "sourceUrl": "https://www.gov.uk/student-visa",
+        "apiUrl": "https://www.gov.uk/api/content/student-visa",
+        "retrievedAt": "2026-10-13T18:21:23.850Z",
+        "sourcePublishedAt": "2014-01-29T16:10:58+00:00",
+        "sourceUpdatedAt": "2024-10-31T17:00:02+00:00",
+        "evidence": {
+          "path": "description",
+          "quote": "Apply for a Student visa to study in the UK if you're 16 or over - eligibility, extend or switch your visa, how much it costs and how long it takes"
+        },
+        "contentHash": "32f37eaaa6f8f539",
+        "licence": "Open Government Licence v3.0 (GOV.UK default; confirm per page)",
+        "status": "unverified",
+        "review": "human-required"
+      }
+    },
+    {
+      "type": "added",
+      "id": "govuk-content:/healthcare-immigration-application",
+      "record": {
+        "id": "govuk-content:/healthcare-immigration-application",
+        "sourceId": "govuk-content",
+        "country": "GBR",
+        "field": "living.healthcare",
+        "label": {
+          "en": "Immigration Health Surcharge (GOV.UK)",
+          "ja": "移民医療付加金（GOV.UK）"
+        },
+        "value": {
+          "text": "Find out if you need to pay the immigration health surcharge as part of your visa or immigration application."
+        },
+        "sourceUrl": "https://www.gov.uk/healthcare-immigration-application",
+        "apiUrl": "https://www.gov.uk/api/content/healthcare-immigration-application",
+        "retrievedAt": "2026-10-13T18:21:23.850Z",
+        "sourcePublishedAt": "2015-04-06T01:01:03+01:00",
+        "sourceUpdatedAt": "2024-11-28T10:11:14+00:00",
+        "evidence": {
+          "path": "description",
+          "quote": "Find out if you need to pay the immigration health surcharge as part of your visa or immigration application."
+        },
+        "contentHash": "94052f4c054a4ae3",
+        "licence": "Open Government Licence v3.0 (GOV.UK default; confirm per page)",
+        "status": "unverified",
+        "review": "human-required"
+      }
+    },
+    {
+      "type": "added",
+      "id": "canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
+      "record": {
+        "id": "canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
+        "sourceId": "canada-open-gov",
+        "country": "CAN",
+        "field": "dataset.housing",
+        "label": {
+          "en": "Housing data (CMHC portal, covers Vancouver): Housing Market Information Portal",
+          "ja": "住宅データ（CMHCポータル、バンクーバーを含む）：Housing Market Information Portal"
+        },
+        "value": {
+          "text": "Housing Market Information Portal — Canada Mortgage and Housing Corporation | Société canadienne d'hypothèques et de logement — formats: HTML"
+        },
+        "sourceUrl": "https://open.canada.ca/data/en/dataset/c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
+        "apiUrl": "https://open.canada.ca/data/api/action/package_show?id=c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
+        "retrievedAt": "2026-10-13T18:21:23.850Z",
+        "sourcePublishedAt": "2020-07-16T19:30:58.388005",
+        "sourceUpdatedAt": "2020-07-16T19:30:58.388011",
+        "evidence": {
+          "path": "result.title",
+          "quote": "Housing Market Information Portal"
+        },
+        "contentHash": "d39bd1794b86d299",
+        "licence": "Open Government Licence - Canada",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+      "record": {
+        "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+        "sourceId": "canada-open-gov",
+        "country": "CAN",
+        "field": "dataset.climate",
+        "label": {
+          "en": "Climate data products (ECCC): Climate Data Products",
+          "ja": "気候データ製品（カナダ環境・気候変動省）：Climate Data Products"
+        },
+        "value": {
+          "text": "Climate Data Products — Environment and Climate Change Canada | Environnement et Changement climatique Canada — formats: OTHER, HTML"
+        },
+        "sourceUrl": "https://open.canada.ca/data/en/dataset/51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+        "apiUrl": "https://open.canada.ca/data/api/action/package_show?id=51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+        "retrievedAt": "2026-10-13T18:21:23.850Z",
+        "sourcePublishedAt": "2016-09-24T13:05:20.030774",
+        "sourceUpdatedAt": "2022-02-21T14:56:19.361658",
+        "evidence": {
+          "path": "result.title",
+          "quote": "Climate Data Products"
+        },
+        "contentHash": "aaa80dfcafcdb4d3",
+        "licence": "Open Government Licence - Canada",
+        "status": "unverified",
+        "review": "standard"
+      }
+    }
+  ]
+}
