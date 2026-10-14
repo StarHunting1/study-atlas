@@ -32,7 +32,7 @@ export const RAW_FILES: string[] = [];
 export const robotsFor = makeRobots((u) => fetchText(u, { accept: "text/plain" }), USER_AGENT);
 
 const MONEY = /(£|\$|CAD|GBP)\s?\d|\d+(\.\d+)?\s?(p\b|pence)/i;
-const LINK_WORDS = /eligib|contract|guarantee|stationdata|\\.txt|csv|\.pdf|climate-averages\/|stnID|fare|price|pric|cost|rate|fee|ticket|pass|student|concession|u-pass|residence|accommodation|room|rent|average|normal|climate|station|terms|copyright|legal|disclaimer|licen|open data|developer/i;
+const LINK_WORDS = /eligib|contract|guarantee|stationdata|\.txt|csv|\.pdf|climate-averages\/|stnID|fare|price|pric|cost|rate|fee|ticket|pass|student|concession|u-pass|residence|accommodation|room|rent|average|normal|climate|station|terms|copyright|legal|disclaimer|licen|open data|developer/i;
 
 export function moneyLines(text: string, max = 80) { return [...new Set(text.split("\n").map((l) => l.trim()).filter((l) => l.length < 400 && MONEY.test(l)))].slice(0, max); }
 export function links(html: string, base: string, max = 60) {
