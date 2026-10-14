@@ -95,7 +95,6 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           npx tsx collector/terms-probe.ts | tee -a "$GITHUB_STEP_SUMMARY"
-          npx tsx collector/terms-probe.ts --detail | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the collected files as an artifact
         if: always()

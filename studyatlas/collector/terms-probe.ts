@@ -31,6 +31,11 @@ export const TERMS_PAGES: { who: string; url: string }[] = [
   { who: "ECCC (GeoMet API)", url: "https://api.weather.gc.ca/" },
   { who: "Met Office", url: "https://www.metoffice.gov.uk/policies/legal" },
   { who: "Met Office (station data on data.gov.uk)", url: "https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5" },
+  { who: "GOV.UK", url: "https://www.gov.uk/help/terms-conditions" },
+  { who: "GOV.UK Content API", url: "https://content-api.publishing.service.gov.uk/" },
+  { who: "Open Government Canada", url: "https://open.canada.ca/en/open-government-licence-canada" },
+  { who: "Open Government Canada", url: "https://open.canada.ca/en/terms-and-conditions" },
+  { who: "Open Government Canada (API)", url: "https://open.canada.ca/en/access-our-application-programming-interface-api" },
   { who: "UK Open Government Licence v3.0", url: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" },
 ];
 /** Origins whose robots.txt is printed verbatim (public crawl policy). */
