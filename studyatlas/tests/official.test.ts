@@ -151,7 +151,10 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     const down = async (url: string) => { if (/robots\.txt$/.test(url)) return { status: 200, url, body: "User-agent: *\nAllow: /\n" }; throw new Error("fetch failed"); };
     const run = await collect({ ai: false, fixtures: true, now: "2026-11-01T00:00:00.000Z", prev: first.next, force: true, fetchers: { fetchText: down } });
     assert.equal(run.changes.length, 0); assert.equal(Object.keys(run.next.records).filter((i) => i.startsWith("page:")).length, 24);
-    assert.ok(run.runs.filter((r) => r.sourceId.startsWith("page:")).every((r) => !r.ok));
+    const pageRuns = run.runs.filter((r) => r.sourceId.startsWith("page:"));
+    // sources blocked by the rights review are skipped (never requested); the others were requested and failed
+    assert.ok(pageRuns.filter((r) => automationFor(r.sourceId).automation !== "blocked").every((r) => !r.ok));
+    assert.ok(pageRuns.filter((r) => automationFor(r.sourceId).automation === "blocked").every((r) => /blocked by the rights review/.test(JSON.stringify(r))));
   });
 
   await t("a page disallowed by robots.txt is not fetched", async () => {
@@ -185,14 +188,11 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.deepEqual(real.rows[0], { year: 1949, month: 1, tmax: 7.9, tmin: 2, af: 6, rain: undefined, sun: 41.5 }); assert.deepEqual([real.rows[1].tmax, real.rows[1].tmin, real.rows[1].rain], [11.2, undefined, 30.1]);
   });
 
-  await t("Met Office source (fixture): 1971-2000 records are produced and re-collecting changes nothing; an ended series produces none", async () => {
+  await t("Met Office source: blocked by the rights review (automated access restricted) - skipped, nothing requested or recorded", async () => {
+    assert.equal(automationFor("metoffice-station-data").automation, "blocked");
     const run1 = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true, only: ["metoffice-station-data"] });
-    const ids = Object.keys(run1.next.records); assert.deepEqual(ids.sort(), ["tmax", "tmin", "rain"].map((k) => `metoffice-station-data:ringway:1971-2000:${k}`).sort());
-    const rec = run1.next.records["metoffice-station-data:ringway:1971-2000:tmax"]; assert.equal(rec.value.series!.length, 12); assert.equal(rec.period, "1971–2000"); assert.match(rec.apiUrl, /^https:\/\/www\.metoffice\.gov\.uk\/pub\//);
-    const run2 = await collect({ ai: false, fixtures: true, now: "2026-10-15T00:00:00.000Z", prev: run1.next, force: true, only: ["metoffice-station-data"] }); assert.equal(run2.changes.length, 0);
-    const ended = async (url: string) => { const r = await fixtureText(url); return /ringwaydata/.test(url) ? { ...r, body: r.body.split("\n").filter((l) => !/^\s+(20(0[5-9]|1\d|20))\s/.test(l)).join("\n").replace(/^\s+(1971|1972)\s.*$/gm, "") } : r; };
-    const run3 = await collect({ ai: false, fixtures: true, now: "2026-11-01T00:00:00.000Z", prev: run1.next, force: true, only: ["metoffice-station-data"], fetchers: { fetchText: ended } });
-    assert.ok(run3.runs.every((r) => !r.ok)); assert.equal(Object.keys(run3.next.records).length, 3); assert.equal(run3.changes.length, 0); // old records kept, nothing invented
+    assert.equal(Object.keys(run1.next.records).length, 0); assert.equal(run1.changes.length, 0);
+    assert.ok(run1.runs.length > 0 && run1.runs.every((r) => /blocked by the rights review/.test(JSON.stringify(r))));
   });
 
   await t("consistency: published Ringway climate matches the collected values; a differing value is reported", () => {
