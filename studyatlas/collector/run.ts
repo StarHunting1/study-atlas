@@ -19,7 +19,8 @@ import { renderReport } from "./report";
 import { sources } from "./sources";
 import { diffSnapshots, emptySnapshot, merge } from "./store";
 import type { CollectedRecord, FetchContext, Snapshot, SourceRun } from "./types";
-import { fetchJson, fetchText, postJson, USER_AGENT } from "./util";
+import { fetchJson, fetchText, postJson, sleep, USER_AGENT } from "./util";
+import { automationFor } from "../data/official/rights";
 
 export const DEFAULT_DATA_DIR = path.resolve(process.cwd(), "data/collected");
 const arg = (name: string) => { const i = process.argv.indexOf(`--${name}`); return i >= 0 ? process.argv[i + 1] : undefined; };
@@ -37,10 +38,20 @@ export async function collect(o: { only?: string[]; ai: boolean; fixtures: boole
   const live = { fetchJson: (u: string) => fetchJson(u), postJson, fetchText: (u: string) => fetchText(u) };
   const fix = { fetchJson: fixtureFetchAll, postJson: fixturePost, fetchText: fixtureText };
   const base = { ...(o.fixtures ? fix : live), ...(o.fetcher ? { fetchJson: o.fetcher } : {}), ...o.fetchers };
-  const ctx: FetchContext = { ...base, robots: makeRobots(base.fetchText, USER_AGENT), now: o.now };
+  const robots = makeRobots(base.fetchText, USER_AGENT);
+  // Every request goes through one gate: robots.txt must allow the URL, and a Crawl-delay is honoured per host (Ver.1.2).
+  // (The page sources check robots themselves as before; checking twice is harmless – the verdict is cached per origin.)
+  const lastAt = new Map<string, number>(); const polite = async (url: string) => {
+    const rb = await robots(url); if (!rb.allowed) throw new Error(`${url}: ${rb.reason} – not requested`);
+    const host = new URL(url).host; const gap = (rb.crawlDelay ?? 0) * 1000; const wait = (lastAt.get(host) ?? 0) + gap - Date.now(); if (gap > 0 && wait > 0) await sleep(wait); lastAt.set(host, Date.now());
+  };
+  const gated = o.fixtures ? base : { ...base, fetchJson: async (u: string) => { await polite(u); return base.fetchJson(u); }, postJson: async (u: string, b: unknown) => { await polite(u); return base.postJson(u, b); } };
+  const ctx: FetchContext = { ...gated, robots, now: o.now };
   for (const s of sources) {
     if (o.only && !o.only.includes(s.id)) continue;
     if (!s.fetch) { runs.push({ sourceId: s.id, ok: false, attemptedAt: o.now, records: 0, skipped: `not implemented (${s.access})` }); continue; }
+    const auto = automationFor(s.id); // rights review (data/official/rights.data.ts): a blocked source is not requested at all
+    if (auto.automation === "blocked") { runs.push({ sourceId: s.id, ok: true, attemptedAt: o.now, records: 0, skipped: `blocked by the rights review: ${auto.why}` }); continue; }
     const wait = o.force ? 0 : dueIn(s, o.prev.runs[s.id]?.lastSuccessAt, o.now);
     if (wait > 0) { runs.push({ sourceId: s.id, ok: true, attemptedAt: o.now, records: 0, skipped: `not due (checked every ${s.cadenceDays} days; due in ${wait} day(s))` }); continue; }
     try {

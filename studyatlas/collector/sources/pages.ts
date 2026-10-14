@@ -2,7 +2,7 @@ import { allOfficialData, officialSources } from "../../data/official";
 import type { DataPoint } from "../../data/official/types";
 import { numbersIn } from "../../data/official/validate";
 import type { CollectedRecord, Fetched, Source } from "../types";
-import { htmlToText, normalize, sha256 } from "../util";
+import { htmlToText, normalize, sha256, sleep } from "../util";
 /*
  * Official page check (no API available). For every data point whose source is a public web page, fetch that page
  * (once per cadence, only where robots.txt allows) and check that the recorded figure is still shown:
@@ -33,7 +33,8 @@ export function makePageSource(id: string): Source {
       const points = allOfficialData().flatMap((c) => c.points).filter((p) => p.sourceId === id && p.status !== "pending");
       const urls = [...new Set(points.flatMap((p) => p.evidence.map((e) => e.url)))];
       const texts: Record<string, string> = {}; const errors: string[] = [];
-      for (const url of urls) {
+      for (const [i, url] of urls.entries()) {
+        if (i > 0) await sleep(1000); // one request at a time, a second apart
         const rb = await ctx.robots(url);
         if (!rb.allowed) { errors.push(`${url}: ${rb.reason}`); continue; }
         try { const r = await ctx.fetchText(url); if (r.status >= 400) throw new Error(`HTTP ${r.status}`); texts[url] = htmlToText(r.body); }
