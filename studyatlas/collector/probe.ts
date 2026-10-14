@@ -10,24 +10,22 @@ import { makeRobots } from "./robots";
 import { fetchText, htmlToText, postJson, sleep, USER_AGENT } from "./util";
 
 export const PROBE_PAGES: string[] = [
-  "https://vancouver.housing.ubc.ca/applications/fees-payments/",
-  "https://vancouver.housing.ubc.ca/applications/fees-payments/eligibility/",
-  "https://vancouver.housing.ubc.ca/applications/essential-application-facts/",
+  "https://vancouver.housing.ubc.ca/residences/marine-drive-residence/",
+  "https://vancouver.housing.ubc.ca/applications/how-to-apply/",
+  "https://vancouver.housing.ubc.ca/getting-started/prospective/",
 ];
 
 /** Pages printed as text. `from`: print from the LAST occurrence of this marker (skips long navigation menus). */
-export const TEXT_PAGES: { url: string; from?: string }[] = [
-  { url: "https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/", from: "Marine Drive Fees" },
-  { url: "https://vancouver.housing.ubc.ca/applications/fees-payments/place-vanier/", from: "Place Vanier Fees" },
-  { url: "https://vancouver.housing.ubc.ca/applications/fees-payments/ponderosa-commons/", from: "Ponderosa Commons Fees" },
-  { url: "https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5/historic-monthly-meteorological-station-data", from: "Historic monthly" },
-  { url: "https://www.metoffice.gov.uk/research/climate/maps-and-data/historic-station-data", from: "Sample of monthly station data" },
-  { url: "https://www.metoffice.gov.uk/research/climate/maps-and-data/uk-synoptic-and-climate-stations", from: "stations" },
+export const TEXT_PAGES: { url: string; from?: string }[] = [];
+/** Pages whose raw HTML is inspected: table/iframe/script counts and the context of every price-like string. */
+export const HTML_HINTS: string[] = [
+  "https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/",
+  "https://vancouver.housing.ubc.ca/applications/fees-payments/place-vanier/",
 ];
 /** Extra pages probed for links/money lines only. */
 export const LINK_PAGES: string[] = [];
 /** Raw text files: first lines printed as they are (data files). */
-export const RAW_FILES: string[] = [];
+export const RAW_FILES: string[] = ["https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt"];
 
 export const robotsFor = makeRobots((u) => fetchText(u, { accept: "text/plain" }), USER_AGENT);
 
@@ -61,6 +59,22 @@ async function probePage(url: string, fullText = false, from?: string) {
     if (fullText) { const k = from ? text.lastIndexOf(from) : -1; L.push(`- page text${k >= 0 ? ` (from "${from}")` : ""} (capped):`, "```", text.slice(k >= 0 ? k : 0, (k >= 0 ? k : 0) + 14000), "```", "- links:", ...links(r.body, r.url).map((l) => `  - ${l}`)); return L; }
     L.push("- money lines (verbatim page text):", ...moneyLines(text).map((l) => `  - ${l}`));
     L.push("- links:", ...links(r.body, r.url).map((l) => `  - ${l}`));
+  } catch (e) { L.push(`- ❌ ${(e as Error).message}`); }
+  return L;
+}
+
+async function probeHtml(url: string) {
+  const L: string[] = [`## HTML hints: ${url}`]; const rb = await robotsFor(url); L.push(`- robots.txt: ${rb.allowed ? "allowed" : "NOT allowed"}`); if (!rb.allowed) return L;
+  try {
+    const r = await fetchText(url); const h = r.body; L.push(`- HTTP ${r.status}, ${h.length} chars`);
+    const count = (re: RegExp) => (h.match(re) ?? []).length;
+    L.push(`- tables: ${count(/<table/gi)} · iframes: ${count(/<iframe/gi)} · scripts: ${count(/<script/gi)} · accordions/tabs: ${count(/accordion|tab-pane|data-toggle/gi)} · pdf links: ${count(/\.pdf/gi)}`);
+    L.push("- headings:", ...[...h.matchAll(/<h([1-4])[^>]*>([\s\S]*?)<\/h\1>/gi)].map((m) => `  - h${m[1]}: ${htmlToText(m[2]).replace(/\s+/g, " ").slice(0, 100)}`).slice(0, 40));
+    L.push("- script srcs:", ...[...h.matchAll(/<script[^>]+src="([^"]+)"/gi)].map((m) => `  - ${m[1]}`).slice(0, 25));
+    L.push("- price-like contexts:", ...[...h.matchAll(/\$\s?\d[\d,]*(\.\d+)?/g)].slice(0, 40).map((m) => `  - …${htmlToText(h.slice(Math.max(0, m.index! - 120), m.index! + 60)).replace(/\s+/g, " ")}…`));
+    L.push("- json-like data hints:", ...[...h.matchAll(/(wp-json|admin-ajax|data-url|data-src|fetch\()[^"'<>]{0,120}/gi)].slice(0, 15).map((m) => `  - ${m[0]}`));
+    const main = /<main[\s\S]*?<\/main>|<article[\s\S]*?<\/article>/i.exec(h)?.[0];
+    L.push(`- <main>/<article> text: ${main ? htmlToText(main).replace(/\s+/g, " ").slice(0, 2500) : "none found"}`);
   } catch (e) { L.push(`- ❌ ${(e as Error).message}`); }
   return L;
 }
@@ -112,6 +126,7 @@ async function main() {
   for (const u of urls.length ? urls : [...PROBE_PAGES, ...LINK_PAGES]) { out.push(...(await probePage(u)), ""); await sleep(1000); }
   if (!urls.length) for (const u of TEXT_PAGES) { out.push(...(await probePage(u.url, true, u.from)), ""); await sleep(1000); }
   if (!urls.length) out.push(...(await probeCkan()));
+  if (!urls.length) for (const u of HTML_HINTS) { out.push(...(await probeHtml(u)), ""); await sleep(1000); }
   if (!urls.length) out.push(...(await probeApis()));
   if (!urls.length) for (const u of RAW_FILES) {
     const rb = await robotsFor(u); out.push(`## ${u}`, `- robots.txt: ${rb.allowed ? "allowed" : "NOT allowed"} (${rb.reason})`);
