@@ -1,9 +1,11 @@
 // Tests for the smart planner (Ver.1.7): plan generation, budget verdicts, flights, currencies, saving, texts.
 // Local tests only (no network, no flight API). Run: npm test
 import assert from "node:assert/strict";
+import { readFileSync } from "node:fs";
 import { DESTINATIONS, ORIGINS, isIata } from "../data/airports";
 import { schoolCandidates } from "../data/official/planner";
-import { FLIGHT_PROVIDERS, departureDate, fetchQuotes, returnDate, searchLinks, skyscannerIndicative } from "../lib/flights";
+import { FLIGHT_PROVIDERS, PRICE_BASES, SKYSCANNER_FORMATS, SKYSCANNER_HOME, departureDate, fetchQuotes, isValidQuote, returnDate, skyscannerIndicative, skyscannerLink, type FlightQuote } from "../lib/flights";
+import { VERSION, parseVersion, versionLabel } from "../lib/version";
 import { ITEM_IDS, calcPlan, stayWeeks, WEEKS_PER_MONTH, type ItemId } from "../lib/planner";
 import { MAIN_ITEMS, MAX_COMPARE, MAX_SAVED, TIERS, cleanEasy, cleanSaved, defaultEasy, deleteSaved, emptySaved, generate, generateOne, renameSaved, savePlan, toggleCompare, type Easy } from "../lib/smart";
 import { st } from "../locales/smart";
@@ -26,19 +28,47 @@ await t("flights: no provider is connected – nothing is fetched or pretended t
   const q = { origin: "HND", destination: "MAN", month: 9, trip: "round" as const, currency: "JPY" as const };
   const r = await skyscannerIndicative.quote(q); assert.equal(r.status, "not-connected");
   const all = await fetchQuotes(q); assert.equal(all.quotes.length, 0); assert.equal(all.failures.length, FLIGHT_PROVIDERS.length);
-  // a connected provider can be swapped in; reference and bookable prices stay labelled
-  const fake = { id: "x", name: "X", kind: "reference" as const, quote: async () => ({ status: "ok" as const, quotes: [{ kind: "reference" as const, amount: 1, currency: "JPY" as const, trip: "round" as const, provider: "X" }] }) };
-  const swapped = await fetchQuotes(q, [fake, { ...fake, quote: async () => { throw new Error("boom"); } }]); assert.equal(swapped.quotes[0].kind, "reference"); assert.equal(swapped.failures[0].status, "error");
+  // a connected provider can be swapped in; every price keeps its type, and inconsistent quotes are dropped
+  const good: FlightQuote = { basis: "observed", bookable: false, amount: 1, currency: "JPY", trip: "round", provider: "X", observedAt: "2026-10-14T00:00:00Z" };
+  const range: FlightQuote = { basis: "range", bookable: false, low: 80_000, high: 160_000, currency: "JPY", trip: "round", provider: "X" };
+  const bad: FlightQuote = { basis: "user", bookable: true, amount: 5, currency: "JPY", trip: "round", provider: "X" };
+  const fake = { id: "x", name: "X", quote: async () => ({ status: "ok" as const, quotes: [good, range, bad, { ...range, low: 9, high: 1 }] }) };
+  const swapped = await fetchQuotes(q, [fake, { ...fake, quote: async () => { throw new Error("boom"); } }]); assert.deepEqual(swapped.quotes.map((x) => x.basis), ["observed", "range"]); assert.equal(swapped.failures[0].status, "error");
 });
 
-await t("flights: departure month → date (never in the past), undecided month works, round trip vs one way links", () => {
+await t("price types: observed / average / reference range / user budget are distinct and validated", () => {
+  assert.deepEqual([...PRICE_BASES], ["observed", "average", "range", "user"]);
+  const base = { bookable: false, currency: "JPY" as const, trip: "oneway" as const, provider: "p" };
+  assert.ok(isValidQuote({ ...base, basis: "average", amount: 100 })); assert.ok(isValidQuote({ ...base, basis: "user", amount: 0 })); assert.ok(isValidQuote({ ...base, basis: "range", low: 1, high: 1 }));
+  assert.ok(!isValidQuote({ ...base, basis: "range", low: 5, high: 1 })); assert.ok(!isValidQuote({ ...base, basis: "average", amount: -1 })); assert.ok(!isValidQuote({ ...base, basis: "observed", amount: NaN }));
+  assert.ok(!isValidQuote({ ...base, bookable: true, basis: "user", amount: 1 }), "a user's budget is never a bookable fare"); assert.ok(isValidQuote({ ...base, bookable: true, basis: "observed", amount: 1 }));
+});
+
+await t("flights: departure month → date (never in the past); undecided month works", () => {
   const now = new Date("2026-10-14T00:00:00Z");
   assert.equal(departureDate(11, now), "2026-11-01"); assert.equal(departureDate(10, now), "2026-10-01"); assert.equal(departureDate(9, now), "2027-09-01"); assert.equal(departureDate(null, now), null); assert.equal(departureDate(13, now), null);
   assert.equal(returnDate("2026-11-01", 4), "2026-11-29"); assert.equal(returnDate(null, 4), null);
-  const base = { origin: "HND", destination: "MAN", currency: "JPY" as const, now, stayWeeks: 12 };
-  const round = searchLinks({ ...base, month: 11, trip: "round" }); const one = searchLinks({ ...base, month: 11, trip: "oneway" }); const undated = searchLinks({ ...base, month: null, trip: "round" });
-  assert.ok(round[0].url.includes("/hnd/man/261101/270124/")); assert.ok(one[0].url.endsWith("/hnd/man/261101/")); assert.ok(decodeURIComponent(one[1].url).includes("one way")); assert.ok(!decodeURIComponent(round[1].url).includes("one way"));
-  assert.ok(undated[0].url.endsWith("/hnd/man/")); assert.ok(undated.every((l) => /^https:\/\//.test(l.url)));
+});
+
+await t("Skyscanner link: only Skyscanner's own site; route and dates are not carried over an unverified format", () => {
+  const q = { origin: "HND", destination: "MAN", currency: "JPY" as const, now: new Date("2026-10-14T00:00:00Z"), stayWeeks: 12 };
+  assert.ok(SKYSCANNER_FORMATS.every((f) => f.verified === false && f.source), "no URL format is verified today");
+  for (const month of [null, 11]) for (const trip of ["round", "oneway"] as const) {
+    const ja = skyscannerLink({ ...q, month, trip }, "ja"); const en = skyscannerLink({ ...q, month, trip }, "en");
+    assert.equal(ja.url, SKYSCANNER_HOME.ja); assert.equal(en.url, SKYSCANNER_HOME.en); assert.equal(ja.carriesRoute, false); assert.ok(!/hnd|man|2611/i.test(ja.url));
+  }
+  assert.ok(/^https:\/\/www\.skyscanner\.(jp|net)\/$/.test(SKYSCANNER_HOME.ja) && /^https:\/\/www\.skyscanner\.(jp|net)\/$/.test(SKYSCANNER_HOME.en));
+  // once a format is verified it is used; a result that is not a Skyscanner https URL is refused
+  const verified = [{ id: "t", verified: true, source: "test", build: (x: { origin: string; destination: string }) => `https://www.skyscanner.net/x/${x.origin}/${x.destination}/` }];
+  const v = skyscannerLink({ ...q, month: null, trip: "round" }, "en", verified); assert.equal(v.carriesRoute, true); assert.equal(v.url, "https://www.skyscanner.net/x/HND/MAN/");
+  const evil = skyscannerLink({ ...q, month: null, trip: "round" }, "en", [{ ...verified[0], build: () => "https://evil.example/skyscanner.net/" }]); assert.equal(evil.carriesRoute, false); assert.equal(evil.url, SKYSCANNER_HOME.en);
+  const http = skyscannerLink({ ...q, month: null, trip: "round" }, "en", [{ ...verified[0], build: () => "http://www.skyscanner.net/" }]); assert.equal(http.carriesRoute, false);
+});
+
+await t("version scheme: Major.Phase.Update, this release is Ver.1.1.9", () => {
+  assert.equal(VERSION, "1.1.9"); assert.equal(versionLabel, "Ver.1.1.9"); assert.deepEqual(parseVersion("Ver.1.1.9"), [1, 1, 9]); assert.deepEqual(parseVersion("1.1.10"), [1, 1, 10]);
+  assert.equal(parseVersion("Ver.1.8"), undefined, "the old two-part names are not rewritten");
+  const pkg = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")); assert.equal(pkg.version, VERSION);
 });
 
 await t("three plans are generated for every supported city / study type, in the same order", () => {

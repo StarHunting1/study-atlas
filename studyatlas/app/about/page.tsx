@@ -1,4 +1,5 @@
 "use client";
+import { versionLabel } from "@/lib/version";
 import Link from "next/link";
 import { cities } from "@/data/cities";
 import { useI18n } from "@/lib/i18n";
@@ -56,7 +57,7 @@ export default function About() {
 
       {/* Current version + photo credits (kept from Ver.1.1) */}
       <section className="grid gap-6 md:grid-cols-2">
-        <div className={`p-6 ${panel}`}><h2 className="mb-2 text-lg font-semibold">{L(about.currentTitle)}</h2><p className="text-sm leading-relaxed text-slate-600">{t("aboutBody")}</p></div>
+        <div className={`p-6 ${panel}`}><h2 className="mb-2 text-lg font-semibold">{L(about.currentTitle)} <span className="ml-1 text-sm font-normal text-slate-400" data-testid="version">{versionLabel}</span></h2><p className="text-sm leading-relaxed text-slate-600">{t("aboutBody")}</p></div>
         {credited.length > 0 && <div className={`space-y-2 p-6 ${panel}`}><h2 className="text-lg font-semibold">{t("photoCredits")}</h2><p className="text-sm text-slate-500">{t("photoNote")}</p>
           <ul className="space-y-1 text-sm text-slate-600">{credited.map((c) => <li key={c.id}>{L(c.name)}: <a href={c.photo!.sourceUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{c.photo!.author}</a> / <a href={c.photo!.licenseUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{c.photo!.license}</a></li>)}</ul></div>}
       </section>
