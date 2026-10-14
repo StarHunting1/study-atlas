@@ -84,7 +84,52 @@ async function detail() {
   console.log(out.join("\n"));
 }
 
+/** Ver.1.2.1: GOV.UK / ONS / Open Government Canada terms, read in full so the wording can be quoted in the rights records. */
+export const V121_PAGES: { who: string; url: string; width?: number }[] = [
+  { who: "GOV.UK reuse of content", url: "https://www.gov.uk/help/reuse-govuk-content" },
+  { who: "GOV.UK terms and conditions", url: "https://www.gov.uk/help/terms-conditions" },
+  { who: "ONS terms and conditions", url: "https://www.ons.gov.uk/help/terms-conditions" },
+  { who: "ONS Manchester housing page", url: "https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003" },
+  { who: "ONS private rents dataset", url: "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics" },
+  { who: "ONS private rents bulletin", url: "https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/priceindexofprivaterentsuk/latest" },
+  { who: "Open Government Canada terms", url: "https://open.canada.ca/en/terms-and-conditions" },
+  { who: "Open Government Licence - Canada", url: "https://open.canada.ca/en/open-government-licence-canada" },
+  { who: "Open Government Canada API page", url: "https://open.canada.ca/en/access-our-application-programming-interface-api" },
+];
+export const V121_ROBOTS = ["https://www.gov.uk", "https://www.ons.gov.uk", "https://open.canada.ca", "https://api.beta.ons.gov.uk"];
+export const V121_JSON = [
+  "https://open.canada.ca/data/api/action/license_list",
+  "https://open.canada.ca/data/api/action/package_show?id=c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
+  "https://open.canada.ca/data/api/action/package_show?id=51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+  "https://www.gov.uk/api/content/help/reuse-govuk-content",
+];
+
+async function v121() {
+  const out: string[] = ["# Terms probe - Ver.1.2.1 (verbatim, nothing stored)", ""];
+  for (const o of V121_ROBOTS) {
+    try { const r = await fetchText(`${o}/robots.txt`, { accept: "text/plain" }); out.push(`## ${o}/robots.txt -> HTTP ${r.status}`, "```", r.status < 400 ? r.body.split("\n").slice(0, 60).join("\n") : "(none)", "```"); }
+    catch (e) { out.push(`## ${o}/robots.txt -> ERROR ${(e as Error).message}`); }
+    await sleep(1000);
+  }
+  for (const d of V121_PAGES) {
+    out.push(`## ${d.who} - ${d.url}`); const rb = await robotsFor(d.url); out.push(`- robots.txt: ${rb.allowed ? "allowed" : "NOT allowed"} (${rb.reason})`); if (!rb.allowed) continue;
+    try {
+      const r = await fetchText(d.url); out.push(`- HTTP ${r.status} - final URL ${r.url}`); if (r.status >= 400) continue;
+      const text = htmlToText(r.body).replace(/[ \t]+/g, " "); out.push("```", text.slice(0, 9000), "```");
+      out.push("- links:", ...links(r.body, r.url, 120).filter((l) => /licen|terms|dataset|download|api|csv|xls|json/i.test(l)).slice(0, 30).map((l) => `  - ${l}`));
+    } catch (e) { out.push(`- ERROR ${(e as Error).message}`); }
+    await sleep(1000);
+  }
+  for (const u of V121_JSON) {
+    out.push(`## JSON ${u}`);
+    try { const r = await fetchText(u, { accept: "application/json" }); out.push(`- HTTP ${r.status}`, "```", r.body.slice(0, 4000), "```"); } catch (e) { out.push(`- ERROR ${(e as Error).message}`); }
+    await sleep(1000);
+  }
+  console.log(out.join("\n"));
+}
+
 async function main() {
+  if (process.argv.includes("--v121")) return v121();
   if (process.argv.includes("--detail")) return detail();
   const full = process.argv.includes("--full"); const out: string[] = ["# Terms probe (live requests, reviewer aid — nothing stored)", "", `Run at ${new Date().toISOString()}. User agent as in collector/util.ts.`, ""];
   out.push("## robots.txt (verbatim, first 40 lines of each origin)");
