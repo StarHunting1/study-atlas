@@ -16,12 +16,9 @@ export const PROBE_PAGES: string[] = [];
 export const TEXT_PAGES: { url: string; from?: string }[] = [];
 /** Pages whose raw HTML is inspected: table/iframe/script counts and the context of every price-like string. */
 export const HTML_HINTS: string[] = [
-  "https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/",
-  "https://vancouver.housing.ubc.ca/applications/fees-payments/place-vanier/",
-  "https://vancouver.housing.ubc.ca/residences/marine-drive-residence/",
-  "https://vancouver.housing.ubc.ca/applications/how-to-apply/",
-  "https://vancouver.housing.ubc.ca/getting-started/prospective/",
-  "https://vancouver.housing.ubc.ca/getting-started/graduate-students/",
+  // UBC housing pages were probed here until Ver.1.2. UBC's terms of use (ubc.ca/site/legal.html) allow only short extracts for
+  // personal, non-commercial use and require prior written consent for anything else, and StudyAtlas shows no UBC figures,
+  // so these pages are no longer requested automatically. Re-add only with UBC's written consent.
 ];
 /** Extra pages probed for links/money lines only. */
 export const LINK_PAGES: string[] = [];

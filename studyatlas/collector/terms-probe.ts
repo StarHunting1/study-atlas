@@ -20,7 +20,6 @@ export const TERMS_PAGES: { who: string; url: string }[] = [
   { who: "University of Manchester", url: "https://www.manchester.ac.uk/copyright/" },
   { who: "University of Manchester", url: "https://www.manchester.ac.uk/" },
   { who: "UBC", url: "https://www.ubc.ca/site/legal.html" },
-  { who: "UBC Housing", url: "https://vancouver.housing.ubc.ca/" },
   { who: "CMHC", url: "https://www.cmhc-schl.gc.ca/en/professionals/housing-markets-data-and-research/housing-data/cmhc-licence-agreement-use-of-data" },
   { who: "CMHC", url: "https://www.cmhc-schl.gc.ca/about-us/terms-conditions/hmip-terms-conditions" },
   { who: "CMHC / Statistics Canada", url: "https://www.statcan.gc.ca/en/reference/agreement_CMHC" },
@@ -35,7 +34,7 @@ export const TERMS_PAGES: { who: string; url: string }[] = [
   { who: "UK Open Government Licence v3.0", url: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" },
 ];
 /** Origins whose robots.txt is printed verbatim (public crawl policy). */
-export const ROBOTS_ORIGINS = ["https://tfgm.com", "https://www.translink.ca", "https://www.manchester.ac.uk", "https://www.ubc.ca", "https://vancouver.housing.ubc.ca", "https://www.cmhc-schl.gc.ca", "https://www150.statcan.gc.ca", "https://api.weather.gc.ca", "https://climate.weather.gc.ca", "https://www.metoffice.gov.uk", "https://www.data.gov.uk"];
+export const ROBOTS_ORIGINS = ["https://tfgm.com", "https://www.translink.ca", "https://www.manchester.ac.uk", "https://www.ubc.ca", "https://vancouver.housing.ubc.ca", "https://www.cmhc-schl.gc.ca", "https://www150.statcan.gc.ca", "https://api.weather.gc.ca", "https://climate.weather.gc.ca", "https://www.metoffice.gov.uk", "https://www.data.gov.uk", "https://www.gov.uk", "https://open.canada.ca"];
 
 const KEY = /copyright|reproduc|republish|redistribut|licen[cs]e|permission|written consent|personal use|non-commercial|commercial|robot|spider|crawl|scrap|automat|data mining|text and data|extract|database right|open government|attribution|\bapi\b|rate limit|requests per|trade ?mark|exclusive property|may not|must not|prohibit/i;
 const TERMS_LINK = /terms|copyright|legal|licen|disclaimer|conditions|open data|developer|privacy/i;
