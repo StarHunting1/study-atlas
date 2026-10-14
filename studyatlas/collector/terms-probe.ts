@@ -46,7 +46,42 @@ export function keyLines(text: string, max = 45): string[] {
   return out;
 }
 
+/** Pages read in full (or around the clauses that matter) so the exact wording can be quoted in the review. */
+export const DETAIL_PAGES: { who: string; url: string; full?: boolean; around?: RegExp; width?: number }[] = [
+  { who: "TfGM / Bee Network", url: "https://tfgm.com/disclaimer", full: true },
+  { who: "TransLink website terms", url: "https://www.translink.ca/terms-and-conditions", around: /Copyright:|robot|spider|scrap|automat|personal use|non-commercial/i, width: 1500 },
+  { who: "University of Manchester", url: "https://www.manchester.ac.uk/copyright/", full: true },
+  { who: "University of Manchester", url: "https://www.manchester.ac.uk/disclaimer/", full: true },
+  { who: "UBC", url: "https://www.ubc.ca/site/legal.html", around: /limited license|robot, spider/i, width: 1400 },
+  { who: "ECCC MSC Open Data usage policy", url: "https://eccc-msc.github.io/open-data/usage-policy/readme_en", full: true },
+  { who: "Statistics Canada table 34-10-0133-01", url: "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301", full: true },
+  { who: "Met Office website terms of use", url: "https://www.metoffice.gov.uk/policies/tandc", around: /Open Government Licence|licen[cs]e|copyright|automat|robot|scrap/i, width: 900 },
+];
+const JSON_PAGES = ["https://api.weather.gc.ca/collections/climate-normals?f=json", "https://www.data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5"];
+
+async function detail() {
+  const out: string[] = ["# Terms probe — detail (verbatim excerpts, nothing stored)", ""];
+  for (const d of DETAIL_PAGES) {
+    out.push(`## ${d.who} — ${d.url}`); const rb = await robotsFor(d.url); out.push(`- robots.txt: ${rb.allowed ? "allowed" : "NOT allowed"}`); if (!rb.allowed) continue;
+    try {
+      const r = await fetchText(d.url); out.push(`- HTTP ${r.status}`); if (r.status >= 400) continue; const text = htmlToText(r.body).replace(/[ \t]+/g, " ");
+      if (d.full) out.push("```", text.slice(0, 7000), "```");
+      else if (d.around) { const seen: number[] = []; for (const m of text.matchAll(new RegExp(d.around.source, d.around.flags.includes("g") ? d.around.flags : d.around.flags + "g"))) { if (seen.some((x) => Math.abs(x - m.index!) < (d.width ?? 800))) continue; seen.push(m.index!); out.push(`### …@${m.index}`, "```", text.slice(Math.max(0, m.index! - 100), m.index! + (d.width ?? 800)), "```"); if (seen.length >= 6) break; } }
+    } catch (e) { out.push(`- ❌ ${(e as Error).message}`); }
+    await sleep(1000);
+  }
+  for (const u of JSON_PAGES) {
+    out.push(`## JSON ${u}`); try { const r = await fetchText(u, { accept: "application/json" }); out.push(`- HTTP ${r.status}`); const j = JSON.parse(r.body) as Record<string, unknown>;
+      if (/package_show/.test(u)) { const p = (j.result ?? {}) as { license_title?: string; license_url?: string; title?: string; organization?: { title?: string } }; out.push(`- title: ${p.title} · publisher: ${p.organization?.title} · licence: ${p.license_title} ${p.license_url ?? ""}`); }
+      else { const l = (j.links ?? []) as { rel?: string; href?: string; title?: string }[]; out.push(`- title: ${j.title} — ${String(j.description ?? "").slice(0, 300)}`, ...l.filter((x) => /licen|terms/i.test(`${x.rel} ${x.title} ${x.href}`)).map((x) => `- ${x.rel}: ${x.title} ${x.href}`)); }
+    } catch (e) { out.push(`- ❌ ${(e as Error).message}`); }
+    await sleep(1000);
+  }
+  console.log(out.join("\n"));
+}
+
 async function main() {
+  if (process.argv.includes("--detail")) return detail();
   const full = process.argv.includes("--full"); const out: string[] = ["# Terms probe (live requests, reviewer aid — nothing stored)", "", `Run at ${new Date().toISOString()}. User agent as in collector/util.ts.`, ""];
   out.push("## robots.txt (verbatim, first 40 lines of each origin)");
   for (const o of ROBOTS_ORIGINS) {
