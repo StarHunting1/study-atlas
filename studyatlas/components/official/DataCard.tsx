@@ -1,7 +1,7 @@
 "use client";
 import type { DataPoint } from "@/data/official/types";
 import { useI18n } from "@/lib/i18n";
-import { validForText } from "@/data/official/validFor";
+import { cardPeriod, validForText } from "@/data/official/validFor";
 import { displayModeOf, rightsOfPoint, showsFigure } from "@/data/official/rights";
 import { tpl } from "@/components/planner/format";
 import { ot } from "@/locales/official";
@@ -65,7 +65,7 @@ export default function DataCard({ p }: { p: DataPoint }) {
         {p.status !== "verified" && <StatusBadge status={p.status} />}
       </div>
       {shown ? (p.value ? <AmountText p={p} big /> : p.text ? <p className="text-sm text-slate-700">{L(p.text)}</p> : null) : <p className="text-sm text-slate-400">{L(ot.pendingNote)}</p>}
-      <p className="text-xs leading-relaxed text-slate-600">{L(ot.audience[p.audience])}</p>
+      <p className="text-xs leading-relaxed text-slate-600">{L(ot.audience[p.audience])}{cardPeriod(p, lang) && <span data-testid={`period-${p.id}`}> · {cardPeriod(p, lang)}</span>}</p>
       {p.status === "unverified" && <p className="text-xs text-amber-700">{L(ot.unverifiedNote)}</p>}
       <Disclosure level="sources" className="mt-auto">
         <dl className="grid gap-1 text-xs leading-relaxed text-slate-600">

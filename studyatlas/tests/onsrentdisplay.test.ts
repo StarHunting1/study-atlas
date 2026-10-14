@@ -68,8 +68,9 @@ t("an approval needs a name, a date and what was compared; a candidate that fail
   assert.equal(onsRentPoints(sample).length, 1);
 });
 
-t("the Planner, the compare table and the key figures do not read this metric (other cities and the Planner are untouched)", () => {
-  for (const f of ["data/official/planner.ts", "data/official/compare.ts", "lib/overview.ts"]) { const s = readFileSync(path.join(root, f), "utf8"); assert.ok(!s.includes("privateRent.average") && !s.includes(ONS_RENT_ID), f); }
+t("the Planner and the key figures do not read this metric; the compare table reads it in exactly one row (whole-market rent, flagged as not directly comparable)", () => {
+  const cmp = readFileSync(path.join(root, "data/official/compare.ts"), "utf8"); assert.equal(cmp.split("privateRent.average").length - 1, 1);
+  for (const f of ["data/official/planner.ts", "lib/overview.ts"]) { const s = readFileSync(path.join(root, f), "utf8"); assert.ok(!s.includes("privateRent.average") && !s.includes(ONS_RENT_ID), f); }
   assert.equal(pointsOf("vancouver").some((p) => p.sourceId === "ons-private-rents"), false);
 });
 
