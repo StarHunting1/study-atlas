@@ -117,3 +117,12 @@ data/official/validFor.ts   Japanese wording of validFor strings (falls back to 
 - `notices`: a topic that was reviewed but is NOT shown (UBC residence fees: UBC's Terms of Use forbid republishing without written consent),
   with the official pages to check. A source with `terms.status: "needs-review"` never gets data points and is never fetched.
 - Cards of sources without a reuse licence show a "terms to be confirmed" line (`terms.status: "page-check-only"`).
+
+## ONS private rent for Manchester – prepared, shown only after approval (Ver.1.2.3)
+`data/official/onsRent.ts` holds the one figure waiting for a person's approval (ONS Price Index of Private Rents, Manchester `E08000003`,
+August 2026, £1,373 per month – the mean rent of ALL privately rented dwellings; **not** student housing, university halls or an
+international-student average). While `ONS_RENT_APPROVAL` is `null` the figure is not part of the website's data and nothing is verified.
+To publish it: compare it with the ONS Manchester page and the PIPR workbook, then set `ONS_RENT_APPROVAL = { approvedBy, approvedAt, basis }`
+in a reviewed pull request. The card then appears (verified) in the existing "City rental market" group of the housing card, with its sources and
+conditions behind 「出典・適用条件を見る」. The approval covers exactly that month and value; a newer month in `data/collected/snapshot.json` needs its own review
+(`npx tsx tests/onsrentdisplay.test.ts` prints the reconciliation of the candidate with the collected record).
