@@ -7,6 +7,7 @@
  * Pages disallowed by robots.txt are not fetched.
  */
 import { makeRobots } from "./robots";
+import { MET_PERIODS, MET_ELEMENTS, monthlyMeans, parseStationData } from "./sources/metoffice";
 import { fetchText, htmlToText, postJson, sleep, USER_AGENT } from "./util";
 
 export const PROBE_PAGES: string[] = [
@@ -130,7 +131,9 @@ async function main() {
   if (!urls.length) out.push(...(await probeApis()));
   if (!urls.length) for (const u of RAW_FILES) {
     const rb = await robotsFor(u); out.push(`## ${u}`, `- robots.txt: ${rb.allowed ? "allowed" : "NOT allowed"} (${rb.reason})`);
-    if (rb.allowed) try { const r = await fetchText(u, { accept: "text/plain" }); out.push(`- HTTP ${r.status}`, "```", r.body.split("\n").slice(0, 80).join("\n"), "```"); } catch (e) { out.push(`- ❌ ${(e as Error).message}`); }
+    if (rb.allowed) try { const r = await fetchText(u, { accept: "text/plain" }); out.push(`- HTTP ${r.status}`, "```", r.body.split("\n").slice(0, 80).join("\n"), "```");
+      const f = parseStationData(r.body); out.push(`- parsed: name="${f.name}" rows=${f.rows.length} first=${JSON.stringify(f.rows[0])} last=${JSON.stringify(f.rows[f.rows.length - 1])}`, `- header: ${JSON.stringify(f.header.slice(0, 6))}`, `- tail:`, "```", r.body.trimEnd().split("\n").slice(-6).join("\n"), "```");
+      for (const [a, b] of MET_PERIODS) for (const el of MET_ELEMENTS) { const mm = monthlyMeans(f.rows, el.key, a, b); out.push(`- MEANS ${mm.period} ${el.key}: [${mm.values.join(", ")}] complete=${mm.complete} ${mm.missing.join(";")}`); } } catch (e) { out.push(`- ❌ ${(e as Error).message}`); }
     out.push(""); await sleep(1000);
   }
   console.log(out.join("\n"));
