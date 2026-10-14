@@ -24,18 +24,17 @@ const json = (r?: Res): any => { try { return r && r.status < 400 ? JSON.parse(r
 const clip = (s: string, n = 2500) => (s.length > n ? s.slice(0, n) + " ...[cut]" : s);
 
 async function pages() {
-  // The developer hub guide on rate limiting and bot development: find it from the hub's own navigation, then read it in full.
-  const hub = await get("https://developer.ons.gov.uk/", "text/html"); const seen = new Set<string>();
-  if (hub && hub.status < 400) {
-    const found = [...hub.body.matchAll(/<a\b[^>]*href="([^"#]+)"[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => { let h = ""; try { h = new URL(m[1].replace(/&amp;/g, "&"), hub.url).toString(); } catch { /* skip */ } return `${m[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 90)} -> ${h}`; }).filter((l, n, a) => /rate|bot|limit|terms|licen|fair/i.test(l) && a.indexOf(l) === n); log("- hub links mentioning rate / bot / limit / terms / licence:", ...found.map((l) => `  - ${l}`));
-    const urls = found.map((l) => /https?:\/\/\S+/.exec(l)?.[0] ?? "").filter((u) => u && /rate|bot/i.test(u)).slice(0, 3);
-    for (const u of urls) { if (seen.has(u)) continue; seen.add(u); const r = await get(u, "text/html"); if (!r || r.status >= 400) continue;
+  // Fair use policy: find it from the bot guide's own links, then read it in full.
+  const bots = await get("https://developer.ons.gov.uk/bots/", "text/html");
+  if (bots && bots.status < 400) {
+    const anchors = [...bots.body.matchAll(/<a\b[^>]*href="([^"#]+)"[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => { let h = ""; try { h = new URL(m[1].replace(/&amp;/g, "&"), bots.url).toString(); } catch { /* skip */ } return { t: m[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(), h }; });
+    log("- links on the bot guide:", ...anchors.filter((a) => /fair|use|terms|polic|licen|contact/i.test(`${a.t} ${a.h}`)).map((a) => `  - ${a.t.slice(0, 80)} -> ${a.h}`));
+    const fair = anchors.find((a) => /fair use/i.test(a.t) || /fair-?use/i.test(a.h));
+    if (fair) { const r = await get(fair.h, "text/html"); if (r && r.status < 400) {
       const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
-      const k = text.search(/rate limit|bot/i); log(`## ${u}`, "```", text.slice(Math.max(0, k - 200), Math.max(0, k - 200) + 9000), "```"); }
+      const k = text.search(/fair use/i); log(`## ${fair.h}`, "```", text.slice(Math.max(0, k - 100), Math.max(0, k - 100) + 9000), "```"); } }
+    else log("- no 'fair use' link found on the bot guide");
   }
-  for (const u of ["https://developer.ons.gov.uk/rate-limiting-and-bot-development/", "https://developer.ons.gov.uk/guide-to-rate-limiting-and-bot-development/", "https://developer.ons.gov.uk/rate_limiting/", "https://developer.ons.gov.uk/bot-development/"]) {
-    if (seen.has(u)) continue; const r = await get(u, "text/html"); if (r && r.status < 400) {
-      const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " "); log(`## ${u}`, "```", text.slice(0, 9000), "```"); break; } }
   console.log(out.join("\n"));
 }
 

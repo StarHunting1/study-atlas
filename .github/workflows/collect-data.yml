@@ -95,8 +95,6 @@ jobs:
         if: github.event_name == 'pull_request'
         run: |
           npx tsx collector/ons-probe.ts --pages | tee -a "$GITHUB_STEP_SUMMARY"
-          pip install -q openpyxl
-          python3 collector/ons-xlsx-probe.py 2>&1 | tee -a "$GITHUB_STEP_SUMMARY" || true
 
       - name: Keep the collected files as an artifact
         if: always()
