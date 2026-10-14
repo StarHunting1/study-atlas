@@ -6,6 +6,7 @@ const ja: Record<string, string> = {
   "2026/27 academic year (undergraduate year of 41 weeks)": "2026/27学年（学部の1学年・41週）",
   "2026/27 (as published on the cost-of-living page)": "2026/27（生活費ページの記載）",
   "As published on 13 Oct 2026 (academic year not stated next to the price)": "2026年10月13日時点の掲載（価格の横に学年の記載なし）",
+  "2026-08 (August 2026; ONS Price Index of Private Rents, published 16 September 2026)": "2026年8月（ONS民間家賃指数、2026年9月16日公表）",
   "1 Sep 2026 – 31 Aug 2027": "2026年9月1日〜2027年8月31日",
   "2025 (latest reference year; released by Statistics Canada 2025-12-17)": "2025年（最新の調査年。Statistics Canadaが2025-12-17に公表）",
 };

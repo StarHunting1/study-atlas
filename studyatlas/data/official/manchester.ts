@@ -1,3 +1,4 @@
+import { onsRentPoints } from "./onsRent";
 import type { ClimateNormals, DataPoint, Evidence, OfficialCityData } from "./types";
 /*
  * Manchester – official figures. Every quote below is verbatim page text read by the collector's live probe on
@@ -113,6 +114,9 @@ const points: DataPoint[] = [
     validFor: ugYear, evidence: [colEv(quote)], ...ok,
     note: { en: `Groceries based on a budget supermarket shop in April 2026; other costs from savethestudent.org's National Student Money Survey, increased with inflation as of February 2026 (as stated on the page).${noteEn ? " " + noteEn : ""}`, ja: `食料品は2026年4月の格安スーパーでの買い物、その他は savethestudent.org の National Student Money Survey を2026年2月時点のインフレ率で調整した値です（ページの記載）。${noteJa}` },
   })),
+
+  // ---- Housing: ONS private rent, whole Manchester market – prepared in onsRent.ts, added ONLY after a person's approval (ONS_RENT_APPROVAL) ----
+  ...onsRentPoints(),
 ];
 
 /* Ringway (Manchester Airport): Met Office monthly station data, calendar-month means derived by StudyAtlas (collector/sources/metoffice.ts). */

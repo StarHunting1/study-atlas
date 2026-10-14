@@ -10,13 +10,13 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | TransLink (`translink-fares`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | 12 link-only |
 | The University of Manchester (`uom-cost-of-living`) | **needs-review** | figure-with-link | page-check-only | page-check | 2026-10-14 | yes | 10 figure-with-link |
 | The University of Manchester (accommodation) (`uom-accommodation`) | **needs-review** | figure-with-link | page-check-only | page-check | 2026-10-14 | yes | 5 figure-with-link |
+| Office for National Statistics – Price Index of Private Rents (Manchester) (`ons-private-rents`) | **permitted** | full | allowed | open-data-file | 2026-10-14 | no | — |
 | Statistics Canada / CMHC – average rents (table 34-10-0133-01) (`statcan-cmhc-rents`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 4 full |
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 1 full |
 | Met Office – historical monthly station data (Ringway) (`metoffice-station-data`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | 1 full |
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |
 | GOV.UK (Content API) (`govuk-content`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
 | Open Government Canada (CKAN API) (`canada-open-gov`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
-| Office for National Statistics – Price Index of Private Rents (Manchester) (`ons-private-rents`) | **permitted** | full | allowed | open-data-file | 2026-10-14 | no | — |
 
 ## Details
 
@@ -66,6 +66,22 @@ What each publisher's published terms permit, how the data may be accessed, and 
 - review notes: Same terms as the University's cost-of-living pages (copyright notice; no licence; no statement about plain prices). Only the rent figures, their contract and conditions and a link are shown.
 - pages read:
   - https://www.manchester.ac.uk/copyright/ (2026-10-14) — Copyright notice (full text)
+
+### Office for National Statistics – Price Index of Private Rents (Manchester) — `ons-private-rents`
+
+- reuseStatus: **permitted** · collector: **allowed** · access: open-data-file · last reviewed: 2026-10-14
+- source: https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics
+- terms / licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ (Open Government Licence v3.0 (ONS website terms))
+- restrictions: attribution-required
+- attribution required: “Source: Office for National Statistics licensed under the Open Government Licence v3.0.”
+- review notes: ONS terms: “Most content on this website is subject to Crown copyright protection and is published under the Open Government Licence (OGL). Some content is exempt from the OGL” – the exemptions named are photographs, illustrations and videos under third-party licences; “Reproduction of information is subject to the terms of the OGL and the UK Government Licensing Framework.” The dataset page and the ONS fair use policy footer state “All content is available under the Open Government Licence v3.0, except where otherwise stated”. The workbook is the source: the ONS API (api.beta.ons.gov.uk) does not carry PIPR (only the discontinued experimental Index of Private Housing Rental Prices, last version February 2024). Table 1 is a long table (Time period, Area code, Area name, Region or country name, then Index / Monthly change / Annual change / Rental price for all dwellings and for one, two, three and four-or-more bedrooms, detached, semi-detached, terraced and flat/maisonette), January 2015 onwards, one row per area and month; Manchester (E08000003) has one row per month. The Notes sheet: not seasonally adjusted (note 1); index January 2023 = 100 (note 2); “Private rental prices are rounded to the nearest £1” (note 6); [x] = not available, [z] = not applicable (notes 4, 5). Definition (cover sheet, read 2026-10-14): PIPR “covers both new and existing tenancies in the private rental sector”, is built from administrative data on rents, and is “official statistics in development”. Rate limits (developer.ons.gov.uk/bots, read in full): 120 requests / 10 s and 200 / 1 min for all site and API assets, 15 / 10 s for high-demand assets; HTTP 429 with Retry-After, which must be respected or a block of up to 1 hour may follow; limits may change without notice. Fair use policy (ons.gov.uk/help/fairusepolicy, last updated 30 April 2026, read in full): downloads for one's own use are fine “provided they do so fairly”; bots, crawlers and scrapers must follow the technical guidance and set a User-Agent that identifies them and gives a contact, otherwise access may be blocked without notice; ONS may restrict anyone affecting others, e.g. by scraping large volumes. StudyAtlas makes two requests a month (the dataset page, one workbook) with the User-Agent “StudyAtlasCollector/1.0 (+https://github.com/StarHunting1/study-atlas)” (name, version, URL; no personal data). ONS has no robots.txt (HTTP 404). Only the Manchester all-dwellings rent is kept; the workbook is neither stored nor committed. It is a private-market average for the whole local authority: not university halls and not a student average.
+- pages read:
+  - https://www.ons.gov.uk/help/terms-conditions (2026-10-14) — ONS website terms: Crown copyright, OGL, exemptions (full)
+  - https://www.ons.gov.uk/help/fairusepolicy (2026-10-14) — Fair use policy, last updated 30 April 2026 (full)
+  - https://developer.ons.gov.uk/bots/ (2026-10-14) — Guide to rate limiting and bot development (full)
+  - https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics (2026-10-14) — dataset page: monthly xlsx editions
+  - https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003 (2026-10-14) — Manchester page: the figures the workbook was compared with (August 2026: £1,373)
+  - https://www.ons.gov.uk/robots.txt (2026-10-14) — HTTP 404 (no crawl rules)
 
 ### Statistics Canada / CMHC – average rents (table 34-10-0133-01) — `statcan-cmhc-rents`
 
@@ -150,22 +166,6 @@ What each publisher's published terms permit, how the data may be accessed, and 
   - https://open.canada.ca/en/access-our-application-programming-interface-api (2026-10-14) — CKAN API page (GET only, no key)
   - https://open.canada.ca/robots.txt (2026-10-14) — Crawl-delay: 20
   - https://open.canada.ca/data/api/action/license_list (2026-10-14) — licence list: ca-ogl-lgo = Open Government Licence - Canada
-
-### Office for National Statistics – Price Index of Private Rents (Manchester) — `ons-private-rents`
-
-- reuseStatus: **permitted** · collector: **allowed** · access: open-data-file · last reviewed: 2026-10-14
-- source: https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics
-- terms / licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ (Open Government Licence v3.0 (ONS website terms))
-- restrictions: attribution-required
-- attribution required: “Source: Office for National Statistics licensed under the Open Government Licence v3.0.”
-- review notes: ONS terms: “Most content on this website is subject to Crown copyright protection and is published under the Open Government Licence (OGL). Some content is exempt from the OGL” – the exemptions named are photographs, illustrations and videos under third-party licences; “Reproduction of information is subject to the terms of the OGL and the UK Government Licensing Framework.” The dataset page and the ONS fair use policy footer state “All content is available under the Open Government Licence v3.0, except where otherwise stated”. The workbook is the source: the ONS API (api.beta.ons.gov.uk) does not carry PIPR (only the discontinued experimental Index of Private Housing Rental Prices, last version February 2024). Table 1 is a long table (Time period, Area code, Area name, Region or country name, then Index / Monthly change / Annual change / Rental price for all dwellings and for one, two, three and four-or-more bedrooms, detached, semi-detached, terraced and flat/maisonette), January 2015 onwards, one row per area and month; Manchester (E08000003) has one row per month. The Notes sheet: not seasonally adjusted (note 1); index January 2023 = 100 (note 2); “Private rental prices are rounded to the nearest £1” (note 6); [x] = not available, [z] = not applicable (notes 4, 5). Definition (cover sheet, read 2026-10-14): PIPR “covers both new and existing tenancies in the private rental sector”, is built from administrative data on rents, and is “official statistics in development”. Rate limits (developer.ons.gov.uk/bots, read in full): 120 requests / 10 s and 200 / 1 min for all site and API assets, 15 / 10 s for high-demand assets; HTTP 429 with Retry-After, which must be respected or a block of up to 1 hour may follow; limits may change without notice. Fair use policy (ons.gov.uk/help/fairusepolicy, last updated 30 April 2026, read in full): downloads for one's own use are fine “provided they do so fairly”; bots, crawlers and scrapers must follow the technical guidance and set a User-Agent that identifies them and gives a contact, otherwise access may be blocked without notice; ONS may restrict anyone affecting others, e.g. by scraping large volumes. StudyAtlas makes two requests a month (the dataset page, one workbook) with the User-Agent “StudyAtlasCollector/1.0 (+https://github.com/StarHunting1/study-atlas)” (name, version, URL; no personal data). ONS has no robots.txt (HTTP 404). Only the Manchester all-dwellings rent is kept; the workbook is neither stored nor committed. It is a private-market average for the whole local authority: not university halls and not a student average.
-- pages read:
-  - https://www.ons.gov.uk/help/terms-conditions (2026-10-14) — ONS website terms: Crown copyright, OGL, exemptions (full)
-  - https://www.ons.gov.uk/help/fairusepolicy (2026-10-14) — Fair use policy, last updated 30 April 2026 (full)
-  - https://developer.ons.gov.uk/bots/ (2026-10-14) — Guide to rate limiting and bot development (full)
-  - https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics (2026-10-14) — dataset page: monthly xlsx editions
-  - https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003 (2026-10-14) — Manchester page: the figures the workbook was compared with (August 2026: £1,373)
-  - https://www.ons.gov.uk/robots.txt (2026-10-14) — HTTP 404 (no crawl rules)
 
 ## Not covered by this review
 
