@@ -16,3 +16,16 @@ Slider-driven study cost planner for Manchester and Vancouver (language school o
 - `lib/fx.ts` – exchange-rate provider interface; the planner uses manual rates (`manualFx`), a rate API can replace it.
 - `components/planner/*`, `locales/planner.ts` (Japanese + English), slider styles in `app/globals.css` (`.sa-range`).
 - Chart colours: the validated 8-slot categorical palette in its fixed order.
+
+
+## Smart Study Planner (Ver.1.7)
+
+`/planner` opens in **Easy mode**: choose departure airport, destination city, study type, length of stay, departure month, total budget and (optionally) a housing type. Three plans (Budget / Balanced / Comfort) are generated at once and update live. The per-item sliders of Ver.1.6 are in **Advanced mode** (`/planner#advanced`); every plan can be opened there with "Fine-tune in Advanced mode".
+
+- `lib/smart.ts` – deterministic plan generator (no AI, no network). Every number is a verified official figure (Ver.1.5 data / verified school fees) that passed the eligibility and contract checks, the user's own assumption, or missing (never counted as 0). Returns structured reasons (codes) so an AI can later write explanations from the same facts.
+- Verdict "within budget" only when tuition, housing, food, transport, flights, visa and insurance are all present; otherwise the plan is marked *provisional* (暫定プラン), "already over budget" is reported when the counted costs alone exceed the budget, and the remaining budget is shown.
+- Over budget: Balanced/Comfort step items down one level at a time; suggestions (shorter stay, other housing type) are computed, not guessed.
+- Flights (`lib/flights.ts`, `data/airports.ts`): IATA airport codes, round trip / one way with separate prices, replaceable `FlightProvider` interface (reference vs bookable quotes). No provider is connected (Skyscanner Indicative Prices is a stub that returns "not connected"); the user enters a price (their assumption) or opens an external search link.
+- Currencies: budget in GBP/CAD/JPY; amounts in other currencies are converted only with a manual rate entered by the user (shown as approximate).
+- Saved plans (browser only, `studyatlas.smart.v1`): rename, re-edit conditions, open in Advanced mode, compare up to 3, delete one / all.
+- Tests: `tests/smart.test.ts` (25 tests, included in `npm test`).

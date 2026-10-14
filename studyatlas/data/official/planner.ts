@@ -16,9 +16,12 @@ export type Candidate = {
   /** shown in amber when the figure may not fit the user's situation */ caution?: Localized;
   /** the source page grants no reuse licence (terms to be confirmed) */ termsUnconfirmed: boolean;
   /** "official" from city data, "school" from a school's fee table */ origin: "city" | "school";
+  /** false when the figure is for a group the chosen study type does not belong to (e.g. U-Pass BC for a language school) */ eligible: boolean;
+  /** false when the figure describes something other than what a student pays (e.g. a whole flat): shown, but never picked automatically */ auto: boolean;
+  /** housing type the figure belongs to (housing items only) */ housingType?: HousingType;
 };
 
-type Rule = { itemId: ItemId; pointId: string; per: Per; housing?: HousingType[]; types?: StudyType[]; use?: "value" | "max" | "both"; coverageWeeks?: number; caution?: Localized; label?: Localized };
+type Rule = { itemId: ItemId; pointId: string; per: Per; housing?: HousingType[]; types?: StudyType[]; use?: "value" | "max" | "both"; manual?: boolean; coverageWeeks?: number; caution?: Localized; label?: Localized };
 const uniOnly: Localized = { en: "This figure is a University of Manchester estimate for undergraduates. It may not match a language-school student.", ja: "マンチェスター大学の学部生向けの見積もりです。語学留学の方には当てはまらない可能性があります。" };
 const RULES: Record<CityId, Rule[]> = {
   manchester: [
@@ -36,7 +39,7 @@ const RULES: Record<CityId, Rule[]> = {
   vancouver: [
     { itemId: "housing", pointId: "van-cmhc-rent-bachelor", per: "month", housing: ["other"], label: { en: "Average rent, bachelor (whole market)", ja: "平均家賃・バチェラー（市場全体）" }, caution: { en: "Whole rental market average, not student housing.", ja: "賃貸市場全体の平均で、学生寮ではありません。" } },
     { itemId: "housing", pointId: "van-cmhc-rent-1br", per: "month", housing: ["other"], label: { en: "Average rent, 1 bedroom (whole market)", ja: "平均家賃・1ベッドルーム（市場全体）" }, caution: { en: "Whole rental market average, not student housing.", ja: "賃貸市場全体の平均で、学生寮ではありません。" } },
-    { itemId: "housing", pointId: "van-cmhc-rent-2br", per: "month", housing: ["other"], label: { en: "Average rent, 2 bedrooms (whole market)", ja: "平均家賃・2ベッドルーム（市場全体）" }, caution: { en: "Whole rental market average for the whole unit, not one room.", ja: "賃貸市場全体の、住戸全体の平均です（1部屋分ではありません）。" } },
+    { itemId: "housing", pointId: "van-cmhc-rent-2br", per: "month", housing: ["other"], manual: true, label: { en: "Average rent, 2 bedrooms (whole market)", ja: "平均家賃・2ベッドルーム（市場全体）" }, caution: { en: "Whole rental market average for the whole unit, not one room.", ja: "賃貸市場全体の、住戸全体の平均です（1部屋分ではありません）。" } },
     { itemId: "transport", pointId: "van-upass", per: "month", types: ["university"], label: { en: "U-Pass BC", ja: "U-Pass BC" }, caution: { en: "Only students of participating public institutions; paid through student fees. Private schools (e.g. most language schools) are not eligible.", ja: "参加する公立校の学生が対象で、学費に含めて支払います。私立校（多くの語学学校を含む）は対象外です。" } },
     { itemId: "transport", pointId: "van-monthly-adult-z1", per: "month", label: { en: "Monthly Pass, adult, 1 zone", ja: "マンスリーパス・大人・1ゾーン" } },
     { itemId: "transport", pointId: "van-monthly-adult-z2", per: "month", label: { en: "Monthly Pass, adult, 2 zones", ja: "マンスリーパス・大人・2ゾーン" } },
@@ -58,7 +61,7 @@ export function cityCandidates(cityId: CityId, itemId: ItemId, o: { studyType: S
     const currency = ccyOf(p.value.currency); if (!currency) continue;
     const terms = officialSources.find((s) => s.id === p.sourceId)?.terms.status === "page-check-only";
     const mismatch = r.types && !r.types.includes(o.studyType);
-    const base = { itemId, per: r.per, currency, coverageWeeks: r.coverageWeeks, publisher: p.evidence[0].publisher, url: p.evidence[0].url, validFor: p.validFor, status: p.status, audience: audienceOf(p), termsUnconfirmed: !!terms, origin: "city" as const,
+    const base = { itemId, per: r.per, currency, coverageWeeks: r.coverageWeeks, eligible: !mismatch, auto: !r.manual, housingType: itemId === "housing" ? o.housingType : undefined, publisher: p.evidence[0].publisher, url: p.evidence[0].url, validFor: p.validFor, status: p.status, audience: audienceOf(p), termsUnconfirmed: !!terms, origin: "city" as const,
       caution: mismatch ? { en: "Not meant for your study type: " + (r.caution?.en ?? "check the conditions."), ja: "選択中の留学タイプ向けではありません。" + (r.caution?.ja ?? "適用条件をご確認ください。") } : r.caution };
     const label = r.label ?? p.label; const range = p.value.max !== undefined && r.use !== "value";
     out.push({ ...base, id: `${p.id}`, value: p.value.amount, label: range ? { en: `${label.en} – lower end`, ja: `${label.ja}（下限）` } : label });
@@ -84,7 +87,7 @@ export function schoolCandidates(cityId: CityId, itemId: ItemId, studyType: Stud
       if (!ok(fact.status) || !fact.value) return; const cur = ccyOf(fact.value.currency); if (!cur) return;
       out.push({ id: `school:${s.id}:${optId}:${itemId}`, itemId, per: priceToPer(fact.value.unit), value: fact.value.amount, currency: cur, coverageWeeks: weeks,
         label: { en: `${s.name} – ${optName.en}`, ja: `${s.name} – ${optName.ja}` }, publisher: fact.sources?.[0]?.publisher ?? s.name, url: fact.sources?.[0]?.url ?? web, validFor: fact.value.feeYear ?? fact.period ?? "",
-        status: fact.status, audience: fact.value.applicability ?? { en: "See the school's conditions", ja: "学校の条件をご確認ください" }, termsUnconfirmed: false, origin: "school",
+        status: fact.status, audience: fact.value.applicability ?? { en: "See the school's conditions", ja: "学校の条件をご確認ください" }, termsUnconfirmed: false, origin: "school", eligible: true, auto: true,
         caution: demo ? { en: "Fictional sample school (demo only).", ja: "架空のサンプル校です（デモ用）。" } : undefined });
     };
     if (isLanguage(s)) for (const c of s.courses) {
