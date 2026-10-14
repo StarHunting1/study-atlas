@@ -23,7 +23,28 @@ async function get(url: string, accept = "application/json"): Promise<Res | unde
 const json = (r?: Res): any => { try { return r && r.status < 400 ? JSON.parse(r.body) : undefined; } catch { return undefined; } };
 const clip = (s: string, n = 2500) => (s.length > n ? s.slice(0, n) + " ...[cut]" : s);
 
+async function pages() {
+  // A. the JSON behind the Manchester page (found in its own HTML)
+  const m = await get("https://www.ons.gov.uk/visualisations/housingpriceslocal/data/json/E08000003.json");
+  if (m && m.status < 400) {
+    const j = json(m); const keys = (o: any, d = 0): any => (o && typeof o === "object" && d < 3 ? (Array.isArray(o) ? [`array(${o.length})`, keys(o[0], d + 1)] : Object.fromEntries(Object.entries(o).map(([k, v]) => [k, keys(v, d + 1)]))) : typeof o);
+    log("- structure (keys, 3 levels):", "```", clip(JSON.stringify(keys(j), null, 1), 3500), "```");
+    log("- raw start:", "```", clip(m.body, 3500), "```");
+    const rent = JSON.stringify(j ?? {}).match(/.{0,200}(rent|Rent).{0,300}/g)?.slice(0, 6) ?? []; log("- fragments mentioning rent:", ...rent.map((x) => `  > ${x}`));
+  }
+  // B. place list
+  const pl = await get("https://www.ons.gov.uk/visualisations/housingpriceslocal/data/places.csv", "text/csv,*/*");
+  if (pl && pl.status < 400) log("```", pl.body.split("\n").slice(0, 5).join("\n"), "```", `- E08000003 rows: ${pl.body.split("\n").filter((l) => /E08000003/.test(l)).join(" | ")}`);
+  // C. the latest PIPR edition through the website's own data endpoint (download links and metadata)
+  const ed = await get("https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/16september2026/data");
+  if (ed && ed.status < 400) log("```", clip(ed.body, 3500), "```");
+  const bu = await get("https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/latest/data");
+  if (bu && bu.status < 400) { const j = json(bu); log("```", clip(JSON.stringify({ title: j?.description?.title, releaseDate: j?.description?.releaseDate, nextRelease: j?.description?.nextRelease, contact: j?.description?.contact, nationalStatistic: j?.description?.nationalStatistic, meta: j?.description?.metaDescription }, null, 1), 2000), "```"); }
+  console.log(out.join("\n"));
+}
+
 async function main() {
+  if (process.argv.includes("--pages")) return pages();
   // 1. is PIPR in the dataset list?
   const found: { id: string; title: string }[] = []; let offset = 0, total = Infinity;
   while (offset < total && offset < 1000) {
