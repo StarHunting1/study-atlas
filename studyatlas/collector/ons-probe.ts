@@ -24,22 +24,16 @@ const json = (r?: Res): any => { try { return r && r.status < 400 ? JSON.parse(r
 const clip = (s: string, n = 2500) => (s.length > n ? s.slice(0, n) + " ...[cut]" : s);
 
 async function pages() {
-  // A. the JSON behind the Manchester page (found in its own HTML)
-  const m = await get("https://www.ons.gov.uk/visualisations/housingpriceslocal/data/json/E08000003.json");
-  if (m && m.status < 400) {
-    const j = json(m); const keys = (o: any, d = 0): any => (o && typeof o === "object" && d < 3 ? (Array.isArray(o) ? [`array(${o.length})`, keys(o[0], d + 1)] : Object.fromEntries(Object.entries(o).map(([k, v]) => [k, keys(v, d + 1)]))) : typeof o);
-    log("- structure (keys, 3 levels):", "```", clip(JSON.stringify(keys(j), null, 1), 3500), "```");
-    log("- raw start:", "```", clip(m.body, 3500), "```");
-    const rent = JSON.stringify(j ?? {}).match(/.{0,200}(rent|Rent).{0,300}/g)?.slice(0, 6) ?? []; log("- fragments mentioning rent:", ...rent.map((x) => `  > ${x}`));
+  const m = await get("https://www.ons.gov.uk/visualisations/housingpriceslocal/data/json/E08000003.json"); const j = json(m);
+  if (j) {
+    const place = j.place ?? {}; const rk = Object.keys(place).filter((k) => /rent/i.test(k)).sort();
+    log(`- place: areacd=${place.areacd} areanm=${place.areanm} geography=${place.geography} parentcd=${place.parentcd} parentnm=${place.parentnm} brma=${place.brma_name}/${place.brmacd}`);
+    log(`- place keys mentioning rent: ${rk.length}; first/last: ${rk.slice(0, 3).join(", ")} ... ${rk.slice(-3).join(", ")}`, `- latest values: ${rk.slice(-4).map((k) => `${k}=${place[k]}`).join(", ")}`, `- other key families: ${[...new Set(Object.keys(place).map((k) => k.replace(/[0-9]{4}-[0-9]{2}$/, "YYYY-MM")))].join(", ")}`);
+    const secs: any[] = j.sections ?? []; log(`- sections: ${secs.length}`, ...secs.map((x, n) => `  ${n}. id=${x.id ?? ""} type=${x.type ?? ""} chartType=${x.chartType ?? ""} title=${x.title ?? ""} | subtitle=${x.subtitle ?? ""} | footer=${String(x.footer ?? "").replace(/<[^>]+>/g, "")}`));
+    for (const x of secs.filter((y) => /rent/i.test(`${y.id} ${y.title} ${y.subtitle}`))) log(`- section ${x.id ?? x.title} (JSON, cut):`, "```", clip(JSON.stringify(x), 2200), "```");
   }
-  // B. place list
-  const pl = await get("https://www.ons.gov.uk/visualisations/housingpriceslocal/data/places.csv", "text/csv,*/*");
-  if (pl && pl.status < 400) log("```", pl.body.split("\n").slice(0, 5).join("\n"), "```", `- E08000003 rows: ${pl.body.split("\n").filter((l) => /E08000003/.test(l)).join(" | ")}`);
-  // C. the latest PIPR edition through the website's own data endpoint (download links and metadata)
-  const ed = await get("https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/16september2026/data");
-  if (ed && ed.status < 400) log("```", clip(ed.body, 3500), "```");
-  const bu = await get("https://www.ons.gov.uk/economy/inflationandpriceindices/bulletins/privaterentandhousepricesuk/latest/data");
-  if (bu && bu.status < 400) { const j = json(bu); log("```", clip(JSON.stringify({ title: j?.description?.title, releaseDate: j?.description?.releaseDate, nextRelease: j?.description?.nextRelease, contact: j?.description?.contact, nationalStatistic: j?.description?.nationalStatistic, meta: j?.description?.metaDescription }, null, 1), 2000), "```"); }
+  const ret = await get("https://developer.ons.gov.uk/retirement/", "text/html,application/json");
+  if (ret && ret.status < 400) log("```", clip(ret.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " "), 3500), "```");
   console.log(out.join("\n"));
 }
 
