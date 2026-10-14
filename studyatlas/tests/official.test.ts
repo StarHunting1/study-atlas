@@ -28,7 +28,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
 (async () => {
   await t("every published point passes validation; counts and statuses", () => {
     for (const c of allOfficialData()) { for (const p of c.points) assert.deepEqual(checkPoint(p, officialSources), [], p.id); if (c.climate) assert.deepEqual(checkClimate(c.climate, officialSources), []); }
-    assert.equal(man.points.length, 24); assert.equal(van.points.length, 16); assert.ok(van.climate); assert.ok(man.climate);
+    assert.equal(man.points.length, 25); assert.equal(van.points.length, 16); assert.ok(van.climate); assert.ok(man.climate);
     assert.ok([...man.points, ...van.points].every((p) => p.status === "verified" && p.evidence.length && p.checkedAt));
   });
 
@@ -50,7 +50,8 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.ok(halls.length >= 4 && halls.every((p) => p.housing?.schoolId && p.housing.school && p.audience === "universityStudent"));
     const rent = van.points.filter((p) => p.metric.startsWith("housing.marketRent"));
     assert.equal(rent.length, 4); assert.ok(rent.every((p) => p.audience === "renter" && !p.housing && /not student housing/.test(p.conditions.en)));
-    assert.equal(man.points.filter((p) => p.audience === "renter").length, 0); // no city-wide Manchester statistic is invented
+    // the only city-wide Manchester statistic is the approved ONS private rent (Ver.1.2.3): whole market, not student housing, nothing else is invented
+    const mr = man.points.filter((p) => p.audience === "renter"); assert.equal(mr.length, 1); assert.equal(mr[0].id, "man-ons-pipr-private-rent-month"); assert.equal(mr[0].status, "verified"); assert.equal(mr[0].value?.amount, 1373); assert.ok(!mr[0].housing && /Not student housing/.test(mr[0].conditions.en));
   });
 
   await t("evidence quotes carry the published amounts (spot checks against the 2026-10-13 live page text)", () => {
