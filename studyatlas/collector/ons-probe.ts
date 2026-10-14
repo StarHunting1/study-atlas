@@ -24,16 +24,18 @@ const json = (r?: Res): any => { try { return r && r.status < 400 ? JSON.parse(r
 const clip = (s: string, n = 2500) => (s.length > n ? s.slice(0, n) + " ...[cut]" : s);
 
 async function pages() {
-  const m = await get("https://www.ons.gov.uk/visualisations/housingpriceslocal/data/json/E08000003.json"); const j = json(m);
-  if (j) {
-    const place = j.place ?? {}; const rk = Object.keys(place).filter((k) => /rent/i.test(k)).sort();
-    log(`- place: areacd=${place.areacd} areanm=${place.areanm} geography=${place.geography} parentcd=${place.parentcd} parentnm=${place.parentnm} brma=${place.brma_name}/${place.brmacd}`);
-    log(`- place keys mentioning rent: ${rk.length}; first/last: ${rk.slice(0, 3).join(", ")} ... ${rk.slice(-3).join(", ")}`, `- latest values: ${rk.slice(-4).map((k) => `${k}=${place[k]}`).join(", ")}`, `- other key families: ${[...new Set(Object.keys(place).map((k) => k.replace(/[0-9]{4}-[0-9]{2}$/, "YYYY-MM")))].join(", ")}`);
-    const secs: any[] = j.sections ?? []; log(`- sections: ${secs.length}`, ...secs.map((x, n) => `  ${n}. id=${x.id ?? ""} type=${x.type ?? ""} chartType=${x.chartType ?? ""} title=${x.title ?? ""} | subtitle=${x.subtitle ?? ""} | footer=${String(x.footer ?? "").replace(/<[^>]+>/g, "")}`));
-    for (const x of secs.filter((y) => /rent/i.test(`${y.id} ${y.title} ${y.subtitle}`))) log(`- section ${x.id ?? x.title} (JSON, cut):`, "```", clip(JSON.stringify(x), 2200), "```");
+  // The developer hub guide on rate limiting and bot development: find it from the hub's own navigation, then read it in full.
+  const hub = await get("https://developer.ons.gov.uk/", "text/html"); const seen = new Set<string>();
+  if (hub && hub.status < 400) {
+    const found = [...hub.body.matchAll(/<a\b[^>]*href="([^"#]+)"[^>]*>([\s\S]*?)<\/a>/gi)].map((m) => { let h = ""; try { h = new URL(m[1].replace(/&amp;/g, "&"), hub.url).toString(); } catch { /* skip */ } return `${m[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim().slice(0, 90)} -> ${h}`; }).filter((l, n, a) => /rate|bot|limit|terms|licen|fair/i.test(l) && a.indexOf(l) === n); log("- hub links mentioning rate / bot / limit / terms / licence:", ...found.map((l) => `  - ${l}`));
+    const urls = found.map((l) => /https?:\/\/\S+/.exec(l)?.[0] ?? "").filter((u) => u && /rate|bot/i.test(u)).slice(0, 3);
+    for (const u of urls) { if (seen.has(u)) continue; seen.add(u); const r = await get(u, "text/html"); if (!r || r.status >= 400) continue;
+      const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " ");
+      const k = text.search(/rate limit|bot/i); log(`## ${u}`, "```", text.slice(Math.max(0, k - 200), Math.max(0, k - 200) + 9000), "```"); }
   }
-  const ret = await get("https://developer.ons.gov.uk/retirement/", "text/html,application/json");
-  if (ret && ret.status < 400) log("```", clip(ret.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/\s+/g, " "), 3500), "```");
+  for (const u of ["https://developer.ons.gov.uk/rate-limiting-and-bot-development/", "https://developer.ons.gov.uk/guide-to-rate-limiting-and-bot-development/", "https://developer.ons.gov.uk/rate_limiting/", "https://developer.ons.gov.uk/bot-development/"]) {
+    if (seen.has(u)) continue; const r = await get(u, "text/html"); if (r && r.status < 400) {
+      const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, " ").replace(/&nbsp;/g, " ").replace(/\s+/g, " "); log(`## ${u}`, "```", text.slice(0, 9000), "```"); break; } }
   console.log(out.join("\n"));
 }
 
