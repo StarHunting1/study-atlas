@@ -51,4 +51,22 @@ export async function postJson(url: string, body: unknown, timeoutMs = 30000): P
     return await res.json();
   } finally { clearTimeout(t); }
 }
+/** GET returning raw bytes (an .xlsx workbook). One polite retry: 429 waits for Retry-After (at most 60 s), 5xx waits 3 s. A larger body than `maxBytes` is refused. */
+export async function fetchBinary(url: string, opts: { timeoutMs?: number; maxBytes?: number } = {}): Promise<{ status: number; url: string; body: Buffer }> {
+  const { timeoutMs = 120000, maxBytes = 64 * 1024 * 1024 } = opts;
+  for (let attempt = 0; ; attempt++) {
+    const ctrl = new AbortController(); const t = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const res = await fetch(url, { headers: { "User-Agent": UA, Accept: "*/*" }, signal: ctrl.signal, redirect: "follow" });
+      if ((res.status === 429 || res.status >= 500) && attempt < 1) {
+        const ra = Number(res.headers.get("retry-after")); await res.arrayBuffer().catch(() => undefined);
+        await sleep(res.status === 429 && Number.isFinite(ra) && ra > 0 ? Math.min(ra, 60) * 1000 : 3000); continue;
+      }
+      if (res.status === 429) throw new Error(`HTTP 429 for ${url} (Retry-After: ${res.headers.get("retry-after") ?? "not given"}); not retried again`);
+      const len = Number(res.headers.get("content-length")); if (Number.isFinite(len) && len > maxBytes) throw new Error(`${url}: ${len} bytes is larger than the ${maxBytes} byte limit`);
+      const body = Buffer.from(await res.arrayBuffer()); if (body.length > maxBytes) throw new Error(`${url}: ${body.length} bytes is larger than the ${maxBytes} byte limit`);
+      return { status: res.status, url: res.url, body };
+    } finally { clearTimeout(t); }
+  }
+}
 export const USER_AGENT = UA;
