@@ -65,7 +65,10 @@ t("stored data is cleaned", () => {
   const pr = cleanProfile({ nationality: "JP", ageGroup: "bogus", departure: "2027-04", duration: { value: 6, unit: "months" } })!;
   assert.deepEqual([pr.nationality, pr.ageGroup, pr.departure, pr.duration.unit], ["JP", "", "2027-04", "months"]);
 });
-t("knowledge registry lists visa pages as unverified", () => {
-  const d = knowledgeDocuments(); assert.ok(d.length >= 4); assert.ok(d.every((x) => x.status !== "verified"));
+t("knowledge registry: visa pages stay unverified; verified documents come only from checked official data", () => {
+  const d = knowledgeDocuments(); assert.ok(d.length >= 4);
+  const visa = d.filter((x) => x.topics.includes("visa")); assert.ok(visa.length >= 3 && visa.every((x) => x.status !== "verified"));
+  const verified = d.filter((x) => x.status === "verified"); assert.ok(verified.length > 0);
+  assert.ok(verified.every((x) => x.checkedAt && /^https:\/\//.test(x.url)));
 });
 console.log(`${n} unit tests passed`);

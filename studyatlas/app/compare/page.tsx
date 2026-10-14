@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import Compare from "@/components/Compare";
+import OfficialCompare from "@/components/official/OfficialCompare";
 import { cities, getCity } from "@/data/cities";
 import { useI18n } from "@/lib/i18n";
 import { MAX_COMPARE, useCompare } from "@/lib/store";
@@ -18,7 +19,7 @@ export default function ComparePage() {
       </div>
       {full && <p className="text-sm text-slate-500">{t("compareFull")}</p>}
       {ids.length >= 2 && anySample && <p className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">{t("sampleNote")}</p>}
-      {ids.length >= 2 ? <Compare ids={ids} onRemove={toggle} /> : <p className="text-slate-500">{ids.length === 0 ? t("emptyCompare") + " " : ""}{t("maxCompare")}</p>}
+      {ids.length >= 2 ? <><OfficialCompare ids={ids} /><Compare ids={ids} onRemove={toggle} /></> : <p className="text-slate-500">{ids.length === 0 ? t("emptyCompare") + " " : ""}{t("maxCompare")}</p>}
     </div>
   );
 }

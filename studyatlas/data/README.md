@@ -84,3 +84,28 @@ fee from school data on every calculation, so official fees registered later flo
 - `data/knowledge.ts`: `KnowledgeDocument` (url, publisher, source language, jurisdiction, topics, status,
   checkedAt, retrievedAt, terms) and `knowledgeDocuments()`, which collects every source referenced by the data.
   A future multilingual AI search indexes these and may state as fact only what comes from verified documents.
+
+## Official city data (Ver.1.5)
+```
+data/official/sources.ts    registry of official sources (publisher, pages, method api|page, cadenceDays, terms)
+data/official/types.ts      DataPoint (amount + currency + per + audience + conditions + validFor + evidence), ClimateNormals
+data/official/<city>.ts     the figures for one city (Manchester, Vancouver so far)
+data/official/validate.ts   load-time checks: evidence quote must contain the amount, https source in the registry, dates, ja+en text
+data/official/toFact.ts     bridges a data point into the Ver.1.3 profile Fact (one source of truth)
+data/official/compare.ts    comparison rows + compareIssues(): comparable only if verified, same period unit, same audience
+data/official/validFor.ts   Japanese wording of validFor strings (falls back to English)
+```
+- Every figure keeps its original currency and period (`per`), who it applies to (`audience`, `conditions`), what it is valid for
+  (`validFor`: fare year, academic year, survey year), the page section and a verbatim quote (`evidence`), `retrievedAt` and `checkedAt`.
+- University hall prices carry `housing` (school, room type, contract, inclusions) and are never mixed with city rent
+  (`audience: "renter"`, CMHC whole-market averages). A university's cost estimate is `audience: "undergraduate"`, not "all students".
+- Cities with a `data/official/<city>.ts` file get the tabbed detail page (Overview / Living Costs / Housing / Transport / Climate /
+  Education / Visa & Healthcare); other cities keep the Ver.1.3 layout.
+- Exchange rates: `lib/fx.ts` defines `FxProvider`; no provider is wired in, so no converted number is ever shown.
+
+### Add a city
+1. Register its sources in `data/official/sources.ts` (method, pages, cadence, terms).
+2. Create `data/official/<city>.ts` (copy an existing one); register it in `data/official/index.ts`.
+3. For API sources add a collector in `collector/sources/` (see statcan.ts / eccc.ts); for pages the generic page check
+   (`collector/sources/pages.ts`) picks the points up automatically.
+4. `npm test && npm run build`.

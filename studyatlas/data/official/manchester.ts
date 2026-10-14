@@ -30,7 +30,7 @@ const points: DataPoint[] = [
     label: { en: "Bus 7-day ticket (adult)", ja: "バス 7日券（大人）" }, value: { amount: 20, currency: "GBP", per: "week" }, audience: "adult",
     conditions: { en: "7-day Bee Bus ticket, Bee Network buses.", ja: "Bee Network のバス 7日券。" },
     validFor: busFare.en, evidence: [busEv("A 7-day Bee Bus ticket costs £10 for children and £20 for adults.")], ...ok },
-  { id: "man-bus-28day-adult", cityId: "manchester", topic: "transport", sourceId: "tfgm-fares", metric: "transport.periodPass.adult",
+  { id: "man-bus-28day-adult", highlight: true, cityId: "manchester", topic: "transport", sourceId: "tfgm-fares", metric: "transport.periodPass.adult",
     label: { en: "Bus 28-day ticket (adult)", ja: "バス 28日券（大人）" }, value: { amount: 80, currency: "GBP", per: "4weeks" }, audience: "adult",
     conditions: { en: "28-day Bee Bus ticket, Bee Network buses only (not other operators, not tram).", ja: "Bee Network のバスのみ（他社バス・トラムは対象外）の28日券。" },
     validFor: busFare.en, evidence: [busEv("A 28-day Bee Bus ticket costs £40 for children and £80 for adults.")], ...ok },
@@ -42,7 +42,7 @@ const points: DataPoint[] = [
     label: { en: "Bee AnyBus 28-day ticket (adult, any operator)", ja: "Bee AnyBus 28日券（大人・全事業者のバス）" }, value: { amount: 87.4, currency: "GBP", per: "4weeks" }, audience: "adult",
     conditions: { en: "Any bus operator in Greater Manchester.", ja: "グレーター・マンチェスター内の全事業者のバスで利用可。" },
     validFor: busFare.en, evidence: [busEv("A 28-day Bee AnyBus ticket costs £63.30 for a young person (aged 16-21) / student (aged 16-26) and £87.40 for adults.")], ...ok },
-  { id: "man-anybus-28day-student", cityId: "manchester", topic: "transport", sourceId: "tfgm-fares", metric: "transport.periodPassAllOperators.student",
+  { id: "man-anybus-28day-student", highlight: true, cityId: "manchester", topic: "transport", sourceId: "tfgm-fares", metric: "transport.periodPassAllOperators.student",
     label: { en: "Bee AnyBus 28-day ticket (student / young person)", ja: "Bee AnyBus 28日券（学生・若者）" }, value: { amount: 63.3, currency: "GBP", per: "4weeks" }, audience: "student",
     conditions: { en: "Students aged 16–26 or young people aged 16–21. Any bus operator in Greater Manchester.", ja: "16〜26歳の学生、または16〜21歳の若者。グレーター・マンチェスター内の全事業者のバスで利用可。" },
     validFor: busFare.en, evidence: [busEv("A 28-day Bee AnyBus ticket costs £63.30 for a young person (aged 16-21) / student (aged 16-26) and £87.40 for adults.")], ...ok },
@@ -64,7 +64,7 @@ const points: DataPoint[] = [
     housing: { schoolId: "uom", school: "The University of Manchester", roomType: { en: "Self-catered rooms (range across halls and room types)", ja: "自炊の部屋（寮・部屋タイプ全体の幅）" }, contract: { en: "41/42 weeks (undergraduate) or 50/51 weeks (postgraduate taught)", ja: "41/42週（学部）または 50/51週（修士）" }, includes: { en: "Contents insurance, utility bills (usually gas and electricity), internet", ja: "家財保険、光熱費（通常ガス・電気）、インターネット" }, catered: false },
     evidence: [colEv("The University of Manchester self-catered accommodation can range in price from £4,853 to £12,096 a year.", { en: "Estimated accommodation costs", ja: "住居費の見積もり" }),
       colEv("University halls of residence contracts run for the duration of your year of study (e.g. 41/42 weeks for undergraduate and 50/51 for postgraduate taught).", { en: "Estimated accommodation costs", ja: "住居費の見積もり" })], ...ok },
-  { id: "man-uom-halls-catered-month", cityId: "manchester", topic: "housing", sourceId: "uom-accommodation", metric: "housing.universityHalls.catered",
+  { id: "man-uom-halls-catered-month", highlight: true, cityId: "manchester", topic: "housing", sourceId: "uom-accommodation", metric: "housing.universityHalls.catered",
     label: { en: "University of Manchester halls, catered (per month)", ja: "マンチェスター大学寮・食事付き（月額）" }, value: { amount: 555, max: 982, currency: "GBP", per: "month" }, audience: "universityStudent",
     conditions: { en: "University of Manchester catered halls; the monthly figure includes the cost of catering. Catering is offered 34 of the 41 weeks of the licence agreement.", ja: "マンチェスター大学の食事付き寮。月額に食費を含む。食事の提供は契約41週のうち34週。" },
     validFor: "2026/27 (as published on the cost-of-living page)",
@@ -107,7 +107,7 @@ const points: DataPoint[] = [
     ["course", "Course materials", "教材費", 21, "Course materials £210 £21", "", ""],
     ["total", "Total (catered; self-catered £1,503)", "合計（食事付き寮の場合。自炊は £1,503）", 1484, "Total* £14,840 (£15,030 if self-catered) £1,484 (£1,503 if self-catered)", "Total including accommodation, for one undergraduate year of 41 weeks.", "住居費を含む、学部の1学年（41週）の合計です。"],
   ] as const).map(([key, en, ja, amount, quote, noteEn, noteJa]): DataPoint => ({
-    id: `man-uom-ug-${key}`, cityId: "manchester", topic: "living", sourceId: "uom-cost-of-living", metric: `living.universityEstimate.${key}`,
+    id: `man-uom-ug-${key}`, highlight: key === "total", cityId: "manchester", topic: "living", sourceId: "uom-cost-of-living", metric: `living.universityEstimate.${key}`,
     label: { en: `${en} – UoM undergraduate estimate`, ja: `${ja} – マンチェスター大学の学部生向け見積もり` }, value: { amount, currency: "GBP", per: "month" }, audience: "undergraduate",
     conditions: { en: "University of Manchester estimate for a single undergraduate student; monthly figure based on a 41-week undergraduate year. A guide only, not an average for all students.", ja: "マンチェスター大学による単身の学部生向けの見積もり。月額は学部の1学年41週を基準にした値です。目安であり、すべての留学生の平均ではありません。" },
     validFor: ugYear, evidence: [colEv(quote)], ...ok,
@@ -115,5 +115,9 @@ const points: DataPoint[] = [
   })),
 ];
 
-const data: OfficialCityData = { cityId: "manchester", points };
+const data: OfficialCityData = { cityId: "manchester", points,
+  climateNote: {
+    en: "Met Office publishes 1991–2020 station averages on its website (Open Government Licence), but the station pages load their figures with JavaScript and there is no documented open API without registration, so StudyAtlas has not read them yet. Planned: register for Met Office data access or a downloadable dataset, then add the 12-month chart.",
+    ja: "Met Office は 1991–2020 年の観測地点別平年値をウェブサイトで公開しています（Open Government Licence）が、観測地点ページは数値を JavaScript で読み込み、登録不要の公開 API も文書化されていないため、まだ取得していません。今後、Met Office のデータ利用登録またはダウンロード可能なデータセットを使い、12か月のグラフを追加する予定です。",
+  } };
 export default data;

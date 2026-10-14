@@ -57,6 +57,8 @@ export type DataPoint = {
   checkedAt?: string;
   status: Status;
   note?: Localized;
+  /** Shown as a key figure on the city overview tab */
+  highlight?: boolean;
   /** For api sources: id of the collector record holding the same figure (data/collected/snapshot.json). Kept in sync by review. */
   collectedId?: string;
 };
@@ -73,4 +75,4 @@ export type ClimateNormals = {
   collectedIds?: string[];
 };
 
-export type OfficialCityData = { cityId: string; points: DataPoint[]; climate?: ClimateNormals };
+export type OfficialCityData = { cityId: string; points: DataPoint[]; climate?: ClimateNormals; /** Why climate data is missing / caveats */ climateNote?: Localized };
