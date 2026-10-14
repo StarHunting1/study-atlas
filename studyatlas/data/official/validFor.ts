@@ -9,6 +9,7 @@ const ja: Record<string, string> = {
   "1 Sep 2026 – 31 Aug 2027": "2026年9月1日〜2027年8月31日",
   "2025 (latest reference year; released by Statistics Canada 2025-12-17)": "2025年（最新の調査年。Statistics Canadaが2025-12-17に公表）",
 };
+// Short English forms used where the long text does not fit
 export const validForText = (s: string, lang: string) => (lang === "ja" ? ja[s] ?? s : s);
 /** Short form for tight spaces (before the first parenthesis). */
 export const validForShort = (s: string, lang: string) => validForText(s, lang).split(/ \(|（/)[0];

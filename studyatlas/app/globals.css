@@ -1,3 +1,21 @@
 @tailwind base;@tailwind components;@tailwind utilities;
 body{font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f8fafc;color:#0f172a}
 html{scroll-padding-top:6.5rem}
+
+/* Planner sliders: big, touch friendly track and thumb (filled part follows --p) */
+.sa-range{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:44px;background:transparent;cursor:pointer;touch-action:pan-y}
+.sa-range:focus{outline:none}
+.sa-range::-webkit-slider-runnable-track{height:10px;border-radius:9999px;background:linear-gradient(to right,#0b2a5b 0,#0b2a5b var(--p,0%),#e2e8f0 var(--p,0%),#e2e8f0 100%)}
+.sa-range::-moz-range-track{height:10px;border-radius:9999px;background:#e2e8f0}
+.sa-range::-moz-range-progress{height:10px;border-radius:9999px;background:#0b2a5b}
+.sa-range::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:32px;height:32px;margin-top:-11px;border-radius:9999px;background:#fff;border:1px solid #cbd5e1;box-shadow:0 2px 8px rgba(11,42,91,.25),0 0 0 4px rgba(11,42,91,.08)}
+.sa-range::-moz-range-thumb{width:30px;height:30px;border-radius:9999px;background:#fff;border:1px solid #cbd5e1;box-shadow:0 2px 8px rgba(11,42,91,.25),0 0 0 4px rgba(11,42,91,.08)}
+.sa-range:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 4px #7dd3fc,0 2px 8px rgba(11,42,91,.25)}
+.sa-range:focus-visible::-moz-range-thumb{box-shadow:0 0 0 4px #7dd3fc,0 2px 8px rgba(11,42,91,.25)}
+.sa-range[data-unset="true"]::-webkit-slider-runnable-track{background:#e2e8f0}
+.sa-range[data-unset="true"]::-webkit-slider-thumb{background:#f1f5f9;border-style:dashed}
+.sa-range[data-unset="true"]::-moz-range-thumb{background:#f1f5f9;border-style:dashed}
+.sa-step{flex:none;width:40px;height:40px;border-radius:9999px;background:#f1f5f9;color:#0b2a5b;font-size:22px;line-height:1;font-weight:500}
+.sa-step:hover:not(:disabled){background:#e2e8f0}.sa-step:disabled{opacity:.35;cursor:default}
+.sa-step:focus-visible{outline:2px solid #7dd3fc;outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.sa-range,.sa-step{transition:none}}
