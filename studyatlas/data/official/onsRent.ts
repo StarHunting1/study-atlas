@@ -20,8 +20,11 @@ import type { DataPoint } from "./types";
  * What it is not: university halls, student housing, an average for international students, or a figure by bedroom or property type.
  */
 export type RentApproval = { approvedBy: string; approvedAt: string; /** what the approver compared, e.g. "ONS Manchester page and PIPR workbook, 16 Sep 2026 edition" */ basis: string };
-/** Set by a human reviewer. null = not approved: the figure stays out of the website. */
-export const ONS_RENT_APPROVAL: RentApproval | null = null;
+/** Set by a human reviewer. null = not approved: the figure stays out of the website. Approved 2026-10-14 for August 2026 (£1,373) only: a revised or newer ONS value needs a new approval. */
+export const ONS_RENT_APPROVAL: RentApproval | null = {
+  approvedBy: "StarHunting1", approvedAt: "2026-10-14",
+  basis: "ONS公式Manchesterページで地域・対象月・金額を確認。公式Excelとの照合結果はPR #25の承認シートを参照。",
+};
 
 export const ONS_RENT_ID = "man-ons-pipr-private-rent-month";
 export const ONS_RENT_COLLECTED_ID = "ons-private-rents:manchester:rental-price";
