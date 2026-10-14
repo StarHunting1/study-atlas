@@ -1,122 +1,1470 @@
 {
-  "generatedAt": "2026-10-13T18:21:23.850Z",
+  "generatedAt": "2026-10-14T09:13:56.486Z",
   "changes": [
     {
       "type": "added",
-      "id": "govuk-content:/student-visa",
+      "id": "eccc-climate-normals:1108447:precip",
       "record": {
-        "id": "govuk-content:/student-visa",
-        "sourceId": "govuk-content",
-        "country": "GBR",
-        "field": "visa.official",
-        "label": {
-          "en": "Student visa (GOV.UK)",
-          "ja": "学生ビザ（GOV.UK）"
-        },
-        "value": {
-          "text": "Apply for a Student visa to study in the UK if you're 16 or over - eligibility, extend or switch your visa, how much it costs and how long it takes"
-        },
-        "sourceUrl": "https://www.gov.uk/student-visa",
-        "apiUrl": "https://www.gov.uk/api/content/student-visa",
-        "retrievedAt": "2026-10-13T18:21:23.850Z",
-        "sourcePublishedAt": "2014-01-29T16:10:58+00:00",
-        "sourceUpdatedAt": "2024-10-31T17:00:02+00:00",
-        "evidence": {
-          "path": "description",
-          "quote": "Apply for a Student visa to study in the UK if you're 16 or over - eligibility, extend or switch your visa, how much it costs and how long it takes"
-        },
-        "contentHash": "32f37eaaa6f8f539",
-        "licence": "Open Government Licence v3.0 (GOV.UK default; confirm per page)",
-        "status": "unverified",
-        "review": "human-required"
-      }
-    },
-    {
-      "type": "added",
-      "id": "govuk-content:/healthcare-immigration-application",
-      "record": {
-        "id": "govuk-content:/healthcare-immigration-application",
-        "sourceId": "govuk-content",
-        "country": "GBR",
-        "field": "living.healthcare",
-        "label": {
-          "en": "Immigration Health Surcharge (GOV.UK)",
-          "ja": "移民医療付加金（GOV.UK）"
-        },
-        "value": {
-          "text": "Find out if you need to pay the immigration health surcharge as part of your visa or immigration application."
-        },
-        "sourceUrl": "https://www.gov.uk/healthcare-immigration-application",
-        "apiUrl": "https://www.gov.uk/api/content/healthcare-immigration-application",
-        "retrievedAt": "2026-10-13T18:21:23.850Z",
-        "sourcePublishedAt": "2015-04-06T01:01:03+01:00",
-        "sourceUpdatedAt": "2024-11-28T10:11:14+00:00",
-        "evidence": {
-          "path": "description",
-          "quote": "Find out if you need to pay the immigration health surcharge as part of your visa or immigration application."
-        },
-        "contentHash": "94052f4c054a4ae3",
-        "licence": "Open Government Licence v3.0 (GOV.UK default; confirm per page)",
-        "status": "unverified",
-        "review": "human-required"
-      }
-    },
-    {
-      "type": "added",
-      "id": "canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
-      "record": {
-        "id": "canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
-        "sourceId": "canada-open-gov",
+        "id": "eccc-climate-normals:1108447:precip",
+        "sourceId": "eccc-climate-normals",
         "country": "CAN",
-        "field": "dataset.housing",
+        "cityId": "vancouver",
+        "field": "climate.precip",
         "label": {
-          "en": "Housing data (CMHC portal, covers Vancouver): Housing Market Information Portal",
-          "ja": "住宅データ（CMHCポータル、バンクーバーを含む）：Housing Market Information Portal"
+          "en": "Vancouver Int'l A (ECCC climate normals): Total precipitation mm",
+          "ja": "バンクーバー国際空港（ECCC 気候平年値）：Total precipitation mm"
         },
         "value": {
-          "text": "Housing Market Information Portal — Canada Mortgage and Housing Corporation | Société canadienne d'hypothèques et de logement — formats: HTML"
+          "series": [
+            168.44,
+            104.57,
+            113.86,
+            88.53,
+            65.03,
+            53.8,
+            35.58,
+            36.73,
+            50.89,
+            120.76,
+            188.89,
+            161.93
+          ],
+          "unit": "mm",
+          "text": "VANCOUVER INT'L A (1108447)"
         },
-        "sourceUrl": "https://open.canada.ca/data/en/dataset/c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
-        "apiUrl": "https://open.canada.ca/data/api/action/package_show?id=c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6",
-        "retrievedAt": "2026-10-13T18:21:23.850Z",
-        "sourcePublishedAt": "2020-07-16T19:30:58.388005",
-        "sourceUpdatedAt": "2020-07-16T19:30:58.388011",
+        "period": "1981–2010",
+        "sourceUrl": "https://climate.weather.gc.ca/climate_normals/",
+        "apiUrl": "https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108447&NORMAL_ID=56&limit=50",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2012-10-10 14:40:42",
         "evidence": {
-          "path": "result.title",
-          "quote": "Housing Market Information Portal"
+          "path": "features[].properties.{MONTH,VALUE}",
+          "quote": "VANCOUVER INT'L A Total precipitation mm: 168.44, 104.57, 113.86, 88.53, 65.03, 53.8, 35.58, 36.73, 50.89, 120.76, 188.89, 161.93"
         },
-        "contentHash": "d39bd1794b86d299",
-        "licence": "Open Government Licence - Canada",
+        "contentHash": "662d2b5b9c37b10d",
+        "licence": "Environment and Climate Change Canada Data Servers End-use Licence / Open Government Licence – Canada (confirm in review)",
         "status": "unverified",
         "review": "standard"
       }
     },
     {
       "type": "added",
-      "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
+      "id": "eccc-climate-normals:1108447:temp-max",
       "record": {
-        "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
-        "sourceId": "canada-open-gov",
+        "id": "eccc-climate-normals:1108447:temp-max",
+        "sourceId": "eccc-climate-normals",
         "country": "CAN",
-        "field": "dataset.climate",
+        "cityId": "vancouver",
+        "field": "climate.temp-max",
         "label": {
-          "en": "Climate data products (ECCC): Climate Data Products",
-          "ja": "気候データ製品（カナダ環境・気候変動省）：Climate Data Products"
+          "en": "Vancouver Int'l A (ECCC climate normals): Mean daily max temperature deg C",
+          "ja": "バンクーバー国際空港（ECCC 気候平年値）：Mean daily max temperature deg C"
         },
         "value": {
-          "text": "Climate Data Products — Environment and Climate Change Canada | Environnement et Changement climatique Canada — formats: OTHER, HTML"
+          "series": [
+            6.87,
+            8.19,
+            10.34,
+            13.15,
+            16.72,
+            19.59,
+            22.15,
+            22.18,
+            18.9,
+            13.54,
+            9.15,
+            6.28
+          ],
+          "unit": "°C",
+          "text": "VANCOUVER INT'L A (1108447)"
         },
-        "sourceUrl": "https://open.canada.ca/data/en/dataset/51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
-        "apiUrl": "https://open.canada.ca/data/api/action/package_show?id=51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
-        "retrievedAt": "2026-10-13T18:21:23.850Z",
-        "sourcePublishedAt": "2016-09-24T13:05:20.030774",
-        "sourceUpdatedAt": "2022-02-21T14:56:19.361658",
+        "period": "1981–2010",
+        "sourceUrl": "https://climate.weather.gc.ca/climate_normals/",
+        "apiUrl": "https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108447&NORMAL_ID=5&limit=50",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2012-10-10 14:40:42",
         "evidence": {
-          "path": "result.title",
-          "quote": "Climate Data Products"
+          "path": "features[].properties.{MONTH,VALUE}",
+          "quote": "VANCOUVER INT'L A Mean daily max temperature deg C: 6.87, 8.19, 10.34, 13.15, 16.72, 19.59, 22.15, 22.18, 18.9, 13.54, 9.15, 6.28"
         },
-        "contentHash": "aaa80dfcafcdb4d3",
-        "licence": "Open Government Licence - Canada",
+        "contentHash": "7e160be48d65c29d",
+        "licence": "Environment and Climate Change Canada Data Servers End-use Licence / Open Government Licence – Canada (confirm in review)",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "eccc-climate-normals:1108447:temp-mean",
+      "record": {
+        "id": "eccc-climate-normals:1108447:temp-mean",
+        "sourceId": "eccc-climate-normals",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "climate.temp-mean",
+        "label": {
+          "en": "Vancouver Int'l A (ECCC climate normals): Mean daily temperature deg C",
+          "ja": "バンクーバー国際空港（ECCC 気候平年値）：Mean daily temperature deg C"
+        },
+        "value": {
+          "series": [
+            4.13,
+            4.9,
+            6.88,
+            9.39,
+            12.8,
+            15.66,
+            17.96,
+            18,
+            14.89,
+            10.29,
+            6.33,
+            3.57
+          ],
+          "unit": "°C",
+          "text": "VANCOUVER INT'L A (1108447)"
+        },
+        "period": "1981–2010",
+        "sourceUrl": "https://climate.weather.gc.ca/climate_normals/",
+        "apiUrl": "https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108447&NORMAL_ID=1&limit=50",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2012-10-10 14:40:42",
+        "evidence": {
+          "path": "features[].properties.{MONTH,VALUE}",
+          "quote": "VANCOUVER INT'L A Mean daily temperature deg C: 4.13, 4.9, 6.88, 9.39, 12.8, 15.66, 17.96, 18, 14.89, 10.29, 6.33, 3.57"
+        },
+        "contentHash": "3e256fce9fb9caa3",
+        "licence": "Environment and Climate Change Canada Data Servers End-use Licence / Open Government Licence – Canada (confirm in review)",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "eccc-climate-normals:1108447:temp-min",
+      "record": {
+        "id": "eccc-climate-normals:1108447:temp-min",
+        "sourceId": "eccc-climate-normals",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "climate.temp-min",
+        "label": {
+          "en": "Vancouver Int'l A (ECCC climate normals): Mean daily min temperature deg C",
+          "ja": "バンクーバー国際空港（ECCC 気候平年値）：Mean daily min temperature deg C"
+        },
+        "value": {
+          "series": [
+            1.36,
+            1.58,
+            3.38,
+            5.57,
+            8.84,
+            11.67,
+            13.71,
+            13.77,
+            10.82,
+            7,
+            3.48,
+            0.83
+          ],
+          "unit": "°C",
+          "text": "VANCOUVER INT'L A (1108447)"
+        },
+        "period": "1981–2010",
+        "sourceUrl": "https://climate.weather.gc.ca/climate_normals/",
+        "apiUrl": "https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108447&NORMAL_ID=8&limit=50",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2012-10-10 14:40:42",
+        "evidence": {
+          "path": "features[].properties.{MONTH,VALUE}",
+          "quote": "VANCOUVER INT'L A Mean daily min temperature deg C: 1.36, 1.58, 3.38, 5.57, 8.84, 11.67, 13.71, 13.77, 10.82, 7, 3.48, 0.83"
+        },
+        "contentHash": "e589790db193c421",
+        "licence": "Environment and Climate Change Canada Data Servers End-use Licence / Open Government Licence – Canada (confirm in review)",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-anybus-28day-adult",
+      "record": {
+        "id": "page:man-anybus-28day-adult",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-anybus-28day-adult",
+        "label": {
+          "en": "Bee AnyBus 28-day ticket (adult, any operator) — still on the official page",
+          "ja": "Bee AnyBus 28日券（大人・全事業者のバス） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 87.4,
+          "currency": "GBP",
+          "unit": "4weeks"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "A 28-day Bee AnyBus ticket costs £63.30 for a young person (aged 16-21) / student (aged 16-26) and £87.40 for adults."
+        },
+        "contentHash": "4e275573b3ad2c8a",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-anybus-28day-student",
+      "record": {
+        "id": "page:man-anybus-28day-student",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-anybus-28day-student",
+        "label": {
+          "en": "Bee AnyBus 28-day ticket (student / young person) — still on the official page",
+          "ja": "Bee AnyBus 28日券（学生・若者） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 63.3,
+          "currency": "GBP",
+          "unit": "4weeks"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "A 28-day Bee AnyBus ticket costs £63.30 for a young person (aged 16-21) / student (aged 16-26) and £87.40 for adults."
+        },
+        "contentHash": "e111e51527615a22",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-anybus-7day-student",
+      "record": {
+        "id": "page:man-anybus-7day-student",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-anybus-7day-student",
+        "label": {
+          "en": "Bee AnyBus 7-day ticket (student / young person) — still on the official page",
+          "ja": "Bee AnyBus 7日券（学生・若者） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 18.6,
+          "currency": "GBP",
+          "unit": "week"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "A 7-day Bee AnyBus ticket costs £18.60 for a young person (aged 16-21) / student (aged 16-26) and £21 for adults."
+        },
+        "contentHash": "d7661efd08d632d3",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-bus-28day-adult",
+      "record": {
+        "id": "page:man-bus-28day-adult",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-bus-28day-adult",
+        "label": {
+          "en": "Bus 28-day ticket (adult) — still on the official page",
+          "ja": "バス 28日券（大人） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 80,
+          "currency": "GBP",
+          "unit": "4weeks"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "A 28-day Bee Bus ticket costs £40 for children and £80 for adults."
+        },
+        "contentHash": "c891df5620facc9f",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-bus-7day-adult",
+      "record": {
+        "id": "page:man-bus-7day-adult",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-bus-7day-adult",
+        "label": {
+          "en": "Bus 7-day ticket (adult) — still on the official page",
+          "ja": "バス 7日券（大人） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 20,
+          "currency": "GBP",
+          "unit": "week"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "A 7-day Bee Bus ticket costs £10 for children and £20 for adults."
+        },
+        "contentHash": "0eee91d490f14951",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-bus-allterms-student",
+      "record": {
+        "id": "page:man-bus-allterms-student",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-bus-allterms-student",
+        "label": {
+          "en": "All Terms Bee Bus student ticket — still on the official page",
+          "ja": "学生向け All Terms Bee Bus 券（通年） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 330,
+          "currency": "GBP",
+          "unit": "academicYear"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "The cost of an All Terms Bee Bus ticket is £330."
+        },
+        "contentHash": "78091997161b0129",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-bus-annual-adult",
+      "record": {
+        "id": "page:man-bus-annual-adult",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-bus-annual-adult",
+        "label": {
+          "en": "Annual Bee Bus ticket (adult) — still on the official page",
+          "ja": "バス 年間券（大人） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 800,
+          "currency": "GBP",
+          "unit": "year"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "The Annual Bee Bus ticket costs £800, offering savings of up to £240."
+        },
+        "contentHash": "e94292e90c2b22a8",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-bus-day-adult",
+      "record": {
+        "id": "page:man-bus-day-adult",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-bus-day-adult",
+        "label": {
+          "en": "Bus 1-day ticket (adult) — still on the official page",
+          "ja": "バス 1日券（大人） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 5,
+          "currency": "GBP",
+          "unit": "day"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "A 1-day Bee Bus ticket costs £2.50 for children and £5 for adults."
+        },
+        "contentHash": "06dda83cf35392e6",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-bus-single-adult",
+      "record": {
+        "id": "page:man-bus-single-adult",
+        "sourceId": "page:tfgm-fares",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-bus-single-adult",
+        "label": {
+          "en": "Bus single ticket (adult) — still on the official page",
+          "ja": "バス 片道（大人） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 2,
+          "currency": "GBP",
+          "unit": "trip"
+        },
+        "period": "Published fare on the TfGM page as of 13 Oct 2026 (no effective date stated on the page)",
+        "sourceUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "apiUrl": "https://tfgm.com/tickets-and-passes/bus-tickets",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "The Bee Bus single ‘hopper’ ticket costs £2 for adults and £1 for children."
+        },
+        "contentHash": "8d5f5671ff8e12cd",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-est-private-share-month",
+      "record": {
+        "id": "page:man-uom-est-private-share-month",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-est-private-share-month",
+        "label": {
+          "en": "Private house share incl. bills – University estimate (per month) — still on the official page",
+          "ja": "民間シェアハウス（光熱費込み）– 大学の見積もり（月額） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 645,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 (as published on the cost-of-living page)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Privately rented house shares (with average bills cost included) £ 645 - 710"
+        },
+        "contentHash": "767d96f6c948a718",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-halls-catered-month",
+      "record": {
+        "id": "page:man-uom-halls-catered-month",
+        "sourceId": "page:uom-accommodation",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-halls-catered-month",
+        "label": {
+          "en": "University of Manchester halls, catered (per month) — still on the official page",
+          "ja": "マンチェスター大学寮・食事付き（月額） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 555,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 (as published on the cost-of-living page)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "The University of Manchester halls of residence (catered) £555-£982 (includes cost of catering)"
+        },
+        "contentHash": "801bb1b1d361740d",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-halls-selfcatered-year",
+      "record": {
+        "id": "page:man-uom-halls-selfcatered-year",
+        "sourceId": "page:uom-accommodation",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-halls-selfcatered-year",
+        "label": {
+          "en": "University of Manchester halls, self-catered (per year) — still on the official page",
+          "ja": "マンチェスター大学寮・自炊（年額） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 4853,
+          "currency": "GBP",
+          "unit": "year"
+        },
+        "period": "2026/27 (as published on the cost-of-living page)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "The University of Manchester self-catered accommodation can range in price from £4,853 to £12,096 a year."
+        },
+        "contentHash": "41d91e8292ceea8f",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-intl-catered-week",
+      "record": {
+        "id": "page:man-uom-intl-catered-week",
+        "sourceId": "page:uom-accommodation",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-intl-catered-week",
+        "label": {
+          "en": "University of Manchester: single room, catered hall (from) — still on the official page",
+          "ja": "マンチェスター大学：食事付き寮の個室（最低額） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 184,
+          "currency": "GBP",
+          "unit": "week"
+        },
+        "period": "As published on 13 Oct 2026 (academic year not stated next to the price)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/international/accommodation/",
+        "apiUrl": "https://www.manchester.ac.uk/study/international/accommodation/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "from £184 per week for a single room with shared facilities in a catered hall."
+        },
+        "contentHash": "60732d5e88d38711",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-intl-selfcatered-ensuite-week",
+      "record": {
+        "id": "page:man-uom-intl-selfcatered-ensuite-week",
+        "sourceId": "page:uom-accommodation",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-intl-selfcatered-ensuite-week",
+        "label": {
+          "en": "University of Manchester: single self-catering en-suite room (from) — still on the official page",
+          "ja": "マンチェスター大学：自炊・専用バスルーム付き個室（最低額） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 175,
+          "currency": "GBP",
+          "unit": "week"
+        },
+        "period": "As published on 13 Oct 2026 (academic year not stated next to the price)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/international/accommodation/",
+        "apiUrl": "https://www.manchester.ac.uk/study/international/accommodation/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "from £175 per week for a single self-catering room with en-suite facilities;"
+        },
+        "contentHash": "74988d245cad0926",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-intl-selfcatered-shared-week",
+      "record": {
+        "id": "page:man-uom-intl-selfcatered-shared-week",
+        "sourceId": "page:uom-accommodation",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-intl-selfcatered-shared-week",
+        "label": {
+          "en": "University of Manchester: single self-catering room, shared facilities (from) — still on the official page",
+          "ja": "マンチェスター大学：自炊・共用設備の個室（最低額） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 119,
+          "currency": "GBP",
+          "unit": "week"
+        },
+        "period": "As published on 13 Oct 2026 (academic year not stated next to the price)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/international/accommodation/",
+        "apiUrl": "https://www.manchester.ac.uk/study/international/accommodation/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "from £119 per week for a single self-catering room with shared facilities;"
+        },
+        "contentHash": "527eece8947641c8",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-clothes",
+      "record": {
+        "id": "page:man-uom-ug-clothes",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-clothes",
+        "label": {
+          "en": "Clothes – UoM undergraduate estimate — still on the official page",
+          "ja": "衣類 – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 42,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Clothes £420 £42"
+        },
+        "contentHash": "303827c1bc5868df",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-course",
+      "record": {
+        "id": "page:man-uom-ug-course",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-course",
+        "label": {
+          "en": "Course materials – UoM undergraduate estimate — still on the official page",
+          "ja": "教材費 – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 21,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Course materials £210 £21"
+        },
+        "contentHash": "0043d8954ce3d9ec",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-groceries",
+      "record": {
+        "id": "page:man-uom-ug-groceries",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-groceries",
+        "label": {
+          "en": "Groceries – UoM undergraduate estimate — still on the official page",
+          "ja": "食料品 – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 250,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Groceries** £2,500 £250"
+        },
+        "contentHash": "15f4bd7a8310e12d",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-health",
+      "record": {
+        "id": "page:man-uom-ug-health",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-health",
+        "label": {
+          "en": "Health and wellbeing – UoM undergraduate estimate — still on the official page",
+          "ja": "健康・ウェルビーイング – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 25,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Health and wellbeing £250 £25"
+        },
+        "contentHash": "01e8268b66519ccb",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-phone",
+      "record": {
+        "id": "page:man-uom-ug-phone",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-phone",
+        "label": {
+          "en": "Mobile phone – UoM undergraduate estimate — still on the official page",
+          "ja": "携帯電話 – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 35,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Mobile phone contract/payments £350 £35"
+        },
+        "contentHash": "1d4421f308994e8a",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-social",
+      "record": {
+        "id": "page:man-uom-ug-social",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-social",
+        "label": {
+          "en": "Going out and socialising – UoM undergraduate estimate — still on the official page",
+          "ja": "外出・交際費 – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 110,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Going out and socialising £1,100 £110"
+        },
+        "contentHash": "113897a3c3f04928",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-takeaways",
+      "record": {
+        "id": "page:man-uom-ug-takeaways",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-takeaways",
+        "label": {
+          "en": "Takeaways – UoM undergraduate estimate — still on the official page",
+          "ja": "テイクアウト – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 51,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Takeaways £510 £51"
+        },
+        "contentHash": "2ade8d1cb7cfaea5",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-total",
+      "record": {
+        "id": "page:man-uom-ug-total",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-total",
+        "label": {
+          "en": "Total (catered; self-catered £1,503) – UoM undergraduate estimate — still on the official page",
+          "ja": "合計（食事付き寮の場合。自炊は £1,503） – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 1484,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Total* £14,840 (£15,030 if self-catered) £1,484 (£1,503 if self-catered)"
+        },
+        "contentHash": "23780c018ba845ca",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:man-uom-ug-transport",
+      "record": {
+        "id": "page:man-uom-ug-transport",
+        "sourceId": "page:uom-cost-of-living",
+        "country": "GBR",
+        "cityId": "manchester",
+        "field": "official.man-uom-ug-transport",
+        "label": {
+          "en": "Transport (local and travel elsewhere) – UoM undergraduate estimate — still on the official page",
+          "ja": "交通費（市内・市外への移動） – マンチェスター大学の学部生向け見積もり — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 70,
+          "currency": "GBP",
+          "unit": "month"
+        },
+        "period": "2026/27 academic year (undergraduate year of 41 weeks)",
+        "sourceUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "apiUrl": "https://www.manchester.ac.uk/study/undergraduate/fees-and-funding/cost-of-living/",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Transport (including local transport and travelling elsewhere) £700 £70"
+        },
+        "contentHash": "ac3c5363fb6e2ed6",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-daypass-adult",
+      "record": {
+        "id": "page:van-daypass-adult",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-daypass-adult",
+        "label": {
+          "en": "DayPass (adult, all zones) — still on the official page",
+          "ja": "デイパス（大人・全ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 12.55,
+          "currency": "CAD",
+          "unit": "day"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult DayPass Zone Current Fares July 1 Fares All Zones $12.55"
+        },
+        "contentHash": "0703a0c1f7cdbb6f",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-fare-cash-adult-z1",
+      "record": {
+        "id": "page:van-fare-cash-adult-z1",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-fare-cash-adult-z1",
+        "label": {
+          "en": "Single fare, cash / contactless (adult) – 1-Zone — still on the official page",
+          "ja": "片道 現金・タッチ決済（大人）（1ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 3.5,
+          "currency": "CAD",
+          "unit": "trip"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult Cash Fares Zone Current Fares July 1 Fares 1-Zone $3.50 $3.50 (+$0.15) 2-Zone $5.10 $5.10 (+$0.25) 3-Zone $6.70"
+        },
+        "contentHash": "638ecfb859f28469",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-fare-cash-adult-z2",
+      "record": {
+        "id": "page:van-fare-cash-adult-z2",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-fare-cash-adult-z2",
+        "label": {
+          "en": "Single fare, cash / contactless (adult) – 2-Zone — still on the official page",
+          "ja": "片道 現金・タッチ決済（大人）（2ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 5.1,
+          "currency": "CAD",
+          "unit": "trip"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult Cash Fares Zone Current Fares July 1 Fares 1-Zone $3.50 $3.50 (+$0.15) 2-Zone $5.10 $5.10 (+$0.25) 3-Zone $6.70"
+        },
+        "contentHash": "92d60dc50f289945",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-fare-cash-adult-z3",
+      "record": {
+        "id": "page:van-fare-cash-adult-z3",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-fare-cash-adult-z3",
+        "label": {
+          "en": "Single fare, cash / contactless (adult) – 3-Zone — still on the official page",
+          "ja": "片道 現金・タッチ決済（大人）（3ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 6.7,
+          "currency": "CAD",
+          "unit": "trip"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult Cash Fares Zone Current Fares July 1 Fares 1-Zone $3.50 $3.50 (+$0.15) 2-Zone $5.10 $5.10 (+$0.25) 3-Zone $6.70"
+        },
+        "contentHash": "58e4c2d8edce1997",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-fare-stored-adult-z1",
+      "record": {
+        "id": "page:van-fare-stored-adult-z1",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-fare-stored-adult-z1",
+        "label": {
+          "en": "Single fare, Compass Card Stored Value (adult) – 1-Zone — still on the official page",
+          "ja": "片道 Compass Card ストアドバリュー（大人）（1ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 2.85,
+          "currency": "CAD",
+          "unit": "trip"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Stored Value Adult Fares Zone Current Fares July 1 Fares 1-Zone $2.85 $2.85 (+$0.15) 2-Zone $4.20 $4.20 (+$0.20) 3-Zone $5.40"
+        },
+        "contentHash": "3e702c2deffc0801",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-fare-stored-adult-z2",
+      "record": {
+        "id": "page:van-fare-stored-adult-z2",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-fare-stored-adult-z2",
+        "label": {
+          "en": "Single fare, Compass Card Stored Value (adult) – 2-Zone — still on the official page",
+          "ja": "片道 Compass Card ストアドバリュー（大人）（2ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 4.2,
+          "currency": "CAD",
+          "unit": "trip"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Stored Value Adult Fares Zone Current Fares July 1 Fares 1-Zone $2.85 $2.85 (+$0.15) 2-Zone $4.20 $4.20 (+$0.20) 3-Zone $5.40"
+        },
+        "contentHash": "bf8ba551e02a4ccc",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-fare-stored-adult-z3",
+      "record": {
+        "id": "page:van-fare-stored-adult-z3",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-fare-stored-adult-z3",
+        "label": {
+          "en": "Single fare, Compass Card Stored Value (adult) – 3-Zone — still on the official page",
+          "ja": "片道 Compass Card ストアドバリュー（大人）（3ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 5.4,
+          "currency": "CAD",
+          "unit": "trip"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Stored Value Adult Fares Zone Current Fares July 1 Fares 1-Zone $2.85 $2.85 (+$0.15) 2-Zone $4.20 $4.20 (+$0.20) 3-Zone $5.40"
+        },
+        "contentHash": "28801f914af948a4",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-monthly-adult-z1",
+      "record": {
+        "id": "page:van-monthly-adult-z1",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-monthly-adult-z1",
+        "label": {
+          "en": "Monthly Pass (adult) – 1-Zone — still on the official page",
+          "ja": "マンスリーパス（大人）（1ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 117.2,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult Monthly Pass Zone Current Fares July 1 Fares 1-Zone $117.20 $117.20 (+$5.60) 2-Zone $156.70 $156.70 (+$7.45) 3-Zone $211.65"
+        },
+        "contentHash": "af1e91e55c2dffa4",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-monthly-adult-z2",
+      "record": {
+        "id": "page:van-monthly-adult-z2",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-monthly-adult-z2",
+        "label": {
+          "en": "Monthly Pass (adult) – 2-Zone — still on the official page",
+          "ja": "マンスリーパス（大人）（2ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 156.7,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult Monthly Pass Zone Current Fares July 1 Fares 1-Zone $117.20 $117.20 (+$5.60) 2-Zone $156.70 $156.70 (+$7.45) 3-Zone $211.65"
+        },
+        "contentHash": "a0cd9568fe934560",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-monthly-adult-z3",
+      "record": {
+        "id": "page:van-monthly-adult-z3",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-monthly-adult-z3",
+        "label": {
+          "en": "Monthly Pass (adult) – 3-Zone — still on the official page",
+          "ja": "マンスリーパス（大人）（3ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 211.65,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Adult Monthly Pass Zone Current Fares July 1 Fares 1-Zone $117.20 $117.20 (+$5.60) 2-Zone $156.70 $156.70 (+$7.45) 3-Zone $211.65"
+        },
+        "contentHash": "581f8a10c93dc6bd",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-monthly-concession",
+      "record": {
+        "id": "page:van-monthly-concession",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-monthly-concession",
+        "label": {
+          "en": "Concession Monthly Pass (all zones) — still on the official page",
+          "ja": "コンセッション・マンスリーパス（全ゾーン） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 66.95,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "‘Current Fares’ column of the TransLink fare tables as of 13 Oct 2026 (the page also shows a ‘July 1 Fares’ column without a year)",
+        "sourceUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "apiUrl": "https://www.translink.ca/transit-fares/pricing-and-fare-zones",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "Concession Monthly Pass Zone Current Fares July 1 Fares All Zones $66.95"
+        },
+        "contentHash": "19f531e8c8384b4f",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:van-upass",
+      "record": {
+        "id": "page:van-upass",
+        "sourceId": "page:translink-fares",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "official.van-upass",
+        "label": {
+          "en": "U-Pass BC (students of participating institutions) — still on the official page",
+          "ja": "U-Pass BC（参加校の学生） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 47.85,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "1 Sep 2026 – 31 Aug 2027",
+        "sourceUrl": "https://www.translink.ca/transit-fares/u-pass-bc",
+        "apiUrl": "https://www.translink.ca/transit-fares/u-pass-bc",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "evidence": {
+          "path": "page text (quote-found)",
+          "quote": "$47.85 from Sep 1 2026 to Aug 31 2027"
+        },
+        "contentHash": "6731ffdf20732e7d",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "statcan-cmhc-rents:vancouver:1br",
+      "record": {
+        "id": "statcan-cmhc-rents:vancouver:1br",
+        "sourceId": "statcan-cmhc-rents",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "housing.marketRent.1br",
+        "label": {
+          "en": "Average rent, one bedroom units (Vancouver, British Columbia, CMHC)",
+          "ja": "平均家賃：1ベッドルーム（Vancouver, British Columbia、CMHC）"
+        },
+        "value": {
+          "number": 1807,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "2025",
+        "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+        "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2025-12-17T08:30",
+        "evidence": {
+          "path": "vector v3822971 (184.3.2.0.0.0.0.0.0.0) refPer 2025-01-01",
+          "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; One bedroom units; 2025: 1807"
+        },
+        "contentHash": "e9e55cb7372f5fb5",
+        "licence": "Statistics Canada Open Licence",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "statcan-cmhc-rents:vancouver:2br",
+      "record": {
+        "id": "statcan-cmhc-rents:vancouver:2br",
+        "sourceId": "statcan-cmhc-rents",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "housing.marketRent.2br",
+        "label": {
+          "en": "Average rent, two bedroom units (Vancouver, British Columbia, CMHC)",
+          "ja": "平均家賃：2ベッドルーム（Vancouver, British Columbia、CMHC）"
+        },
+        "value": {
+          "number": 2364,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "2025",
+        "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+        "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2025-12-17T08:30",
+        "evidence": {
+          "path": "vector v3823105 (184.3.3.0.0.0.0.0.0.0) refPer 2025-01-01",
+          "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Two bedroom units; 2025: 2364"
+        },
+        "contentHash": "1737355dca6710f2",
+        "licence": "Statistics Canada Open Licence",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "statcan-cmhc-rents:vancouver:3br",
+      "record": {
+        "id": "statcan-cmhc-rents:vancouver:3br",
+        "sourceId": "statcan-cmhc-rents",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "housing.marketRent.3br",
+        "label": {
+          "en": "Average rent, three bedroom units (Vancouver, British Columbia, CMHC)",
+          "ja": "平均家賃：3ベッドルーム（Vancouver, British Columbia、CMHC）"
+        },
+        "value": {
+          "number": 2820,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "2025",
+        "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+        "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2025-12-17T08:30",
+        "evidence": {
+          "path": "vector v3823239 (184.3.4.0.0.0.0.0.0.0) refPer 2025-01-01",
+          "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Three bedroom units; 2025: 2820"
+        },
+        "contentHash": "550dd02f1db6b601",
+        "licence": "Statistics Canada Open Licence",
+        "status": "unverified",
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "statcan-cmhc-rents:vancouver:bachelor",
+      "record": {
+        "id": "statcan-cmhc-rents:vancouver:bachelor",
+        "sourceId": "statcan-cmhc-rents",
+        "country": "CAN",
+        "cityId": "vancouver",
+        "field": "housing.marketRent.bachelor",
+        "label": {
+          "en": "Average rent, bachelor units (Vancouver, British Columbia, CMHC)",
+          "ja": "平均家賃：ワンルーム（バチェラー）（Vancouver, British Columbia、CMHC）"
+        },
+        "value": {
+          "number": 1667,
+          "currency": "CAD",
+          "unit": "month"
+        },
+        "period": "2025",
+        "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+        "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+        "retrievedAt": "2026-10-14T09:13:56.486Z",
+        "sourceUpdatedAt": "2025-12-17T08:30",
+        "evidence": {
+          "path": "vector v3822837 (184.3.1.0.0.0.0.0.0.0) refPer 2025-01-01",
+          "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Bachelor units; 2025: 1667"
+        },
+        "contentHash": "494629e663a60da9",
+        "licence": "Statistics Canada Open Licence",
         "status": "unverified",
         "review": "standard"
       }
