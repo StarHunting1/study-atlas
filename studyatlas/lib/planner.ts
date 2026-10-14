@@ -131,6 +131,16 @@ export type PlanCalc = {
 const add = (m: ByCcy, c: Ccy, v: number) => { m[c] = (m[c] ?? 0) + v; };
 const emptyMoney = (): Money => ({ byCurrency: {}, converted: 0, unconverted: {} });
 
+/** Sum of some items' totals (e.g. "other start-up costs"), kept per currency and converted only with a manual rate. */
+export function moneyOf(plan: Plan, calc: PlanCalc, ids: readonly ItemId[]): Money {
+  const fx = manualFx(plan); const m = emptyMoney();
+  for (const id of ids) {
+    const r = calc.items[id]; if (r.state !== "ok") continue; add(m.byCurrency, r.currency, r.total);
+    const c = convert(r.total, r.currency, plan.displayCurrency, fx); if (c) m.converted += c.amount; else add(m.unconverted, r.currency, r.total);
+  }
+  return m;
+}
+
 export function calcPlan(plan: Plan): PlanCalc {
   const items = Object.fromEntries(ITEM_IDS.map((id) => [id, calcItem(plan, id)])) as Record<ItemId, ItemCalc>;
   const fx = manualFx(plan); const used = new Map<string, FxRate>(); const missing = new Set<Ccy>();
@@ -265,6 +275,8 @@ export const addPlan = (s: Store, p: Plan): Store => ({ ...s, plans: [...s.plans
 export const updatePlan = (s: Store, p: Plan): Store => ({ ...s, plans: s.plans.map((x) => (x.id === p.id ? p : x)) });
 export const renamePlan = (s: Store, id: string, name: string): Store => ({ ...s, plans: s.plans.map((x) => (x.id === id ? { ...x, name: name.slice(0, 60) } : x)) });
 export const duplicatePlan = (s: Store, id: string, name: string): Store => { const p = s.plans.find((x) => x.id === id); return p ? addPlan(s, { ...JSON.parse(JSON.stringify(p)), id: newId(), name }) : s; };
+/** Add a copy of a plan made elsewhere (e.g. a Smart planner plan) as a new editable plan. */
+export const importPlan = (s: Store, p: Plan): Store => addPlan(s, { ...JSON.parse(JSON.stringify(p)), id: newId(), updatedAt: new Date().toISOString() });
 export function deletePlan(s: Store, id: string): Store {
   const plans = s.plans.filter((x) => x.id !== id); const pick = (x: string | null) => (x && plans.some((p) => p.id === x) ? x : null);
   return { ...s, plans, activeId: pick(s.activeId) ?? plans[plans.length - 1]?.id ?? null, compare: [pick(s.compare[0]), pick(s.compare[1])] };
