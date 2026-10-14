@@ -30,7 +30,7 @@ export default function PlannerPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5 pb-28">
       <Link href="/my" className="text-sm text-slate-500 hover:text-slate-900">← {L({ en: "My Study", ja: "マイ留学" })}</Link>
-      <header className="space-y-2"><h1 className="text-3xl font-bold tracking-tight text-[#0b2a5b] sm:text-4xl">{L(mode === "easy" ? st.title : pt.title)}</h1><p className="text-sm leading-relaxed text-slate-600">{L(mode === "easy" ? st.lead : st.advancedHint)}</p><p className="text-xs text-slate-500">🔒 {L(st.privacy)}</p>
+      <header className="space-y-2"><h1 className="text-3xl font-bold tracking-tight text-[#0b2a5b] sm:text-4xl">{L(mode === "easy" ? st.title : pt.title)}</h1><p className="text-sm leading-relaxed text-slate-600">{L(mode === "easy" ? st.leadShort : st.advancedHint)}</p><p className="text-xs text-slate-500">🔒 {L(st.privacy)}</p>
         <div role="group" aria-label={L(st.modeLabel)} className="inline-flex gap-1 rounded-full bg-slate-50 p-1 ring-1 ring-slate-200">
           {(["easy", "advanced"] as const).map((m) => <button key={m} type="button" data-testid={`mode-${m}`} aria-pressed={mode === m} onClick={() => go(m)} className={`rounded-full px-5 py-2 text-sm font-medium transition ${mode === m ? "bg-[#0b2a5b] text-white shadow-sm" : "text-slate-600 hover:bg-slate-100"}`}>{L(m === "easy" ? st.modeEasy : st.modeAdvanced)}</button>)}
         </div></header>

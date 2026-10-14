@@ -29,3 +29,18 @@ Slider-driven study cost planner for Manchester and Vancouver (language school o
 - Currencies: budget in GBP/CAD/JPY; amounts in other currencies are converted only with a manual rate entered by the user (shown as approximate).
 - Saved plans (browser only, `studyatlas.smart.v1`): rename, re-edit conditions, open in Advanced mode, compare up to 3, delete one / all.
 - Tests: `tests/smart.test.ts` (25 tests, included in `npm test`).
+
+## Simplify & Explore (Ver.1.8)
+
+"Simple at first glance. Detailed when you need it." Nothing was removed; less is shown first and the rest opens on click (Progressive Disclosure).
+
+1. **Quick Overview** – what is visible on opening: short text, one key figure, who it applies to, and a warning whenever a figure is not verified.
+2. **「詳しく見る」** – breakdowns, housing/transport types, discounts, extra items (`components/Disclosure.tsx`, one control for the whole site: real button, `aria-expanded`/`aria-controls`, 44 px target, Enter/Space).
+3. **「出典・適用条件を見る」** – source URL, valid period, retrieval/check dates, conditions, reuse terms, limits (kept on every data card and fact).
+
+- City page (`components/overview/CityOverview.tsx`): five cards (living, housing, transport, climate, schools); visa & healthcare, safety, daily life and the data status/sources in their own section below. Deep links: `/city/manchester#transport`, `#visa`, `#safety`, `#daily`, `#data`.
+- Compare (`components/overview/QuickCompare.tsx`): five rows; each row says "same basis / conditions differ / not verified / not enough data". "さらに比較する" adds safety, visa, healthcare, student life. No conversion, no gap filling.
+- `lib/overview.ts`: picks the key figure per topic from existing data (never from nothing, status always kept).
+- Smart Planner Easy mode: first screen = destination, study type, duration, budget. Airport, departure month, housing, currency/exchange rate, flights and known costs sit under "条件を追加する". Plan cards show name, one-line character, counted total, remaining budget / over-budget and the 暫定 mark; breakdown and sources open on demand. Identical plans are merged (`groupPlans`).
+- Stored data (`studyatlas.planner.v1`, `studyatlas.smart.v1`, `studyatlas.smart.draft.v1`) is unchanged and still loads (tested). Collector, verification status and sources are untouched.
+- Tests: `tests/overview.test.ts` (9 tests, part of `npm test`).

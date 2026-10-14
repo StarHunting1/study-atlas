@@ -162,6 +162,18 @@ function suggest(easy: Easy, sp: SmartPlan, opts: { now?: string; allowSample?: 
 export function generate(easy: Easy, opts: { now?: string; allowSample?: boolean } = {}): SmartPlan[] { return TIERS.map((t) => build(easy, t, opts)); }
 export const generateOne = (easy: Easy, tier: Tier, opts: { now?: string; allowSample?: boolean } = {}) => build(easy, tier, opts);
 
+/**
+ * Plans that come out identical (same figures from the same sources) are shown once: with the data available there is no
+ * real difference to offer, and a second card with the same numbers would only add noise. Adjacent tiers are merged.
+ */
+export type PlanGroup = { tiers: Tier[]; plan: SmartPlan };
+export function groupPlans(plans: SmartPlan[]): PlanGroup[] {
+  const sig = (p: SmartPlan) => JSON.stringify(ITEM_IDS.map((id) => { const i = p.plan.items[id]; return [i.value, i.per, i.currency, i.coverageWeeks, i.source.kind === "official" ? i.source.ref : "user"]; }));
+  const out: PlanGroup[] = [];
+  for (const p of plans) { const last = out[out.length - 1]; if (last && sig(last.plan) === sig(p)) last.tiers.push(p.tier); else out.push({ tiers: [p.tier], plan: p }); }
+  return out;
+}
+
 /** Tuition headroom: what is left of the budget for costs that are not counted yet, per week of the stay. */
 export function headroom(sp: SmartPlan, weeks: number): { total: number; perWeek: number } | null {
   return sp.remaining !== null && sp.remaining > 0 && weeks > 0 ? { total: sp.remaining, perWeek: sp.remaining / weeks } : null;

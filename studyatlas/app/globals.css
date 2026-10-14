@@ -19,3 +19,8 @@ html{scroll-padding-top:6.5rem}
 .sa-step:hover:not(:disabled){background:#e2e8f0}.sa-step:disabled{opacity:.35;cursor:default}
 .sa-step:focus-visible{outline:2px solid #7dd3fc;outline-offset:2px}
 @media (prefers-reduced-motion:reduce){.sa-range,.sa-step{transition:none}}
+
+/* Progressive disclosure: content fades in gently when a section is opened */
+@keyframes sa-fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.sa-fade{animation:sa-fade .18s ease-out}
+@media (prefers-reduced-motion:reduce){.sa-fade{animation:none}}
