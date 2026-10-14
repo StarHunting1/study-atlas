@@ -10,11 +10,7 @@ import { makeRobots } from "./robots";
 import { MET_PERIODS, MET_ELEMENTS, monthlyMeans, parseStationData } from "./sources/metoffice";
 import { fetchText, htmlToText, postJson, sleep, USER_AGENT } from "./util";
 
-export const PROBE_PAGES: string[] = [
-  "https://vancouver.housing.ubc.ca/residences/marine-drive-residence/",
-  "https://vancouver.housing.ubc.ca/applications/how-to-apply/",
-  "https://vancouver.housing.ubc.ca/getting-started/prospective/",
-];
+export const PROBE_PAGES: string[] = [];
 
 /** Pages printed as text. `from`: print from the LAST occurrence of this marker (skips long navigation menus). */
 export const TEXT_PAGES: { url: string; from?: string }[] = [];
@@ -22,6 +18,10 @@ export const TEXT_PAGES: { url: string; from?: string }[] = [];
 export const HTML_HINTS: string[] = [
   "https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/",
   "https://vancouver.housing.ubc.ca/applications/fees-payments/place-vanier/",
+  "https://vancouver.housing.ubc.ca/residences/marine-drive-residence/",
+  "https://vancouver.housing.ubc.ca/applications/how-to-apply/",
+  "https://vancouver.housing.ubc.ca/getting-started/prospective/",
+  "https://vancouver.housing.ubc.ca/getting-started/graduate-students/",
 ];
 /** Extra pages probed for links/money lines only. */
 export const LINK_PAGES: string[] = [];
@@ -74,8 +74,11 @@ async function probeHtml(url: string) {
     L.push("- script srcs:", ...[...h.matchAll(/<script[^>]+src="([^"]+)"/gi)].map((m) => `  - ${m[1]}`).slice(0, 25));
     L.push("- price-like contexts:", ...[...h.matchAll(/\$\s?\d[\d,]*(\.\d+)?/g)].slice(0, 40).map((m) => `  - …${htmlToText(h.slice(Math.max(0, m.index! - 120), m.index! + 60)).replace(/\s+/g, " ")}…`));
     L.push("- json-like data hints:", ...[...h.matchAll(/(wp-json|admin-ajax|data-url|data-src|fetch\()[^"'<>]{0,120}/gi)].slice(0, 15).map((m) => `  - ${m[0]}`));
-    const main = /<main[\s\S]*?<\/main>|<article[\s\S]*?<\/article>/i.exec(h)?.[0];
-    L.push(`- <main>/<article> text: ${main ? htmlToText(main).replace(/\s+/g, " ").slice(0, 2500) : "none found"}`);
+    const i1 = h.search(/<h1[\s>]/i); const i2 = h.search(/<h2[^>]*>\s*Actions\s*</i);
+    const body = i1 >= 0 ? h.slice(i1, i2 > i1 ? i2 : i1 + 60000) : "";
+    L.push(`- body text from <h1> to "Actions" (table cells joined by " | "):`, "```", htmlToText(body.replace(/<\/t[dh]>/gi, " | ")).replace(/[ \t]+/g, " ").slice(0, 6500), "```");
+    const hrefs = [...new Set([...h.matchAll(/href="(https:\/\/vancouver\.housing\.ubc\.ca\/[^"#]+)"/g)].map((m) => m[1]))].filter((u) => /applications|getting-started|eligib|contract|guarantee|assign|dining|meal|residences\//.test(u));
+    L.push("- internal links:", ...hrefs.slice(0, 60).map((u) => `  - ${u}`));
   } catch (e) { L.push(`- ❌ ${(e as Error).message}`); }
   return L;
 }
