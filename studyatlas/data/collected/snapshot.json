@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-14T09:13:56.486Z",
+  "updatedAt": "2026-10-14T12:24:54.854Z",
   "records": {
     "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8": {
       "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
@@ -272,6 +272,129 @@
       "licence": "Open Government Licence v3.0 (GOV.UK default; confirm per page)",
       "status": "unverified",
       "review": "human-required"
+    },
+    "metoffice-station-data:ringway:1971-2000:rain": {
+      "id": "metoffice-station-data:ringway:1971-2000:rain",
+      "sourceId": "metoffice-station-data",
+      "country": "GBR",
+      "cityId": "manchester",
+      "field": "climate.rain",
+      "label": {
+        "en": "Ringway (Manchester Airport), Met Office monthly station data: Total rainfall (rain), mean by calendar month 1971–2000",
+        "ja": "リングウェイ（マンチェスター空港）Met Office 月別観測データ：Total rainfall (rain)（1971–2000 暦月平均）"
+      },
+      "value": {
+        "series": [
+          71.51,
+          51.59,
+          64.02,
+          49.05,
+          53.81,
+          66.77,
+          59.51,
+          70.9,
+          69.94,
+          85.99,
+          81.88,
+          81.21
+        ],
+        "unit": "mm",
+        "text": "Ringway (30 years, derived by StudyAtlas)"
+      },
+      "period": "1971–2000",
+      "sourceUrl": "https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5",
+      "apiUrl": "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt",
+      "retrievedAt": "2026-10-14T12:24:54.854Z",
+      "evidence": {
+        "path": "rows 1971–2000, column rain",
+        "quote": "Ringway rain 1971–2000 calendar-month means: 71.51, 51.59, 64.02, 49.05, 53.81, 66.77, 59.51, 70.9, 69.94, 85.99, 81.88, 81.21"
+      },
+      "contentHash": "65d7a62b51fbc34f",
+      "licence": "UK Open Government Licence v3.0",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "metoffice-station-data:ringway:1971-2000:tmax": {
+      "id": "metoffice-station-data:ringway:1971-2000:tmax",
+      "sourceId": "metoffice-station-data",
+      "country": "GBR",
+      "cityId": "manchester",
+      "field": "climate.tmax",
+      "label": {
+        "en": "Ringway (Manchester Airport), Met Office monthly station data: Mean daily maximum temperature (tmax), mean by calendar month 1971–2000",
+        "ja": "リングウェイ（マンチェスター空港）Met Office 月別観測データ：Mean daily maximum temperature (tmax)（1971–2000 暦月平均）"
+      },
+      "value": {
+        "series": [
+          6.85,
+          7.27,
+          9.46,
+          11.92,
+          15.68,
+          18.01,
+          20.3,
+          20.09,
+          17.14,
+          13.54,
+          9.58,
+          7.61
+        ],
+        "unit": "°C",
+        "text": "Ringway (30 years, derived by StudyAtlas)"
+      },
+      "period": "1971–2000",
+      "sourceUrl": "https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5",
+      "apiUrl": "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt",
+      "retrievedAt": "2026-10-14T12:24:54.854Z",
+      "evidence": {
+        "path": "rows 1971–2000, column tmax",
+        "quote": "Ringway tmax 1971–2000 calendar-month means: 6.85, 7.27, 9.46, 11.92, 15.68, 18.01, 20.3, 20.09, 17.14, 13.54, 9.58, 7.61"
+      },
+      "contentHash": "12379621b3cb29f5",
+      "licence": "UK Open Government Licence v3.0",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "metoffice-station-data:ringway:1971-2000:tmin": {
+      "id": "metoffice-station-data:ringway:1971-2000:tmin",
+      "sourceId": "metoffice-station-data",
+      "country": "GBR",
+      "cityId": "manchester",
+      "field": "climate.tmin",
+      "label": {
+        "en": "Ringway (Manchester Airport), Met Office monthly station data: Mean daily minimum temperature (tmin), mean by calendar month 1971–2000",
+        "ja": "リングウェイ（マンチェスター空港）Met Office 月別観測データ：Mean daily minimum temperature (tmin)（1971–2000 暦月平均）"
+      },
+      "value": {
+        "series": [
+          1.52,
+          1.57,
+          3.06,
+          4.49,
+          7.39,
+          10.12,
+          12.36,
+          12.13,
+          9.98,
+          7.24,
+          3.9,
+          2.32
+        ],
+        "unit": "°C",
+        "text": "Ringway (30 years, derived by StudyAtlas)"
+      },
+      "period": "1971–2000",
+      "sourceUrl": "https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5",
+      "apiUrl": "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt",
+      "retrievedAt": "2026-10-14T12:24:54.854Z",
+      "evidence": {
+        "path": "rows 1971–2000, column tmin",
+        "quote": "Ringway tmin 1971–2000 calendar-month means: 1.52, 1.57, 3.06, 4.49, 7.39, 10.12, 12.36, 12.13, 9.98, 7.24, 3.9, 2.32"
+      },
+      "contentHash": "ce1d7dcff7bbc9a7",
+      "licence": "UK Open Government Licence v3.0",
+      "status": "unverified",
+      "review": "standard"
     },
     "page:man-anybus-28day-adult": {
       "id": "page:man-anybus-28day-adult",
@@ -1402,35 +1525,35 @@
     "govuk-content": {
       "sourceId": "govuk-content",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
       "records": 2,
-      "lastSuccessAt": "2026-10-14T09:13:56.486Z"
+      "lastSuccessAt": "2026-10-14T12:24:54.854Z"
     },
     "canada-open-gov": {
       "sourceId": "canada-open-gov",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
       "records": 2,
-      "lastSuccessAt": "2026-10-14T09:13:56.486Z"
+      "lastSuccessAt": "2026-10-14T12:24:54.854Z"
     },
     "ons-api": {
       "sourceId": "ons-api",
       "ok": false,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
       "records": 0,
       "skipped": "not implemented (open-api-planned)"
     },
     "met-office-datahub": {
       "sourceId": "met-office-datahub",
       "ok": false,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
     "tfgm-open-data": {
       "sourceId": "tfgm-open-data",
       "ok": false,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
@@ -1451,51 +1574,64 @@
     "translink-open-api": {
       "sourceId": "translink-open-api",
       "ok": false,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
     "statcan-cmhc-rents": {
       "sourceId": "statcan-cmhc-rents",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
-      "records": 4,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 0,
+      "skipped": "not due (checked every 30 days; due in 30 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "eccc-climate-normals": {
       "sourceId": "eccc-climate-normals",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
-      "records": 4,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 0,
+      "skipped": "not due (checked every 180 days; due in 180 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:tfgm-fares": {
       "sourceId": "page:tfgm-fares",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
-      "records": 9,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 0,
+      "skipped": "not due (checked every 30 days; due in 30 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:translink-fares": {
       "sourceId": "page:translink-fares",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
-      "records": 12,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 0,
+      "skipped": "not due (checked every 30 days; due in 30 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:uom-cost-of-living": {
       "sourceId": "page:uom-cost-of-living",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
-      "records": 10,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 0,
+      "skipped": "not due (checked every 60 days; due in 60 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:uom-accommodation": {
       "sourceId": "page:uom-accommodation",
       "ok": true,
-      "attemptedAt": "2026-10-14T09:13:56.486Z",
-      "records": 5,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 0,
+      "skipped": "not due (checked every 60 days; due in 60 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
+    },
+    "metoffice-station-data": {
+      "sourceId": "metoffice-station-data",
+      "ok": true,
+      "attemptedAt": "2026-10-14T12:24:54.854Z",
+      "records": 3,
+      "lastSuccessAt": "2026-10-14T12:24:54.854Z"
     }
   }
 }
