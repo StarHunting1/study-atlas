@@ -1,4 +1,4 @@
-import type { DataPoint, Evidence, OfficialCityData } from "./types";
+import type { ClimateNormals, DataPoint, Evidence, OfficialCityData } from "./types";
 /*
  * Manchester – official figures. Every quote below is verbatim page text read by the collector's live probe on
  * GitHub Actions (2026-10-13, robots.txt allowed). The page check re-reads these pages on each source's cadence.
@@ -115,9 +115,23 @@ const points: DataPoint[] = [
   })),
 ];
 
-const data: OfficialCityData = { cityId: "manchester", points,
-  climateNote: {
-    en: "Met Office publishes 1991–2020 station averages on its website (Open Government Licence), but the station pages load their figures with JavaScript and there is no documented open API without registration, so StudyAtlas has not read them yet. Planned: register for Met Office data access or a downloadable dataset, then add the 12-month chart.",
-    ja: "Met Office は 1991–2020 年の観測地点別平年値をウェブサイトで公開しています（Open Government Licence）が、観測地点ページは数値を JavaScript で読み込み、登録不要の公開 API も文書化されていないため、まだ取得していません。今後、Met Office のデータ利用登録またはダウンロード可能なデータセットを使い、12か月のグラフを追加する予定です。",
-  } };
+/* Ringway (Manchester Airport): Met Office monthly station data, calendar-month means derived by StudyAtlas (collector/sources/metoffice.ts). */
+const RW = "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt";
+const tmax = [6.85, 7.27, 9.46, 11.92, 15.68, 18.01, 20.3, 20.09, 17.14, 13.54, 9.58, 7.61];
+const tmin = [1.52, 1.57, 3.06, 4.49, 7.39, 10.12, 12.36, 12.13, 9.98, 7.24, 3.9, 2.32];
+const rain = [71.51, 51.59, 64.02, 49.05, 53.81, 66.77, 59.51, 70.9, 69.94, 85.99, 81.88, 81.21];
+const rwEv = (key: string, v: number[]): Evidence => ({ url: RW, publisher: "Met Office", section: { en: `Historical monthly data, station Ringway, column ${key}: calendar-month means 1971–2000`, ja: `月別履歴データ 観測地点 Ringway、列 ${key}：1971–2000 暦月平均` }, quote: `Ringway ${key} 1971–2000 calendar-month means: ${v.join(", ")}`, terms: "UK Open Government Licence v3.0" });
+const climate: ClimateNormals = {
+  id: "man-climate-ringway-1971-2000", cityId: "manchester", sourceId: "metoffice-station-data", station: "Ringway (Manchester Airport)", period: "1971–2000", derived: true,
+  months: tmax.map((m, i) => ({ maxC: m, minC: tmin[i], precipMm: rain[i] })),
+  evidence: [rwEv("tmax", tmax), rwEv("tmin", tmin), rwEv("rain", rain)],
+  collectedIds: ["metoffice-station-data:ringway:1971-2000:tmax", "metoffice-station-data:ringway:1971-2000:tmin", "metoffice-station-data:ringway:1971-2000:rain"],
+  retrievedAt: "2026-10-14", checkedAt: "2026-10-14", status: "verified",
+  note: {
+    en: "Calculated by StudyAtlas from the Met Office's monthly values for Ringway (tmax = mean daily maximum, tmin = mean daily minimum, rain = total rainfall; each calendar month averaged over 1971–2000, all 30 years present). Mean temperature is not published in this dataset, so it is not shown. Ringway is Manchester Airport, about 14 km south of the city centre (53.356°N, 2.279°W, 69 m): city-centre temperatures can differ. The Ringway file ends in October 2004 (\"Site Closed\"), so 1981–2010 and 1991–2020 cannot be calculated from it.",
+    ja: "Met Officeが公開するRingway（マンチェスター空港）の月別値から、StudyAtlasが計算した値です（tmax＝日最高気温の平均、tmin＝日最低気温の平均、rain＝降水量の合計。1971〜2000年の30年分すべてがそろった暦月ごとの平均）。このデータセットには平均気温がないため表示していません。Ringwayは市中心部から約14km南の空港（北緯53.356°・西経2.279°・標高69m）にあり、市中心部の気温とは異なる場合があります。Ringwayのファイルは2004年10月で終わっている（「Site Closed」）ため、1981–2010・1991–2020は計算できません。",
+  },
+};
+
+const data: OfficialCityData = { cityId: "manchester", points, climate };
 export default data;

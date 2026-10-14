@@ -1,6 +1,6 @@
 "use client";
 import { getCity } from "@/data/cities";
-import { climateSummary, compareIssues, compareRows, pickPoint, type Issue } from "@/data/official/compare";
+import { climateCompare, climateIssues, compareIssues, compareRows, pickPoint, type ClimateCompare, type Issue } from "@/data/official/compare";
 import { officialData } from "@/data/official";
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
@@ -16,7 +16,7 @@ export default function OfficialCompare({ ids }: { ids: string[] }) {
   const { L, lang } = useI18n();
   const cities = ids.map((id) => getCity(id)).filter((c) => c && officialData(c.id));
   if (cities.length < 1 || ids.length < 2) return null;
-  const hasClimate = cities.some((c) => climateSummary(c!.id));
+  const hasClimate = cities.some((c) => climateCompare(c!.id));
   return (
     <section className={`${panel} space-y-3 p-4`}>
       <h2 className="text-lg font-semibold text-[#0b2a5b]">{L(ot.cmpTitle)}</h2>
@@ -47,14 +47,23 @@ export default function OfficialCompare({ ids }: { ids: string[] }) {
                 </tr>
               );
             })}
-            {hasClimate && (
-              <tr className="border-t border-slate-100 align-top">
-                <td className="p-2 text-slate-600">{L(ot.climateTemp)}</td>
-                {cities.map((c) => { const s = climateSummary(c!.id); return (
-                  <td key={c!.id} className="p-2">{s ? <div className="space-y-1"><span className="font-semibold tabular-nums">{s.min.toFixed(1)} – {s.max.toFixed(1)} °C</span> <StatusBadge status={s.status} />
-                    <p className="text-[11px] text-slate-500">{L(ot.climateStation)}: {s.station}</p><p className="text-[11px] text-slate-500">{L(ot.climatePeriod)}: {s.period}</p></div> : <span className="text-xs text-slate-400">{L(ot.cmpMissing)}</span>}</td>); })}
-              </tr>
-            )}
+            {hasClimate && ([
+              ["tmax", ot.cmpTmax, (c: ClimateCompare) => c.tmax && `${c.tmax[0].toFixed(1)} – ${c.tmax[1].toFixed(1)} °C`],
+              ["tmin", ot.cmpTmin, (c: ClimateCompare) => c.tmin && `${c.tmin[0].toFixed(1)} – ${c.tmin[1].toFixed(1)} °C`],
+              ["precip", ot.cmpPrecip, (c: ClimateCompare) => c.precipTotal !== undefined && `${c.precipTotal} mm`],
+            ] as const).map(([key, label, fmtv]) => {
+              const cs = cities.map((c) => climateCompare(c!.id)); const issues = climateIssues(cs);
+              return (
+                <tr key={key} className="border-t border-slate-100 align-top">
+                  <td className="p-2 text-slate-600">{L(label)}
+                    <p className={`mt-1 text-[11px] leading-snug ${issues.length ? "text-amber-700" : "text-emerald-700"}`}>{issues.length ? issues.map((i) => L(i === "period" ? ot.cmpClimatePeriods : ot[issueText[i]] as never)).join(" / ") : L(ot.cmpOkSame)}</p>
+                    {key === "precip" && <p className="mt-1 text-[11px] leading-snug text-slate-400">{L(ot.cmpPrecipNote)}</p>}
+                  </td>
+                  {cs.map((c, i) => (
+                    <td key={cities[i]!.id} className="p-2">{c && fmtv(c) ? <div className="space-y-1"><span className="font-semibold tabular-nums">{fmtv(c)}</span> <StatusBadge status={c.status} />
+                      <p className="text-[11px] text-slate-500">{L(ot.climateStation)}: {c.station}</p><p className="text-[11px] text-slate-500">{L(ot.climatePeriod)}: {c.period}{c.derived ? ` · ${L(ot.cmpDerived)}` : ""}</p></div> : <span className="text-xs text-slate-400">{L(ot.cmpMissing)}</span>}</td>))}
+                </tr>);
+            })}
           </tbody>
         </table>
       </div>

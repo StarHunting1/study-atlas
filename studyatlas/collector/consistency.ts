@@ -21,7 +21,7 @@ export function officialConsistency(snap: Snapshot): Consistency[] {
     for (const cid of cl?.collectedIds ?? []) {
       const r = snap.records[cid];
       if (!r) { out.push({ id: cl!.id, collectedId: cid, result: "not-collected" }); continue; }
-      const key = cid.endsWith("temp-mean") ? "meanC" : cid.endsWith("temp-max") ? "maxC" : cid.endsWith("temp-min") ? "minC" : "precipMm";
+      const key = ({ "temp-mean": "meanC", "temp-max": "maxC", "temp-min": "minC", precip: "precipMm", tmax: "maxC", tmin: "minC", rain: "precipMm" } as const)[cid.split(":").pop() as "tmax"] ?? "precipMm";
       const site = cl!.months.map((m) => m[key] ?? null);
       const same = JSON.stringify(site) === JSON.stringify(r.value.series ?? []) && r.period === cl!.period;
       out.push({ id: cl!.id, collectedId: cid, result: same ? "match" : "differs", detail: same ? undefined : `site ${JSON.stringify(site)} (${cl!.period}) vs API ${JSON.stringify(r.value.series)} (${r.period})` });

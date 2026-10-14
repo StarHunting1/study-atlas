@@ -18,6 +18,17 @@ import ClimateCharts from "./ClimateCharts";
 export const TABS = ["overview", "living", "housing", "transport", "climate", "education", "visa"] as const;
 type Tab = (typeof TABS)[number];
 
+function Notices({ data, topic }: { data: OfficialCityData; topic: DataPoint["topic"] }) {
+  const { L } = useI18n();
+  const ns = (data.notices ?? []).filter((n) => n.topic === topic); if (!ns.length) return null;
+  return <>{ns.map((n) => (
+    <section key={n.sourceId} className="space-y-2 rounded-2xl bg-slate-50 p-4 ring-1 ring-slate-200">
+      <h3 className="text-sm font-semibold text-slate-700">{L(ot.notShownTitle)}</h3>
+      <p className="text-sm leading-relaxed text-slate-600">{L(n.text)}</p>
+      <ul className="space-y-1 text-sm">{n.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(l.label)} ↗</a></li>)}</ul>
+    </section>))}</>;
+}
+
 function Group({ title, note, points }: { title: string; note?: string; points: DataPoint[] }) {
   if (!points.length) return null;
   return (
@@ -80,8 +91,8 @@ export default function CityTabs({ city, country, data }: { city: City; country:
               ))}
               {data.climate && (
                 <button onClick={() => go("climate")} className="rounded-xl bg-slate-50 p-3 text-left ring-1 ring-slate-100 hover:bg-sky-50">
-                  <p className="text-xs text-slate-600">{L(ot.climateTemp)}</p>
-                  <p className="mt-1 text-base font-semibold tabular-nums text-slate-900">{Math.min(...data.climate.months.map((m) => m.meanC ?? Infinity)).toFixed(1)} – {Math.max(...data.climate.months.map((m) => m.meanC ?? -Infinity)).toFixed(1)} °C</p>
+                  <p className="text-xs text-slate-600">{L(ot.climateTemp)}{data.climate.months.some((m) => m.meanC === undefined) ? ` ${L(ot.climateMinMaxNote)}` : ""}</p>
+                  <p className="mt-1 text-base font-semibold tabular-nums text-slate-900">{(() => { const ms = data.climate!.months; const hasMean = ms.every((m) => m.meanC !== undefined); const lo = Math.min(...ms.map((m) => (hasMean ? m.meanC! : m.minC ?? Infinity))), hi = Math.max(...ms.map((m) => (hasMean ? m.meanC! : m.maxC ?? -Infinity))); return Number.isFinite(lo) && Number.isFinite(hi) ? `${lo.toFixed(1)} – ${hi.toFixed(1)} °C` : "—"; })()}</p>
                   <p className="mt-1 text-[11px] text-slate-500">{data.climate.station} · {data.climate.period}</p>
                 </button>
               )}
@@ -105,6 +116,7 @@ export default function CityTabs({ city, country, data }: { city: City; country:
         {tab === "housing" && <>
           <p className="text-xs leading-relaxed text-slate-500">{L(ot.housingNote)}</p>
           <Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} />
+          <Notices data={data} topic="housing" />
           <Group title={L(ot.housingMarket)} points={by("housing").filter((p) => p.audience === "renter")} />
           <Group title={L(ot.housingEstimate)} points={by("housing").filter((p) => !p.housing && p.audience !== "renter")} />
           <ProfileSection city={city} id="housing" />
@@ -121,6 +133,7 @@ export default function CityTabs({ city, country, data }: { city: City; country:
             {data.climate ? <>
               <div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}{data.climate.checkedAt ? ` · ${L(ot.checked)}: ${data.climate.checkedAt}` : ""}</span></div>
               <ClimateCharts c={data.climate} />
+              {data.climate.derived && <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">{L(ot.climateDerived)}</p>}
               <p className="text-[11px] text-slate-500">{data.climate.evidence.map((e) => <span key={e.url}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(e.section)} </span>)}</p>
               {data.climate.note && <p className="text-[11px] text-slate-400">{L(data.climate.note)}</p>}
             </> : <p className="text-sm text-slate-500">{L(ot.climateMissing)}</p>}

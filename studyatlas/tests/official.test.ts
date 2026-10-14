@@ -7,7 +7,10 @@ import { officialConsistency } from "../collector/consistency";
 import { makeRobots, robotsAllows } from "../collector/robots";
 import { emptySnapshot } from "../collector/store";
 import { allOfficialData, officialSources, pointsOf } from "../data/official";
-import { climateSummary, compareIssues, compareRows, pickPoint } from "../data/official/compare";
+import { climateCompare, climateIssues, compareIssues, compareRows, pickPoint } from "../data/official/compare";
+import { monthlyMeans, parseStationData } from "../collector/sources/metoffice";
+import { sources } from "../collector/sources";
+import { fixtureStationFile } from "../collector/fixtures";
 import { checkClimate, checkPoint } from "../data/official/validate";
 import { checkOnPage } from "../collector/sources/pages";
 import { convert, noFx } from "../lib/fx";
@@ -24,7 +27,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
 (async () => {
   await t("every published point passes validation; counts and statuses", () => {
     for (const c of allOfficialData()) { for (const p of c.points) assert.deepEqual(checkPoint(p, officialSources), [], p.id); if (c.climate) assert.deepEqual(checkClimate(c.climate, officialSources), []); }
-    assert.equal(man.points.length, 24); assert.equal(van.points.length, 16); assert.ok(van.climate);
+    assert.equal(man.points.length, 24); assert.equal(van.points.length, 16); assert.ok(van.climate); assert.ok(man.climate);
     assert.ok([...man.points, ...van.points].every((p) => p.status === "verified" && p.evidence.length && p.checkedAt));
   });
 
@@ -74,7 +77,11 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.deepEqual(compareIssues([m("marketRent", "manchester"), m("marketRent", "vancouver")]), ["missing"]);
     assert.deepEqual(compareIssues([pt("man-bus-single-adult"), pt("man-anybus-28day-student")]).sort(), ["audience", "period"]);
     assert.ok(compareIssues([pt("man-bus-single-adult"), { ...pt("van-fare-stored-adult-z1"), status: "unverified" }]).includes("notVerified"));
-    const s = climateSummary("vancouver")!; assert.equal(s.period, "1981–2010"); assert.equal(climateSummary("manchester"), undefined);
+    const v = climateCompare("vancouver")!, mc = climateCompare("manchester")!;
+    assert.equal(v.period, "1981–2010"); assert.equal(mc.period, "1971–2000"); assert.ok(mc.derived && !v.derived);
+    assert.deepEqual(climateIssues([mc, v]), ["period"]); // different averaging periods are not compared as the same metric
+    assert.deepEqual(climateIssues([mc, { ...mc }]), []); assert.deepEqual(climateIssues([mc, undefined]), ["missing"]);
+    assert.equal(mc.mean, undefined); assert.ok(mc.tmax && mc.tmin && mc.precipTotal === 806); // no mean temperature is invented for Manchester
   });
 
   await t("no currency conversion without an exchange-rate provider; same currency passes through", () => {
@@ -153,6 +160,46 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.equal(officialConsistency(moved).filter((c) => c.result === "differs").length, 1);
     assert.ok(officialConsistency(emptySnapshot()).every((c) => c.result === "not-collected"));
     assert.equal(pointsOf("vancouver", "housing").length, 4);
+  });
+
+  await t("Met Office station file: parsing, missing values and 30-year coverage", () => {
+    const f = parseStationData(fixtureStationFile());
+    assert.equal(f.name, "Ringway [FIXTURE]"); assert.equal(f.rows.length, 75 * 12);
+    assert.equal(f.rows.find((r) => r.year === 1950 && r.month === 1)!.tmax, 9); // "*" (estimated) kept as published
+    const mm = monthlyMeans(f.rows, "tmax", 1971, 2000); assert.ok(mm.complete); assert.deepEqual(mm.values.slice(0, 3), [9, 10, 11]);
+    // a "---" month inside the period makes that calendar month null; nothing is filled in
+    const gap = f.rows.map((r) => (r.year === 1990 && r.month === 2 ? { ...r, rain: undefined } : r));
+    const g = monthlyMeans(gap, "rain", 1971, 2000); assert.equal(g.complete, false); assert.equal(g.values[1], null); assert.equal(g.values[0], 51);
+    // the real file ends in 2004: later periods are incomplete, never derived
+    const short = f.rows.filter((r) => r.year <= 2004); assert.equal(monthlyMeans(short, "tmax", 1981, 2010).complete, false); assert.equal(monthlyMeans(short, "tmax", 1971, 2000).complete, true);
+    const real = parseStationData("Ringway\nLocation: 381400E 384400N, Lat 53.356 Lon -2.279, 69 metres amsl\n   yyyy  mm   tmax    tmin      af    rain     sun\n              degC    degC    days      mm   hours\n   1949   1    7.9     2.0       6     ---    41.5\n   1950   3   11.2*    ---      ---   30.1#   ---\n");
+    assert.deepEqual(real.rows[0], { year: 1949, month: 1, tmax: 7.9, tmin: 2, af: 6, rain: undefined, sun: 41.5 }); assert.deepEqual([real.rows[1].tmax, real.rows[1].tmin, real.rows[1].rain], [11.2, undefined, 30.1]);
+  });
+
+  await t("Met Office source (fixture): 1971-2000 records are produced and re-collecting changes nothing; an ended series produces none", async () => {
+    const run1 = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true, only: ["metoffice-station-data"] });
+    const ids = Object.keys(run1.next.records); assert.deepEqual(ids.sort(), ["tmax", "tmin", "rain"].map((k) => `metoffice-station-data:ringway:1971-2000:${k}`).sort());
+    const rec = run1.next.records["metoffice-station-data:ringway:1971-2000:tmax"]; assert.equal(rec.value.series!.length, 12); assert.equal(rec.period, "1971–2000"); assert.match(rec.apiUrl, /^https:\/\/www\.metoffice\.gov\.uk\/pub\//);
+    const run2 = await collect({ ai: false, fixtures: true, now: "2026-10-15T00:00:00.000Z", prev: run1.next, force: true, only: ["metoffice-station-data"] }); assert.equal(run2.changes.length, 0);
+    const ended = async (url: string) => { const r = await fixtureText(url); return /ringwaydata/.test(url) ? { ...r, body: r.body.split("\n").filter((l) => !/^\s+(20(0[5-9]|1\d|20))\s/.test(l)).join("\n").replace(/^\s+(1971|1972)\s.*$/gm, "") } : r; };
+    const run3 = await collect({ ai: false, fixtures: true, now: "2026-11-01T00:00:00.000Z", prev: run1.next, force: true, only: ["metoffice-station-data"], fetchers: { fetchText: ended } });
+    assert.ok(run3.runs.every((r) => !r.ok)); assert.equal(Object.keys(run3.next.records).length, 3); assert.equal(run3.changes.length, 0); // old records kept, nothing invented
+  });
+
+  await t("consistency: published Ringway climate matches the collected values; a differing value is reported", () => {
+    const rec = (k: string, series: number[]) => [`metoffice-station-data:ringway:1971-2000:${k}`, { value: { series }, period: "1971–2000" }] as const;
+    const m = man.climate!; const snap = { ...emptySnapshot(), records: Object.fromEntries([rec("tmax", m.months.map((x) => x.maxC!)), rec("tmin", m.months.map((x) => x.minC!)), rec("rain", m.months.map((x) => x.precipMm!))]) } as never;
+    const rows = officialConsistency(snap).filter((c) => c.id === m.id); assert.equal(rows.length, 3); assert.ok(rows.every((r) => r.result === "match"));
+    const bad = JSON.parse(JSON.stringify(snap)); bad.records["metoffice-station-data:ringway:1971-2000:rain"].value.series[0] = 99;
+    assert.deepEqual(officialConsistency(bad).filter((c) => c.id === m.id && c.result === "differs").map((c) => c.collectedId), ["metoffice-station-data:ringway:1971-2000:rain"]);
+  });
+
+  await t("UBC residence fees are reviewed but NOT published (terms of use); the page shows a notice with official links", () => {
+    assert.ok([...man.points, ...van.points].every((p) => p.evidence.every((e) => !/ubc\.ca/.test(e.url)))); // no UBC figure anywhere
+    const n = van.notices!.find((x) => x.sourceId === "ubc-housing-fees")!; assert.equal(n.topic, "housing"); assert.ok(n.text.en && n.text.ja && n.links.length >= 4 && n.links.every((l) => /^https:\/\//.test(l.url)));
+    const src = officialSources.find((x) => x.id === "ubc-housing-fees")!; assert.equal(src.terms.status, "needs-review");
+    assert.ok(!sources.some((x) => x.id === "page:ubc-housing-fees")); // never fetched or checked without data points
+    assert.ok(officialSources.filter((x) => x.terms.status === "needs-review").every((x) => ![...man.points, ...van.points].some((p) => p.sourceId === x.id)));
   });
 
   console.log(`${n} official-data tests passed`);

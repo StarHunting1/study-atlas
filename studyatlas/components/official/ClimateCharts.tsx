@@ -49,14 +49,15 @@ function Frame({ title, yTicks, y, hover, setHover, months, children, tip }: { t
 export default function ClimateCharts({ c }: { c: ClimateNormals }) {
   const { L, lang } = useI18n(); const months = d.months[lang === "ja" ? "ja" : "en"];
   const [hover, setHover] = useState<number | null>(null); const [table, setTable] = useState(false);
+  const hasMeanEarly = c.months.some((m) => m.meanC !== undefined);
   const temps = c.months.flatMap((m) => [m.meanC, m.maxC, m.minC]).filter((v): v is number => v !== undefined);
   const tMin = Math.min(0, ...temps), tMax = Math.max(...temps, 1);
   const tTicks = ticks(tMin, tMax); const ty = (v: number) => PAD.t + (H - PAD.t - PAD.b) * (1 - (v - tTicks[0]) / (tTicks[tTicks.length - 1] - tTicks[0]));
   const precs = c.months.map((m) => m.precipMm).filter((v): v is number => v !== undefined);
   const pTicks = ticks(0, Math.max(...precs, 1)); const py = (v: number) => PAD.t + (H - PAD.t - PAD.b) * (1 - v / pTicks[pTicks.length - 1]);
-  const line = (key: "meanC") => c.months.map((m, i) => (m[key] === undefined ? null : `${xOf(i)},${ty(m[key]!)}`));
+  const line = (key: "meanC" | "maxC" | "minC") => c.months.map((m, i) => (m[key] === undefined ? null : `${xOf(i)},${ty(m[key]!)}`));
   const segs = (pts: (string | null)[]) => pts.reduce<string[][]>((acc, p) => { if (p === null) acc.push([]); else acc[acc.length - 1].push(p); return acc; }, [[]]).filter((s) => s.length);
-  const band = c.months.every((m) => m.maxC !== undefined && m.minC !== undefined)
+  const band = hasMeanEarly && c.months.every((m) => m.maxC !== undefined && m.minC !== undefined)
     ? `${c.months.map((m, i) => `${xOf(i)},${ty(m.maxC!)}`).join(" ")} ${[...c.months].map((m, i) => `${xOf(i)},${ty(m.minC!)}`).reverse().join(" ")}` : null;
   const num = (v?: number) => (v === undefined ? "—" : v.toFixed(1));
   const hasMean = c.months.some((m) => m.meanC !== undefined);
@@ -68,7 +69,11 @@ export default function ClimateCharts({ c }: { c: ClimateNormals }) {
           {band && <polygon points={band} className="fill-sky-200/60" />}
           {hasMean && segs(line("meanC")).map((s, k) => <polyline key={k} points={s.join(" ")} fill="none" className="stroke-sky-700" strokeWidth={2} strokeLinejoin="round" />)}
           {hasMean && c.months.map((m, i) => m.meanC !== undefined && <circle key={i} cx={xOf(i)} cy={ty(m.meanC)} r={hover === i ? 5 : 3.5} className="fill-sky-700 stroke-white" strokeWidth={2} />)}
-          {!hasMean && c.months.map((m, i) => m.maxC !== undefined && <circle key={i} cx={xOf(i)} cy={ty(m.maxC)} r={3.5} className="fill-sky-700" />)}
+          {!hasMean && (["maxC", "minC"] as const).map((k) => (
+            <g key={k}>
+              {segs(line(k)).map((sg, n) => <polyline key={n} points={sg.join(" ")} fill="none" className={k === "maxC" ? "stroke-sky-700" : "stroke-indigo-400"} strokeWidth={2} strokeLinejoin="round" />)}
+              {c.months.map((m, i) => m[k] !== undefined && <circle key={i} cx={xOf(i)} cy={ty(m[k]!)} r={hover === i ? 5 : 3.5} className={`${k === "maxC" ? "fill-sky-700" : "fill-indigo-400"} stroke-white`} strokeWidth={2} />)}
+            </g>))}
         </Frame>
         <Frame title={L(ot.climatePrecip)} yTicks={pTicks} y={py} hover={hover} setHover={setHover} months={months} tip={(i) => `${num(c.months[i].precipMm)} mm`}>
           {c.months.map((m, i) => m.precipMm !== undefined && (
@@ -79,7 +84,8 @@ export default function ClimateCharts({ c }: { c: ClimateNormals }) {
       </div>
       <p className="text-xs text-slate-500">
         {hasMean && <><span className="mr-1 inline-block h-0.5 w-4 bg-sky-700 align-middle" />{L(ot.climateMean)} </>}
-        {band && <><span className="ml-2 mr-1 inline-block h-2.5 w-4 rounded-sm bg-sky-200 align-middle" />{L(ot.climateRange)}</>}
+        {!hasMean && <><span className="mr-1 inline-block h-0.5 w-4 bg-sky-700 align-middle" />{L(ot.climateMax)} <span className="ml-2 mr-1 inline-block h-0.5 w-4 bg-indigo-400 align-middle" />{L(ot.climateMin)} </>}
+        {band && hasMean && <><span className="ml-2 mr-1 inline-block h-2.5 w-4 rounded-sm bg-sky-200 align-middle" />{L(ot.climateRange)}</>}
         <span className="ml-3">{L(ot.climateStation)}: {c.station}{c.stationId ? ` (${c.stationId})` : ""} · {L(ot.climatePeriod)}: <strong>{c.period}</strong></span>
       </p>
       <button onClick={() => setTable(!table)} className="text-xs text-sky-700 underline">{L(table ? ot.hideTable : ot.showTable)}</button>

@@ -2,6 +2,7 @@
 import type { DataPoint } from "@/data/official/types";
 import { useI18n } from "@/lib/i18n";
 import { validForText } from "@/data/official/validFor";
+import { officialSources } from "@/data/official/sources";
 import { ot } from "@/locales/official";
 import { StatusBadge } from "@/components/FactView";
 
@@ -47,6 +48,7 @@ export default function DataCard({ p }: { p: DataPoint }) {
           <p key={e.url + e.quote}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(ot.section)}: {L(e.section)}</p>
         ))}
         <p>{L(ot.retrieved)}: {p.retrievedAt}{p.checkedAt ? ` · ${L(ot.checked)}: ${p.checkedAt}` : ""}</p>
+        {officialSources.find((x) => x.id === p.sourceId)?.terms.status === "page-check-only" && <p className="mt-1 text-slate-400">{L(ot.termsPageOnly)}</p>}
         {p.note && <p className="mt-1 text-slate-400">{L(p.note)}</p>}
       </div>
     </article>

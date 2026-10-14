@@ -109,3 +109,11 @@ data/official/validFor.ts   Japanese wording of validFor strings (falls back to 
 3. For API sources add a collector in `collector/sources/` (see statcan.ts / eccc.ts); for pages the generic page check
    (`collector/sources/pages.ts`) picks the points up automatically.
 4. `npm test && npm run build`.
+
+## Ver.1.5.1 additions
+- `climate.derived`: values StudyAtlas calculated from published source values (shown with a notice; never presented as an official average).
+  Manchester: Met Office monthly data for Ringway (Manchester Airport), 1971–2000 calendar-month means of tmax / tmin / rain. The Ringway file
+  ends in October 2004, so 1981–2010 and 1991–2020 are not available; periods that differ from Vancouver's (ECCC 1981–2010) are flagged in the compare table.
+- `notices`: a topic that was reviewed but is NOT shown (UBC residence fees: UBC's Terms of Use forbid republishing without written consent),
+  with the official pages to check. A source with `terms.status: "needs-review"` never gets data points and is never fetched.
+- Cards of sources without a reuse licence show a "terms to be confirmed" line (`terms.status: "page-check-only"`).

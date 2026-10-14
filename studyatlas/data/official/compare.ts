@@ -32,10 +32,21 @@ export function compareIssues(points: (DataPoint | undefined)[]): Issue[] {
 }
 export const pickPoint = (cityId: string, row: CompareRow) => officialData(cityId)?.points.find((p) => row.metrics.includes(p.metric));
 
-/** Mean-temperature range over the published monthly values (min and max month), with station and averaging period. */
-export function climateSummary(cityId: string) {
+/** Climate figures per city for the compare table: warmest/coolest month of the mean daily max and min, and the sum of the 12 monthly precipitation values. */
+export type ClimateCompare = { tmax?: [number, number]; tmin?: [number, number]; mean?: [number, number]; precipTotal?: number; station: string; period: string; derived: boolean; status: DataPoint["status"] };
+export function climateCompare(cityId: string): ClimateCompare | undefined {
   const c = officialData(cityId)?.climate; if (!c || c.status === "pending") return undefined;
-  const means = c.months.map((m) => m.meanC).filter((v): v is number => v !== undefined);
-  if (means.length !== 12) return undefined;
-  return { min: Math.min(...means), max: Math.max(...means), station: c.station, period: c.period, status: c.status };
+  const col = (k: "maxC" | "minC" | "meanC" | "precipMm") => c.months.map((m) => m[k]).filter((v): v is number => v !== undefined);
+  const rng = (v: number[]): [number, number] | undefined => (v.length === 12 ? [Math.min(...v), Math.max(...v)] : undefined);
+  const rain = col("precipMm");
+  return { tmax: rng(col("maxC")), tmin: rng(col("minC")), mean: rng(col("meanC")), precipTotal: rain.length === 12 ? Math.round(rain.reduce((a, b) => a + b, 0)) : undefined, station: c.station, period: c.period, derived: !!c.derived, status: c.status };
+}
+/** Climate rows can be compared only when the averaging periods are the same (and both are verified). */
+export function climateIssues(list: (ClimateCompare | undefined)[]): Issue[] {
+  const have = list.filter((x): x is ClimateCompare => !!x);
+  if (have.length < 2) return ["missing"];
+  const out: Issue[] = [];
+  if (have.some((x) => x.status !== "verified")) out.push("notVerified");
+  if (new Set(have.map((x) => x.period)).size > 1) out.push("period");
+  return out;
 }

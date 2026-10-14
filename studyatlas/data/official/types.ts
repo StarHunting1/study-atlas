@@ -73,6 +73,10 @@ export type ClimateNormals = {
   months: ClimateMonth[];
   evidence: Evidence[]; retrievedAt: string; checkedAt?: string; status: Status; note?: Localized;
   collectedIds?: string[];
+  /** true when StudyAtlas calculated the values from published source values (not an official published average) */
+  derived?: boolean;
 };
 
-export type OfficialCityData = { cityId: string; points: DataPoint[]; climate?: ClimateNormals; /** Why climate data is missing / caveats */ climateNote?: Localized };
+/** A topic where data was reviewed but is NOT shown (e.g. terms of use not satisfied), with the official pages to check instead. */
+export type TopicNotice = { topic: Topic; sourceId: string; text: Localized; links: { label: Localized; url: string }[] };
+export type OfficialCityData = { cityId: string; points: DataPoint[]; climate?: ClimateNormals; climateAlt?: ClimateNormals; notices?: TopicNotice[]; /** Why climate data is missing / caveats */ climateNote?: Localized };

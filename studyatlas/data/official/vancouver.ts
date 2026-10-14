@@ -74,5 +74,19 @@ const climate: ClimateNormals = {
   note: { en: "Values as published by the ECCC GeoMet OGC API (climate-normals collection, normals 1981–2010; calculated 2012-10-10). Newer 1991–2020 normals exist on the ECCC website but are not in this API.", ja: "ECCC GeoMet OGC API（climate-normals、1981–2010 平年値、2012-10-10 計算）の公表値です。より新しい 1991–2020 平年値は ECCC のウェブサイトにありますが、この API には含まれていません。" },
 };
 
-const data: OfficialCityData = { cityId: "vancouver", points, climate };
+const ubc = (path: string) => `https://vancouver.housing.ubc.ca/applications/fees-payments/${path}`;
+const data: OfficialCityData = { cityId: "vancouver", points, climate,
+  notices: [{ topic: "housing", sourceId: "ubc-housing-fees",
+    text: {
+      en: "UBC residence fees (2026/27) were reviewed on 14 Oct 2026 but are not shown here: UBC's Terms of Use allow only short, unmodified extracts for personal non-commercial use and require written consent for any republication. Please check the official fee pages. (Room types, contract dates and who can apply are also on those pages.) StudyAtlas will add them if UBC gives permission.",
+      ja: "UBCの寮料金（2026/27）は2026年10月14日に調査しましたが、掲載していません。UBCの利用規約では、個人の非商用目的での短い抜粋の利用に限られ、転載には書面による同意が必要なためです。部屋タイプ・契約期間・入居資格を含め、公式の料金ページでご確認ください。UBCの許可が得られた場合に追加します。",
+    },
+    links: [
+      { label: { en: "UBC – Fees & Payments (all residences)", ja: "UBC – 料金と支払い（全寮）" }, url: ubc("") },
+      { label: { en: "UBC – Marine Drive fees", ja: "UBC – Marine Drive の料金" }, url: ubc("marine-drive/") },
+      { label: { en: "UBC – Place Vanier fees (first-year residence with meal plan)", ja: "UBC – Place Vanier の料金（第一学年寮・食事プラン付き）" }, url: ubc("place-vanier/") },
+      { label: { en: "UBC – Eligibility", ja: "UBC – 入居資格" }, url: "https://vancouver.housing.ubc.ca/applications/eligibility/" },
+      { label: { en: "UBC – Terms of Use", ja: "UBC – 利用規約" }, url: "https://www.ubc.ca/site/legal.html" },
+    ] }],
+};
 export default data;
