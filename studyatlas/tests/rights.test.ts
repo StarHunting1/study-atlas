@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 import path from "node:path";
 import { officialSources } from "../data/official/sources";
 import { RIGHTS, REUSE_STATUSES, automationFor, displayModeOf, impliedDisplay } from "../data/official/rights";
+import { datasetLicenceOk } from "../collector/sources/canada";
 import { rightsMarkdown } from "../data/official/rightsReport";
 
 const V = { amount: 1, currency: "GBP" } as never;
@@ -36,6 +37,21 @@ t("a per-figure override can only be stricter, never looser", () => {
 t("collector gate: restricted and unregistered sources are blocked", () => {
   assert.equal(automationFor("no-such-source").automation, "blocked");
   for (const [id, r] of Object.entries(RIGHTS)) if (r.reuseStatus === "restricted") assert.equal(automationFor(`page:${id}`).automation, "blocked", id);
+});
+
+t("Ver.1.2.1 verification: GOV.UK and Open Government Canada are permitted for collection, ONS rents are recorded but not collectable yet", () => {
+  for (const id of ["govuk-content", "canada-open-gov", "ons-private-rents"]) { assert.equal(RIGHTS[id].reuseStatus, "permitted", id); assert.ok(RIGHTS[id].lastReviewedAt, id); assert.ok(RIGHTS[id].attribution, id); assert.ok(RIGHTS[id].reviewed.length >= 3, id); }
+  assert.equal(automationFor("govuk-content").automation, "allowed"); assert.equal(automationFor("canada-open-gov").automation, "allowed");
+  assert.equal(automationFor("ons-private-rents").automation, "blocked");
+  assert.ok(RIGHTS["canada-open-gov"].restrictions.includes("crawl-delay"));
+});
+
+t("Open Government Canada: a dataset is collected only when its own CKAN licence is OGL-Canada", () => {
+  assert.equal(datasetLicenceOk({ license_id: "ca-ogl-lgo" }), true);
+  assert.equal(datasetLicenceOk({ license_title: "Open Government Licence - Canada" }), true);
+  assert.equal(datasetLicenceOk({ license_id: "ca-odla-aldg", license_title: "Open Government Licence - Canada" }), false);
+  assert.equal(datasetLicenceOk({ license_id: "other", license_title: "Something else" }), false);
+  assert.equal(datasetLicenceOk({}), false);
 });
 
 t("RIGHTS.md is current (run `npm run rights` after changing a record)", () => {
