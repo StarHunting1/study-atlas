@@ -30,7 +30,7 @@ export type DisplayMode = (typeof DISPLAY_MODES)[number];
 export const AUTOMATIONS = ["allowed", "page-check-only", "blocked"] as const;
 export type Automation = (typeof AUTOMATIONS)[number];
 export type AccessMethod = "open-api" | "open-data-file" | "page-check" | "manual-link" | "none";
-export type RestrictionCode = "no-reproduction-without-consent" | "personal-noncommercial-extracts-only" | "attribution-required" | "no-official-marks" | "robots-disallows-api-path" | "crawl-delay" | "api-key-and-approval-required" | "no-commercial-redistribution-without-permission";
+export type RestrictionCode = "no-reproduction-without-consent" | "personal-noncommercial-extracts-only" | "attribution-required" | "no-official-marks" | "robots-disallows-api-path" | "crawl-delay" | "api-key-and-approval-required" | "no-commercial-redistribution-without-permission" | "automated-access-restricted";
 
 /** A page that was read for the review: its URL, the date, and which part of it was relevant. */
 export type ReviewedPage = { url: string; reviewedAt: string; scope: string };
@@ -48,6 +48,8 @@ export type Rights = {
   attribution?: string;
   /** Stricter than the status implies (e.g. "hold" to suspend a source while it is re-checked) */
   display?: DisplayMode;
+  /** robots.txt disallows a path but the provider's own usage policy documents programmatic use of it (requests to URLs under `urlPrefix` are then allowed) */
+  robotsException?: { urlPrefix: string; policyUrl: string; reason: string };
   /** A professional's opinion is recommended before relying on this reading of the terms */
   expertReview: boolean;
 };

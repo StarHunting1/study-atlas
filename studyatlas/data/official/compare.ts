@@ -1,5 +1,6 @@
 import type { Localized } from "@/lib/i18n";
 import { officialData } from "./index";
+import { displayModeOfClimate, isFigureShown, showsFigure } from "./rights";
 import type { DataPoint } from "./types";
 /*
  * City comparison rows for official data. A row names the kind of figure; for each city the first data point whose
@@ -30,12 +31,13 @@ export function compareIssues(points: (DataPoint | undefined)[]): Issue[] {
   if (new Set(have.map((p) => p.audience)).size > 1) out.push("audience");
   return out;
 }
-export const pickPoint = (cityId: string, row: CompareRow) => officialData(cityId)?.points.find((p) => row.metrics.includes(p.metric));
+/** A figure the publisher's terms allow to be shown (rights.ts); held-back figures are treated as "no figure" and never compared. */
+export const pickPoint = (cityId: string, row: CompareRow) => officialData(cityId)?.points.find((p) => row.metrics.includes(p.metric) && isFigureShown(p));
 
 /** Climate figures per city for the compare table: warmest/coolest month of the mean daily max and min, and the sum of the 12 monthly precipitation values. */
 export type ClimateCompare = { tmax?: [number, number]; tmin?: [number, number]; mean?: [number, number]; precipTotal?: number; station: string; period: string; derived: boolean; status: DataPoint["status"] };
 export function climateCompare(cityId: string): ClimateCompare | undefined {
-  const c = officialData(cityId)?.climate; if (!c || c.status === "pending") return undefined;
+  const c = officialData(cityId)?.climate; if (!c || c.status === "pending" || !showsFigure(displayModeOfClimate(c))) return undefined;
   const col = (k: "maxC" | "minC" | "meanC" | "precipMm") => c.months.map((m) => m[k]).filter((v): v is number => v !== undefined);
   const rng = (v: number[]): [number, number] | undefined => (v.length === 12 ? [Math.min(...v), Math.max(...v)] : undefined);
   const rain = col("precipMm");

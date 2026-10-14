@@ -1,6 +1,7 @@
 // Tests for official city data (Ver.1.5). Local fixtures only (no network): results here are NOT live API results.
 // Run: npm test
 import assert from "node:assert/strict";
+import { automationFor, rightsOfSource } from "../data/official/rights";
 import { collect, dueIn } from "../collector/run";
 import { fixtureText } from "../collector/fixtures";
 import { officialConsistency } from "../collector/consistency";
@@ -71,9 +72,11 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
   await t("comparison: different period or group of people is not comparable; unverified is not comparable", () => {
     const row = (id: string) => compareRows.find((r) => r.id === id)!;
     const m = (id: string, city: string) => pickPoint(city, row(id));
-    assert.deepEqual(compareIssues([m("single", "manchester"), m("single", "vancouver")]), []); // trip vs trip, both adults
-    assert.deepEqual(compareIssues([m("monthlyAdult", "manchester"), m("monthlyAdult", "vancouver")]), ["period"]); // 28 days vs calendar month
-    assert.deepEqual(compareIssues([m("studentTransit", "manchester"), m("studentTransit", "vancouver")]), ["period"]);
+    // TransLink fares are held back (rights.ts: restricted), so a Vancouver fare is "no figure" and nothing is compared with it
+    for (const id of ["single", "monthlyAdult", "studentTransit"]) { assert.equal(m(id, "vancouver"), undefined); assert.deepEqual(compareIssues([m(id, "manchester"), m(id, "vancouver")]), ["missing"]); }
+    // the same comparison logic on the held-back figures themselves (all points are still in the data)
+    assert.deepEqual(compareIssues([pt("man-bus-single-adult"), pt("van-fare-stored-adult-z1")]), []); // trip vs trip, both adults
+    assert.deepEqual(compareIssues([pt("man-bus-28day-adult"), pt("van-monthly-adult-z1")]), ["period"]); // 28 days vs calendar month
     assert.deepEqual(compareIssues([m("marketRent", "manchester"), m("marketRent", "vancouver")]), ["missing"]);
     assert.deepEqual(compareIssues([pt("man-bus-single-adult"), pt("man-anybus-28day-student")]).sort(), ["audience", "period"]);
     assert.ok(compareIssues([pt("man-bus-single-adult"), { ...pt("van-fare-stored-adult-z1"), status: "unverified" }]).includes("notVerified"));
@@ -88,7 +91,10 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.equal(convert(10, "GBP", "CAD", noFx), undefined); assert.deepEqual(convert(10, "GBP", "GBP"), { amount: 10 });
     const fx = { rate: (f: string, to: string) => (f === "GBP" && to === "JPY" ? { from: f, to, rate: 200, date: "2026-10-14", publisher: "test", url: "https://example.com" } : undefined) };
     assert.equal(convert(2, "GBP", "JPY", fx)!.amount, 400);
-    assert.equal(moneyComparability([getCity("manchester")!.profile.cost.transport, getCity("vancouver")!.profile.cost.transport]), "currency");
+    // Vancouver's transport fare is held back (TransLink: restricted), so it is "pending" in the profile and nothing is compared; the rent (CMHC: permitted) shows the currency rule
+    assert.equal(getCity("vancouver")!.profile.cost.transport.status, "pending");
+    assert.equal(moneyComparability([getCity("manchester")!.profile.cost.transport, getCity("vancouver")!.profile.cost.transport]), "ok");
+    assert.equal(moneyComparability([{ ...getCity("manchester")!.profile.cost.transport, status: "verified" }, getCity("vancouver")!.profile.cost.rent]), "currency");
   });
 
   await t("robots.txt: Disallow honoured, unreachable treated as disallow, 404 allows", async () => {
@@ -111,16 +117,19 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     const first = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot() });
     const later = "2026-10-20T00:00:00.000Z"; // 6 days later: page checks (30/60 days) and climate (180 days) are not due; others have no cadence
     const second = await collect({ ai: false, fixtures: true, now: later, prev: first.next });
-    assert.ok(second.runs.filter((r) => /^(page:|statcan|eccc)/.test(r.sourceId)).every((r) => /not due/.test(r.skipped ?? "")));
+    // (a source blocked by the rights review is skipped for that reason, with or without --force)
+    assert.ok(second.runs.filter((r) => /^(page:|statcan|eccc)/.test(r.sourceId)).every((r) => /not due|blocked by the rights review/.test(r.skipped ?? "")));
     assert.equal(second.changes.length, 0);
     const forced = await collect({ ai: false, fixtures: true, now: later, prev: first.next, force: true });
-    assert.ok(forced.runs.filter((r) => /^(page:|statcan|eccc)/.test(r.sourceId)).every((r) => r.ok && !r.skipped)); assert.equal(forced.changes.length, 0);
+    const live = forced.runs.filter((r) => /^(page:|statcan|eccc)/.test(r.sourceId) && automationFor(r.sourceId).automation !== "blocked"); assert.ok(live.length >= 4);
+    assert.ok(live.every((r) => r.ok && !r.skipped)); assert.equal(forced.changes.length, 0);
+    assert.ok(forced.runs.filter((r) => automationFor(r.sourceId).automation === "blocked" && r.skipped && !/not implemented/.test(r.skipped)).every((r) => /blocked by the rights review/.test(r.skipped!)));
   });
 
   await t("collecting the same (fixture) responses twice: first run adds records, second run finds 0 changes", async () => {
     const first = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true });
     const ids = Object.keys(first.next.records);
-    assert.equal(ids.filter((i) => i.startsWith("page:")).length, 36); assert.equal(ids.filter((i) => i.startsWith("statcan-cmhc-rents:")).length, 4); assert.equal(ids.filter((i) => i.startsWith("eccc-climate-normals:")).length, 4);
+    assert.equal(ids.filter((i) => i.startsWith("page:")).length, 24); assert.ok(!ids.some((i) => i.startsWith("page:translink")), "no TransLink page is checked: the rights review blocks it"); assert.equal(ids.filter((i) => i.startsWith("statcan-cmhc-rents:")).length, 4); assert.equal(ids.filter((i) => i.startsWith("eccc-climate-normals:")).length, 4);
     const second = await collect({ ai: false, fixtures: true, now: "2026-10-14T06:00:00.000Z", prev: first.next, force: true });
     assert.equal(second.changes.length, 0); assert.equal(JSON.stringify(second.next.records), JSON.stringify(first.next.records)); // retrieval times untouched
     assert.ok(Object.values(first.next.records).filter((r) => r.sourceId.startsWith("page:")).every((r) => r.value.text === "found"));
@@ -141,7 +150,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     const first = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true });
     const down = async (url: string) => { if (/robots\.txt$/.test(url)) return { status: 200, url, body: "User-agent: *\nAllow: /\n" }; throw new Error("fetch failed"); };
     const run = await collect({ ai: false, fixtures: true, now: "2026-11-01T00:00:00.000Z", prev: first.next, force: true, fetchers: { fetchText: down } });
-    assert.equal(run.changes.length, 0); assert.equal(Object.keys(run.next.records).filter((i) => i.startsWith("page:")).length, 36);
+    assert.equal(run.changes.length, 0); assert.equal(Object.keys(run.next.records).filter((i) => i.startsWith("page:")).length, 24);
     assert.ok(run.runs.filter((r) => r.sourceId.startsWith("page:")).every((r) => !r.ok));
   });
 
@@ -197,9 +206,9 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
   await t("UBC residence fees are reviewed but NOT published (terms of use); the page shows a notice with official links", () => {
     assert.ok([...man.points, ...van.points].every((p) => p.evidence.every((e) => !/ubc\.ca/.test(e.url)))); // no UBC figure anywhere
     const n = van.notices!.find((x) => x.sourceId === "ubc-housing-fees")!; assert.equal(n.topic, "housing"); assert.ok(n.text.en && n.text.ja && n.links.length >= 4 && n.links.every((l) => /^https:\/\//.test(l.url)));
-    const src = officialSources.find((x) => x.id === "ubc-housing-fees")!; assert.equal(src.terms.status, "needs-review");
+    assert.equal(rightsOfSource("ubc-housing-fees").reuseStatus, "restricted");
     assert.ok(!sources.some((x) => x.id === "page:ubc-housing-fees")); // never fetched or checked without data points
-    assert.ok(officialSources.filter((x) => x.terms.status === "needs-review").every((x) => ![...man.points, ...van.points].some((p) => p.sourceId === x.id)));
+    assert.ok(officialSources.filter((x) => rightsOfSource(x.id).automation === "blocked" && rightsOfSource(x.id).reuseStatus === "restricted" && x.id.startsWith("ubc")).every((x) => ![...man.points, ...van.points].some((p) => p.sourceId === x.id)));
   });
 
   console.log(`${n} official-data tests passed`);

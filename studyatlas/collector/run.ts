@@ -20,7 +20,7 @@ import { sources } from "./sources";
 import { diffSnapshots, emptySnapshot, merge } from "./store";
 import type { CollectedRecord, FetchContext, Snapshot, SourceRun } from "./types";
 import { fetchJson, fetchText, postJson, sleep, USER_AGENT } from "./util";
-import { automationFor } from "../data/official/rights";
+import { RIGHTS, automationFor } from "../data/official/rights";
 
 export const DEFAULT_DATA_DIR = path.resolve(process.cwd(), "data/collected");
 const arg = (name: string) => { const i = process.argv.indexOf(`--${name}`); return i >= 0 ? process.argv[i + 1] : undefined; };
@@ -42,10 +42,16 @@ export async function collect(o: { only?: string[]; ai: boolean; fixtures: boole
   // Every request goes through one gate: robots.txt must allow the URL, and a Crawl-delay is honoured per host (Ver.1.2).
   // (The page sources check robots themselves as before; checking twice is harmless – the verdict is cached per origin.)
   const lastAt = new Map<string, number>(); const polite = async (url: string) => {
-    const rb = await robots(url); if (!rb.allowed) throw new Error(`${url}: ${rb.reason} – not requested`);
+    const rb = await robots(url);
+    if (!rb.allowed) {
+      const ex = Object.values(RIGHTS).find((r) => r.robotsException && url.startsWith(r.robotsException.urlPrefix))?.robotsException;
+      if (!ex) throw new Error(`${url}: ${rb.reason} – not requested`);
+      console.warn(`[robots] ${url} is disallowed by robots.txt but allowed by the provider's usage policy (${ex.policyUrl}); continuing at the documented rate.`);
+    }
     const host = new URL(url).host; const gap = (rb.crawlDelay ?? 0) * 1000; const wait = (lastAt.get(host) ?? 0) + gap - Date.now(); if (gap > 0 && wait > 0) await sleep(wait); lastAt.set(host, Date.now());
   };
-  const gated = o.fixtures ? base : { ...base, fetchJson: async (u: string) => { await polite(u); return base.fetchJson(u); }, postJson: async (u: string, b: unknown) => { await polite(u); return base.postJson(u, b); } };
+  const gate = !o.fixtures && !o.fetcher; // fixtures and an injected JSON fetcher are tests: no real robots.txt requests
+  const gated = !gate ? base : { ...base, fetchJson: async (u: string) => { await polite(u); return base.fetchJson(u); }, postJson: async (u: string, b: unknown) => { await polite(u); return base.postJson(u, b); } };
   const ctx: FetchContext = { ...gated, robots, now: o.now };
   for (const s of sources) {
     if (o.only && !o.only.includes(s.id)) continue;

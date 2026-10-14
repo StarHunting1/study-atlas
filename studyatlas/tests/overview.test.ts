@@ -13,7 +13,7 @@ let n = 0; const t = (name: string, fn: () => void) => { fn(); n++; console.log(
 const man = getCity("manchester")!, van = getCity("vancouver")!;
 
 t("every city has a quick overview for the five topics; a missing topic says 'none', never a made-up figure", () => {
-  for (const c of cities) for (const topic of TOPICS) { const k = keyFigure(c, topic); assert.ok(["point", "money", "text", "temp", "schools", "none"].includes(k.kind)); if (k.kind === "none") assert.equal(keyStatus(k), undefined); }
+  for (const c of cities) for (const topic of TOPICS) { const k = keyFigure(c, topic); assert.ok(["point", "money", "text", "temp", "schools", "link", "none"].includes(k.kind)); if (k.kind === "none") assert.equal(keyStatus(k), undefined); }
 });
 
 t("official cities: the key figure is a verified data point with its audience; nothing is promoted to 'verified'", () => {
@@ -32,7 +32,7 @@ t("climate and schools: temperature range comes from the stored months; school c
 
 t("compare verdicts: same basis, different basis, not verified, missing – and free text is never 'same basis'", () => {
   const living = [keyFigure(man, "living"), keyFigure(van, "living")]; assert.equal(compareKeys(living), "missing");
-  const tr = [keyFigure(man, "transport"), keyFigure(van, "transport")]; const verdict = compareKeys(tr); assert.ok(["same", "differ", "unverified"].includes(verdict));
+  const tr = [keyFigure(man, "transport"), keyFigure(van, "transport")]; assert.equal(tr[1].kind, "link", "TransLink figures are held back: a link to the official page, no figure"); assert.equal(compareKeys(tr), "missing");
   assert.equal(compareKeys([{ kind: "none" }, { kind: "none" }]), "missing"); assert.equal(compareKeys([keyFigure(man, "living")]), "missing");
   const mk = (per: "month" | "week", audience: "adult" | "student", status: "verified" | "unverified" = "verified"): Key => ({ kind: "point", point: { ...(keyPoint("manchester", "living") as never as object), value: { amount: 1, currency: "GBP", per }, audience, status } as never });
   assert.equal(compareKeys([mk("month", "adult"), mk("month", "adult")]), "same"); assert.equal(compareKeys([mk("month", "adult"), mk("week", "adult")]), "differ");
