@@ -53,6 +53,11 @@ const fail = (match: RegExp) => async (url: string) => { if (match.test(url)) th
     const r = await collect({ only: ["govuk-content"], ai: false, fixtures: false, now: T2, prev: first.next, fetcher: fail(/healthcare/) });
     assert.equal(r.runs[0].ok, true); assert.deepEqual(r.next.records["govuk-content:/healthcare-immigration-application"], first.next.records["govuk-content:/healthcare-immigration-application"]); assert.equal(r.changes.length, 0);
   });
+  await t("a dataset whose CKAN licence is not OGL-Canada is not collected (that dataset only); the other one still is", async () => {
+    const r = await collect({ only: ["canada-open-gov"], ai: false, fixtures: false, now: T2, prev: emptySnapshot(), fetcher: edit(/51dbf91e/, (j) => { j.result.license_id = "ca-odla-aldg"; j.result.license_title = "Some other licence"; }) });
+    const ids = Object.keys(r.next.records).filter((i) => i.startsWith("canada-open-gov:"));
+    assert.deepEqual(ids, ["canada-open-gov:c2a1fdbf-d9b7-4c84-b7eb-c845b6ffd5e6"]);
+  });
   await t("a pinned dataset failing is kept as is (not flagged missing)", async () => {
     const r = await collect({ only, ai: false, fixtures: false, now: T2, prev: first.next, fetcher: fail(/51dbf91e/) });
     assert.deepEqual(r.next.records["canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8"], first.next.records["canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8"]); assert.equal(r.changes.length, 0);

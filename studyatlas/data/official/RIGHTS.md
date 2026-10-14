@@ -14,8 +14,9 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 1 full |
 | Met Office – historical monthly station data (Ringway) (`metoffice-station-data`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | 1 full |
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |
-| GOV.UK (Content API) (`govuk-content`) | **unknown** | figure-with-link | allowed | open-api | never | no | — |
-| Open Government Canada (CKAN API) (`canada-open-gov`) | **unknown** | figure-with-link | allowed | open-api | never | no | — |
+| GOV.UK (Content API) (`govuk-content`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
+| Open Government Canada (CKAN API) (`canada-open-gov`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
+| Office for National Statistics – Price Index of Private Rents (Manchester) (`ons-private-rents`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | — |
 
 ## Details
 
@@ -125,23 +126,44 @@ What each publisher's published terms permit, how the data may be accessed, and 
 
 ### GOV.UK (Content API) — `govuk-content`
 
-- reuseStatus: **unknown** · collector: **allowed** · access: open-api · last reviewed: never
+- reuseStatus: **permitted** · collector: **allowed** · access: open-api · last reviewed: 2026-10-14
 - source: https://www.gov.uk/
-- terms / licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/
-- restrictions: none recorded
-- review notes: Pending: terms pages are read in the next probe run. Collected records stay unverified and are never shown without a person's approval.
+- terms / licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ (Open Government Licence v3.0 (except where otherwise stated on a page))
+- restrictions: attribution-required
+- attribution required: “Contains public sector information licensed under the Open Government Licence v3.0.”
+- review notes: “To reuse content published on GOV.UK you must meet the conditions of the Open Government Licence.” The page lists the Content API among the APIs for reusing GOV.UK content and says “You can scrape GOV.UK as long as you respect our robots.txt policy. If you make too many requests, your access will be limited until your request rate drops.” The footer states “All content is available under the Open Government Licence v3.0, except where otherwise stated”; the terms page adds that “Most content on GOV.UK is subject to Crown copyright protection and is published under the OGL, which also sets out which content is exempt”, and that content not under the OGL is usually credited to its owner. robots.txt (read 2026-10-14) disallows only /*/print$ and /search/all* for all agents, so /api/content/ is allowed; no Crawl-delay applies to our agent. No numeric request limit is published, so the collector stays at two pages per run and honours robots.txt. The OGL exempts personal information, third-party rights, departmental logos and other IP; each collected record keeps its own licence line and stays unverified until a person approves it. Not read: the Content API documentation site.
 - pages read:
-  - none yet
+  - https://www.gov.uk/help/reuse-govuk-content (2026-10-14) — Reuse GOV.UK content: OGL, APIs, scraping and rate limiting (full)
+  - https://www.gov.uk/help/terms-conditions (2026-10-14) — Terms and conditions: Crown copyright and OGL (full)
+  - https://www.gov.uk/robots.txt (2026-10-14) — crawl rules
 
 ### Open Government Canada (CKAN API) — `canada-open-gov`
 
-- reuseStatus: **unknown** · collector: **allowed** · access: open-api · last reviewed: never
+- reuseStatus: **permitted** · collector: **allowed** · access: open-api · last reviewed: 2026-10-14
 - source: https://open.canada.ca/
-- terms / licence: none published
-- restrictions: none recorded
-- review notes: Pending: terms pages are read in the next probe run. Collected records stay unverified and are never shown without a person's approval.
+- terms / licence: https://open.canada.ca/en/open-government-licence-canada (Open Government Licence – Canada 2.0, checked per dataset)
+- restrictions: attribution-required, crawl-delay
+- attribution required: “Contains information licensed under the Open Government Licence – Canada.”
+- review notes: The Open Government Licence – Canada (version 2.0, read in full) grants a “worldwide, royalty-free, perpetual, non-exclusive licence to use the Information, including for commercial purposes”: copy, modify, publish, translate, adapt, distribute or otherwise use it for any lawful purpose, with the provider's attribution statement (default: “Contains information licensed under the Open Government Licence – Canada.”). It does not cover personal information, third-party rights the provider is not authorised to license, official names, crests and logos, or information under other IP rights, and it implies no endorsement. The licence applies to a dataset only if the dataset is offered under it, so the collector checks every dataset's CKAN licence (license_id ca-ogl-lgo, “Open Government Licence - Canada”, listed by license_list) and pauses collection of any dataset with another or no licence – that dataset only. The two pinned datasets were recorded under this licence in earlier live runs. The API page confirms the public CKAN API needs no key and supports GET only (the collector uses GET). robots.txt asks for “Crawl-delay: 20” and does not disallow /data/; the collector observes the delay. The terms page requested (open.canada.ca/en/terms-and-conditions) returned HTTP 404; the site footer links to https://www.canada.ca/en/transparency/terms.html, which was not re-read here. Only dataset metadata is stored; no figures are shown.
 - pages read:
-  - none yet
+  - https://open.canada.ca/en/open-government-licence-canada (2026-10-14) — Open Government Licence - Canada 2.0 (full)
+  - https://open.canada.ca/en/access-our-application-programming-interface-api (2026-10-14) — CKAN API page (GET only, no key)
+  - https://open.canada.ca/robots.txt (2026-10-14) — Crawl-delay: 20
+  - https://open.canada.ca/data/api/action/license_list (2026-10-14) — licence list: ca-ogl-lgo = Open Government Licence - Canada
+
+### Office for National Statistics – Price Index of Private Rents (Manchester) — `ons-private-rents`
+
+- reuseStatus: **permitted** · collector: **blocked** · access: open-data-file · last reviewed: 2026-10-14
+- source: https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003
+- terms / licence: https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/ (Open Government Licence v3.0 (ONS website terms))
+- restrictions: attribution-required
+- attribution required: “Source: Office for National Statistics licensed under the Open Government Licence v3.0.”
+- review notes: ONS terms: “Most content on this website is subject to Crown copyright protection and is published under the Open Government Licence (OGL). Some content is exempt from the OGL”; the exemptions named are photographs, illustrations and videos under third-party licences, and “Reproduction of information is subject to the terms of the OGL and the UK Government Licensing Framework.” The Manchester page ends “All content is available under the Open Government Licence v3.0, except where otherwise stated” and credits the rent figures to “Price Index of Private Rents from the Office for National Statistics”; the house-price figures on the same page come from the UK House Price Index (ONS and HM Land Registry) and are not covered by this record. Scope seen on the page: Manchester local authority, average monthly private rent £1,373 for August 2026 (+4.2% on a year earlier), also by bedroom count and property type; monthly; “UK-level rent estimates for the latest two months … are provisional”. The full data is a monthly UK-wide xlsx (about 17.8 MB, latest edition 16 September 2026) on the dataset page, with a “Download data” link per chart. ONS has no robots.txt (HTTP 404) and the terms pages say nothing about automated access. Not confirmed: the release bulletin (HTTP 502 when read) and so the precise definition (new and existing tenancies) and underlying data credits; the source's own caveats must be read before a figure is published. No ONS figure is stored or shown, and no collector exists: this source is blocked for automation until a collector is written and reviewed.
+- pages read:
+  - https://www.ons.gov.uk/help/terms-conditions (2026-10-14) — ONS website terms: Crown copyright, OGL, exemptions (full)
+  - https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003 (2026-10-14) — Manchester page: rent figures, sources, licence footer
+  - https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics (2026-10-14) — dataset page: monthly xlsx editions
+  - https://www.ons.gov.uk/robots.txt (2026-10-14) — HTTP 404 (no crawl rules)
 
 ## Not covered by this review
 

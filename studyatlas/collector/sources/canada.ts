@@ -19,12 +19,17 @@ export const CANADA_DATASETS: Dataset[] = [
 type Pkg = {
   id: string; name: string; title: string; title_translated?: { en?: string; fr?: string };
   organization?: { title?: string }; metadata_created?: string; metadata_modified?: string;
-  license_title?: string; license_url?: string; resources?: { format?: string; last_modified?: string | null; url?: string }[];
+  license_id?: string; license_title?: string; license_url?: string; resources?: { format?: string; last_modified?: string | null; url?: string }[];
 };
+
+/** Ver.1.2.1: only datasets that CKAN itself marks as Open Government Licence - Canada are collected; any other (or missing) licence pauses collection of that dataset only. */
+export const OGL_CANADA_ID = "ca-ogl-lgo";
+export const datasetLicenceOk = (p: Pick<Pkg, "license_id" | "license_title">) =>
+  p.license_id === OGL_CANADA_ID || (!p.license_id && /^Open Government Licence\s*[-–]\s*Canada$/i.test((p.license_title ?? "").trim()));
 
 export const canada: Source = {
   id: "canada-open-gov", name: "Open Government Canada (CKAN API)", country: "CAN", access: "implemented",
-  docs: "https://open.canada.ca/en/access-our-application-programming-interface-api", licence: "Per dataset (usually Open Government Licence – Canada; stored per record)",
+  docs: "https://open.canada.ca/en/access-our-application-programming-interface-api", licence: "Open Government Licence – Canada, checked per dataset (a dataset under any other licence is not collected)",
   domains: ["open.canada.ca"], topics: ["housing", "climate"],
   note: "Public CKAN API, no key. Dataset metadata only in Ver.1.0.",
   async fetch(ctx): Promise<Fetched> {
@@ -36,6 +41,7 @@ export const canada: Source = {
         const res = (await ctx.fetchJson(apiUrl)) as { success?: boolean; result?: Pkg };
         const p = res?.result;
         if (!res?.success || !p?.id || !p.title) throw new Error("unexpected response shape");
+        if (!datasetLicenceOk(p)) { errors.push(`${d.id}: licence "${p.license_id ?? p.license_title ?? "none"}" is not Open Government Licence - Canada; paused until reviewed`); continue; }
         const title = p.title_translated?.en ?? p.title;
         const formats = [...new Set((p.resources ?? []).map((r) => (r.format ?? "").toUpperCase()).filter(Boolean))];
         records.push({

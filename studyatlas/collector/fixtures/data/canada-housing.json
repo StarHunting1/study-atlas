@@ -13,7 +13,8 @@
   },
   "metadata_created": "2024-01-01T00:00:00",
   "metadata_modified": "2026-03-01T00:00:00",
-  "license_title": "[FIXTURE] Test licence",
+  "license_id": "ca-ogl-lgo",
+  "license_title": "Open Government Licence - Canada",
   "resources": [
    {
     "format": "CSV",
