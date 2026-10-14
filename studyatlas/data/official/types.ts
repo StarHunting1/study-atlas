@@ -1,6 +1,7 @@
 import type { Localized } from "@/lib/i18n";
 import type { Status } from "../schema";
 import type { Topic } from "./sources";
+import type { RightsOverride } from "./rights";
 /*
  * Official city data (Ver.1.5): concrete figures with their conditions, kept separate from the Ver.1.3 profile
  * summaries. Every data point says what the number is, for whom, for which period, and where exactly it was read.
@@ -59,6 +60,8 @@ export type DataPoint = {
   note?: Localized;
   /** Shown as a key figure on the city overview tab */
   highlight?: boolean;
+  /** Rights of this single figure when they differ from its source (see rights.ts). Rarely needed. */
+  rights?: RightsOverride;
   /** For api sources: id of the collector record holding the same figure (data/collected/snapshot.json). Kept in sync by review. */
   collectedId?: string;
 };

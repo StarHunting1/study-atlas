@@ -1,8 +1,9 @@
 import { allOfficialData, officialSources } from "../../data/official";
 import type { DataPoint } from "../../data/official/types";
 import { numbersIn } from "../../data/official/validate";
+import { rightsOfSource } from "../../data/official/rights";
 import type { CollectedRecord, Fetched, Source } from "../types";
-import { htmlToText, normalize, sha256 } from "../util";
+import { htmlToText, normalize, sha256, sleep } from "../util";
 /*
  * Official page check (no API available). For every data point whose source is a public web page, fetch that page
  * (once per cadence, only where robots.txt allows) and check that the recorded figure is still shown:
@@ -27,13 +28,14 @@ export function makePageSource(id: string): Source {
   const os = officialSources.find((s) => s.id === id)!;
   return {
     id: `page:${id}`, name: `${os.publisher} – ${os.name.en} (page check)`, country: os.country, access: "page-check", cadenceDays: os.cadenceDays,
-    docs: os.pages[0], licence: os.terms.licence, domains: [...new Set(os.pages.map((u) => new URL(u).hostname))], topics: [os.topic],
+    docs: os.pages[0], licence: rightsOfSource(id).licence, domains: [...new Set(os.pages.map((u) => new URL(u).hostname))], topics: [os.topic],
     note: "Public web page without an API: checks that recorded figures are still shown (robots.txt respected).",
     async fetch(ctx): Promise<Fetched> {
       const points = allOfficialData().flatMap((c) => c.points).filter((p) => p.sourceId === id && p.status !== "pending");
       const urls = [...new Set(points.flatMap((p) => p.evidence.map((e) => e.url)))];
       const texts: Record<string, string> = {}; const errors: string[] = [];
-      for (const url of urls) {
+      for (const [i, url] of urls.entries()) {
+        if (i > 0) await sleep(1000); // one request at a time, a second apart
         const rb = await ctx.robots(url);
         if (!rb.allowed) { errors.push(`${url}: ${rb.reason}`); continue; }
         try { const r = await ctx.fetchText(url); if (r.status >= 400) throw new Error(`HTTP ${r.status}`); texts[url] = htmlToText(r.body); }
@@ -53,7 +55,7 @@ export function makePageSource(id: string): Source {
           period: p.validFor, sourceUrl: ev.url, apiUrl: ev.url, retrievedAt: ctx.now,
           evidence: { path: `page text (${check})`, quote: ev.quote },
           contentHash: sha256(JSON.stringify([check === "not-found", p.value ?? p.text?.en ?? "", p.evidence.map((e) => e.url)])),
-          licence: os.terms.licence, status: "unverified", review: check === "not-found" ? "human-required" : "standard",
+          licence: rightsOfSource(id).licence, status: "unverified", review: check === "not-found" ? "human-required" : "standard",
         });
       }
       if (!records.length) throw new Error(errors.join("; ") || "no pages fetched");

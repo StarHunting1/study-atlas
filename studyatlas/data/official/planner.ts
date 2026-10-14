@@ -2,7 +2,8 @@ import type { Localized } from "@/lib/i18n";
 import type { Ccy, CityId, HousingType, ItemId, Per, StudyType } from "@/lib/planner";
 import { CURRENCIES } from "@/lib/planner";
 import { getSchool, isLanguage, listSchools, type Price } from "../schools";
-import { officialData, officialSources } from "./index";
+import { officialData } from "./index";
+import { isFigureShown, rightsOfPoint } from "./rights";
 import type { DataPoint } from "./types";
 /*
  * Cost planner candidates (Ver.1.6): verified official figures from data/official/* (Ver.1.5) and, later, school fees,
@@ -58,10 +59,10 @@ export function cityCandidates(cityId: CityId, itemId: ItemId, o: { studyType: S
     if (r.itemId !== itemId) continue;
     if (r.housing && !r.housing.includes(o.housingType)) continue;
     const p = data.points.find((x) => x.id === r.pointId); if (!p || p.status !== "verified" || !p.value) continue;
+    if (!isFigureShown(p)) continue; // the publisher's terms do not allow this figure to be shown or used (rights.ts)
     const currency = ccyOf(p.value.currency); if (!currency) continue;
-    const terms = officialSources.find((s) => s.id === p.sourceId)?.terms.status === "page-check-only";
     const mismatch = r.types && !r.types.includes(o.studyType);
-    const base = { itemId, per: r.per, currency, coverageWeeks: r.coverageWeeks, eligible: !mismatch, auto: !r.manual, housingType: itemId === "housing" ? o.housingType : undefined, publisher: p.evidence[0].publisher, url: p.evidence[0].url, validFor: p.validFor, status: p.status, audience: audienceOf(p), termsUnconfirmed: !!terms, origin: "city" as const,
+    const base = { itemId, per: r.per, currency, coverageWeeks: r.coverageWeeks, eligible: !mismatch, auto: !r.manual, housingType: itemId === "housing" ? o.housingType : undefined, publisher: p.evidence[0].publisher, url: p.evidence[0].url, validFor: p.validFor, status: p.status, audience: audienceOf(p), termsUnconfirmed: rightsOfPoint(p).reuseStatus !== "permitted", origin: "city" as const,
       caution: mismatch ? { en: "Not meant for your study type: " + (r.caution?.en ?? "check the conditions."), ja: "選択中の留学タイプ向けではありません。" + (r.caution?.ja ?? "適用条件をご確認ください。") } : r.caution };
     const label = r.label ?? p.label; const range = p.value.max !== undefined && r.use !== "value";
     out.push({ ...base, id: `${p.id}`, value: p.value.amount, label: range ? { en: `${label.en} – lower end`, ja: `${label.ja}（下限）` } : label });

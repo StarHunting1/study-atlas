@@ -5,6 +5,7 @@ import type { City, Country } from "@/data/types";
 import type { DataPoint, OfficialCityData } from "@/data/official/types";
 import { officialSources } from "@/data/official";
 import { sections } from "@/data/fields";
+import { displayModeOfClimate, showsFigure } from "@/data/official/rights";
 import { healthLinks, visaLinks } from "@/data/visa";
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
@@ -60,7 +61,7 @@ function Card({ topic, city, data, open, setOpen }: { topic: Topic; city: City; 
     <Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} /><Notices data={data} topic="housing" />
     <Group title={L(ot.housingMarket)} points={by("housing").filter((p) => p.audience === "renter")} /><Group title={L(ot.housingEstimate)} points={by("housing").filter((p) => !p.housing && p.audience !== "renter")} /><Profile city={city} id="housing" /></>;
   if (topic === "transport") body = <><Group title={L(ot.transportAdult)} points={by("transport").filter((p) => p.audience === "adult")} /><Group title={L(ot.transportStudent)} points={by("transport").filter((p) => p.audience !== "adult")} /><Profile city={city} id="transport" /></>;
-  if (topic === "climate") body = <>{data?.climate && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}</span></div><ClimateCharts c={data.climate} />
+  if (topic === "climate") body = <>{data?.climate && showsFigure(displayModeOfClimate(data.climate)) && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}</span></div><ClimateCharts c={data.climate} />
     {data.climate.derived && <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">{L(ot.climateDerived)}</p>}
     <Disclosure level="sources"><p className="text-[11px] text-slate-500">{data.climate.evidence.map((e) => <span key={e.url}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(e.section)} </span>)}</p>{data.climate.note && <p className="mt-1 text-[11px] text-slate-400">{L(data.climate.note)}</p>}</Disclosure></>}
     {data?.climateNote && <p className="text-xs text-slate-500">{L(data.climateNote)}</p>}<Profile city={city} id="climate" /></>;

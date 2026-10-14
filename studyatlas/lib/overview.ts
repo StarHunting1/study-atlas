@@ -5,6 +5,7 @@ import { climateCompare } from "@/data/official/compare";
 import { officialData } from "@/data/official";
 import { sections } from "@/data/fields";
 import type { DataPoint } from "@/data/official/types";
+import { displayModeOfClimate, isFigureShown } from "@/data/official/rights";
 /*
  * Quick Overview (Ver.1.8, Progressive Disclosure level 1). One short "key figure" per topic, picked from what the site already
  * holds – never computed from nothing, never promoted from unverified to verified. The status travels with the figure so the
@@ -21,6 +22,7 @@ export type Key =
   | { kind: "text"; fact: Fact<Localized> }
   | { kind: "temp"; lo: number; hi: number; station: string; period: string; status: Status; derived: boolean }
   | { kind: "schools"; universities: number; languageSchools: number; status: Status }
+  | { kind: "link"; url: string; publisher: string }  // the figure may not be shown (rights.ts): a link to the official page instead
   | { kind: "none" };
 
 const shown = (s: Status) => s !== "pending";
@@ -29,7 +31,7 @@ const POINT_TOPIC: Partial<Record<Topic, DataPoint["topic"]>> = { living: "livin
 
 /** The data point to show first: a highlighted verified figure, else any verified one, else any shown (its status is displayed). */
 export function keyPoint(cityId: string, topic: Topic): DataPoint | undefined {
-  const t = POINT_TOPIC[topic]; const pts = (officialData(cityId)?.points ?? []).filter((p) => p.topic === t && p.value && shown(p.status));
+  const t = POINT_TOPIC[topic]; const pts = (officialData(cityId)?.points ?? []).filter((p) => p.topic === t && p.value && shown(p.status) && isFigureShown(p));
   return pts.find((p) => p.highlight && p.status === "verified") ?? pts.find((p) => p.status === "verified") ?? pts[0];
 }
 
@@ -37,6 +39,7 @@ export function keyFigure(c: City, topic: Topic): Key {
   const pr = c.profile;
   if (topic === "climate") {
     const k = climateCompare(c.id);
+    // (climateCompare already returns nothing for a climate record whose terms do not allow showing it)
     if (k) { const r = k.mean ?? (k.tmin && k.tmax ? ([k.tmin[0], k.tmax[1]] as [number, number]) : undefined); if (r) return { kind: "temp", lo: r[0], hi: r[1], station: k.station, period: k.period, status: k.status, derived: k.derived }; }
     return has(pr.climate.overview) ? { kind: "text", fact: pr.climate.overview } : { kind: "none" };
   }
@@ -47,6 +50,9 @@ export function keyFigure(c: City, topic: Topic): Key {
     return { kind: "schools", universities: uu?.value.length ?? 0, languageSchools: ll?.value.length ?? 0, status };
   }
   const p = keyPoint(c.id, topic); if (p) return { kind: "point", point: p };
+  // Figures exist but the publisher's terms do not allow showing them: point to the official page rather than to a profile summary
+  const held = (officialData(c.id)?.points ?? []).find((x) => x.topic === POINT_TOPIC[topic] && x.value && shown(x.status) && !isFigureShown(x));
+  if (held) return { kind: "link", url: held.evidence[0].url, publisher: held.evidence[0].publisher };
   if (topic === "living") return has(pr.cost.totalMonthly) ? { kind: "money", fact: pr.cost.totalMonthly } : { kind: "none" };
   if (topic === "housing") return has(pr.housing.overview) ? { kind: "text", fact: pr.housing.overview } : { kind: "none" };
   return has(pr.transport.modes) ? { kind: "text", fact: pr.transport.modes } : { kind: "none" };
@@ -58,7 +64,7 @@ export const keyStatus = (k: Key): Status | undefined => (k.kind === "point" ? k
 /** Quick-compare verdict for one topic across cities: same basis, differing basis, unverified or not enough data. Never fills gaps. */
 export type Cmp = "same" | "differ" | "unverified" | "missing" | "n/a";
 export function compareKeys(keys: Key[]): Cmp {
-  const have = keys.filter((k) => k.kind !== "none");
+  const have = keys.filter((k) => k.kind !== "none" && k.kind !== "link");
   if (have.length < 2) return "missing";
   if (have.some((k) => keyStatus(k) !== "verified")) return "unverified";
   const kinds = new Set(have.map((k) => k.kind)); if (kinds.size > 1) return "differ";

@@ -2,7 +2,8 @@
 import type { DataPoint } from "@/data/official/types";
 import { useI18n } from "@/lib/i18n";
 import { validForText } from "@/data/official/validFor";
-import { officialSources } from "@/data/official/sources";
+import { displayModeOf, rightsOfPoint, showsFigure } from "@/data/official/rights";
+import { tpl } from "@/components/planner/format";
 import { ot } from "@/locales/official";
 import { StatusBadge } from "@/components/FactView";
 import Disclosure from "@/components/Disclosure";
@@ -25,15 +26,40 @@ export function AmountText({ p, big }: { p: DataPoint; big?: boolean }) {
   );
 }
 
+/** What the publisher's terms mean for this figure, in one line (level 3). The long review notes stay in the developer data. */
+function RightsLine({ p }: { p: DataPoint }) {
+  const { L } = useI18n(); const r = rightsOfPoint(p); const hold = r.display === "hold";
+  const text = hold ? L(ot.rights.hold) : r.reuseStatus === "permitted" ? tpl(L(ot.rights.permitted), { licence: r.licence ?? "" }) : r.reuseStatus === "needs-review" ? L(ot.rights.needsReview) : r.reuseStatus === "restricted" ? L(ot.rights.restricted) : L(ot.rights.unknown);
+  return (
+    <div className="mt-1 space-y-0.5 text-slate-500" data-testid={`rights-${p.id}`} data-reuse={r.reuseStatus}>
+      <p>{L(ot.rights.label)}: {text}{r.licenseUrl && <> · <a href={r.licenseUrl} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(ot.rights.terms)}</a></>}</p>
+      {r.attribution && showsFigure(displayModeOf(p)) && <p>{L(ot.rights.attribution)}: {r.attribution}</p>}
+      {r.lastReviewedAt && <p className="text-slate-400">{L(ot.rights.reviewedOn)}: {r.lastReviewedAt}</p>}
+    </div>
+  );
+}
+
 /**
  * One official figure. Level 2: amount, who it applies to, a warning when it is not verified. Level 3 (one more click):
- * conditions, contract, validity, sources, retrieval dates, reuse terms and notes.
+ * conditions, contract, validity, sources, retrieval dates, the reuse terms and notes.
+ * When the publisher's terms do not allow the figure to be shown (rights.ts: link-only / hold) the card shows a link to the official page instead.
  */
 export default function DataCard({ p }: { p: DataPoint }) {
   const { L, lang } = useI18n();
+  const mode = displayModeOf(p);
+  if (!showsFigure(mode)) {
+    return (
+      <article data-point={p.id} data-mode={mode} className="flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+        <h3 className="text-sm font-semibold leading-snug text-[#0b2a5b]">{L(p.label)}</h3>
+        <p className="text-xs leading-relaxed text-slate-600">{L(ot.linkOnlyBody)}</p>
+        <a href={p.evidence[0].url} target="_blank" rel="noopener noreferrer" data-testid={`link-${p.id}`} className="inline-flex min-h-[40px] w-fit items-center gap-1 rounded-full px-3 text-sm font-medium text-sky-800 ring-1 ring-sky-200 hover:bg-sky-50">{L(ot.linkOnly)} · {p.evidence[0].publisher} ↗</a>
+        <Disclosure level="sources" className="mt-auto"><div className="text-[11px] leading-relaxed"><RightsLine p={p} /></div></Disclosure>
+      </article>
+    );
+  }
   const shown = p.status !== "pending";
   return (
-    <article data-point={p.id} className={`flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ${p.status === "verified" ? "ring-slate-200" : "ring-amber-200"}`}>
+    <article data-point={p.id} data-mode={mode} className={`flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ${p.status === "verified" ? "ring-slate-200" : "ring-amber-200"}`}>
       <div className="flex items-start justify-between gap-2">
         <h3 className="text-sm font-semibold leading-snug text-[#0b2a5b]">{L(p.label)}</h3>
         {p.status !== "verified" && <StatusBadge status={p.status} />}
@@ -53,7 +79,7 @@ export default function DataCard({ p }: { p: DataPoint }) {
             <p key={e.url + e.quote}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(ot.section)}: {L(e.section)}</p>
           ))}
           <p>{L(ot.retrieved)}: {p.retrievedAt}{p.checkedAt ? ` · ${L(ot.checked)}: ${p.checkedAt}` : ""}</p>
-          {officialSources.find((x) => x.id === p.sourceId)?.terms.status === "page-check-only" && <p className="mt-1 text-slate-400">{L(ot.termsPageOnly)}</p>}
+          <RightsLine p={p} />
           {p.note && <p className="mt-1 text-slate-400">{L(p.note)}</p>}
         </div>
       </Disclosure>
@@ -61,8 +87,23 @@ export default function DataCard({ p }: { p: DataPoint }) {
   );
 }
 
+/** Figures that may not be shown: one "check the official page" card per source (not one per figure). */
+function HeldCard({ points }: { points: DataPoint[] }) {
+  const { L } = useI18n(); const first = points[0]; const urls = [...new Set(points.map((p) => p.evidence[0].url))].slice(0, 3);
+  return (
+    <article data-held-source={first.sourceId} data-mode={displayModeOf(first)} className="flex flex-col gap-2 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200">
+      <h3 className="text-sm font-semibold leading-snug text-[#0b2a5b]">{first.evidence[0].publisher}</h3>
+      <p className="text-xs leading-relaxed text-slate-600">{L(ot.linkOnlyBody)}</p>
+      <div className="flex flex-wrap gap-2">{urls.map((u) => <a key={u} href={u} target="_blank" rel="noopener noreferrer" data-testid={`link-${first.sourceId}`} className="inline-flex min-h-[40px] items-center gap-1 rounded-full px-3 text-sm font-medium text-sky-800 ring-1 ring-sky-200 hover:bg-sky-50">{L(ot.linkOnly)} ↗</a>)}</div>
+      <Disclosure level="sources" className="mt-auto"><div className="text-[11px] leading-relaxed"><RightsLine p={first} /></div></Disclosure>
+    </article>
+  );
+}
+
 export function CardGrid({ points }: { points: DataPoint[] }) {
   const { L } = useI18n();
   if (!points.length) return <p className="text-sm text-slate-500">{L(ot.noData)}</p>;
-  return <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{points.map((p) => <DataCard key={p.id} p={p} />)}</div>;
+  const shown = points.filter((p) => showsFigure(displayModeOf(p))); const held = points.filter((p) => !showsFigure(displayModeOf(p)));
+  const bySource = [...new Set(held.map((p) => p.sourceId))].map((id) => held.filter((p) => p.sourceId === id));
+  return <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">{shown.map((p) => <DataCard key={p.id} p={p} />)}{bySource.map((g) => <HeldCard key={g[0].sourceId} points={g} />)}</div>;
 }

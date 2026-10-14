@@ -109,8 +109,10 @@ await t("fictional sample schools are never used unless explicitly allowed (test
 await t("eligibility: language students get no university halls / U-Pass; university students do", () => {
   const lang = gen(man({ studyType: "language", housing: "dorm" }))[0];
   assert.equal(lang.picks.housing.status, "unset"); assert.equal(lang.picks.housing.why, "ineligible"); assert.ok(lang.excluded.some((x) => x.itemId === "housing" && x.kind === "eligibility"));
-  const vanLang = gen(defaultEasy({ cityId: "vancouver", studyType: "language" }))[0]; assert.ok(vanLang.excluded.some((x) => x.cand.id === "van-upass" && x.kind === "eligibility")); assert.notEqual(vanLang.picks.transport.cand?.id, "van-upass");
-  const vanUni = gen(defaultEasy({ cityId: "vancouver", studyType: "university" }))[0]; assert.equal(vanUni.picks.transport.cand?.id, "van-upass");
+  const manLang = gen(man({ studyType: "language", housing: null }))[0]; assert.ok(manLang.excluded.some((x) => x.cand.id === "man-bus-allterms-student" && x.kind === "eligibility")); assert.notEqual(manLang.picks.transport.cand?.id, "man-bus-allterms-student");
+  const manUni = gen(man({ studyType: "university", housing: null }))[2]; assert.ok([manUni.picks.transport.cand?.id, ...manUni.excluded.map((x) => x.cand.id)].includes("man-bus-allterms-student") || manUni.picks.transport.status === "official");
+  // Vancouver: the TransLink fares are held back (rights review), so transport has no official figure for either study type
+  for (const studyType of ["language", "university"] as const) { const v = gen(defaultEasy({ cityId: "vancouver", studyType }))[0]; assert.equal(v.picks.transport.status, "unset"); assert.ok(v.mainMissing.includes("transport")); }
   const anyLang = gen(man({ studyType: "language", housing: null }))[0]; assert.equal(anyLang.picks.housing.status, "official"); assert.equal(anyLang.plan.housingType, "share");
 });
 

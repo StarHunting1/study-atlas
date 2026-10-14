@@ -115,8 +115,10 @@ t("official figures: only verified data points become candidates; source, year a
   const van = candidatesFor("vancouver", "housing", { studyType: "university", housingType: "dorm" }); assert.equal(van.length, 0); // UBC residence fees are not republished
   const vanOther = candidatesFor("vancouver", "housing", { studyType: "university", housingType: "other" }); assert.ok(vanOther.length === 3 && vanOther.every((c) => c.caution && /not student housing|学生寮ではありません|whole unit|住戸全体/.test(`${c.caution.en}${c.caution.ja}`)));
   for (const id of ["flights", "visa", "insurance", "registration", "otherInitial"] as ItemId[]) assert.equal(candidatesFor("manchester", id, { studyType: "university", housingType: "dorm" }).length, 0);
-  // eligibility mismatch is flagged (U-Pass BC is for students of participating public institutions, not language schools)
-  const up = candidatesFor("vancouver", "transport", { studyType: "language", housingType: "other" }).find((c) => c.id === "van-upass")!; assert.ok(up.caution!.en.startsWith("Not meant for your study type"));
+  // eligibility mismatch is flagged (the All Terms Bee Bus ticket is for students of Greater Manchester colleges and universities, not language schools)
+  const up = candidatesFor("manchester", "transport", { studyType: "language", housingType: "other" }).find((c) => c.id === "man-bus-allterms-student")!; assert.ok(up.caution!.en.startsWith("Not meant for your study type") && up.eligible === false);
+  // TransLink fares are held back by the rights review (restricted): Vancouver transport offers no official figure
+  assert.equal(candidatesFor("vancouver", "transport", { studyType: "university", housingType: "other" }).length, 0);
   assert.ok(!candidatesFor("manchester", "housing", { studyType: "university", housingType: "homestay" }).length);
   // terms-unconfirmed sources are marked; open-licence sources are not
   assert.ok(cityCandidates("manchester", "food", { studyType: "university", housingType: "dorm" }).every((c) => c.termsUnconfirmed)); assert.ok(candidatesFor("vancouver", "housing", { studyType: "university", housingType: "other" }).every((c) => !c.termsUnconfirmed));
