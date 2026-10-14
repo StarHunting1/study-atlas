@@ -103,4 +103,17 @@ export const st = {
   rateShort: { en: "Set an exchange rate to compare with your budget.", ja: "予算と比べるには為替レートの設定が必要です。" }, setRate: { en: "Set rate", ja: "レートを設定" },
   breakdown: { en: "Cost breakdown", ja: "費用の内訳を見る" }, basisBtn: { en: "Calculation basis & sources", ja: "計算根拠・出典を見る" },
   fewer: { en: "Close", ja: "閉じる" },
+  // Ver.1.1.9 flight card
+  fcTitle: { en: "Flights", ja: "航空券" }, fcFrom: { en: "From", ja: "出発地" }, fcTo: { en: "To", ja: "留学先の都市" },
+  fcToHint: { en: "Change it under “Destination” above.", ja: "上の「留学先の都市」で変更できます。" },
+  fcMonth: { en: "Departure month (optional)", ja: "出発予定月（任意）" }, fcUndecided: { en: "Not decided", ja: "日程未定" },
+  fcSearch: { en: "Search flights on Skyscanner", ja: "Skyscannerで航空券を探す" },
+  fcSearchNote: { en: "Opens Skyscanner in a new tab. Your route and month are not passed on, so enter them there: {route}{month}.", ja: "Skyscannerが新しいタブで開きます。出発地・目的地・日程は引き継がれないため、そちらで入力してください：{route}{month}" },
+  fcSearchRoute: { en: "Skyscanner may not accept a link that carries your route. StudyAtlas only passes it on where Skyscanner documents a format that works for everyone.", ja: "出発地・日程をリンクで引き継げるのは、Skyscannerが誰でも使える形式を公開している場合だけです（現在は該当なし）。" },
+  fcDetails: { en: "Reference budget and price notes", ja: "参考予算・料金の扱い" },
+  fcBudget: { en: "Reference budget ({trip})", ja: "航空券の参考予算（{trip}）" }, fcBudgetUnset: { en: "No reference budget – flights are not counted", ja: "参考予算は未設定です（航空券は未計上）" },
+  fcBudgetSet: { en: "Your reference budget – an assumption, not a fetched or average price", ja: "ご自身の参考予算です（取得した価格・平均価格ではありません）" },
+  fcNoPrice: { en: "StudyAtlas does not fetch flight prices yet, so no price is shown or estimated here.", ja: "StudyAtlasはまだ航空券の価格を取得しないため、ここでは価格を表示・推定しません。" },
+  fcBases: { en: "Price types (for later): observed price = a fare seen at a time · average price = an average over a period · reference range = a low–high band · your reference budget = a number you set.", ja: "今後区別する価格の種類：観測価格＝ある時点で確認された運賃／平均価格＝期間や経路の平均／参考価格帯＝下限〜上限の目安／参考予算＝ご自身が設定した金額。" },
+  priceBasis: { observed: { en: "Observed price", ja: "観測価格" }, average: { en: "Average price", ja: "平均価格" }, range: { en: "Reference range", ja: "参考価格帯" }, user: { en: "Your reference budget", ja: "ご自身の参考予算" } },
 } as const;

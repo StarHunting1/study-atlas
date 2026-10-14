@@ -72,22 +72,7 @@ export default function EasyMode({ onOpenAdvanced }: { onOpenAdvanced: (plan: Pl
       <section className={card}>
         <Disclosure level="row" open={extras} onOpenChange={setExtras} testid="extras" title={L(st.addConditions)} summary={L(st.addHint)}>
           <div className="space-y-6" data-testid="extras-body">
-            <div className="space-y-3"><h3 className="text-sm font-semibold text-[#0b2a5b]">{L(st.stepRoute)}</h3>
-              <div className="grid gap-3 sm:grid-cols-2">
-                <label className="space-y-1"><span className={lab}>{L(st.originCountry)}</span>
-                  <select data-testid="origin-country" value={easy.origin.country} onChange={(e) => { const c = e.target.value; const first = airportsIn(c)[0]; upd((x) => ({ ...x, origin: { country: c, airport: first?.code ?? OTHER_AIRPORT, custom: "" } })); }} className={`${sel} w-full`}>{COUNTRIES.map((c) => <option key={c.code} value={c.code}>{L(c.name)}</option>)}</select></label>
-                <label className="space-y-1"><span className={lab}>{L(st.originAirport)}</span>
-                  <select data-testid="origin-airport" value={easy.origin.airport} onChange={(e) => upd((x) => ({ ...x, origin: { ...x.origin, airport: e.target.value } }))} className={`${sel} w-full`}>{airportsIn(easy.origin.country).map((a) => <option key={a.code} value={a.code}>{L(a.city)} {L(a.name)} ({a.code})</option>)}<option value={OTHER_AIRPORT}>{L(st.otherAirport)}</option></select></label>
-                {easy.origin.airport === OTHER_AIRPORT && <label className="space-y-1 sm:col-span-2"><span className={lab}>{L(st.otherAirport)}</span>
-                  <input data-testid="origin-custom" value={easy.origin.custom} maxLength={3} placeholder={L(st.iataHint)} onChange={(e) => upd((x) => ({ ...x, origin: { ...x.origin, custom: e.target.value.replace(/[^a-zA-Z]/g, "").toUpperCase() } }))} className={`${sel} w-32 uppercase`} aria-invalid={!isIata(easy.origin.custom)} />
-                  {!isIata(easy.origin.custom) && <p className="text-xs text-amber-700">{L(st.iataInvalid)}</p>}</label>}
-              </div>
-              <p className="text-xs text-slate-500">{L(st.destAirport)}: {L(DESTINATIONS[easy.cityId].name)} ({DESTINATIONS[easy.cityId].code})</p>
-              <div className="space-y-1"><span className={lab}>{L(st.month)}</span>
-                <div role="group" aria-label={L(st.month)} className="flex flex-wrap gap-1.5">
-                  <button type="button" data-testid="month-none" aria-pressed={easy.month === null} onClick={() => upd((e) => ({ ...e, month: null }))} className={seg(easy.month === null)}>{L(st.monthUndecided)}</button>
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((m) => <button key={m} type="button" data-testid={`month-${m}`} aria-pressed={easy.month === m} onClick={() => upd((e) => ({ ...e, month: m }))} className={seg(easy.month === m)}>{monthName(m, lang)}</button>)}</div></div>
-            </div>
+            <FlightPanel easy={easy} setEasy={upd} />
 
             <div className="space-y-2"><h3 className="text-sm font-semibold text-[#0b2a5b]">{L(st.stepHousing)}</h3>
               <div role="group" aria-label={L(st.stepHousing)} className="flex flex-wrap gap-1.5">
@@ -109,8 +94,6 @@ export default function EasyMode({ onOpenAdvanced }: { onOpenAdvanced: (plan: Pl
                   </div>);
               })}
             </div>
-
-            <FlightPanel easy={easy} setEasy={upd} />
 
             <div className="space-y-3" data-testid="assume"><h3 className="text-sm font-semibold text-[#0b2a5b]">{L(st.assumeTitle)}</h3><p className="text-xs text-slate-500">{L(st.assumeLead)}</p>
               {ASSUME_ITEMS.map((k) => {

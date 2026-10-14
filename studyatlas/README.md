@@ -44,3 +44,16 @@ Slider-driven study cost planner for Manchester and Vancouver (language school o
 - Smart Planner Easy mode: first screen = destination, study type, duration, budget. Airport, departure month, housing, currency/exchange rate, flights and known costs sit under "条件を追加する". Plan cards show name, one-line character, counted total, remaining budget / over-budget and the 暫定 mark; breakdown and sources open on demand. Identical plans are merged (`groupPlans`).
 - Stored data (`studyatlas.planner.v1`, `studyatlas.smart.v1`, `studyatlas.smart.draft.v1`) is unchanged and still loads (tested). Collector, verification status and sources are untouched.
 - Tests: `tests/overview.test.ts` (9 tests, part of `npm test`).
+
+## Versioning (from Ver.1.1.9)
+
+Versions are written **Major.Phase.Update** (three parts): Major = the shape of the product, Phase = a group of related updates, Update = one release. This release is **Ver.1.1.9** (`lib/version.ts`, `package.json`). Earlier releases (Ver.1.1 … Ver.1.8) keep their names; their commits and tags are not renamed.
+
+## Flight search UX (Ver.1.1.9)
+
+Inside Smart Planner → 「条件を追加する」 a flight card holds: departure country/airport (or any IATA code), the destination (from the chosen city), departure month or 「日程未定」, one way / round trip, and the button 「Skyscannerで航空券を探す」. 「参考予算・料金の扱い」 opens the reference budget slider, which feeds the plan as the user's own assumption (round trip and one way keep separate budgets).
+
+- **The Skyscanner button opens Skyscanner's own site (skyscanner.jp / skyscanner.net) and does not carry the route or dates.** Skyscanner's documented link format (Affiliates Link API, `/g/referrals/v1/flights/day-view/?origin=…`) needs a media-partner id StudyAtlas does not have; the `/transport/flights/<from>/<to>/<yymmdd>/` style appears only in third-party pages. `SKYSCANNER_FORMATS` in `lib/flights.ts` lists both as `verified: false`; setting one to `verified: true` (with its source) is the only change needed to start passing the route. The chosen route and month are shown next to the button so they can be entered there.
+- No price is fetched, estimated or shown as an average (the Skyscanner API is not connected; the real price lookup is Ver.1.1.10 or later).
+- `PriceBasis` (`observed` · `average` · `range` · `user`) and `bookable` keep price types apart for later; a user's reference budget is never "bookable"; inconsistent quotes are dropped.
+- Saved plans and drafts keep their format (no migration).
