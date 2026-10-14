@@ -41,7 +41,15 @@ export async function fixturePost(url: string, body: unknown): Promise<unknown> 
    so the page check finds them. Tests edit the text to simulate a changed page. */
 export async function fixtureText(url: string): Promise<{ status: number; url: string; body: string }> {
   if (/\/robots\.txt$/.test(url)) return { status: 200, url, body: "User-agent: *\nAllow: /\n" };
+  if (/ringwaydata\.txt$/.test(url)) return { status: 200, url, body: fixtureStationFile() };
   const quotes = allOfficialData().flatMap((c) => c.points).flatMap((p) => p.evidence).filter((e) => e.url === url).map((e) => `<p>${e.quote}</p>`);
   if (!quotes.length) return { status: 404, url, body: "" };
   return { status: 200, url, body: `<html><body><h1>[FIXTURE]</h1>${[...new Set(quotes)].join("\n")}</body></html>` };
+}
+
+/* Met Office station file: INVENTED numbers in the real layout (header, column line, one row per month, 1946–2020). */
+export function fixtureStationFile(): string {
+  const L = ["Ringway [FIXTURE]", "Location: invented", "Estimated data is marked with a * after the value.", "Missing data (more than 2 days missing in month) is marked by ---.", "   yyyy  mm   tmax    tmin      af    rain     sun", "              degC    degC    days      mm   hours"];
+  for (let y = 1946; y <= 2020; y++) for (let m = 1; m <= 12; m++) L.push(`  ${y}  ${String(m).padStart(2)}   ${(m + 8).toFixed(1).padStart(5)}${y === 1950 ? "*" : " "}  ${(m + 2).toFixed(1).padStart(5)}   ${String(3).padStart(5)}   ${(50 + m).toFixed(1).padStart(6)}   ${(100).toFixed(1).padStart(6)}`);
+  return L.join("\n");
 }

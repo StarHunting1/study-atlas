@@ -96,3 +96,9 @@ Open each source link, confirm value / who it applies to / period / licence, the
 - **Consistency**: the report lists published figures that no longer match the latest API value.
 - `collector/probe.ts` (runs on pull requests): reviewer aid that prints robots verdict, HTTP status, money lines and links of pages to be added. Nothing is stored.
 - `collector/aia-chain.sh`: completes a TLS chain for a host that omits its intermediate certificate (verified against system roots; verification stays on).
+
+## Ver.1.5.1 additions
+- `sources/metoffice.ts`: Met Office historical monthly station data (UK OGL v3.0). Derives calendar-month means for fixed 30-year periods
+  (`MET_PERIODS`); a period with any missing month is not derived (reported as incomplete, old records kept).
+- The page check only covers sources that have data points; a source marked `needs-review` (UBC) is not fetched.
+- The consistency report also checks derived climate series against the collected records.

@@ -20,6 +20,9 @@ export const ot = {
   contract: { en: "Contract", ja: "契約期間" }, includes: { en: "Includes", ja: "含まれるもの" }, school: { en: "School", ja: "学校" },
   unverifiedNote: { en: "Not checked against the source yet – reference only.", ja: "出典との照合が未了のため、参考情報です。" },
   pendingNote: { en: "Not available yet.", ja: "まだ取得できていません。" },
+  termsPageOnly: { en: "Reuse terms: the source page grants no reuse licence. Only the figure is recorded, with a link and a short quote as evidence; terms to be confirmed.", ja: "利用条件：出典ページに再利用ライセンスの記載がありません。数値のみを記録し、リンクと短い引用を根拠として示しています（利用条件は要確認）。" },
+  termsOpen: { en: "Open licence", ja: "オープンライセンス" },
+  notShownTitle: { en: "Not shown (reviewed)", ja: "掲載していない情報（調査済み）" },
   officialBadge: { en: "Official sources", ja: "公式情報源" },
   officialIntro: {
     en: "Figures below come from official pages and open data, in the original currency, with the period and the people they apply to. Each card links to its source.",
@@ -47,6 +50,9 @@ export const ot = {
   climateMax: { en: "Max", ja: "最高" }, climateMin: { en: "Min", ja: "最低" },
   climatePeriod: { en: "Averaging period", ja: "統計期間" }, climateStation: { en: "Station", ja: "観測地点" },
   showTable: { en: "Show as table", ja: "表で表示" }, hideTable: { en: "Hide table", ja: "表を閉じる" },
+  climateDerived: { en: "Averages calculated by StudyAtlas from the Met Office's published monthly station values (calendar-month means over the period). They are not official Met Office climate averages.", ja: "Met Officeが公開する月別観測値から、StudyAtlasが統計期間の暦月平均を計算した値です。Met Office公式の気候平年値ではありません。" },
+  climateMinMaxNote: { en: "(monthly mean of daily min – daily max)", ja: "（日最低〜日最高の月別平均）" },
+  climateOther: { en: "Other period", ja: "別の統計期間" },
   climateMissing: { en: "Monthly climate averages are not available from an official source yet.", ja: "公式な月別の気候平年値はまだ取得できていません。" },
   // Visa
   visaIntro: {
@@ -71,5 +77,10 @@ export const ot = {
   cmpAudience: { en: "Not comparable: different groups of people", ja: "比較不可：対象者が異なる" },
   cmpUnverified: { en: "Not comparable: not verified", ja: "比較不可：未確認のデータ" },
   cmpMissing: { en: "No official figure", ja: "公式データなし" },
+  cmpTmax: { en: "Mean daily max temperature (coolest–warmest month)", ja: "日最高気温の平均（月別の最低〜最高）" },
+  cmpTmin: { en: "Mean daily min temperature (coolest–warmest month)", ja: "日最低気温の平均（月別の最低〜最高）" },
+  cmpPrecip: { en: "Annual precipitation (sum of the 12 monthly averages)", ja: "年間降水量（月別平均12か月の合計）" },
+  cmpPrecipNote: { en: "Definitions differ slightly: Met Office “rainfall” vs ECCC “total precipitation” (rain plus snow water equivalent).", ja: "定義が少し異なります：Met Officeは「降雨量」、ECCCは「降水量（雨＋雪の水換算）」です。" },
+  cmpDerived: { en: "calculated by StudyAtlas", ja: "StudyAtlas算出" },
   cmpClimatePeriods: { en: "Averaging periods differ", ja: "統計期間が異なります" },
 } as const;

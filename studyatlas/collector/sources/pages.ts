@@ -21,7 +21,7 @@ export function checkOnPage(p: DataPoint, pageText: string): PageCheck {
   return want.length && want.every((n) => onPage.has(n)) ? "value-found" : "not-found";
 }
 
-const pageSourceIds = () => new Set(officialSources.filter((s) => s.method === "page").map((s) => s.id));
+const pageSourceIds = () => new Set(officialSources.filter((s) => s.method === "page" && allOfficialData().some((c) => c.points.some((p) => p.sourceId === s.id))).map((s) => s.id));
 
 export function makePageSource(id: string): Source {
   const os = officialSources.find((s) => s.id === id)!;
