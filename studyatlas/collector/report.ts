@@ -1,7 +1,8 @@
+import type { Consistency } from "./consistency";
 import type { Change, Snapshot, Source, SourceRun } from "./types";
 // Markdown report for the GitHub Actions job summary and the change-candidate pull request. Not part of the website.
 const esc = (s: string) => s.replace(/\|/g, "\\|").replace(/\n/g, " ");
-const accessLabel: Record<Source["access"], string> = { implemented: "✅ implemented (open API)", "open-api-planned": "🟡 open API – planned", "needs-key": "🔑 needs key / registration", "needs-terms-review": "⚖️ terms review needed" };
+const accessLabel: Record<Source["access"], string> = { implemented: "✅ implemented (open API)", "page-check": "🔎 page check (no API; robots.txt respected)", "open-api-planned": "🟡 open API – planned", "needs-key": "🔑 needs key / registration", "needs-terms-review": "⚖️ terms review needed" };
 /** One change as Markdown lines. */
 function renderChange(c: Change): string[] {
   const L: string[] = []; const r = c.type === "changed" ? c.after : c.record;
@@ -24,7 +25,7 @@ function renderChange(c: Change): string[] {
  * `changes`  = what THIS run found, compared with the base (main's snapshot, or the open candidate PR's snapshot).
  * `proposed` = only when a candidate PR is open: everything that PR proposes relative to main (not new in this run).
  */
-export function renderReport(o: { sources: Source[]; runs: SourceRun[]; snapshot: Snapshot; changes: Change[]; proposed?: Change[]; mode: "live" | "fixtures"; now: string; aiErrors: string[] }) {
+export function renderReport(o: { sources: Source[]; runs: SourceRun[]; snapshot: Snapshot; changes: Change[]; proposed?: Change[]; mode: "live" | "fixtures"; now: string; aiErrors: string[]; consistency?: Consistency[] }) {
   const L: string[] = []; const base = o.proposed ? "the open candidate PR" : "`main` (accepted snapshot)";
   L.push(`# StudyAtlas data collection report`, "");
   L.push(`- Run: ${o.now} (${o.mode === "live" ? "**live API requests**" : "**local fixtures – not real data**"})`);
@@ -43,6 +44,12 @@ export function renderReport(o: { sources: Source[]; runs: SourceRun[]; snapshot
   if (o.proposed) {
     L.push(`## Already proposed in the open candidate PR (${o.proposed.length}) — not new in this run`, "", `Everything the open candidate PR proposes relative to \`main\`, including the new changes above.`, "");
     for (const c of o.proposed) L.push(...renderChange(c));
+  }
+  if (o.consistency?.length) {
+    const bad = o.consistency.filter((c) => c.result !== "match");
+    L.push(`## Published official data vs. API values`, "", bad.length ? `⚠️ ${bad.length} of ${o.consistency.length} published figure(s) do not match the latest API value — update \`data/official/*\` in a reviewed PR:` : `All ${o.consistency.length} published figure(s) backed by an API match the latest API value.`, "");
+    bad.forEach((c) => L.push(`- \`${c.id}\` ← \`${c.collectedId}\`: ${c.result}${c.detail ? ` — ${esc(c.detail)}` : ""}`));
+    if (bad.length) L.push("");
   }
   if (o.aiErrors.length) L.push(`## AI step errors`, "", ...o.aiErrors.map((e) => `- ${esc(e)}`), "");
   const human = Object.values(o.snapshot.records).filter((r) => r.review === "human-required");

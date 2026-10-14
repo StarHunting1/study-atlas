@@ -22,6 +22,7 @@ on:
   pull_request:
     paths:
       - "studyatlas/collector/**"
+      - "studyatlas/data/official/**"
       - ".github/workflows/collect-data.yml"
 
 permissions:
@@ -52,6 +53,11 @@ jobs:
           cache-dependency-path: studyatlas/package-lock.json
       - run: npm ci
 
+      - name: Complete TLS chains for hosts that omit their intermediate certificate
+        run: |
+          collector/aia-chain.sh "$RUNNER_TEMP/extra-ca.pem" vancouver.housing.ubc.ca
+          if [ -s "$RUNNER_TEMP/extra-ca.pem" ]; then echo "NODE_EXTRA_CA_CERTS=$RUNNER_TEMP/extra-ca.pem" >> "$GITHUB_ENV"; fi
+
       - name: Find an open candidate pull request
         id: pending
         if: github.event_name != 'pull_request'
@@ -75,11 +81,15 @@ jobs:
         id: collect
         env:
           SOURCES: ${{ inputs.sources || 'all' }}
-          DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run' || '' }}
+          DRY_RUN: ${{ github.event_name == 'pull_request' && '--dry-run --force' || '' }}
           AI_FLAG: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && '--ai' || '' }}
           ANTHROPIC_API_KEY: ${{ github.event_name == 'workflow_dispatch' && inputs.ai && secrets.ANTHROPIC_API_KEY || '' }}
           PENDING: ${{ steps.pending.outputs.number && format('--pending {0}/pending-snapshot.json', runner.temp) || '' }}
         run: npx tsx collector/run.ts --sources "$SOURCES" $DRY_RUN $AI_FLAG $PENDING --summary "$GITHUB_STEP_SUMMARY"
+
+      - name: Probe official source pages (pull requests only; reviewer aid, nothing stored)
+        if: github.event_name == 'pull_request'
+        run: npx tsx collector/probe.ts | tee -a "$GITHUB_STEP_SUMMARY"
 
       - name: Keep the collected files as an artifact
         if: always()

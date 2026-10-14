@@ -8,11 +8,14 @@ import type { Localized } from "@/lib/i18n";
 /** How a source can be used, as far as known. */
 export type Access =
   | "implemented"        // open API, no key, implemented in collector/sources
+  | "page-check"         // public page without an API: only checks that recorded figures are still shown (robots.txt respected)
   | "open-api-planned"   // open API documented, not implemented yet
   | "needs-key"          // requires registration / API key (store it in GitHub Secrets)
   | "needs-terms-review" // no documented API, or terms not yet reviewed: do not scrape
 export type SourceInfo = {
   id: string; name: string; country: "GBR" | "CAN"; access: Access;
+  /** Minimum days between fetches (scheduled runs skip a source that is not due; --force ignores this) */
+  cadenceDays?: number;
   /** Developer documentation / terms to read before enabling */
   docs: string;
   /** Licence for reuse of the content, when known from the API response or docs */
@@ -37,7 +40,7 @@ export type CollectedRecord = {
   /** Ver.1.3 field path it would update (e.g. "visa.official", "living.healthcare") or a dataset topic ("dataset.housing") */
   field: string;
   label: Localized;
-  value: { text?: string; number?: number; unit?: string; currency?: string };
+  value: { text?: string; number?: number; unit?: string; currency?: string; /** e.g. 12 monthly climate normals, Jan..Dec */ series?: (number | null)[] };
   /** Period the value describes, when the source states one */
   period?: string;
   /** Human-readable page */
@@ -73,7 +76,14 @@ export type AiExtraction = {
 /** Raw text kept in memory for AI extraction (not stored in the repo). */
 export type Fetched = { records: CollectedRecord[]; texts: Record<string, string>; /** ids that could not be fetched this time (kept as they were, not marked missing) */ failedIds?: string[] };
 export type Source = SourceInfo & { fetch?: (ctx: FetchContext) => Promise<Fetched> };
-export type FetchContext = { fetchJson: (url: string) => Promise<unknown>; now: string };
+export type FetchContext = {
+  fetchJson: (url: string) => Promise<unknown>;
+  postJson: (url: string, body: unknown) => Promise<unknown>;
+  /** Raw page text (HTML/CSV). Page sources must call `robots` first. */
+  fetchText: (url: string) => Promise<{ status: number; url: string; body: string }>;
+  robots: (url: string) => Promise<{ allowed: boolean; reason: string }>;
+  now: string;
+};
 
 export type SourceRun = { sourceId: string; ok: boolean; attemptedAt: string; records: number; error?: string; skipped?: string };
 export type Change =

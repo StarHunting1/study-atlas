@@ -11,12 +11,14 @@ import { useCompare } from "@/lib/store";
 import { panel, pill, pillOff, pillOn } from "@/lib/ui";
 import CityPhoto, { PhotoCredit, useCityPhoto } from "@/components/CityPhoto";
 import { hasInAppHistory } from "@/lib/history";
+import { officialData } from "@/data/official";
+import CityTabs from "@/components/official/CityTabs";
 export default function CityPage() {
   const { id } = useParams<{ id: string }>(); const { t, L } = useI18n(); const { has, toggle, full } = useCompare(); const router = useRouter();
   const c = getCity(id); const [photo, onError] = useCityPhoto(c);
   if (!c) { notFound(); return null; }
   const country = countries.find((x) => x.code === c.country)!; const on = has(c.id);
-  const summary = statusSummary(c);
+  const summary = statusSummary(c); const official = officialData(c.id);
   // Opened directly (shared link, new tab, reload) there is no in-app page to return to, so go home instead.
   const back = () => (hasInAppHistory() ? router.back() : router.push("/"));
   return (
@@ -39,6 +41,8 @@ export default function CityPage() {
         <a href={c.officialUrl} target="_blank" rel="noopener noreferrer" className={`${pill} ${pillOff}`}>{t("official")} ↗</a>
       </div>
       {!on && full && <p className="text-sm text-slate-500">{t("compareFull")}</p>}
+      {/* Cities with official data (Ver.1.5) get the tabbed view; the others keep the Ver.1.3 layout */}
+      {official ? <CityTabs city={c} country={country} data={official} /> : <>
       {/* Data status: how much of this page is verified */}
       <section className={`${panel} p-5`}>
         <h2 className="text-sm font-semibold text-slate-700">{L(d.statusTitle)}</h2>
@@ -60,6 +64,7 @@ export default function CityPage() {
           </section>
         ))}
       </div>
+      </>}
     </div>
   );
 }

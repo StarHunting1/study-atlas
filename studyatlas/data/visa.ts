@@ -36,3 +36,14 @@ export const visaLinks: Record<string, { label: Localized; link: Fact<string> }[
     { label: { en: "Department of Home Affairs – Student visa (subclass 500)", ja: "内務省 – Student visa（subclass 500）" }, link: { status: "unverified", value: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500", note: unchecked } },
   ],
 };
+
+/** Official healthcare pages for international students, per country (national or provincial). Same "unverified until checked" rule. */
+export const healthLinks: Record<string, { label: Localized; link: Fact<string> }[]> = {
+  GBR: [
+    { label: { en: "GOV.UK – Pay for UK healthcare as part of your immigration application (Immigration Health Surcharge)", ja: "GOV.UK – 移民医療付加金（IHS）の支払い" }, link: { status: "unverified", value: "https://www.gov.uk/healthcare-immigration-application", note: unchecked } },
+  ],
+  CAN: [
+    { label: { en: "Government of British Columbia – Medical Services Plan (MSP)", ja: "ブリティッシュコロンビア州政府 – 医療保険（MSP）" }, link: { status: "unverified", value: "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp", note: unchecked } },
+  ],
+  AUS: [],
+};

@@ -86,3 +86,13 @@ as verified. Visa, healthcare and work items always require human approval.
 Open each source link, confirm value / who it applies to / period / licence, then promote by editing
 `data/profiles/<city>.ts` (or `data/countries.ts` for visa) with `status: "verified"`, `sources`, `period` and
 `checkedAt` (`toFact()` gives the starting shape). Merging the collector PR itself only updates `data/collected/`.
+
+## Ver.1.5 additions
+- **API sources**: `statcan.ts` (CMHC average rents via Statistics Canada WDS, table 34-10-0133-01) and `eccc.ts` (ECCC climate normals, OGC API).
+- **Page check** (`sources/pages.ts`): for official pages without an API, re-reads each page (only where `robots.txt` allows, one request at a time) and
+  checks that every figure recorded in `data/official/*` is still shown. It never extracts new values; a figure that disappeared becomes a change candidate marked human-required.
+- **Cadence**: `cadenceDays` per source (fares/rents 30, university pages 60, climate normals 180). A source that is not due is skipped
+  ("not due" in the report); `--force` (used on pull-request dry runs) ignores it. Unchanged content never creates a PR.
+- **Consistency**: the report lists published figures that no longer match the latest API value.
+- `collector/probe.ts` (runs on pull requests): reviewer aid that prints robots verdict, HTTP status, money lines and links of pages to be added. Nothing is stored.
+- `collector/aia-chain.sh`: completes a TLS chain for a host that omits its intermediate certificate (verified against system roots; verification stays on).
