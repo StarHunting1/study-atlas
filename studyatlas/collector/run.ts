@@ -12,21 +12,21 @@
 import { appendFileSync, existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { extract } from "./ai";
-import { fixtureFetchAll, fixturePost, fixtureText } from "./fixtures";
+import { fixtureBinary, fixtureFetchAll, fixturePost, fixtureText } from "./fixtures";
 import { officialConsistency } from "./consistency";
 import { makeRobots } from "./robots";
 import { renderReport } from "./report";
 import { sources } from "./sources";
 import { diffSnapshots, emptySnapshot, merge } from "./store";
 import type { CollectedRecord, FetchContext, Snapshot, SourceRun } from "./types";
-import { fetchJson, fetchText, postJson, sleep, USER_AGENT } from "./util";
+import { fetchBinary, fetchJson, fetchText, postJson, sleep, USER_AGENT } from "./util";
 import { RIGHTS, automationFor } from "../data/official/rights";
 
 export const DEFAULT_DATA_DIR = path.resolve(process.cwd(), "data/collected");
 const arg = (name: string) => { const i = process.argv.indexOf(`--${name}`); return i >= 0 ? process.argv[i + 1] : undefined; };
 const flag = (name: string) => process.argv.includes(`--${name}`);
 
-type Fetchers = Partial<Pick<FetchContext, "fetchJson" | "postJson" | "fetchText">>;
+type Fetchers = Partial<Pick<FetchContext, "fetchJson" | "postJson" | "fetchText" | "fetchBinary">>;
 /** Days until a source is due again (0 = due now). Based on its last successful fetch in the comparison snapshot. */
 export function dueIn(s: { cadenceDays?: number }, lastSuccessAt: string | undefined, now: string) {
   if (!s.cadenceDays || !lastSuccessAt) return 0;
@@ -35,8 +35,8 @@ export function dueIn(s: { cadenceDays?: number }, lastSuccessAt: string | undef
 
 export async function collect(o: { only?: string[]; ai: boolean; fixtures: boolean; now: string; prev: Snapshot; fetcher?: (url: string) => Promise<unknown>; fetchers?: Fetchers; force?: boolean; aiUnavailable?: string }) {
   const runs: SourceRun[] = []; const fetched: Record<string, CollectedRecord[]> = {}; const aiErrors: string[] = o.aiUnavailable ? [o.aiUnavailable] : []; const failedIds = new Set<string>();
-  const live = { fetchJson: (u: string) => fetchJson(u), postJson, fetchText: (u: string) => fetchText(u) };
-  const fix = { fetchJson: fixtureFetchAll, postJson: fixturePost, fetchText: fixtureText };
+  const live = { fetchJson: (u: string) => fetchJson(u), postJson, fetchText: (u: string) => fetchText(u), fetchBinary: (u: string) => fetchBinary(u) };
+  const fix = { fetchJson: fixtureFetchAll, postJson: fixturePost, fetchText: fixtureText, fetchBinary: fixtureBinary };
   const base = { ...(o.fixtures ? fix : live), ...(o.fetcher ? { fetchJson: o.fetcher } : {}), ...o.fetchers };
   const robots = makeRobots(base.fetchText, USER_AGENT);
   // Every request goes through one gate: robots.txt must allow the URL, and a Crawl-delay is honoured per host (Ver.1.2).
@@ -52,7 +52,7 @@ export async function collect(o: { only?: string[]; ai: boolean; fixtures: boole
   };
   const gate = !o.fixtures && !o.fetcher; // fixtures and an injected JSON fetcher are tests: no real robots.txt requests
   const gated = !gate ? base : { ...base, fetchJson: async (u: string) => { await polite(u); return base.fetchJson(u); }, postJson: async (u: string, b: unknown) => { await polite(u); return base.postJson(u, b); } };
-  const ctx: FetchContext = { ...gated, robots, now: o.now };
+  const ctx: FetchContext = { ...gated, robots, now: o.now, paceMs: o.fixtures || o.fetcher ? 0 : 1000 };
   for (const s of sources) {
     if (o.only && !o.only.includes(s.id)) continue;
     if (!s.fetch) { runs.push({ sourceId: s.id, ok: false, attemptedAt: o.now, records: 0, skipped: `not implemented (${s.access})` }); continue; }

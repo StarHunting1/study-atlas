@@ -62,6 +62,8 @@ export type CollectedRecord = {
   missingSince?: string;
   /** Optional AI extraction. Never makes the record verified. */
   ai?: AiExtraction;
+  /** Source-specific facts that belong with the value (area code, scope, which checks passed, what is still unconfirmed) */
+  meta?: Record<string, unknown>;
 };
 
 export type AiFact = { name: string; value: string; unit?: string; currency?: string; appliesTo?: string; quote: string };
@@ -81,7 +83,11 @@ export type FetchContext = {
   postJson: (url: string, body: unknown) => Promise<unknown>;
   /** Raw page text (HTML/CSV). Page sources must call `robots` first. */
   fetchText: (url: string) => Promise<{ status: number; url: string; body: string }>;
+  /** Raw bytes (a data workbook). Callers must have checked `robots` first. */
+  fetchBinary: (url: string) => Promise<{ status: number; url: string; body: Buffer }>;
   robots: (url: string) => Promise<{ allowed: boolean; reason: string }>;
+  /** Minimum gap in ms between two requests of one source (0 in tests) */
+  paceMs?: number;
   now: string;
 };
 

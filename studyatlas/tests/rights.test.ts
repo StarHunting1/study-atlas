@@ -39,10 +39,10 @@ t("collector gate: restricted and unregistered sources are blocked", () => {
   for (const [id, r] of Object.entries(RIGHTS)) if (r.reuseStatus === "restricted") assert.equal(automationFor(`page:${id}`).automation, "blocked", id);
 });
 
-t("Ver.1.2.1 verification: GOV.UK and Open Government Canada are permitted for collection, ONS rents are recorded but not collectable yet", () => {
+t("Ver.1.2.1 verification: GOV.UK and Open Government Canada are permitted for collection, ONS Manchester rents are permitted and collectable from the official workbook", () => {
   for (const id of ["govuk-content", "canada-open-gov", "ons-private-rents"]) { assert.equal(RIGHTS[id].reuseStatus, "permitted", id); assert.ok(RIGHTS[id].lastReviewedAt, id); assert.ok(RIGHTS[id].attribution, id); assert.ok(RIGHTS[id].reviewed.length >= 3, id); }
   assert.equal(automationFor("govuk-content").automation, "allowed"); assert.equal(automationFor("canada-open-gov").automation, "allowed");
-  assert.equal(automationFor("ons-private-rents").automation, "blocked");
+  assert.equal(automationFor("ons-private-rents").automation, "allowed");
   assert.ok(RIGHTS["canada-open-gov"].restrictions.includes("crawl-delay"));
 });
 

@@ -25,7 +25,7 @@ data/collected/
 |---|---|---|---|
 | `govuk-content` | GOV.UK Content API (`/api/content/<path>`) | implemented, open, no key | `www.gov.uk` |
 | `canada-open-gov` | Open Government Canada CKAN API (`package_show`, datasets pinned by id) | implemented, open, no key | `open.canada.ca` |
-| `ons-api` | ONS API (rents, prices) | open API, planned | `api.beta.ons.gov.uk` |
+| `ons-private-rents` | ONS Price Index of Private Rents (official Excel; the ONS API does not carry PIPR) | implemented | `www.ons.gov.uk` |
 | `eccc-geomet` | ECCC GeoMet OGC API (climate normals) | open API, planned | `api.weather.gc.ca` |
 | `met-office-datahub` | Met Office DataHub | needs registration / key | `data.hub.api.metoffice.gov.uk` |
 | `tfgm-open-data` | TfGM Open Data | needs registration / key | `api.tfgm.com` |
@@ -102,3 +102,13 @@ Open each source link, confirm value / who it applies to / period / licence, the
   (`MET_PERIODS`); a period with any missing month is not derived (reported as incomplete, old records kept).
 - The page check only covers sources that have data points; a source marked `needs-review` (UBC) is not fetched.
 - The consistency report also checks derived climate series against the collected records.
+
+## Ver.1.2.2 additions (ONS private rents)
+- `sources/onsrent.ts`: reads the newest official PIPR workbook (found on the dataset page; no JSON endpoint is used) and keeps ONE number: the
+  average monthly private rent of all dwellings in Manchester (E08000003), from "Table 1", newest month. Stored with period, publication date,
+  retrieval date, area code, source URL, licence and scope in `meta` (always `unverified`). Not a student-housing figure.
+- `sources/xlsx.ts`: a small streaming .xlsx reader on `node:zlib` (no new dependency). The workbook is never written to disk or committed.
+- A missing value (`[x]`, `[z]`), a non-whole-pound or implausible price, a date that is not the first of a month, a changed header or area name, or an
+  edition/cover date mismatch stops the import; the earlier record is kept (the newest month is never replaced by an older one).
+- Rate and identification rules (developer.ons.gov.uk/bots, ons.gov.uk/help/fairusepolicy): two requests a month, one second apart, the User-Agent in
+  `util.ts` (name/version/URL, no personal data), HTTP 429 → wait for `Retry-After` (at most 60 s) once, then give up for this run.
