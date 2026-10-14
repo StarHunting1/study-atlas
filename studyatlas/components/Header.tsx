@@ -7,7 +7,7 @@ import { useTrackNavigation } from "@/lib/history";
 import { my } from "@/locales/my";
 export default function Header() {
   const { lang, setLang, t, L } = useI18n(); const { ids } = useCompare(); const p = usePathname(); useTrackNavigation();
-  const nav = [["/", t("explore")], ["/compare", t("compare")], ["/schools", L(my.nav.schools)], ["/my", L(my.nav.my)], ["/about", t("about")]];
+  const nav = [["/", t("explore")], ["/compare", t("compare")], ["/schools", L(my.nav.schools)], ["/planner", L({ en: "Cost planner", ja: "費用プランナー" })], ["/my", L(my.nav.my)], ["/about", t("about")]];
   const active = (h: string) => (h === "/" ? p === "/" : p === h || p.startsWith(h + "/"));
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200 bg-white">

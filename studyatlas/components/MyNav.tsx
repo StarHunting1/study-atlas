@@ -5,7 +5,7 @@ import { useI18n } from "@/lib/i18n";
 import { my } from "@/locales/my";
 export default function MyNav() {
   const { L } = useI18n(); const p = usePathname();
-  const tabs = [["/my", my.tabs.profile], ["/my/budget", my.tabs.budget], ["/my/visa", my.tabs.visa]] as const;
+  const tabs = [["/my", my.tabs.profile], ["/planner", { en: "Cost planner", ja: "費用プランナー" }], ["/my/budget", my.tabs.budget], ["/my/visa", my.tabs.visa]] as const;
   return (
     <div className="space-y-3">
       <nav className="flex gap-1 overflow-x-auto rounded-full bg-white p-1 shadow-sm ring-1 ring-slate-200 sm:inline-flex">
