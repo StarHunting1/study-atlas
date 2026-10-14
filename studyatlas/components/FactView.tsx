@@ -4,6 +4,7 @@ import type { FieldKind } from "@/data/fields";
 import type { Localized } from "@/lib/i18n";
 import { useI18n } from "@/lib/i18n";
 import { dataText as d } from "@/locales/data";
+import Disclosure from "@/components/Disclosure";
 
 const badgeStyle: Record<Status, string> = {
   verified: "bg-sky-50 text-sky-700 ring-1 ring-sky-100",
@@ -34,7 +35,7 @@ function ClimateTable({ c }: { c: MonthlyClimate }) {
 }
 
 /** Renders one Fact: value, status badge, period / last-checked / sources, and the note. Pending facts show "Data coming soon". */
-export default function FactView({ fact, kind, compact }: { fact: Fact<unknown>; kind: FieldKind; compact?: boolean }) {
+export default function FactView({ fact, kind, compact, lean }: { fact: Fact<unknown>; kind: FieldKind; compact?: boolean; /** period, check date and sources go behind "Sources & conditions" */ lean?: boolean }) {
   const { L } = useI18n();
   if (fact.status === "pending" || fact.value === undefined) return <span className="text-sm text-slate-400">{L(d.pending)}</span>;
   const v = fact.value;
@@ -44,17 +45,18 @@ export default function FactView({ fact, kind, compact }: { fact: Fact<unknown>;
     kind === "institutions" ? <ul className="space-y-0.5">{(v as Institution[]).map((i) => <li key={i.name}>{i.url ? <a href={i.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{i.name}</a> : i.name}</li>)}</ul> :
     <span>{L(v as Localized)}</span>;
   const includes = kind === "money" ? (v as Money).includes : undefined;
-  return (
-    <div className="space-y-1">
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">{body}<StatusBadge status={fact.status} /></div>
-      {includes && <p className="text-xs text-slate-500">{L(d.includes)}: {L(includes)}</p>}
-      {(fact.period || fact.checkedAt || fact.sources?.length) && (
+  const meta = (fact.period || fact.checkedAt || fact.sources?.length) ? (
         <p className="text-[11px] text-slate-400">
           {fact.period && <>{L(d.period)}: {fact.period}</>}
           {fact.checkedAt && <>{fact.period ? " · " : ""}{L(d.checked)}: {fact.checkedAt}</>}
           {fact.sources?.map((s) => <span key={s.url}> · {L(d.source)}: <a href={s.url} target="_blank" rel="noopener noreferrer" className="underline">{s.publisher}</a>{s.terms ? ` (${s.terms})` : ""}</span>)}
         </p>
-      )}
+  ) : null;
+  return (
+    <div className="space-y-1">
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">{body}{!(lean && fact.status === "verified") && <StatusBadge status={fact.status} />}</div>
+      {includes && <p className="text-xs text-slate-500">{L(d.includes)}: {L(includes)}</p>}
+      {lean ? (meta && <Disclosure level="sources">{meta}</Disclosure>) : meta}
       {!compact && fact.note && <p className="text-[11px] leading-relaxed text-slate-400">{L(fact.note)}</p>}
     </div>
   );

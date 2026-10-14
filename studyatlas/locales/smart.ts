@@ -6,7 +6,7 @@ export const st = {
   modeEasy: { en: "Easy", ja: "かんたん" }, modeAdvanced: { en: "Advanced", ja: "詳細" }, modeLabel: { en: "Mode", ja: "モード" },
   advancedHint: { en: "Advanced mode: set every cost item yourself with its own slider.", ja: "詳細モード：費用項目ごとに自分でスライダーを調整できます。" },
   // form
-  stepRoute: { en: "1. Route", ja: "1. 出発地と留学先" }, stepStudy: { en: "2. Study", ja: "2. 留学の内容" }, stepBudget: { en: "3. Budget", ja: "3. 予算" }, stepHousing: { en: "4. Housing (optional)", ja: "4. 住居（任意）" },
+  stepRoute: { en: "Departure & timing", ja: "出発地・渡航時期" }, stepStudy: { en: "Study", ja: "留学の内容" }, stepBudget: { en: "Budget", ja: "予算" }, stepHousing: { en: "Housing (optional)", ja: "住居タイプ（任意）" },
   originCountry: { en: "Departure country", ja: "出発国" }, originAirport: { en: "Departure airport", ja: "出発空港" }, otherAirport: { en: "Other airport (IATA code)", ja: "その他の空港（IATAコード）" },
   iataHint: { en: "3 letters, e.g. HND", ja: "アルファベット3文字（例：HND）" }, iataInvalid: { en: "Enter a 3-letter airport code.", ja: "空港コードを3文字で入力してください。" },
   destination: { en: "Destination city", ja: "留学先の都市" }, destAirport: { en: "Arrival airport", ja: "到着空港" },
@@ -91,4 +91,16 @@ export const st = {
   tripName: { round: { en: "round trip", ja: "往復" }, oneway: { en: "one way", ja: "片道" } },
   rangeNote: { en: "Figures marked “from” are the lowest published price; real costs can be higher.", ja: "「最低額」と表示された数値は公表されている最も低い価格で、実際の費用はそれ以上になることがあります。" },
   rule: { en: "Nothing is invented: every number is an official verified figure, your own assumption, or missing (and then not counted).", ja: "根拠のない数値は作りません。すべての数値は「公式・確認済み」「ご自身の仮定」「未取得（未計上）」のいずれかです。" },
+  // Ver.1.8 simplified Easy mode
+  leadShort: { en: "Choose four things. StudyAtlas builds the plans from verified data.", ja: "4つ選ぶだけで、確認済みのデータからプランを作ります。" },
+  addConditions: { en: "Add conditions", ja: "条件を追加する" }, hideConditions: { en: "Close", ja: "閉じる" }, addHint: { en: "Airport, departure month, housing, flights, exchange rate and known costs", ja: "出発空港・渡航月・住居・航空券・為替レート・分かっている費用" },
+  featuresTitle: { en: "Your plans", ja: "あなたのプラン" },
+  feature: { budget: { en: "Keeps costs low", ja: "費用を抑える" }, balanced: { en: "Balance of cost and comfort", ja: "費用と暮らしやすさのバランス" }, comfort: { en: "Prioritises comfort", ja: "快適さを重視" } },
+  merged: { en: "With the data available, these plans do not differ for your choices.", ja: "現在のデータでは、この条件でのプランの差はありません。" },
+  estimate: { en: "Estimated total", ja: "概算総費用" }, countedSoFar: { en: "Counted so far", ja: "計上済み" },
+  missingMain: { en: "Not counted yet: {items}", ja: "未計上：{items}" },
+  leftAfter: { en: "Budget left (counted costs only)", ja: "予算の残り（計上分のみ）" }, overShort: { en: "Over budget", ja: "予算超過" },
+  rateShort: { en: "Set an exchange rate to compare with your budget.", ja: "予算と比べるには為替レートの設定が必要です。" }, setRate: { en: "Set rate", ja: "レートを設定" },
+  breakdown: { en: "Cost breakdown", ja: "費用の内訳を見る" }, basisBtn: { en: "Calculation basis & sources", ja: "計算根拠・出典を見る" },
+  fewer: { en: "Close", ja: "閉じる" },
 } as const;

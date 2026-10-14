@@ -17,7 +17,7 @@ export default function FlightPanel({ easy, setEasy }: { easy: Easy; setEasy: (f
   const set = (v: number | null) => setEasy((e) => ({ ...e, assume: { ...e.assume, flight: { ...e.assume.flight, [e.trip]: v } } }));
   const tripName = L(st.tripName[easy.trip]); const origin = findOrigin(easy.origin.airport);
   return (
-    <section className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5" aria-labelledby="flight-h" data-testid="flight-panel">
+    <section className="space-y-3 rounded-xl bg-slate-50/70 p-4" aria-labelledby="flight-h" data-testid="flight-panel">
       <h2 id="flight-h" className="text-base font-semibold text-[#0b2a5b]">✈ {L(st.flightTitle)}</h2>
       <p className="text-sm text-slate-700" data-testid="flight-route">{tpl(L(st.flightRoute), { from: valid ? `${origin ? L(origin.city) + " " : ""}${code}` : "—", to: `${L(DESTINATIONS[easy.cityId].city)} ${destCode(easy.cityId)}` })} · {easy.month ? tpl(L(st.flightMonth), { month: monthName(easy.month, lang) }) : L(st.flightNoDate)}</p>
       <div role="group" aria-label={L(st.trip)} className="inline-flex gap-1 rounded-full bg-slate-50 p-1 ring-1 ring-slate-200">

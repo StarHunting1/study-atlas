@@ -7,6 +7,7 @@ import { MAX_COMPARE, deleteSaved, originCode, renameSaved, toggleCompare, type 
 import { pt } from "@/locales/planner";
 import { st } from "@/locales/smart";
 import { fmtRound, tpl } from "../format";
+import Disclosure from "@/components/Disclosure";
 import { fmtSum } from "./helpers";
 
 const btn = "rounded-full px-3 py-1.5 text-xs font-medium ring-1 ring-slate-200 hover:bg-slate-50";
@@ -16,8 +17,9 @@ export default function SavedPanel({ store, setStore, onEdit, onOpenAdvanced, on
   const { L, lang } = useI18n(); const [renaming, setRenaming] = useState<string | null>(null);
   const picked = store.compare.map((id) => store.saved.find((s) => s.id === id)).filter((s): s is Saved => !!s);
   return (
-    <section aria-labelledby="saved-h" className="space-y-3 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5" data-testid="saved-panel">
-      <div className="flex flex-wrap items-center justify-between gap-2"><h2 id="saved-h" className="text-base font-semibold text-[#0b2a5b]">{L(st.savedTitle)} <span className="text-xs font-normal text-slate-400">({store.saved.length})</span></h2><span className="text-[11px] text-slate-400">🔒 {L(pt.saved)}</span></div>
+    <section className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-slate-200 sm:p-5" data-testid="saved-panel">
+      <Disclosure level="row" testid="saved-toggle" title={`${L(st.savedTitle)} (${store.saved.length})`} summary={`🔒 ${L(pt.saved)}`}>
+      <div className="space-y-3">
       {store.saved.length === 0 ? <p className="text-sm text-slate-500">{L(st.savedEmpty)}</p> : <>
         <ul className="space-y-2">
           {[...store.saved].reverse().map((s) => {
@@ -63,6 +65,8 @@ export default function SavedPanel({ store, setStore, onEdit, onOpenAdvanced, on
           )}
         </div>
       </>}
+      </div>
+      </Disclosure>
     </section>
   );
 }
