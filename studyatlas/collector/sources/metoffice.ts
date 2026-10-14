@@ -45,7 +45,11 @@ export type MetStation = { id: string; fileUrl: string; cityId: string; label: {
 export const MET_STATIONS: MetStation[] = [
   { id: "ringway", fileUrl: "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt", cityId: "manchester", label: { en: "Ringway (Manchester Airport), Met Office monthly station data", ja: "リングウェイ（マンチェスター空港）Met Office 月別観測データ" } },
 ];
-export const MET_PERIODS: [number, number][] = [[1981, 2010], [1991, 2020]];
+/** Periods StudyAtlas derives. The Ringway file ends in October 2004 ("Site Closed"), so 1981–2010 and 1991–2020 cannot be
+ *  derived from it; 1971–2000 is the latest standard 30-year period fully covered (checked by the run before it is published). */
+export const MET_PERIODS: [number, number][] = [[1971, 2000]];
+/** Extra periods the probe reports on (coverage check only; nothing is stored for them). */
+export const MET_PROBE_PERIODS: [number, number][] = [[1961, 1990], [1971, 2000], [1981, 2010], [1991, 2020]];
 export const MET_ELEMENTS = [
   { key: "tmax" as const, name: "Mean daily maximum temperature (tmax)", unit: "°C" },
   { key: "tmin" as const, name: "Mean daily minimum temperature (tmin)", unit: "°C" },
