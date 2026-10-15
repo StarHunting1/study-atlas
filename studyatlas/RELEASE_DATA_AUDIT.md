@@ -44,9 +44,9 @@
 
 | 都市 | 語学学校（表示） | 非表示 | 状態 | 大学（Ver.1.0引き継ぎ） |
 |---|---|---|---|---|
-| Vancouver | 3 | 0 | unverified | 2（unverified） |
+| Vancouver | 2 | 1 | unverified | 2（unverified） |
 | Toronto | 0 | 0 | pending | 2（unverified） |
-| Manchester | 1 | 2 | unverified | 2（unverified） |
+| Manchester | 3 | 3 | unverified | 2（unverified） |
 | London | 0 | 0 | pending | 3（unverified） |
 | Sydney | 0 | 0 | pending | 2（unverified） |
 | Melbourne | 0 | 0 | pending | 2（unverified） |
@@ -67,18 +67,18 @@
 
 ## 4b. 出典リンクの検査（Manchester / Vancouver）
 
-実行: GitHub Actions（2026-10-15、https://github.com/StarHunting1/study-atlas/actions/runs/38787463398）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
+実行: GitHub Actions（2026-10-15、https://github.com/StarHunting1/study-atlas/actions/runs/38793091211）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
 
 | 対象 | 検証済み（2xx＋期待語を確認） | 到達（語は未確認/不一致） | アクセス拒否 | リンク切れ | 要求せず |
 |---|---|---|---|---|---|
-| 45 | 24 | 10 | 2 | 0 | 9 |
+| 53 | 33 | 10 | 1 | 0 | 9 |
 
 - 「アクセス拒否」(401/403/429)は**リンク切れではありません**。ページは存在しうるが自動アクセスを拒むため、未検証のまま扱います。
 - 到達しても期待語が見つからないリンクは検証済みにしません（例: Express English College の公式サイトはタイトルに校名がなく、手動で English UK 掲載のサイトURLと一致を確認）。
 
 | 状態 | 件数 | 例 |
 |---|---|---|
-| アクセス拒否 | 2 | https://britishcouncil.org/sites/default/files/express_eng_college_2024_post_ma.pdf , https://ihvancouver.com/ |
+| アクセス拒否 | 1 | https://ihvancouver.com/ |
 
 ## 5. 未確認・仮データ一覧（項目ごと）
 
@@ -264,6 +264,9 @@
 
 11. **Ver.1.3.2 の検査で見つかった誤り**: MC Academy に載せていた公式サイトURL（themcacademy.co.uk）は、現在は別の組織（Money Confidence Academy）のサイトだった → URLを削除。English UK の個別ページも開けず、公式サイト・営業状況・認定状況を確認できないため、一般向け一覧から**非表示**（Excel College / UKEC Academy と同じ扱い。データと記録は保持）。
 12. **気候 1991–2020**: ECCC の GeoMet API は 1981–2010 のみ。1991–2020 は気象庁のページから**一括CSV（zip）**でのみ提供され、Vancouver 国際空港は観測所IDが2013年に変わる合成観測所（1108447→1108395）のため、取り込みには別のPRで取得手順と観測所の扱いを確認する必要がある。Met Office は公式の 1991–2020 平年値に利用できるオープンデータのファイルが見つからず（data.gov.uk の UK Climate Averages は 1981–2010 の記述で、ライセンス・資源の記載なし）、サイト規約で自動取得も禁止されている → どちらも**取り込み保留**。既存の 1971–2000 / 1981–2010 は期間を明記し「最新の標準期間ではない」注意書きを都市ページに追加した。
+13. **Ver.1.3.3**: Manchester の語学学校を English UK 掲載を起点に 1校→3校（Express English College / International House Manchester / Kaplan Manchester）へ拡充。公式サイトの生存と English UK 掲載の住所一致を Actions（run 38793091211）で確認できた学校のみ公開。EC Manchester（English UK の個別ページ 404）・MC Academy・Excel College / UKEC は非表示。British Council のページは403のため認定状況は人の確認待ち。料金表は取り込まず、公式料金ページ（IH Manchester / IH Vancouver）へのリンクのみ。
+14. **Vancouver**: International House Vancouver は New Westminster 所在を維持。EF Vancouver は Languages Canada 掲載と住所・宿泊を照合。Sprachcaffe Vancouver は Languages Canada に掲載がなく認定の記載もないため非表示。
+15. **承認用の記録**: 英国・カナダの入国/保険/IHS/BC州学生ヘルスフィーの根拠・対象条件・出典・確認日・ライセンスは `data/APPROVAL_CANDIDATES.md` に集約（全件 unverified のまま、承認待ち）。Planner への自動計上はしない（テストで固定）。
 
 ### 承認待ちの確認結果（verified にはしていません）
 2026-10-15 の Actions ページ確認（run 38787463398）で、言い換えた記述が公式ページの記載と一致することを確認した項目。人が承認するまで unverified のまま。

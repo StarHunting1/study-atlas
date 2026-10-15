@@ -15,5 +15,6 @@ export const sc = {
   crossCity: t("The schools are in different cities (different currency and system). Fees are never converted or compared.", "学校の都市が異なります（通貨や制度が違います）。料金は換算・比較しません。"),
   website: t("Official site", "公式サイト"), details: t("Notes", "補足"), sourceLabel: t("Source", "出典"),
   openCompare: t("Compare this school →", "この学校を比較 →"), openCompareCity: t("Compare two language schools →", "語学学校を2校比較する →"),
+  feesLink: t("Open the school’s fee information ↗", "学校の料金案内を開く ↗"),
   swap: t("Swap", "入れ替え"),
 };

@@ -8,7 +8,9 @@ const visa = () => ({ official: pending<never>(), notes: pending<never>() });
  * on 2026-10-15 (the pages themselves were not opened). Always "unverified". It never says which route applies to a person: that depends
  * on nationality, course, age and plans, and the final check is the government page.
  */
-const outline = (sources: { url: string; publisher: string }[], note: Localized, value: Localized): Fact<Localized> => ({ status: "unverified", value, sources: sources.map((s) => ({ ...s, terms: "Reuse terms not confirmed – facts paraphrased, link only" })), period: "2026-10", checkedAt: "2026-10-15", note });
+/** Licence line per publisher (checked 2026-10-15 on the publishers' own terms pages). Facts are paraphrased and linked; no page text, table or image is copied. */
+const terms = (url: string) => /gov\.uk/.test(url) ? "Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0" : /canada\.ca/.test(url) ? "Government of Canada terms: non-commercial reproduction allowed, commercial reuse not confirmed – facts paraphrased, link only" : "Reuse terms not confirmed – facts paraphrased, link only";
+const outline = (sources: { url: string; publisher: string }[], note: Localized, value: Localized): Fact<Localized> => ({ status: "unverified", value, sources: sources.map((s) => ({ ...s, terms: terms(s.url) })), period: "2026-10", checkedAt: "2026-10-15", note });
 const checkOfficial: Localized = { en: "Paraphrased from the government's public pages; not yet compared with them page by page. Which route applies depends on your nationality and personal circumstances – confirm on the official page before you plan.", ja: "政府の公開ページの内容を言い換えたもので、ページごとの照合は未了です。どの区分が必要かは国籍・個別の事情で異なります。計画の前に必ず公式ページで確認してください。" };
 const gbrVisa = () => ({
   official: outline([{ url: "https://www.gov.uk/standard-visitor/visit-to-study", publisher: "GOV.UK (Home Office)" }, { url: "https://www.gov.uk/visa-to-study-english", publisher: "GOV.UK (Home Office)" }, { url: "https://www.gov.uk/student-visa", publisher: "GOV.UK (Home Office)" }], checkOfficial,

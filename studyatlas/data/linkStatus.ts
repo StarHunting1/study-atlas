@@ -1,6 +1,6 @@
 /*
  * Result of the link check of the Manchester / Vancouver source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-15
- * (workflow "Collect official data", run 38787463398, commit 2683b10). Pasted from the job log; one request per link, no retries.
+ * (workflow "Collect official data", run 38793091211, commit f4ecff7). Pasted from the job log; one request per link, no retries.
  *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests)
  *   content: true = the page answered 2xx AND contains the words we expect (so it is the right page); false = answered but the words were
  *            not found; null = not checked for words (licence pages, catalogues) or not requested.
@@ -8,16 +8,19 @@
  */
 export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped";
 export const LINK_CHECKED_AT = "2026-10-15";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38787463398";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38793091211";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null][] = [
   ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null],
-  ["https://britishcouncil.org/sites/default/files/express_eng_college_2024_post_ma.pdf", "access-denied", 403, null],
   ["https://climate.weather.gc.ca/climate_normals/", "ok", 200, null],
   ["https://eccc-msc.github.io/open-data/licence/readme_en/", "ok", 200, null],
+  ["https://ecenglish.com/en/schools/uk/learn-english-in-manchester/", "ok", 200, true],
   ["https://englishuk.com/member-directory?id=6665", "ok", 200, true],
   ["https://expressenglishcollege.co.uk", "ok", 200, false],
+  ["https://ihmanchester.com/", "ok", 200, true],
+  ["https://ihmanchester.com/prices-and-special-offers/", "ok", 200, true],
   ["https://ihvancouver.com/", "access-denied", 403, null],
   ["https://ihvancouver.com/2024/11/08/new-campus/", "ok", 200, true],
+  ["https://ihvancouver.com/ihv-price-list/", "ok", 200, true],
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", "ok", 200, true],
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student", "ok", 200, true],
@@ -31,14 +34,19 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5", "ok", 200, null],
   ["https://www.ef.com/ca/ilsd/schools/vancouver/", "ok", 200, true],
   ["https://www.englishuk.com/", "ok", 200, null],
+  ["https://www.englishuk.com/member-directory?id=878", "ok", 200, true],
+  ["https://www.englishuk.com/member-directory?id=897", "ok", 200, true],
   ["https://www.gov.uk/check-uk-visa", "ok", 200, true],
   ["https://www.gov.uk/healthcare-immigration-application", "ok", 200, true],
   ["https://www.gov.uk/healthcare-immigration-application/how-much-pay", "ok", 200, true],
   ["https://www.gov.uk/standard-visitor/visit-to-study", "ok", 200, true],
   ["https://www.gov.uk/student-visa", "ok", 200, true],
   ["https://www.gov.uk/visa-to-study-english", "ok", 200, true],
+  ["https://www.kaplaninternational.com/language-schools/united-kingdom/manchester", "ok", 200, true],
   ["https://www.languageinternational.co.uk/school/ukec-academy-formerly-excel-college-manchester-66291", "ok", 200, null],
   ["https://www.languagescanada.ca/en/listing-directory/students", "ok", 200, null],
+  ["https://www.languagescanada.ca/en/listing-directory/students/ef-international-language-schools-canada-vancouver", "ok", 200, true],
+  ["https://www.languagescanada.ca/en/listing-directory/students/international-house-vancouver", "ok", 200, true],
   ["https://www.manchester.ac.uk/copyright/", "ok", 200, true],
   ["https://www.manchester.ac.uk/study/accommodation/student-accommodation/", "ok", 200, true],
   ["https://www.manchester.ac.uk/study/international/accommodation/", "ok", 200, true],

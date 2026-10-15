@@ -48,9 +48,10 @@ export default function FactView({ fact: rawFact, kind, compact, lean }: { fact:
     kind === "money" ? <MoneyText m={v as Money} /> :
     kind === "climate" ? <ClimateTable c={v as MonthlyClimate} /> :
     kind === "institutions" ? <ul className="space-y-1.5">{(v as Institution[]).filter((i) => !i.hidden).map((i) => <li key={i.name} data-testid="institution">{i.url ? <a href={i.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{i.name}</a> : i.name}
-      {(i.note || i.where || i.courses || i.stay || i.source || i.id) && <dl className="mt-0.5 space-y-0.5 text-xs leading-relaxed text-slate-600">
+      {(i.note || i.where || i.courses || i.stay || i.source || i.id || i.feesUrl) && <dl className="mt-0.5 space-y-0.5 text-xs leading-relaxed text-slate-600">
         {i.note && <div>{L(i.note)}</div>}
         {([["where", i.where], ["courses", i.courses], ["stay", i.stay]] as const).map(([k, t]) => t && <div key={k}><dt className="inline text-slate-500">{L(ux.school[k])}: </dt><dd className="inline">{L(t)}</dd></div>)}
+        {i.feesUrl && <div><dt className="inline text-slate-500">{L(ux.school.fees)}: </dt><dd className="inline"><a href={i.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="fees-link" className="text-sky-700 underline">{L(ux.school.feesOpen)}</a></dd></div>}
         {i.id && <div><Link href={compareHref(i.id)} data-testid="compare-link" className="inline-block py-1 text-sky-700 underline">{L(sc.openCompare)}</Link></div>}
         {i.source && <div className="text-[11px] text-slate-400">{L(d.source)}: <a href={i.source.url} target="_blank" rel="noopener noreferrer" className="underline">{i.source.publisher}</a></div>}</dl>}</li>)}</ul> :
     <span>{L(v as Localized)}</span>;

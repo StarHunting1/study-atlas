@@ -31,7 +31,7 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
       {row("where", (s) => (s.inst.where ? L(s.inst.where) : miss))}
       {row("courses", (s) => (s.inst.courses ? L(s.inst.courses) : miss))}
       {row("stay", (s) => (s.inst.stay ? L(s.inst.stay) : miss))}
-      {row("tuition", () => <>{miss}<span className="mt-1 block text-[11px] text-slate-500">{L(sc.tuitionNote)}</span></>)}
+      {row("tuition", (s) => <>{miss}<span className="mt-1 block text-[11px] text-slate-500">{L(sc.tuitionNote)}</span>{s.inst.feesUrl && <a href={s.inst.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="fees-link" className="mt-1 inline-block py-1 text-xs text-sky-700 underline">{L(sc.feesLink)}</a>}</>)}
       {row("status", (s) => (<div className="space-y-1"><StatusBadge status={s.status} />{s.checkedAt && <span className="block text-[11px] text-slate-500">{L(sc.checked)}: {s.checkedAt}</span>}{s.status !== "verified" && <span className="block text-[11px] text-slate-500">{L(sc.statusNote)}</span>}</div>))}
       <Disclosure level="more" testid="compare-more"><div className="space-y-3">
         <section className="space-y-1.5"><h3 className="text-xs font-semibold text-slate-500">{L(sc.details)}</h3>
