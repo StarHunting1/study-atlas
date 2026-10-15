@@ -40,6 +40,7 @@ export default function EasyMode({ onOpenAdvanced }: { onOpenAdvanced: (plan: Pl
     const dv = profile.duration.value; const d: Easy["duration"] = dv && dv > 0 ? (profile.duration.unit === "weeks" ? { value: Math.min(104, dv), unit: "weeks" } : { value: Math.min(24, profile.duration.unit === "years" ? dv * 12 : dv), unit: "months" }) : e.duration;
     return { ...e, cityId, studyType: (profile.studyType || e.studyType) as Easy["studyType"], duration: d, budget: { currency: c, amount: profile.budget.amount ?? defaultBudget(c) }, rates: {} }; });
   const doSave = (g: PlanGroup) => { setSaved((s) => savePlan(s, g.plan, easy, "")); setJustSaved(g.tiers[0]); };
+  const goAssume = () => { setExtras(true); setTimeout(() => document.querySelector('[data-testid="assume"]')?.scrollIntoView({ block: "center" }), 60); };
   const goRate = () => { setExtras(true); setTimeout(() => document.getElementById("rate-panel")?.scrollIntoView({ block: "center" }), 60); };
   const edit = (s: Saved) => { setJustSaved(null); setEasy(s.easy); window.scrollTo({ top: 0, behavior: "smooth" }); };
   if (!loaded) return <div className="h-40 animate-pulse rounded-2xl bg-slate-100" aria-hidden />;
@@ -104,7 +105,19 @@ export default function EasyMode({ onOpenAdvanced }: { onOpenAdvanced: (plan: Pl
                   <div key={k} className="space-y-1" data-assume={k}><div className="flex items-end justify-between gap-2"><span className={lab}>{name}</span>
                     <span className="flex items-center gap-2"><span className="text-xl font-semibold tabular-nums text-slate-900">{v === null ? <span className="text-slate-300">{L(pt.notSet)}</span> : fmtMoney(v, cityCcy, lang)}</span>{v !== null && <button type="button" onClick={() => set(null)} className="text-xs text-slate-500 underline">{L(pt.clear)}</button>}</span></div>
                     <SliderField label={name} value={v} range={r} format={(n) => fmtMoney(n, cityCcy, lang)} onChange={set} /></div>);
-              })}</div>
+              })}
+              {(() => {
+                const h = easy.assume.housing; const per = h?.per ?? "week"; const v = h?.amount ?? null; const r = rangeFor("housing", per, cityCcy);
+                const set = (n: number | null, p2 = per) => upd((e) => { const { housing: _drop, ...rest } = e.assume; return { ...e, assume: n === null && p2 === "week" ? rest : { ...rest, housing: { amount: n, per: p2 } } }; });
+                const name = `${L(st.assumeHousing)} (${L(per === "week" ? st.perWeekUnit : st.perMonthUnit)})`;
+                return (
+                  <div className="space-y-1" data-assume="housing"><div className="flex flex-wrap items-end justify-between gap-2"><span className={lab}>{name}</span>
+                    <span className="flex items-center gap-2"><span className="text-xl font-semibold tabular-nums text-slate-900">{v === null ? <span className="text-slate-300">{L(pt.notSet)}</span> : fmtMoney(v, cityCcy, lang)}</span>{v !== null && <button type="button" onClick={() => set(null)} className="text-xs text-slate-500 underline">{L(pt.clear)}</button>}</span></div>
+                    <div role="group" aria-label={L(st.assumeHousing)} className="inline-flex gap-1 rounded-full bg-slate-50 p-1 ring-1 ring-slate-200">
+                      {(["week", "month"] as const).map((u) => <button key={u} type="button" data-testid={`housing-per-${u}`} aria-pressed={per === u} onClick={() => set(v, u)} className={seg(per === u)}>{L(u === "week" ? st.perWeekUnit : st.perMonthUnit)}</button>)}</div>
+                    <SliderField label={name} value={v} range={r} format={(n) => fmtMoney(n, cityCcy, lang)} onChange={(n) => set(n)} />
+                    <p className="text-[11px] text-slate-400">{L(st.assumeHousingHint)}</p></div>);
+              })()}</div>
 
             <div className="flex flex-wrap items-center gap-2">
               {!isEmptyProfile(profile) && <button type="button" onClick={useProfile_} className="rounded-full bg-sky-50 px-4 py-2 text-xs font-medium text-sky-800 ring-1 ring-sky-100">{L(st.useProfile)}</button>}
@@ -118,7 +131,7 @@ export default function EasyMode({ onOpenAdvanced }: { onOpenAdvanced: (plan: Pl
       {/* results */}
       <h2 id="results" className="scroll-mt-20 text-xl font-semibold text-[#0b2a5b]">{L(st.featuresTitle)}</h2>
       <div className={`grid gap-4 ${cols}`} data-testid="plans" data-count={groups.length}>
-        {groups.map((g) => <PlanCard key={g.tiers[0]} g={g} easy={easy} saved={justSaved === g.tiers[0]} onSave={() => doSave(g)} onOpenAdvanced={() => onOpenAdvanced(g.plan.plan)} onSetRate={goRate} />)}
+        {groups.map((g) => <PlanCard key={g.tiers[0]} g={g} easy={easy} saved={justSaved === g.tiers[0]} onSave={() => doSave(g)} onOpenAdvanced={() => onOpenAdvanced(g.plan.plan)} onSetRate={goRate} onEnter={goAssume} />)}
       </div>
 
       <SavedPanel store={saved} setStore={setSaved} onEdit={edit} onOpenAdvanced={(s) => onOpenAdvanced(s.plan)} onClearAll={clearSaved} />
