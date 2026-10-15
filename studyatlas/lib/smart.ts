@@ -23,7 +23,8 @@ export type Easy = {
   budget: { amount: number; currency: Ccy }; housing: HousingType | null; trip: TripType;
   /** manual exchange rates: 1 unit of the currency = rate × budget currency (the user enters them; no rate API is connected) */
   rates: Plan["rates"];
-  assume: { tuitionWeek: number | null; visa: number | null; insurance: number | null; flight: { round: number | null; oneway: number | null } };
+  assume: { tuitionWeek: number | null; visa: number | null; insurance: number | null; flight: { round: number | null; oneway: number | null };
+    /** housing the user enters themselves (Ver.1.2.9): an amount per week or per month; absent in older saved data = not entered */ housing?: { amount: number | null; per: "week" | "month" } };
 };
 export const defaultBudget = (c: Ccy) => (c === "JPY" ? 2_000_000 : c === "CAD" ? 15_000 : 10_000);
 export function defaultEasy(o: Partial<Pick<Easy, "cityId" | "studyType" | "duration" | "budget">> = {}): Easy {
@@ -83,12 +84,13 @@ function build(easy: Easy, tier: Tier, opts: { now?: string; allowSample?: boole
   const excluded: Excluded[] = []; const notes: Note[] = [];
 
   // user assumptions (the only source of tuition / visa / insurance / flights today)
-  const assume = (id: ItemId, value: number | null, currency: Ccy, per: "week" | "once") => {
+  const assume = (id: ItemId, value: number | null, currency: Ccy, per: "week" | "month" | "once") => {
     if (value === null) { picks[id] = { status: "unset", why: "askUser" }; return; }
     plan = setItem(plan, id, { value, currency, per }); picks[id] = { status: "assumption" };
   };
   assume("tuition", easy.assume.tuitionWeek, cityCcy, "week"); assume("visa", easy.assume.visa, cityCcy, "once"); assume("insurance", easy.assume.insurance, cityCcy, "once");
   assume("flights", flightPrice(easy), ccy, "once");
+  assume("housing", easy.assume.housing?.amount ?? null, cityCcy, easy.assume.housing?.per ?? "week");
 
   // verified candidates, one level per tier
   const options: Partial<Record<ItemId, Opt[]>> = {}; const idx: Partial<Record<ItemId, number>> = {};
@@ -199,7 +201,8 @@ export function cleanEasy(v: unknown): Easy | undefined {
   return { origin: { country: typeof e.origin?.country === "string" ? e.origin.country.slice(0, 2) : d.origin.country, airport: code, custom: typeof e.origin?.custom === "string" && /^[A-Za-z]{0,3}$/.test(e.origin.custom) ? e.origin.custom.toUpperCase() : "" },
     cityId, studyType: oneOf(STUDY_TYPES, e.studyType, "language"), duration: { unit, value: Math.min(max, Math.max(1, num(e.duration?.value) ?? 12)) }, month: m !== null && m >= 1 && m <= 12 ? Math.round(m) : null,
     budget: { currency: ccy, amount: am !== null && am > 0 ? am : defaultBudget(ccy) }, housing: e.housing && (HOUSING_TYPES as readonly string[]).includes(e.housing) ? e.housing : null, trip: e.trip === "oneway" ? "oneway" : "round", rates,
-    assume: { tuitionWeek: nn(e.assume?.tuitionWeek), visa: nn(e.assume?.visa), insurance: nn(e.assume?.insurance), flight: { round: nn(e.assume?.flight?.round), oneway: nn(e.assume?.flight?.oneway) } } };
+    assume: { tuitionWeek: nn(e.assume?.tuitionWeek), visa: nn(e.assume?.visa), insurance: nn(e.assume?.insurance), flight: { round: nn(e.assume?.flight?.round), oneway: nn(e.assume?.flight?.oneway) },
+      ...(nn(e.assume?.housing?.amount) !== null || e.assume?.housing?.per === "month" ? { housing: { amount: nn(e.assume?.housing?.amount), per: e.assume?.housing?.per === "month" ? "month" as const : "week" as const } } : {}) } };
 }
 export function cleanSaved(v: unknown): SavedStore | undefined {
   if (!v || typeof v !== "object") return undefined; const s = v as Partial<SavedStore>;
