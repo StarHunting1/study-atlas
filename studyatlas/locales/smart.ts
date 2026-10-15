@@ -125,4 +125,9 @@ export const st = {
   unitsLegend: { en: "Weekly and monthly costs are added up over your {weeks}-week stay; one-off costs (visa, insurance, flights, fees) are counted once.", ja: "週額・月額の費用は滞在期間（{weeks}週間）で合計し、一回だけの費用（ビザ・保険・航空券・手数料）は1回だけ計上します。" },
   assumeHousingHint: { en: "Your own figure for a room, entered per week or per month. It replaces the table figure and is marked as your entry.", ja: "お部屋の費用を週額または月額でご自身で入力します。表の数値より優先され、「手入力」と表示されます。" },
   diffProv: { en: "Provisional difference (before uncounted costs)", ja: "暫定の差額（未計上の費用を差し引く前）" },
+  // Ver.1.3 – Smart Planner 3.0
+  livingTitle: { en: "Living costs you expect (optional)", ja: "生活費を入力する（任意）" },
+  livingLead: { en: "Enter what you expect to pay, per week or per month. Your entry takes priority over a table figure; an empty item is simply not counted – never treated as 0.", ja: "見込みの金額を、週額または月額で入力します。手入力は表の数値より優先されます。空欄の項目は「未計上」で、0円とはみなしません。" },
+  convNote: { en: "Monthly amounts are converted with 1 month = 52 ÷ 12 ≈ 4.33 weeks, so {weeks} weeks ≈ {months} months. This can differ from what you are actually billed (monthly invoices, minimum terms, pro-rata).", ja: "月額は「1か月＝52÷12≒4.33週」で換算します（{weeks}週間 ≒ {months}か月）。実際の請求（月ごとの請求、最低契約期間、日割りなど）とは異なる場合があります。" },
+  entered: { en: "Entered", ja: "入力済み" },
 } as const;

@@ -1,6 +1,6 @@
 "use client";
 import { useI18n } from "@/lib/i18n";
-import { ITEM_IDS, stayWeeks, type ItemId } from "@/lib/planner";
+import { ITEM_IDS, stayWeeks, weeksToMonths, type ItemId } from "@/lib/planner";
 import { MAIN_ITEMS, headroom, type Easy, type PlanGroup, type Suggestion, type Why } from "@/lib/smart";
 import { validForShort } from "@/data/official/validFor";
 import Disclosure from "@/components/Disclosure";
@@ -47,6 +47,7 @@ export default function PlanCard({ g, easy, onSave, onOpenAdvanced, onSetRate, o
       <Disclosure level="more" label={L(st.breakdown)} testid={`breakdown-${key}`}>
         <div className="space-y-3">
           <p className="text-[11px] text-slate-500" data-testid={`units-${key}`}>{tpl(L(st.unitsLegend), { weeks: fmtNum(Math.round(weeks * 10) / 10, lang) })}</p>
+          <p className="text-[11px] text-slate-500" data-testid={`conv-${key}`}>{tpl(L(st.convNote), { weeks: fmtNum(Math.round(weeks * 10) / 10, lang), months: fmtNum(Math.round(weeksToMonths(weeks) * 10) / 10, lang) })}</p>
           <div data-testid={`status-${key}`}><p className="mb-1 text-xs font-semibold text-slate-600">{L(st.statusTitle)}</p>
             <ul className="grid gap-1 sm:grid-cols-2">{MAIN_ITEMS.map((id) => { const p = sp.picks[id]; return (
               <li key={id} data-status-item={id} data-status={p.status} className="flex items-center justify-between gap-2 rounded-lg bg-slate-50 px-2.5 py-1.5 text-xs"><span className="text-slate-700">{L(pt.items[id])}</span>
