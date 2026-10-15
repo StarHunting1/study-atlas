@@ -52,7 +52,8 @@ export type MonthlyClimate = {
 };
 
 /** `where`, `courses` and `stay` (accommodation arranged by the school) are short paraphrases, written only when a listing states them; `source` is the page the entry was read from. */
-export type Institution = { name: string; url?: string; note?: Localized; where?: Localized; courses?: Localized; stay?: Localized; source?: SourceRef };
+export type Institution = { name: string; url?: string; note?: Localized; where?: Localized; courses?: Localized; stay?: Localized; source?: SourceRef;
+  /** true = kept as research data but not shown to visitors (e.g. identity or operating status could not be confirmed) */ hidden?: true };
 
 export type CityProfile = {
   cost: { rent: Fact<Money>; food: Fact<Money>; transport: Fact<Money>; phone: Fact<Money>; totalMonthly: Fact<Money> };

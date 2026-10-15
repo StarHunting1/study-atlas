@@ -38,15 +38,19 @@ Goal: a few real language schools per city so the language-study mode is not emp
 
 How it was gathered: the build sandbox cannot open school sites (outbound hosts refused), so entries come from public search results and accreditation directories (English UK member directory, British Council inspection summaries, Languages Canada listing, the schools' own pages as quoted in search results). Everything is therefore recorded as `unverified` with the source page and the check date `2026-10-15`; it has not been compared with each school's own site. Text is paraphrased (nothing copied); names, areas and links are facts.
 
-| School | City | Source pages | Gaps |
+| School | City (as listed) | Source pages | Gaps / changes in the final check |
 |---|---|---|---|
-| Express English College | Manchester | englishuk.com member directory (id 6665), British Council inspection summary | official site URL taken from the directory; accommodation "listed", no detail |
-| Excel College | Manchester | britishcouncil (takeielts) page; third-party listings for the accommodation line | no official school URL confirmed; accommodation line from a third-party listing (flagged "check") |
-| MC Academy | Manchester | englishuk.com course finder (id 228) | two different street addresses in listings → none shown; no official URL confirmed |
-| International House Vancouver | Vancouver | Languages Canada listing, IH World page | street address differs between listings → none shown |
-| Sprachcaffe Vancouver | Vancouver | sprachcaffe.com Canada page | age range differs between pages → not shown; prices exist in catalogues but are not reproduced |
-| EF Vancouver | Vancouver | ef.com Vancouver page | courses and accommodation not confirmed → not shown |
+| Express English College | Manchester | English UK member directory (id 6665: 130 Princess Road, M16 7BY, website expressenglishcollege.co.uk, homestay and residential ticked), the school's own pages (English UK North member, accreditations page), British Council 2024 inspection summary | the directory's phone differs from the school's contact page (not displayed). Address, website and accommodation agree with English UK. Current operation not confirmed directly |
+| MC Academy | Manchester | englishuk.com course finder (id 228), school site themcacademy.co.uk, ISI (formerly Manchester Central School of English) | Oldham Street vs Mosley Street: which address is current is unconfirmed → no street address shown |
+| Excel College (UKEC Academy) – **hidden from visitors** (`hidden: true`; data and record kept) | Manchester | Language International directory (“UKEC Academy – formerly Excel College Manchester”) | renamed according to a directory; older listing Fairfield Street vs newer Oxford Street; no official site or current accreditation confirmed → kept as a flagged, unaddressed entry |
+| International House Vancouver | **New Westminster** (not the City of Vancouver) | the school's announcement (ihvancouver.com/2024/11/08/new-campus: new campus at 960 Quayside Drive, classes there from 3 Feb 2025), IH World directory, Languages Canada listing | suite number differs (103 vs 108) → not shown; older listings with Vancouver addresses (West Broadway, Pender Street, Chinatown) are outdated and removed from the display |
+| Sprachcaffe Vancouver | Vancouver | sprachcaffe.com Vancouver (adults) page: 568 Seymour Street, downtown | no closure notice found, but current operation not confirmed directly; prices exist in catalogues but are not reproduced |
+| EF Vancouver | Vancouver | ef.com/ca Vancouver school page: 750 Cambie Street, Suite 200; Languages Canada accreditation stated | accommodation arrangement not confirmed → not shown |
 
 Not obtained: tuition, registration and accommodation fees (catalogue/agent prices are not reused: terms unconfirmed), school-site confirmation of every field, homestay prices. To upgrade an entry to `verified` a person must compare it with the school's own site and approve.
 
 Housing type descriptions (homestay, shared house, halls, private rental) and their "check" lines are general explanations written by StudyAtlas; they contain no figures.
+
+Final check (PR review, 2026-10-15): city of each school, name, website and operating status were re-checked against public listings and search results only (the sandbox cannot open the schools' sites). “Operating today” could not be confirmed directly for any school; the display therefore says so and every entry stays `unverified`.
+
+Decision (2026-10-15): Excel College / UKEC Academy is hidden from the visitor-facing school list until its official site, operating status and accreditation are confirmed. The data entry and this record stay in the repository; remove `hidden` to show it again after a person has confirmed it. The other five schools stay shown as `unverified`.

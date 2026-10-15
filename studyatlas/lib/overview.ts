@@ -51,7 +51,7 @@ export function keyFigure(c: City, topic: Topic, mode?: StudyMode): Key {
     const u = pr.education.universities, l = pr.education.languageSchools; const uu = has<Institution[]>(u) ? u : undefined, ll = has<Institution[]>(l) ? l : undefined;
     if (!uu && !ll) return { kind: "none" };
     const status: Status = [uu, ll].filter(Boolean).every((f) => f!.status === "verified") ? "verified" : "unverified";
-    return { kind: "schools", universities: uu?.value.length ?? 0, languageSchools: ll?.value.length ?? 0, status };
+    return { kind: "schools", universities: uu?.value.filter((i) => !i.hidden).length ?? 0, languageSchools: ll?.value.filter((i) => !i.hidden).length ?? 0, status };
   }
   const p = keyPoint(c.id, topic, mode); if (p) return { kind: "point", point: p };
   if (topic === "housing" && officialData(c.id)) return { kind: "none", prep: true };      // official data exists but no verified student price yet: "reference price in preparation"

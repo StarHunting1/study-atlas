@@ -43,7 +43,7 @@ export default function FactView({ fact, kind, compact, lean }: { fact: Fact<unk
   const body =
     kind === "money" ? <MoneyText m={v as Money} /> :
     kind === "climate" ? <ClimateTable c={v as MonthlyClimate} /> :
-    kind === "institutions" ? <ul className="space-y-1.5">{(v as Institution[]).map((i) => <li key={i.name} data-testid="institution">{i.url ? <a href={i.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{i.name}</a> : i.name}
+    kind === "institutions" ? <ul className="space-y-1.5">{(v as Institution[]).filter((i) => !i.hidden).map((i) => <li key={i.name} data-testid="institution">{i.url ? <a href={i.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{i.name}</a> : i.name}
       {(i.note || i.where || i.courses || i.stay || i.source) && <dl className="mt-0.5 space-y-0.5 text-xs leading-relaxed text-slate-600">
         {i.note && <div>{L(i.note)}</div>}
         {([["where", i.where], ["courses", i.courses], ["stay", i.stay]] as const).map(([k, t]) => t && <div key={k}><dt className="inline text-slate-500">{L(ux.school[k])}: </dt><dd className="inline">{L(t)}</dd></div>)}

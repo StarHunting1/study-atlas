@@ -21,21 +21,36 @@ t("language schools: 3 per city, never 'verified', each with a source page; the 
     assert.ok(new Set(f.value!.map((s) => s.name)).size === f.value!.length);
   }
 });
-t("a school whose street address differs between listings shows no street address; thin entries (EF) carry no invented courses or accommodation", () => {
-  const mc = schools("manchester").value!.find((s) => s.name === "MC Academy")!; assert.ok(!/Oldham|Mosley/.test(JSON.stringify(mc)));
-  const ih = schools("vancouver").value!.find((s) => s.name.startsWith("International House"))!; assert.ok(!/Quayside|Pender/.test(JSON.stringify(ih)));
-  const ef = schools("vancouver").value!.find((s) => s.name === "EF Vancouver")!; assert.ok(!ef.courses && !ef.stay);
+t("International House Vancouver is shown in New Westminster, never as a City-of-Vancouver address; stale Vancouver addresses and the disputed suite are absent", () => {
+  const ih = schools("vancouver").value!.find((s) => s.name.startsWith("International House"))!; const raw = JSON.stringify(ih);
+  assert.ok(ih.where!.ja.includes("ニューウェストミンスター") && ih.where!.ja.includes("バンクーバー市内ではなく") && ih.where!.en.includes("New Westminster") && ih.where!.en.includes("not in the City of Vancouver"));
+  assert.ok(!/Chinatown|チャイナタウン|Pender|West Broadway|Stadium/.test(ih.where!.ja + ih.where!.en + (ih.courses?.en ?? "")), "no former downtown location");
+  assert.ok(!/\b10[38]\b|Suite|部屋番号は.*\d/.test(raw.replace("部屋番号は掲載により異なるため載せていません", "")), "no suite number");
+  assert.ok(schools("vancouver").note!.ja.includes("バンクーバー市内とは限りません"));
+  assert.equal(ih.url, "https://ihvancouver.com/");
+});
+t("every school states its city; Express English College matches the English UK directory entry; uncertain entries stay flagged and unaddressed", () => {
+  for (const id of ["manchester", "vancouver"]) for (const s of schools(id).value!) assert.ok(/Manchester|Vancouver|New Westminster/.test(s.where!.en) && /マンチェスター|バンクーバー|ニューウェストミンスター/.test(s.where!.ja), s.name);
+  const ex = schools("manchester").value!.find((s) => s.name === "Express English College")!;
+  assert.ok(ex.where!.en.includes("130 Princess Road") && ex.where!.en.includes("M16 7BY") && ex.source!.url === "https://englishuk.com/member-directory?id=6665" && ex.url === "https://expressenglishcollege.co.uk");
+  const xl = schools("manchester").value!.find((s) => s.name.startsWith("Excel College"))!; assert.equal(xl.hidden, true, "kept as data, hidden from visitors"); assert.ok(schools("manchester").value!.length === 3 && schools("manchester").value!.filter((s) => !s.hidden).length === 2 && schools("vancouver").value!.every((s) => !s.hidden), "only Excel/UKEC is hidden; the other five stay shown");
+  assert.ok(xl.name.includes("UKEC Academy") && xl.note!.ja.includes("未確認") && !xl.url && !/Oxford Street \d|Fairfield Street \d|M1 \d/.test(JSON.stringify(xl)));
+  const mc = schools("manchester").value!.find((s) => s.name === "MC Academy")!; assert.ok(!/\d+\s*(Oldham|Mosley)|21-23|M1 1JG|M2 3AN/.test(JSON.stringify(mc)));
+  const ef = schools("vancouver").value!.find((s) => s.name === "EF Vancouver")!; assert.ok(!ef.stay, "EF accommodation stays unconfirmed");
+  for (const id of ["manchester", "vancouver"]) assert.ok(schools(id).note!.ja.includes("営業状況") && schools(id).status === "unverified");
 });
 t("the school list renders name, area, courses, accommodation, source link and the 'unverified' badge (ja and en text exist)", () => {
   const out = wrap(h(FactView, { fact: schools("manchester"), kind: "institutions" }));
   assert.ok(out.includes("Express English College") && out.includes("所在地") && out.includes("主なコース") && out.includes("滞在先の手配") && out.includes("English UK") && out.includes("2026-10-15"));
-  assert.equal((out.match(/data-testid="institution"/g) ?? []).length, 3);
+  assert.equal((out.match(/data-testid="institution"/g) ?? []).length, 2, "Excel College / UKEC Academy is hidden");
+  assert.ok(!out.includes("Excel College") && !out.includes("UKEC"));
+  assert.equal((wrap(h(FactView, { fact: schools("vancouver"), kind: "institutions" })).match(/data-testid="institution"/g) ?? []).length, 3);
   for (const s of [...schools("manchester").value!, ...schools("vancouver").value!]) for (const f of [s.where, s.courses, s.stay, s.note]) if (f) assert.ok(f.en && f.ja);
 });
 t("first view (education key): language mode names language schools first, university mode keeps universities first", () => {
   const k = keyFigure(getCity("manchester")!, "education"); assert.equal(k.kind, "schools");
   const lang = wrap(h(KeyView, { k, languageFirst: true })).replace(/<[^>]+>/g, ""), uni = wrap(h(KeyView, { k })).replace(/<[^>]+>/g, "");
-  assert.ok(lang.indexOf("語学学校") >= 0 && lang.indexOf("語学学校") < lang.indexOf("大学"));
+  assert.ok(lang.includes("語学学校 2校"), "hidden entry is not counted"); assert.ok(lang.indexOf("語学学校") >= 0 && lang.indexOf("語学学校") < lang.indexOf("大学"));
   assert.ok(uni.indexOf("大学") < uni.indexOf("語学学校"));
 });
 t("housing: homestay, shared house, student halls and private rental are all explained with their check points – even where no price exists", () => {
