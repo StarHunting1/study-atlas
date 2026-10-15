@@ -28,10 +28,17 @@ t("two schools side by side: location, courses, accommodation, tuition, status, 
   const tx = text(out); assert.ok(tx.includes("Express English College") && tx.includes("EF Vancouver") && tx.includes("130 Princess Road") && tx.includes("750 Cambie Street"));
   assert.ok(view("van-ef", "van-international-house").includes('data-cross-city="false"') && view("man-kaplan", "man-ih-manchester").includes('data-cross-city="false"'));
 });
-t("a school's own fee-information page is offered as a link (no figure is shown); schools without one show only 'not available'", () => {
-  const ih = view("man-ih-manchester", "man-kaplan"); assert.equal((ih.match(/data-testid="fees-link"/g) ?? []).length, 1); assert.ok(ih.includes("https://ihmanchester.com/prices-and-special-offers/"));
-  assert.ok(!/[£$]\s?\d|\d\s?(GBP|CAD)/.test(text(ih)), "no price figure"); assert.equal((view("man-kaplan", "van-ef").match(/data-testid="fees-link"/g) ?? []).length, 0);
+t("every visible school links to its own fee information on its own site (no figure is shown); a pair shows one link per school", () => {
+  const ih = view("man-ih-manchester", "man-kaplan"); assert.equal((ih.match(/data-testid="fees-link"/g) ?? []).length, 2); assert.ok(ih.includes("https://ihmanchester.com/prices-and-special-offers/"));
+  assert.ok(!/[£$]\s?\d|\d\s?(GBP|CAD)/.test(text(ih)), "no price figure");
   assert.equal(getCompareSchool("van-international-house")!.inst.feesUrl, "https://ihvancouver.com/ihv-price-list/");
+  const host = (u: string) => new URL(u).hostname.replace(/^www\./, "").split(".").slice(-3).join(".").replace(/^[a-z]+\.(?=[a-z0-9-]+\.(co\.uk|com|ca)$)/, "");
+  for (const s of listCompareSchools()) { assert.ok(s.inst.feesUrl && s.inst.url, s.id); assert.ok(s.inst.feesUrl!.startsWith("https://"), s.id); assert.equal(host(s.inst.feesUrl!).split(".").slice(-2).join("."), host(s.inst.url!).split(".").slice(-2).join("."), `${s.id}: the fee link stays on the school's own site`); assert.ok(!/[£$€¥]\s?\d|\d\s?(GBP|CAD|pounds|dollars|円)/i.test(JSON.stringify({ ...s.inst, feesUrl: "", url: "", source: undefined })), `${s.id}: no money figure is stored`); }
+});
+t("fee comparison lists the conditions to match (lessons per week, weeks, fees, accommodation terms, year and currency); fees of different conditions are never put side by side", () => {
+  const v = view("man-ih-manchester", "van-ef"); assert.ok(v.includes('data-testid="fee-conditions"'));
+  for (const w of ["レッスン数", "受講週数", "教材費", "契約期間", "年度と通貨"]) assert.ok(text(v).includes(w), w);
+  assert.ok(!/[£$]\s?\d|\d\s?(GBP|CAD|円)/.test(text(v)));
 });
 t("unverified stays unverified (badge, check date, note) and is never shown as verified", () => {
   const tx = text(view("man-express-english-college", "van-international-house"));

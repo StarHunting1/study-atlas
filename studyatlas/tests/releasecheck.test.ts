@@ -79,4 +79,12 @@ t("government fees are never counted for a person automatically: visa, insurance
     for (const sp of generate(defaultEasy({ cityId, studyType, duration: dur }), { now: "2026-10-15T00:00:00.000Z" })) for (const id of ["visa", "insurance", "flights"] as const) { assert.equal(sp.picks[id].status, "unset", `${cityId}/${studyType}/${dur.value}${dur.unit}/${id}`); assert.ok(sp.mainMissing.includes(id)); }
   }
 });
+t("tuition is never filled from a school: no school fee is held, so a language-school plan stays provisional (未完成) until the user types it", () => {
+  const { generate, defaultEasy } = require("@/lib/smart") as typeof import("@/lib/smart");
+  for (const cityId of ["manchester", "vancouver"] as const) for (const sp of generate(defaultEasy({ cityId, studyType: "language", duration: { value: 12, unit: "weeks" } }), { now: "2026-10-15T00:00:00.000Z" })) { assert.equal(sp.picks.tuition.status, "unset", cityId); assert.equal(sp.provisional, true, `${cityId}: main items missing → provisional`); assert.ok(sp.mainMissing.includes("tuition")); }
+});
+t("fee pages of the schools are recorded as link-only in the rights record; no fee figure is held for any displayed school", () => {
+  const { RIGHTS } = require("@/data/official/rights.data") as typeof import("@/data/official/rights.data"); const r = RIGHTS["language-school-fees"];
+  assert.equal(r.display, "link-only"); assert.notEqual(r.reuseStatus, "permitted"); assert.ok(r.reviewed.length >= 4);
+});
 console.log(n, "release check tests passed");

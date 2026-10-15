@@ -29,11 +29,11 @@ const EXPECT: [RegExp, string][] = [
   [/canada\.ca\/.*study-permit\.html/, "study permit"], [/qnum=484/, "study permit"], [/qnum=1289/, "eta"],
   [/gov\.bc\.ca\/.*health-fee-international-students/, "health fee"], [/gov\.bc\.ca\/.*\/msp/, "medical services plan"],
   [/englishuk\.com\/member-directory\?id=6665/, "express english college"], [/englishuk\.com\/member-directory\?id=878/, "international house"], [/englishuk\.com\/member-directory\?id=897/, "kaplan"],
-  [/ihmanchester\.com\/prices/, "price"], [/ihmanchester\.com/, "ih manchester"], [/kaplaninternational\.com/, "manchester"], [/ecenglish\.com/, "manchester"], [/ihvancouver\.com\/ihv-price-list/, "price"],
+  [/ihmanchester\.com\/prices/, "price"], [/kaplaninternational\.com\/faq\/prices/, "price"], [/expressenglishcollege\.co\.uk\/courses\/general-english/, "general english"], [/ihmanchester\.com/, "ih manchester"], [/kaplaninternational\.com/, "manchester"], [/ecenglish\.com/, "manchester"], [/ihvancouver\.com\/ihv-price-list/, "price"],
   [/languagescanada\.ca\/.*ef-international/, "ef"], [/englishuk\.com\/.*id=228/, "mc academy"],
   [/expressenglishcollege\.co\.uk/, "express english"], [/themcacademy\.co\.uk/, "mc academy"],
   [/languagescanada\.ca\/.*international-house-vancouver/, "international house"], [/ihvancouver\.com/, "international house"],
-  [/sprachcaffe\.com.*vancouver|sprachcaffe\.com\/english\/adults-english-courses-canada/, "vancouver"], [/ef\.com\/ca\/ilsd\/schools\/vancouver/, "vancouver"],
+  [/sprachcaffe\.com.*vancouver|sprachcaffe\.com\/english\/adults-english-courses-canada/, "vancouver"], [/ef\.com\/ca\/ilsd\/schools\/vancouver/, "price"],
   [/ons\.gov\.uk/, "private rent"], [/statcan\.gc\.ca|statcan/, "rent"], [/manchester\.ac\.uk/, "manchester"], [/tfgm\.com/, "tfgm|bee|ticket"],
 ];
 export const expectFor = (url: string): string | undefined => EXPECT.find(([re]) => re.test(url))?.[1];
