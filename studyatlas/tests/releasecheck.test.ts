@@ -73,4 +73,10 @@ t("saved data stays readable: older planner drafts and profiles load unchanged",
   const e = cleanEasy({ ...defaultEasy(), assume: { tuitionWeek: 120, visa: null, insurance: null, flight: { round: null, oneway: null } } })!; assert.equal(e.assume.tuitionWeek, 120);
   const p = cleanProfile({ nationality: "JP", destCity: "manchester", studyType: "language" })!; assert.equal(p.nationality, "JP"); assert.equal(p.destCity, "manchester");
 });
+t("government fees are never counted for a person automatically: visa, insurance and flights stay 'unset' in every generated plan unless the user types them", () => {
+  const { generate, defaultEasy } = require("@/lib/smart") as typeof import("@/lib/smart");
+  for (const cityId of ["manchester", "vancouver"] as const) for (const studyType of ["language", "university"] as const) for (const dur of [{ value: 3, unit: "months" as const }, { value: 12, unit: "weeks" as const }, { value: 41, unit: "weeks" as const }, { value: 18, unit: "months" as const }]) {
+    for (const sp of generate(defaultEasy({ cityId, studyType, duration: dur }), { now: "2026-10-15T00:00:00.000Z" })) for (const id of ["visa", "insurance", "flights"] as const) { assert.equal(sp.picks[id].status, "unset", `${cityId}/${studyType}/${dur.value}${dur.unit}/${id}`); assert.ok(sp.mainMissing.includes(id)); }
+  }
+});
 console.log(n, "release check tests passed");

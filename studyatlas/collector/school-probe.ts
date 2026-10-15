@@ -28,25 +28,17 @@ async function directory(url: string) {
   console.log("  accommodation:", ctx(text, /Homestay|Residential|Hotel or Hostel|Accommodation/i, 80, 3).join(" | ") || "none", "| img alts:", [...r.body.matchAll(/alt="([^"]{2,40})"/gi)].map((m) => m[1]).filter((a) => /tick|cross|yes|no|homestay|campus|hotel/i.test(a)).slice(0, 8).join(", "));
 }
 (async () => {
-  console.log("## A. GOV.UK Content API – current dates of the pages we paraphrase (OGL v3.0)");
-  for (const p of ["visa-to-study-english", "standard-visitor/visit-to-study", "healthcare-immigration-application/how-much-pay", "student-visa", "check-uk-visa"]) {
-    const r = await get(`https://www.gov.uk/api/content/${p}`, "application/json");
-    try { const j = JSON.parse(r.body); console.log(`- ${p}: public_updated_at=${j.public_updated_at} first_published_at=${j.first_published_at} title=${j.title} | ${short(JSON.stringify(j.details?.change_description ?? j.details?.change_history?.[0] ?? ""), 160)}`); } catch { console.log(`- ${p}`, r.status, short(r.body, 120)); }
+  console.log("## R2-A. Express English College: its own site vs the English UK entry");
+  await directory("https://www.englishuk.com/member-directory?id=6665");
+  for (const u of ["https://expressenglishcollege.co.uk/contact/", "https://expressenglishcollege.co.uk/courses/", "https://expressenglishcollege.co.uk/school-accreditations-and-members/"]) await school(u, { extra: [/Princess Road/i, /fees|prices/i] });
+  console.log("\n## R2-B. Vancouver: address on the school's announcement, Languages Canada listing of EF");
+  await school("https://ihvancouver.com/2024/11/08/new-campus/", { pc: VPC, extra: [/Quayside/i, /New Westminster/i, /February|2025/i] });
+  await school("https://www.languagescanada.ca/en/listing-directory/students/ef-international-language-schools-canada-vancouver", { pc: VPC, extra: [/Cambie/i, /Type of Accommodation[^.]{0,60}/i] });
+  await school("https://ihvancouver.com/ihv-price-list/", { pc: VPC, extra: [/price list/i] });
+  console.log("\n## R2-C. Terms of use of the government sites (licence column of the approval record)");
+  for (const u of ["https://www.canada.ca/en/transparency/terms.html", "https://www2.gov.bc.ca/gov/content/home/copyright", "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"]) {
+    const rb = await robots(u); if (!rb.allowed) { console.log(`- ${u}\n  robots: ${rb.reason}`); continue; }
+    const r = await get(u); const text = htmlToText(r.body).replace(/\s+/g, " "); console.log(`- ${u}\n  ${r.status} · “${short(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(r.body)?.[1] ?? "", 90)}”`);
+    for (const re of [/commercial/i, /reproduc/i, /without (charge|permission|seeking)/i, /attribution|acknowledg/i]) console.log(`  ${re.source}: ${ctx(text, re, 110, 2).join(" | ") || "none"}`);
   }
-  console.log("\n## B. canada.ca / BC pages – modification dates");
-  for (const u of ["https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", "https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students"]) {
-    const r = await get(u); const text = htmlToText(r.body).replace(/\s+/g, " "); console.log(`- ${u}\n  ${r.status} dates:`, ctx(text, /(date modified|last updated|last modified|page last|updated)[^a-z]{0,3}[:\s]\s*[A-Za-z0-9 ,-]{6,30}/i, 20, 3).join(" | ") || "none", "| meta:", [...r.body.matchAll(/<meta[^>]+(?:dcterms\.modified|dcterms\.issued|last-modified|article:modified_time)[^>]*>/gi)].map((m) => short(m[0], 120)).slice(0, 3).join(" "));
-  }
-  console.log("\n## C. English UK directory entries");
-  for (const u of ["https://www.englishuk.com/member-directory?id=4137", "https://www.englishuk.com/member-directory?id=878", "https://www.englishuk.com/member-directory?id=897", "https://www.englishuk.com/en/course-finder/course-finder-results?id=878", "https://www.englishuk.com/en/course-finder/course-finder-results?id=897"]) await directory(u);
-  console.log("\n## D. Manchester school sites");
-  for (const u of ["https://ihmanchester.com/", "https://ihmanchester.com/our-english-school/", "https://www.kaplaninternational.com/language-schools/united-kingdom/manchester", "https://ecenglish.com/en/schools/uk/learn-english-in-manchester/"]) await school(u);
-  console.log("\n## E. British Council accredited centres index");
-  for (const l of ["m", "e", "i", "k"]) { const u = `https://www.britishcouncil.org/education/accreditation/centres/${l}`; const rb = await robots(u); if (!rb.allowed) { console.log(u, "robots:", rb.reason); continue; } const r = await get(u); const text = htmlToText(r.body).replace(/\s+/g, " "); console.log(`- ${u}\n  ${r.status}`, r.status === 200 ? ctx(text, /manchester/i, 60, 8).join(" | ") : short(r.body, 80)); }
-  console.log("\n## F. Vancouver school sites and Languages Canada");
-  await school("https://ihvancouver.com/2024/11/08/new-campus/", { pc: VPC });
-  await school("https://www.sprachcaffe.com/en/uc/adults/canada/vancouver.htm", { pc: VPC });
-  await school("https://www.ef.com/ca/campaign/ilsd/canada/vancouver/", { pc: VPC });
-  await school("https://www.languagescanada.ca/en/listing-directory/students/international-house-vancouver", { pc: VPC });
-  for (const q of ["Sprachcaffe", "EF International", "International House"]) { const u = `https://www.languagescanada.ca/en/students-new?listing_filter_6%5Btitle%5D=${encodeURIComponent(q)}&listing_filter_6%5Bsave%5D=Filter`; const rb = await robots(u); if (!rb.allowed) { console.log(u, "robots:", rb.reason); continue; } const r = await get(u); console.log(`- Languages Canada search “${q}”: ${r.status}`, r.status === 200 ? "listing links: " + [...new Set([...r.body.matchAll(/href="(\/en\/listing-directory\/students\/[^"]+)"/gi)].map((m) => m[1].replace("/en/listing-directory/students/", "")))].slice(0, 12).join(", ") : short(r.body, 80)); }
 })();

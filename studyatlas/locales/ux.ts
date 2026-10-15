@@ -6,7 +6,7 @@ export const ux = {
     living: { en: "Monthly cost of living for students", ja: "学生の月あたり生活費の目安" }, housing: { en: "Where you could live and what it costs", ja: "住まいの選択肢と費用" },
     transport: { en: "Getting around and student fares", ja: "移動手段と学生向け運賃" }, climate: { en: "Average temperature through the year", ja: "年間の平均気温" }, education: { en: "Universities and language schools", ja: "大学・語学学校" },
   },
-  school: { where: { en: "Area", ja: "所在地" }, courses: { en: "Main courses", ja: "主なコース" }, stay: { en: "Accommodation arranged by the school", ja: "滞在先の手配" } },
+  school: { fees: { en: "Fees: see the school’s own fee page", ja: "料金：学校の公式の料金案内ページ" }, feesOpen: { en: "Open fee information ↗", ja: "料金案内を開く ↗" }, where: { en: "Area", ja: "所在地" }, courses: { en: "Main courses", ja: "主なコース" }, stay: { en: "Accommodation arranged by the school", ja: "滞在先の手配" } },
   studyMode: {
     label: { en: "Study type", ja: "留学タイプ" }, language: { en: "Language study", ja: "語学留学" }, university: { en: "University study", ja: "大学留学" },
     hint: { language: { en: "Showing language-school study first: language schools, homestay, shared houses and the transport and housing language students can use.", ja: "語学留学向け：語学学校・ホームステイ・シェアハウス、語学留学生が利用できる交通・住居情報を優先して表示しています。" },

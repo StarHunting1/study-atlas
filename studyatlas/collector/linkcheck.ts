@@ -28,7 +28,9 @@ const EXPECT: [RegExp, string][] = [
   [/gov\.uk\/healthcare-immigration-application/, "immigration health surcharge"],
   [/canada\.ca\/.*study-permit\.html/, "study permit"], [/qnum=484/, "study permit"], [/qnum=1289/, "eta"],
   [/gov\.bc\.ca\/.*health-fee-international-students/, "health fee"], [/gov\.bc\.ca\/.*\/msp/, "medical services plan"],
-  [/englishuk\.com\/member-directory\?id=6665/, "express english college"], [/englishuk\.com\/.*id=228/, "mc academy"],
+  [/englishuk\.com\/member-directory\?id=6665/, "express english college"], [/englishuk\.com\/member-directory\?id=878/, "international house"], [/englishuk\.com\/member-directory\?id=897/, "kaplan"],
+  [/ihmanchester\.com\/prices/, "price"], [/ihmanchester\.com/, "ih manchester"], [/kaplaninternational\.com/, "manchester"], [/ecenglish\.com/, "manchester"], [/ihvancouver\.com\/ihv-price-list/, "price"],
+  [/languagescanada\.ca\/.*ef-international/, "ef"], [/englishuk\.com\/.*id=228/, "mc academy"],
   [/expressenglishcollege\.co\.uk/, "express english"], [/themcacademy\.co\.uk/, "mc academy"],
   [/languagescanada\.ca\/.*international-house-vancouver/, "international house"], [/ihvancouver\.com/, "international house"],
   [/sprachcaffe\.com.*vancouver|sprachcaffe\.com\/english\/adults-english-courses-canada/, "vancouver"], [/ef\.com\/ca\/ilsd\/schools\/vancouver/, "vancouver"],
@@ -56,7 +58,7 @@ export function linkTargets(): LinkTarget[] {
   for (const code of ["GBR", "CAN"]) { for (const l of visaLinks[code] ?? []) add(l.link.value, `visa:${code}`); for (const l of healthLinks[code] ?? []) add(l.link.value, `health:${code}`); }
   for (const id of CITY_IDS) {
     const c = cities.find((x) => x.id === id)!; const edu = c.profile.education;
-    for (const i of edu.languageSchools.value ?? []) { add(i.url, `school:${id}:${i.name}`); add(i.source?.url, `school-source:${id}:${i.name}`); }
+    for (const i of edu.languageSchools.value ?? []) { add(i.url, `school:${id}:${i.name}`); add(i.source?.url, `school-source:${id}:${i.name}`); add(i.feesUrl, `school-fees:${id}:${i.name}`); }
     for (const i of edu.universities.value ?? []) add(i.url, `university:${id}:${i.name}`);
     const walk = (o: unknown, path: string) => { if (!o || typeof o !== "object") return; const f = o as { status?: string; sources?: { url: string }[] };
       if ("status" in f) f.sources?.forEach((s) => add(s.url, `fact:${id}:${path}`)); else for (const [k, v] of Object.entries(o)) walk(v, `${path}.${k}`); };
