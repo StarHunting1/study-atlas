@@ -6,6 +6,7 @@ import { officialData } from "@/data/official";
 import { sections } from "@/data/fields";
 import { isStudentHousing } from "@/data/official/housingKind";
 import type { DataPoint } from "@/data/official/types";
+import { fitOf, type StudyMode } from "@/data/official/studyType";
 import { displayModeOfClimate, isFigureShown } from "@/data/official/rights";
 /*
  * Quick Overview (Ver.1.8, Progressive Disclosure level 1). One short "key figure" per topic, picked from what the site already
@@ -31,13 +32,14 @@ const has = <T,>(f: Fact<T> | undefined): f is Fact<T> & { value: T } => !!f && 
 const POINT_TOPIC: Partial<Record<Topic, DataPoint["topic"]>> = { living: "living", housing: "housing", transport: "transport" };
 
 /** The data point to show first: a highlighted verified figure, else any verified one, else any shown (its status is displayed). */
-export function keyPoint(cityId: string, topic: Topic): DataPoint | undefined {
+export function keyPoint(cityId: string, topic: Topic, mode?: StudyMode): DataPoint | undefined {
   // Housing leads with what a student pays per person; the whole-market rent statistic is never the key figure (it stays in the details)
-  const t = POINT_TOPIC[topic]; const pts = (officialData(cityId)?.points ?? []).filter((p) => p.topic === t && p.value && shown(p.status) && isFigureShown(p) && (topic !== "housing" || isStudentHousing(p)));
+  const t = POINT_TOPIC[topic]; const pts = (officialData(cityId)?.points ?? []).filter((p) => p.topic === t && p.value && shown(p.status) && isFigureShown(p) && (topic !== "housing" || isStudentHousing(p)) && (!mode || fitOf(p, mode) === "applies"));
   return pts.find((p) => p.highlight && p.status === "verified") ?? pts.find((p) => p.status === "verified") ?? pts[0];
 }
 
-export function keyFigure(c: City, topic: Topic): Key {
+/** `mode` (Ver.1.2.6): only figures that apply to that study type can be the key figure; without it nothing is filtered (compare page). */
+export function keyFigure(c: City, topic: Topic, mode?: StudyMode): Key {
   const pr = c.profile;
   if (topic === "climate") {
     const k = climateCompare(c.id);
@@ -51,7 +53,7 @@ export function keyFigure(c: City, topic: Topic): Key {
     const status: Status = [uu, ll].filter(Boolean).every((f) => f!.status === "verified") ? "verified" : "unverified";
     return { kind: "schools", universities: uu?.value.length ?? 0, languageSchools: ll?.value.length ?? 0, status };
   }
-  const p = keyPoint(c.id, topic); if (p) return { kind: "point", point: p };
+  const p = keyPoint(c.id, topic, mode); if (p) return { kind: "point", point: p };
   if (topic === "housing" && officialData(c.id)) return { kind: "none", prep: true };      // official data exists but no verified student price yet: "reference price in preparation"
   // Figures exist but the publisher's terms do not allow showing them: point to the official page rather than to a profile summary
   const held = (officialData(c.id)?.points ?? []).find((x) => x.topic === POINT_TOPIC[topic] && x.value && shown(x.status) && !isFigureShown(x));
