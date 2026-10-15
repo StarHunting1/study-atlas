@@ -1,21 +1,43 @@
 /*
- * TEMPORARY (Ver.1.3.2): finds out whether 1991–2020 climate normals are available from the official sources and under which licence.
- * Reads only: ECCC GeoMet (open OGC API) and the data.gov.uk CKAN search (open API). Nothing on metoffice.gov.uk is requested (its terms restrict automated access). One request per URL,
- * no retries. Nothing is stored. Removed once the answer is recorded in RELEASE_DATA_AUDIT.md.
+ * TEMPORARY (Ver.1.3.2, second round): re-checks only what the first Actions round could not settle. One request per URL, no retries,
+ * robots.txt respected, nothing stored. Never requests metoffice.gov.uk (its terms restrict automated access).
+ *  A. fact check: do the pages we paraphrased really state the numbers / periods we wrote? (prints short context around each hit)
+ *  B. ECCC: is there a 1991–2020 bulk file or API, and what licence?
+ *  C. replacements for the links that failed (English UK directory entry of MC Academy, IRCC eTA page) and the Met Office catalogue entry.
  */
-import { fetchText, sleep } from "./util";
-const get = async (url: string, accept = "application/json") => { await sleep(1200); try { const r = await fetchText(url, { retries: 0, accept }); return r; } catch (e) { return { status: 0, url, contentType: "", body: `ERROR ${(e as Error).message} ${((e as { cause?: Error }).cause?.message) ?? ""}` }; } };
-const show = (t: string, n = 1500) => t.replace(/\s+/g, " ").slice(0, n);
+import { makeRobots } from "./robots";
+import { fetchText, htmlToText, sleep, USER_AGENT } from "./util";
+const robots = makeRobots((u) => fetchText(u, { accept: "text/plain", retries: 0 }), USER_AGENT);
+const get = async (url: string, accept = "text/html,*/*;q=0.8") => { await sleep(1500); try { return await fetchText(url, { retries: 0, accept }); } catch (e) { return { status: 0, url, contentType: "", body: `ERROR ${(e as Error).message} ${((e as { cause?: Error }).cause?.message) ?? ""}` }; } };
+const short = (t: string, n = 200) => t.replace(/\s+/g, " ").trim().slice(0, n);
+const title = (h: string) => short(htmlToText(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(h)?.[1] ?? ""), 100);
+async function page(url: string, needles: (string | RegExp)[], ctx = 90) {
+  const rb = await robots(url); if (!rb.allowed) { console.log(`- ${url}\n  robots: ${rb.reason} (not fetched)`); return; }
+  const r = await get(url); const text = htmlToText(r.body).replace(/\s+/g, " "); console.log(`- ${url}\n  ${r.status} → ${r.url} · “${title(r.body)}”`);
+  for (const n of needles) { const re = typeof n === "string" ? new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi") : n; const hits = [...text.matchAll(re)].slice(0, 3).map((m) => text.slice(Math.max(0, (m.index ?? 0) - ctx), (m.index ?? 0) + m[0].length + ctx)); console.log(`  [${String(n)}] ${hits.length ? hits.map((h) => `…${h}…`).join(" | ") : "NOT FOUND"}`); }
+  return r;
+}
 (async () => {
-  console.log("## ECCC climate normals");
-  const meta = await get("https://api.weather.gc.ca/collections/climate-normals?f=json"); console.log("collection", meta.status, show(meta.body, 1200));
-  const all = await get("https://api.weather.gc.ca/collections?f=json&limit=400"); try { const ids = (JSON.parse(all.body).collections as { id: string; title?: string }[]).map((c) => c.id).filter((i) => /normal/i.test(i)); console.log("normals collections:", ids.join(", ")); } catch { console.log("collections list", all.status, show(all.body, 200)); }
-  for (const nid of [1, 56]) { const j = await get(`https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108447&NORMAL_ID=${nid}&limit=50`);
-    try { const fs = JSON.parse(j.body).features as { properties: Record<string, unknown> }[]; const per = [...new Set(fs.map((f) => `${f.properties.PERIOD_BEGIN}-${f.properties.PERIOD_END}|${f.properties.DATE_CALCULATED}|${f.properties.STATION_NAME}`))]; console.log(`NORMAL_ID ${nid}: ${fs.length} features; periods/stations:`, per.join("; ")); console.log("keys:", Object.keys(fs[0]?.properties ?? {}).join(",")); } catch { console.log("items", j.status, show(j.body, 300)); } }
-  const st = await get("https://api.weather.gc.ca/collections/climate-normals/items?f=json&STATION_NAME=VANCOUVER%20INTL%20A&limit=5"); console.log("by name", st.status, show(st.body, 400));
-  console.log("\n## data.gov.uk – Met Office 1991–2020 averages");
-  for (const q of ["met office climate averages 1991-2020", "UK climate averages station 1991-2020"]) { const r = await get(`https://data.gov.uk/api/action/package_search?q=${encodeURIComponent(q)}&rows=8`);
-    try { const res = JSON.parse(r.body).result.results as { title: string; name: string; license_title?: string; organization?: { title: string }; resources: { url: string; format: string }[] }[]; for (const p of res) console.log(`- ${p.title} | ${p.organization?.title} | ${p.license_title} | ${p.name} | ${p.resources.slice(0, 3).map((x) => x.format + ":" + x.url).join(" ; ")}`); } catch { console.log(q, r.status, show(r.body, 300)); } }
-  // The Met Office website terms forbid robots / scraping of its site except for APIs it provides (rights record "metoffice-station-data"),
-  // so NO metoffice.gov.uk page or file is requested here: only the catalogue metadata above (data.gov.uk API) is read.
+  console.log("## A. fact check (words / numbers on the official pages)");
+  await page("https://www.gov.uk/healthcare-immigration-application/how-much-pay", ["£776", "£1,035", /student/i, "6 months"]);
+  await page("https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", ["$75", "six months", "6 months", /wait/i]);
+  await page("https://www.gov.uk/visa-to-study-english", ["11 months", "6 months"]);
+  await page("https://www.gov.uk/standard-visitor/visit-to-study", ["6 months"]);
+  await page("https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", ["6 months", "six months", "travel document"]);
+  await page("https://www.gov.uk/student-visa", ["6 months", "sponsor"]);
+  await page("https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", ["6 months", "study permit"]);
+  console.log("\n## B. ECCC 1991–2020 normals");
+  const eccc = await page("https://climate.weather.gc.ca/climate_normals/", ["1991", "bulk", /licen[cs]e/i], 120);
+  if (eccc) console.log("  links:", [...eccc.body.matchAll(/href="([^"]+)"/gi)].map((m) => m[1]).filter((h) => /1991|bulk|csv|zip|download|licen|terms/i.test(h)).slice(0, 25).join(" "));
+  const bulk = await page("https://climate.weather.gc.ca/climate_normals/bulk_data_e.html", ["1991", "csv", /licen[cs]e/i], 140);
+  if (bulk) console.log("  links:", [...bulk.body.matchAll(/(?:href|action)="([^"]+)"/gi)].map((m) => m[1]).slice(0, 40).join(" "));
+  for (const q of ["canadian climate normals 1991-2020", "climate normals 1991 2020 station"]) { const r = await get(`https://open.canada.ca/data/api/action/package_search?q=${encodeURIComponent(q)}&rows=6`, "application/json");
+    try { for (const p of JSON.parse(r.body).result.results as { title: string; license_title?: string; name: string; resources: { url: string; format: string }[] }[]) console.log(`  CKAN: ${p.title} | ${p.license_title} | ${p.name} | ${p.resources.slice(0, 3).map((x) => x.format + ":" + x.url).join(" ; ")}`); } catch { console.log("  CKAN", q, r.status, short(r.body, 160)); } }
+  console.log("\n## C. replacement links and the Met Office catalogue entry");
+  await page("https://englishuk.com/member-directory?id=228", ["MC Academy", "Mosley", "Oldham", "website", /homestay/i], 100);
+  await page("https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", ["eTA", "air"], 100);
+  const pk = await get("https://data.gov.uk/api/action/package_show?id=uk-climate-averages", "application/json");
+  try { const p = JSON.parse(pk.body).result; console.log(`- uk-climate-averages | ${p.title} | licence: ${p.license_title ?? p.license_id} | ${short(p.notes ?? "", 400)} | resources: ${(p.resources ?? []).map((x: { url: string; format: string }) => x.format + ":" + x.url).join(" ; ")}`); } catch { console.log("- package_show", pk.status, short(pk.body, 300)); }
+  const pk2 = await get("https://data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5", "application/json");
+  try { const p = JSON.parse(pk2.body).result; console.log(`- historic station data | ${p.name} | licence: ${p.license_title ?? p.license_id}`); } catch { console.log("- package_show 17ba", pk2.status); }
 })();
