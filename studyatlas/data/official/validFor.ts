@@ -14,3 +14,5 @@ const ja: Record<string, string> = {
 export const validForText = (s: string, lang: string) => (lang === "ja" ? ja[s] ?? s : s);
 /** Short form for tight spaces (before the first parenthesis). */
 export const validForShort = (s: string, lang: string) => validForText(s, lang).split(/ \(|（/)[0];
+/** Reference period shown on the card itself for market statistics (whole-market rents): the year/month is part of what the number means. Other figures keep it behind the details. */
+export const cardPeriod = (p: { audience: string; validFor: string }, lang: string) => (p.audience === "renter" ? validForShort(p.validFor, lang) : undefined);

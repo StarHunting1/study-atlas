@@ -78,7 +78,8 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     // the same comparison logic on the held-back figures themselves (all points are still in the data)
     assert.deepEqual(compareIssues([pt("man-bus-single-adult"), pt("van-fare-stored-adult-z1")]), []); // trip vs trip, both adults
     assert.deepEqual(compareIssues([pt("man-bus-28day-adult"), pt("van-monthly-adult-z1")]), ["period"]); // 28 days vs calendar month
-    assert.deepEqual(compareIssues([m("marketRent", "manchester"), m("marketRent", "vancouver")]), ["missing"]);
+    // Ver.1.2.4: the whole-market rent row puts the ONS Manchester figure beside the CMHC Vancouver figure; they share no basis, which the row says (see tests/housingcompare.test.ts)
+    assert.deepEqual(compareIssues([m("marketRent", "manchester"), m("marketRent", "vancouver")]), []);
     assert.deepEqual(compareIssues([pt("man-bus-single-adult"), pt("man-anybus-28day-student")]).sort(), ["audience", "period"]);
     assert.ok(compareIssues([pt("man-bus-single-adult"), { ...pt("van-fare-stored-adult-z1"), status: "unverified" }]).includes("notVerified"));
     const v = climateCompare("vancouver")!, mc = climateCompare("manchester")!;

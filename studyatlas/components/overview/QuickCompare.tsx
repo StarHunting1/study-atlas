@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getCity, type City } from "@/data/cities";
 import { sections } from "@/data/fields";
 import { moneyComparability } from "@/data/comparability";
-import { climateCompare, climateIssues, compareIssues, compareRows, pickPoint, type ClimateCompare, type Issue } from "@/data/official/compare";
+import { climateCompare, climateIssues, compareRows, pickPoint, rowVerdict, type ClimateCompare, type Issue } from "@/data/official/compare";
 import { officialData } from "@/data/official";
 import type { Fact, Money } from "@/data/types";
 import { useI18n } from "@/lib/i18n";
@@ -63,8 +63,8 @@ function OfficialDetail({ cities, topic }: { cities: City[]; topic: Topic }) {
   return (
     <div className="space-y-3">
       {rows.map((row) => {
-        const pts = cities.map((c) => pickPoint(c.id, row)); if (!pts.some(Boolean)) return null; const issues = compareIssues(pts);
-        return <DetailRow key={row.id} label={L(row.label)} note={issues.length ? issues.map((i) => L(ot[issueText[i]] as never)).join(" / ") : L(ot.cmpOk)} noteCls={issues.length ? "text-amber-700" : "text-emerald-700"} extra={row.hint ? L(row.hint) : undefined} cities={cities}
+        const pts = cities.map((c) => pickPoint(c.id, row)); if (!pts.some(Boolean)) return null; const { verdict, issues } = rowVerdict(row, pts);
+        return <DetailRow key={row.id} label={L(row.label)} note={verdict === "notDirect" ? L(row.basis!) : issues.length ? issues.map((i) => L(ot[issueText[i]] as never)).join(" / ") : L(ot.cmpOk)} noteCls={issues.length || verdict === "notDirect" ? "text-amber-700" : "text-emerald-700"} extra={row.hint ? L(row.hint) : undefined} cities={cities}
           cells={pts.map((p) => p ? <div className="space-y-1"><AmountText p={p} /> {p.status !== "verified" && <StatusBadge status={p.status} />}
             <p className="text-[11px] text-slate-500">{L(ot.audience[p.audience])} · {validForShort(p.validFor, lang)}</p><p className="text-[11px] leading-snug text-slate-500">{L(p.conditions)}</p>
             <Disclosure level="sources"><p className="text-[11px] text-slate-500">{L(ot.source)}: <a href={p.evidence[0].url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{p.evidence[0].publisher}</a> · {L(ot.retrieved)}: {p.retrievedAt}{p.checkedAt ? ` · ${L(ot.checked)}: ${p.checkedAt}` : ""}</p></Disclosure></div> : none)} />;

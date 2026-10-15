@@ -8,7 +8,11 @@ import type { DataPoint } from "./types";
  * share the same period unit and the same group of people; anything else is still shown, labelled as not comparable.
  * Currencies are never converted here (see lib/fx.ts for the future exchange-rate hook).
  */
-export type CompareRow = { id: string; label: Localized; metrics: string[]; hint?: Localized };
+export type CompareRow = {
+  id: string; label: Localized; metrics: string[]; hint?: Localized;
+  /** Set when the figures chosen for the cities are different statistics (not just different currencies): the row then says so instead of "same basis", and no verdict is ever drawn. */
+  basis?: Localized;
+};
 export const compareRows: CompareRow[] = [
   { id: "single", label: { en: "Single adult fare", ja: "大人の片道運賃" }, metrics: ["transport.single.adult", "transport.single.adult.zone1"],
     hint: { en: "Manchester: Bee Network bus only; Vancouver: any mode, 1 zone, Compass Stored Value.", ja: "マンチェスターはBee Networkのバスのみ、バンクーバーは全交通機関・1ゾーン・Compassストアドバリューです。" } },
@@ -16,7 +20,9 @@ export const compareRows: CompareRow[] = [
     hint: { en: "Manchester sells 28-day tickets; Vancouver sells calendar-month passes.", ja: "マンチェスターは28日券、バンクーバーは暦月のパスです。" } },
   { id: "studentTransit", label: { en: "Student transit pass", ja: "学生向け交通パス" }, metrics: ["transport.periodPassAllOperators.student", "transport.studentProgramPass"] },
   { id: "uniHalls", label: { en: "University halls", ja: "大学寮" }, metrics: ["housing.universityHalls.selfCatered"] },
-  { id: "marketRent", label: { en: "Average rent, 1 bedroom (whole market)", ja: "平均家賃・1ベッドルーム（市場全体）" }, metrics: ["housing.marketRent.1br"] },
+  { id: "marketRent", label: { en: "Average rent in the private rental market", ja: "民間賃貸市場の平均家賃" }, metrics: ["housing.privateRent.average", "housing.marketRent.1br"],
+    hint: { en: "Manchester: all private dwellings (ONS). Vancouver: 1-bedroom units (CMHC). Neither is student housing.", ja: "マンチェスター：民間賃貸住宅すべて（ONS）。バンクーバー：1ベッドルーム（CMHC）。どちらも学生向け住居ではありません。" },
+    basis: { en: "Not directly comparable: the statistic, year, housing type and currency differ (not converted). No “cheaper” verdict is given.", ja: "直接は比較できません：統計の種類・対象年・住居タイプ・通貨が異なります（換算なし）。どちらが安いかは判定しません。" } },
   { id: "livingTotal", label: { en: "Student living-cost estimate (total per month)", ja: "学生の生活費見積もり（月額合計）" }, metrics: ["living.universityEstimate.total"] },
 ];
 
@@ -30,6 +36,14 @@ export function compareIssues(points: (DataPoint | undefined)[]): Issue[] {
   if (new Set(have.map((p) => p.value!.per)).size > 1) out.push("period");
   if (new Set(have.map((p) => p.audience)).size > 1) out.push("audience");
   return out;
+}
+/** What a compare row can say about its figures. Never an ordering: StudyAtlas does not call one city's figure cheaper or dearer (currencies are not converted). */
+export type RowVerdict = "missing" | "issues" | "notDirect" | "sameBasis";
+export function rowVerdict(row: CompareRow, points: (DataPoint | undefined)[]): { verdict: RowVerdict; issues: Issue[]; currenciesDiffer: boolean } {
+  const issues = compareIssues(points); const have = points.filter((p): p is DataPoint => !!p?.value);
+  const currenciesDiffer = new Set(have.map((p) => p.value!.currency)).size > 1;
+  const verdict: RowVerdict = issues.includes("missing") ? "missing" : issues.length ? "issues" : row.basis ? "notDirect" : "sameBasis";
+  return { verdict, issues, currenciesDiffer };
 }
 /** A figure the publisher's terms allow to be shown (rights.ts); held-back figures are treated as "no figure" and never compared. */
 export const pickPoint = (cityId: string, row: CompareRow) => officialData(cityId)?.points.find((p) => row.metrics.includes(p.metric) && isFigureShown(p));
