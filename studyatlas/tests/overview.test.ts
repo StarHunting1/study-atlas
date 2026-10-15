@@ -49,8 +49,10 @@ t("identical plans are merged into one card; different plans stay separate", () 
   const now = "2026-10-14T00:00:00.000Z";
   const g = groupPlans(generate({ ...defaultEasy({ cityId: "manchester", studyType: "language" }), housing: null }, { now })); assert.ok(g.length >= 1 && g.length <= 3); assert.deepEqual(g.flatMap((x) => x.tiers), ["budget", "balanced", "comfort"]);
   for (const x of g) if (x.tiers.length > 1) { const [a, ...rest] = x.tiers; void a; assert.ok(rest.length >= 1); }
-  const uni = groupPlans(generate({ ...defaultEasy({ cityId: "manchester", studyType: "university" }), housing: null }, { now })); assert.equal(uni.length, 3, "university data gives three different plans");
-  const same = generate(defaultEasy({ cityId: "vancouver", studyType: "language" }), { now }); const gg = groupPlans([same[0], { ...same[0], tier: "balanced" }, same[2]]); assert.equal(gg.length, 2); assert.deepEqual(gg[0].tiers, ["budget", "balanced"]);
+  const uni = groupPlans(generate({ ...defaultEasy({ cityId: "manchester", studyType: "university" }), housing: null }, { now })); assert.ok(uni.length >= 2 && uni.length <= 3, "university data gives different plans for the tiers (housing is no longer auto-filled from an estimate, Ver.1.2.5)");
+  // (Vancouver has no automatically adopted figure since Ver.1.2.5, so its three plans are identical and merge into one card)
+  const van3 = generate(defaultEasy({ cityId: "vancouver", studyType: "language" }), { now }); assert.equal(groupPlans(van3).length, 1);
+  const same = generate({ ...defaultEasy({ cityId: "manchester", studyType: "university" }), housing: null }, { now }); const gg = groupPlans([same[0], { ...same[0], tier: "balanced" }, same[2]]); assert.equal(gg.length, JSON.stringify(same[0].calc) === JSON.stringify(same[2].calc) ? 1 : 2); assert.deepEqual(gg[0].tiers.slice(0, 2), ["budget", "balanced"]);
   const lang = generate({ ...defaultEasy({ cityId: "manchester", studyType: "language" }), housing: null }, { now }); const lg = groupPlans(lang); assert.equal(lg.length < 3 || lang[0].calc.total.converted !== lang[1].calc.total.converted, true);
 });
 

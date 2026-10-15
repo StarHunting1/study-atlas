@@ -16,6 +16,7 @@ import { ux } from "@/locales/ux";
 import Disclosure from "@/components/Disclosure";
 import FactView, { StatusBadge } from "@/components/FactView";
 import { CardGrid } from "@/components/official/DataCard";
+import { housingKindOf } from "@/data/official/housingKind";
 import ClimateCharts from "@/components/official/ClimateCharts";
 import KeyView from "./KeyView";
 import type { Status } from "@/data/types";
@@ -34,6 +35,27 @@ function Notices({ data, topic }: { data?: OfficialCityData; topic: DataPoint["t
       <h4 className="text-xs font-semibold text-slate-700">{L(ot.notShownTitle)}</h4><p className="text-xs leading-relaxed text-slate-600">{L(n.text)}</p>
       <ul className="space-y-1 text-xs">{n.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(l.label)} ↗</a></li>)}</ul>
     </section>))}</>;
+}
+
+/** Ver.1.2.5 – the housing card leads with what a student pays per person (halls, homestay, a room in a shared house); a missing price says so instead of showing anything else. */
+export function HousingStudentFirst({ city, data, points }: { city: City; data?: OfficialCityData; points: DataPoint[] }) {
+  const { L } = useI18n(); const kinds = ["dorm", "homestay", "share"] as const;
+  return (
+    <div className="space-y-4" data-testid="housing-student">
+      <p className="text-xs leading-relaxed text-slate-500">{L(ot.housingNote)}</p>
+      <section className="space-y-3"><h3 className="text-sm font-semibold text-[#0b2a5b]">{L(ot.housingPricesTitle)}</h3>
+        {kinds.map((k) => { const pts = points.filter((p) => housingKindOf(p) === k);
+          return <div key={k} data-testid={`kind-${k}`} data-count={pts.length} className="space-y-1.5">
+            <h4 className="text-sm font-medium text-slate-800">{L(ot.housingKinds[k])} <span className="text-[11px] font-normal text-slate-500">· {L(ot.housingKindUnit[k])}</span></h4>
+            {pts.length ? <CardGrid points={pts} /> : <p className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-200" data-testid={`prep-${k}`}>{L(ot.pricePrep)}</p>}
+          </div>; })}
+        <Notices data={data} topic="housing" />
+      </section>
+      <section className="space-y-1.5" data-testid="housing-types"><h3 className="text-sm font-semibold text-[#0b2a5b]">{L(ot.housingTypesTitle)}</h3>
+        <dl className="space-y-1.5 text-xs leading-relaxed text-slate-600">{kinds.map((k) => <div key={k}><dt className="inline font-medium text-slate-700">{L(ot.housingKinds[k])}: </dt><dd className="inline">{L(ot.housingTypes[k])}</dd></div>)}</dl>
+        <p className="text-xs text-slate-500">{L(ot.housingTypesCheck)}</p></section>
+    </div>
+  );
 }
 function Group({ title, note, points }: { title: string; note?: string; points: DataPoint[] }) {
   if (!points.length) return null;
@@ -57,9 +79,9 @@ function Card({ topic, city, data, open, setOpen }: { topic: Topic; city: City; 
   const { L } = useI18n(); const k = keyFigure(city, topic); const by = (t: DataPoint["topic"]) => (data?.points ?? []).filter((p) => p.topic === t);
   let body: ReactNode = null;
   if (topic === "living") body = <>{by("living").length > 0 && <><p className="rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">{L(ot.livingIntro)}</p><CardGrid points={by("living")} /></>}<Profile city={city} id="cost" /></>;
-  if (topic === "housing") body = <><p className="text-xs leading-relaxed text-slate-500">{L(ot.housingNote)}</p>
-    <Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} /><Notices data={data} topic="housing" />
-    <Group title={L(ot.housingMarket)} points={by("housing").filter((p) => p.audience === "renter")} /><Group title={L(ot.housingEstimate)} points={by("housing").filter((p) => !p.housing && p.audience !== "renter")} /><Profile city={city} id="housing" /></>;
+  if (topic === "housing") body = <><HousingStudentFirst city={city} data={data} points={by("housing")} />
+    <Disclosure level="more" label={L(ot.housingMarketMore)} testid="market-more"><div className="space-y-3"><p className="text-xs leading-relaxed text-slate-500">{L(ot.housingMarketMoreNote)}</p>
+      <Group title={L(ot.housingMarket)} points={by("housing").filter((p) => housingKindOf(p) === "market")} /></div></Disclosure><Profile city={city} id="housing" /></>;
   if (topic === "transport") body = <><Group title={L(ot.transportAdult)} points={by("transport").filter((p) => p.audience === "adult")} /><Group title={L(ot.transportStudent)} points={by("transport").filter((p) => p.audience !== "adult")} /><Profile city={city} id="transport" /></>;
   if (topic === "climate") body = <>{data?.climate && showsFigure(displayModeOfClimate(data.climate)) && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}</span></div><ClimateCharts c={data.climate} />
     {data.climate.derived && <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">{L(ot.climateDerived)}</p>}

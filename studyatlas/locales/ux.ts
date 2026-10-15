@@ -6,7 +6,7 @@ export const ux = {
     living: { en: "Monthly cost of living for students", ja: "学生の月あたり生活費の目安" }, housing: { en: "Where you could live and what it costs", ja: "住まいの選択肢と費用" },
     transport: { en: "Getting around and student fares", ja: "移動手段と学生向け運賃" }, climate: { en: "Average temperature through the year", ja: "年間の平均気温" }, education: { en: "Universities and language schools", ja: "大学・語学学校" },
   },
-  noData: { en: "Data coming soon", ja: "データ準備中" }, unverifiedShort: { en: "Not verified", ja: "未確認" },
+  noData: { en: "Data coming soon", ja: "データ準備中" }, pricePrep: { en: "Reference price in preparation", ja: "参考料金は準備中" }, unverifiedShort: { en: "Not verified", ja: "未確認" },
   schoolsU: { en: "{u} universities", ja: "大学 {u}校" }, schoolsL: { en: "{l} language schools", ja: "語学学校 {l}校" },
   seeSchools: { en: "Compare schools →", ja: "学校を比較する →" }, tempLabel: { en: "Monthly mean temperature over the year", ja: "月別平均気温の年間の幅" },
   // city page

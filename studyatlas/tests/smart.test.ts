@@ -113,7 +113,8 @@ await t("eligibility: language students get no university halls / U-Pass; univer
   const manUni = gen(man({ studyType: "university", housing: null }))[2]; assert.ok([manUni.picks.transport.cand?.id, ...manUni.excluded.map((x) => x.cand.id)].includes("man-bus-allterms-student") || manUni.picks.transport.status === "official");
   // Vancouver: the TransLink fares are held back (rights review), so transport has no official figure for either study type
   for (const studyType of ["language", "university"] as const) { const v = gen(defaultEasy({ cityId: "vancouver", studyType }))[0]; assert.equal(v.picks.transport.status, "unset"); assert.ok(v.mainMissing.includes("transport")); }
-  const anyLang = gen(man({ studyType: "language", housing: null }))[0]; assert.equal(anyLang.picks.housing.status, "official"); assert.equal(anyLang.plan.housingType, "share");
+  // Ver.1.2.5: the University of Manchester house-share figure is an estimate for its own undergraduates (term not stated), so it is offered by hand but never picked automatically
+  const anyLang = gen(man({ studyType: "language", housing: null }))[0]; assert.equal(anyLang.picks.housing.status, "unset"); assert.ok(anyLang.mainMissing.includes("housing"));
 });
 
 await t("contract terms: a 41-week hall contract is only used for a stay of about 41 weeks", () => {
@@ -126,7 +127,8 @@ await t("contract terms: a 41-week hall contract is only used for a stay of abou
 
 await t("single rooms only: a whole-flat average is never picked automatically", () => {
   const sp = gen({ ...defaultEasy({ cityId: "vancouver", studyType: "language" }), housing: "other" }); assert.ok(sp.every((p) => p.picks.housing.cand?.id !== "van-cmhc-rent-2br")); assert.ok(sp[2].excluded.some((x) => x.kind === "scope"));
-  assert.equal(sp[2].picks.housing.cand?.id, "van-cmhc-rent-1br", "the highest single-room figure is the 1-bedroom average");
+  // Ver.1.2.5: the CMHC averages describe the whole rental market, not what a student pays per person: offered by hand, never picked automatically
+  assert.ok(sp.every((p) => p.picks.housing.cand === undefined || !p.picks.housing.cand.id.startsWith("van-cmhc-rent")), "no whole-market average is adopted"); assert.equal(sp[2].picks.housing.status, "unset");
 });
 
 await t("data gaps: vancouver dorm / homestay have no verified figure → unset with a reason, never 0", () => {
@@ -140,7 +142,8 @@ await t("provisional: main items missing → 暫定, no 'within budget' verdict,
 });
 
 await t("verdicts: within / over (all main items present) and overAlready (items missing but already over)", () => {
-  const e = full(man({ housing: "dorm", duration: { value: 36, unit: "weeks" }, budget: { amount: 8_000, currency: "GBP" }, rates: { JPY: { rate: 0.005, date: "2026-10-14" } } }));
+  // (41 weeks = the stated hall contract; weekly "from" prices without a contract are no longer picked automatically, Ver.1.2.5)
+  const e = full(man({ housing: "dorm", duration: { value: 41, unit: "weeks" }, budget: { amount: 8_000, currency: "GBP" }, rates: { JPY: { rate: 0.005, date: "2026-10-14" } } }));
   const ok = gen({ ...e, budget: { amount: 100_000, currency: "GBP" } }); assert.ok(ok.every((p) => p.mainMissing.length === 0 || p.mainMissing.every((i) => MAIN_ITEMS.includes(i))));
   // JPY flight needs a JPY→GBP rate here (flight currency = budget currency, so it is GBP and needs none)
   const e2 = { ...e, assume: { ...e.assume, flight: { round: 700, oneway: 400 } } };
@@ -151,7 +154,7 @@ await t("verdicts: within / over (all main items present) and overAlready (items
 });
 
 await t("equal to budget counts as within; remaining 0", () => {
-  const e = full(man({ housing: "share", duration: { value: 12, unit: "weeks" }, assume: { tuitionWeek: 250, visa: 490, insurance: 300, flight: { round: 700, oneway: 400 } } }));
+  const e = full(man({ housing: "dorm", duration: { value: 41, unit: "weeks" }, assume: { tuitionWeek: 250, visa: 490, insurance: 300, flight: { round: 700, oneway: 400 } } }));
   const total = gen({ ...e, budget: { amount: 1e9, currency: "GBP" } })[0].calc.total.converted; const sp = gen({ ...e, budget: { amount: total, currency: "GBP" } })[0]; assert.equal(sp.verdict, "within"); near(sp.remaining!, 0, 1e-6);
 });
 
@@ -165,7 +168,7 @@ await t("slider ↔ amount: tuition assumption feeds the plan total exactly (per
 await t("duration change recalculates: weeks, months (1 month = 52/12 weeks) and the weekly/monthly items", () => {
   const e = man({ housing: "share", assume: { tuitionWeek: 100, visa: null, insurance: null, flight: { round: null, oneway: null } } });
   const w12 = gen({ ...e, duration: { value: 12, unit: "weeks" } })[0]; const w24 = gen({ ...e, duration: { value: 24, unit: "weeks" } })[0];
-  near((w24.calc.items.tuition as { total: number }).total, 2400); near((w24.calc.items.housing as { total: number }).total, 2 * (w12.calc.items.housing as { total: number }).total);
+  near((w24.calc.items.tuition as { total: number }).total, 2400); near((w24.calc.items.food as { total: number }).total, 2 * (w12.calc.items.food as { total: number }).total); // a monthly item (housing has no automatic monthly figure for a short stay since Ver.1.2.5)
   const m3 = gen({ ...e, duration: { value: 3, unit: "months" } })[0]; near(stayWeeks(m3.plan), 13); near((m3.calc.items.tuition as { total: number }).total, 1300);
   near(m3.calc.months, 3); near(m3.calc.monthlyLiving!.converted, gen({ ...e, duration: { value: 13, unit: "weeks" } })[0].calc.monthlyLiving!.converted);
   assert.ok(w24.calc.total.converted > w12.calc.total.converted); near(WEEKS_PER_MONTH, 52 / 12);
@@ -179,15 +182,15 @@ await t("round trip vs one way: separate prices, the plan uses the selected one,
 });
 
 await t("currency: no rate → not merged and verdict asks for a rate; manual rate → converted and compared", () => {
-  const e = full(man({ housing: "share", duration: { value: 12, unit: "weeks" }, budget: { amount: 2_000_000, currency: "JPY" }, assume: { tuitionWeek: 250, visa: 490, insurance: 300, flight: { round: 150_000, oneway: 0 } } }));
+  const e = full(man({ housing: "dorm", duration: { value: 41, unit: "weeks" }, budget: { amount: 2_000_000, currency: "JPY" }, assume: { tuitionWeek: 250, visa: 490, insurance: 300, flight: { round: 150_000, oneway: 0 } } }));
   const a = gen(e)[0]; assert.equal(a.verdict, "needsRate"); assert.ok(Object.keys(a.calc.total.unconverted).includes("GBP")); assert.equal(a.remaining, null); assert.ok(a.notes.some((x) => x.code === "noRate"));
   assert.ok(a.calc.total.byCurrency.GBP! > 0 && a.calc.total.byCurrency.JPY === 150_000);
   const b = gen({ ...e, rates: { GBP: { rate: 190, date: "2026-10-14" } } })[0]; assert.notEqual(b.verdict, "needsRate"); assert.deepEqual(b.calc.total.unconverted, {});
   near(b.calc.total.converted, b.calc.total.byCurrency.GBP! * 190 + 150_000, 0.5); near(b.remaining!, 2_000_000 - b.calc.total.converted, 1e-6);
   // a rate to the budget currency itself is ignored
   const c = gen({ ...e, rates: { JPY: { rate: 5, date: "x" }, GBP: { rate: 190, date: "2026-10-14" } } })[0]; near(c.calc.total.converted, b.calc.total.converted, 1e-6);
-  // vancouver (CAD prices) with a GBP budget needs a CAD→GBP rate
-  const v = gen({ ...defaultEasy({ cityId: "vancouver", studyType: "university" }), budget: { amount: 10_000, currency: "GBP" } })[0]; assert.equal(v.verdict, "needsRate");
+  // vancouver: no verified per-person student price and no TransLink fare are adopted (Ver.1.2.5), so there is no CAD figure to convert and the verdict stays undetermined
+  const v = gen({ ...defaultEasy({ cityId: "vancouver", studyType: "university" }), budget: { amount: 10_000, currency: "GBP" } })[0]; assert.equal(v.verdict, "undetermined"); assert.ok(v.mainMissing.includes("housing"));
 });
 
 await t("budget-aware: a tight budget lowers Balanced / Comfort step by step and says so", () => {
