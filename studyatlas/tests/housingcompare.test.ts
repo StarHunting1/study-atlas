@@ -62,9 +62,9 @@ t("no verdict is ever 'cheaper': the row logic returns only missing / issues / n
   assert.ok(!Object.keys(compareModule).some((k) => /cheap|dear|rank|order|sort|winner|lower|higher/i.test(k)), Object.keys(compareModule).join(", "));
 });
 
-t("the Manchester ONS figure stays as approved, and the Vancouver key figure is still the CMHC 1-bedroom rent", () => {
+t("the Manchester ONS figure stays as approved, and the whole-market rent is not a key figure", () => {
   const m = officialData("manchester")!.points.find((p) => p.id === "man-ons-pipr-private-rent-month")!; assert.equal(m.value!.amount, 1373); assert.equal(m.status, "verified");
-  assert.equal(keyPoint("vancouver", "housing")!.metric, "housing.marketRent.1br");
+  assert.equal(keyPoint("vancouver", "housing"), undefined, "the whole-market rent is no longer the key figure (student housing first, Ver.1.2.5)");
 });
 
 console.log(`${n} housing compare tests passed`);
