@@ -31,3 +31,22 @@ data.police.uk, TfL fares (18+ Student Oyster), GOV.UK.
 ## Existing content to re-check
 - Ver.1.0 summaries (housing, climate, transport, student life, university names) are kept as `unverified`.
 - Ver.1.0 cost numbers are `sample` and must be replaced, not promoted to verified.
+
+## Ver.1.2.7 – language schools (Manchester, Vancouver) – 2026-10-15
+
+Goal: a few real language schools per city so the language-study mode is not empty. Scope: name, area, main course types, accommodation arrangement, link. **No prices.**
+
+How it was gathered: the build sandbox cannot open school sites (outbound hosts refused), so entries come from public search results and accreditation directories (English UK member directory, British Council inspection summaries, Languages Canada listing, the schools' own pages as quoted in search results). Everything is therefore recorded as `unverified` with the source page and the check date `2026-10-15`; it has not been compared with each school's own site. Text is paraphrased (nothing copied); names, areas and links are facts.
+
+| School | City | Source pages | Gaps |
+|---|---|---|---|
+| Express English College | Manchester | englishuk.com member directory (id 6665), British Council inspection summary | official site URL taken from the directory; accommodation "listed", no detail |
+| Excel College | Manchester | britishcouncil (takeielts) page; third-party listings for the accommodation line | no official school URL confirmed; accommodation line from a third-party listing (flagged "check") |
+| MC Academy | Manchester | englishuk.com course finder (id 228) | two different street addresses in listings → none shown; no official URL confirmed |
+| International House Vancouver | Vancouver | Languages Canada listing, IH World page | street address differs between listings → none shown |
+| Sprachcaffe Vancouver | Vancouver | sprachcaffe.com Canada page | age range differs between pages → not shown; prices exist in catalogues but are not reproduced |
+| EF Vancouver | Vancouver | ef.com Vancouver page | courses and accommodation not confirmed → not shown |
+
+Not obtained: tuition, registration and accommodation fees (catalogue/agent prices are not reused: terms unconfirmed), school-site confirmation of every field, homestay prices. To upgrade an entry to `verified` a person must compare it with the school's own site and approve.
+
+Housing type descriptions (homestay, shared house, halls, private rental) and their "check" lines are general explanations written by StudyAtlas; they contain no figures.

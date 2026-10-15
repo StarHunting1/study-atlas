@@ -57,7 +57,7 @@ export function HousingStudentFirst({ city, data, points, mode }: { city: City; 
         <Notices data={data} topic="housing" />
       </section>
       <section className="space-y-1.5" data-testid="housing-types"><h3 className="text-sm font-semibold text-[#0b2a5b]">{L(ot.housingTypesTitle)}</h3>
-        <dl className="space-y-1.5 text-xs leading-relaxed text-slate-600">{kinds.map((k) => <div key={k}><dt className="inline font-medium text-slate-700">{L(ot.housingKinds[k])}: </dt><dd className="inline">{L(ot.housingTypes[k])}</dd></div>)}</dl>
+        <dl className="space-y-1.5 text-xs leading-relaxed text-slate-600">{[...kinds, "market" as const].map((k) => <div key={k} data-testid={`type-${k}`}><dt className="inline font-medium text-slate-700">{L(ot.housingKinds[k])}: </dt><dd className="inline">{L(ot.housingTypes[k])} <span className="text-slate-500">{L(ot.housingChecks[k])}</span></dd></div>)}</dl>
         <p className="text-xs text-slate-500">{L(ot.housingTypesCheck)}</p></section>
     </div>
   );
@@ -112,7 +112,7 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
     <article id={topic} data-testid={`card-${topic}`} className={`${panel} scroll-mt-24 self-start p-4 sm:p-5 ${open ? "md:col-span-2" : ""}`}>
       <h2 className="text-base font-semibold text-[#0b2a5b]">{L(ux.topics[topic])}</h2>
       <p className="mb-2 text-xs text-slate-500">{L(ux.blurb[topic])}</p>
-      <div data-testid={`key-${topic}`}><KeyView k={k} big /></div>
+      <div data-testid={`key-${topic}`}><KeyView k={k} big languageFirst={mode === "language"} /></div>
       <Disclosure level="more" open={open} onOpenChange={setOpen} testid={`more-${topic}`} className="mt-3"><div className="space-y-4">{body}</div></Disclosure>
     </article>
   );
