@@ -43,7 +43,7 @@ function Home() {
         <h2 className="mb-4 text-2xl font-semibold text-[#0b2a5b]">{t("popular")}</h2>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">{cities.map((c) => <CityCard key={c.id} city={c} active={c.country === country} />)}</div>
       </section>
-      <p className="text-xs text-slate-400">{t("mapNote")} · {t("sample")}</p>
+      <p className="text-xs text-slate-400">{t("mapNote")} · {t("dataNote")}</p>
     </div>
   );
 }

@@ -27,7 +27,8 @@ export type Key =
   | { kind: "link"; url: string; publisher: string }  // the figure may not be shown (rights.ts): a link to the official page instead
   | { kind: "none"; /** housing: no verified per-person student price yet – "reference price in preparation", never an invented figure */ prep?: true };
 
-const shown = (s: Status) => s !== "pending";
+/** A demo "sample" figure (Ver.1.0 placeholder with no period or source) is never a key figure: it counts as not available. */
+const shown = (s: Status) => s !== "pending" && s !== "sample";
 const has = <T,>(f: Fact<T> | undefined): f is Fact<T> & { value: T } => !!f && shown(f.status) && f.value !== undefined;
 const POINT_TOPIC: Partial<Record<Topic, DataPoint["topic"]>> = { living: "living", housing: "housing", transport: "transport" };
 

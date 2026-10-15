@@ -1,13 +1,12 @@
 "use client";
 import Link from "next/link";
 import QuickCompare from "@/components/overview/QuickCompare";
-import { cities, getCity } from "@/data/cities";
+import { cities } from "@/data/cities";
 import { useI18n } from "@/lib/i18n";
 import { MAX_COMPARE, useCompare } from "@/lib/store";
 import { pill, pillOff, pillOn } from "@/lib/ui";
 export default function ComparePage() {
   const { t, L } = useI18n(); const { ids, toggle, clear, has, full } = useCompare();
-  const anySample = ids.some((id) => { const c = getCity(id); return c && Object.values(c.profile.cost).some((f) => f.status === "sample"); });
   return (
     <div className="space-y-6">
       <Link href="/" className="text-sm text-slate-500 hover:text-slate-900">← {t("home")}</Link>
@@ -17,7 +16,6 @@ export default function ComparePage() {
         {ids.length > 0 && <button onClick={clear} className="px-2 text-sm text-slate-500 underline">{t("clear")}</button>}
       </div>
       {full && <p className="text-sm text-slate-500">{t("compareFull")}</p>}
-      {ids.length >= 2 && anySample && <p className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">{t("sampleNote")}</p>}
       {ids.length >= 2 ? <QuickCompare ids={ids} /> : <p className="text-slate-500">{ids.length === 0 ? t("emptyCompare") + " " : ""}{t("maxCompare")}</p>}
     </div>
   );

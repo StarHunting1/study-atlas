@@ -1,0 +1,88 @@
+/*
+ * `npm run audit` writes RELEASE_DATA_AUDIT.md (Ver.1.3.1): for every city, what the site really holds – verified / unverified /
+ * demo-sample / pending – per field, official data points with their reuse status, schools, and items that look stale.
+ * Everything is read from the data files; nothing here is typed in by hand except the "findings" text at the end.
+ * Coverage counts only what a visitor can really use: a "demo sample" number is NOT counted as data.
+ */
+import { writeFileSync } from "node:fs";
+import path from "node:path";
+import { cities } from "../data/cities";
+import { sections } from "../data/fields";
+import { officialData } from "../data/official";
+import { displayModeOf, rightsOfSource } from "../data/official/rights";
+import { officialSources } from "../data/official/sources";
+import { isSampleFact } from "../data/publicFacts";
+import type { Status } from "../data/schema";
+
+const TODAY = process.env.AUDIT_DATE ?? new Date().toISOString().slice(0, 10);
+const days = (d?: string) => (d ? Math.round((Date.parse(TODAY) - Date.parse(d)) / 86_400_000) : null);
+const STALE = 180;
+const ST: Status[] = ["verified", "unverified", "sample", "pending"];
+const pct = (a: number, b: number) => (b ? `${Math.round((a / b) * 100)}%` : "–");
+
+export function auditMarkdown(): string {
+  const L: string[] = [];
+  L.push("# RELEASE_DATA_AUDIT – データ監査（6都市）", "", `生成: \`npm run audit\`（基準日 ${TODAY}）。データファイルから自動生成。手書きの所見は末尾。`, "",
+    "- **verified** = 引用した出典と照合済み / **unverified** = 出典未照合 / **sample** = 架空のデモ数値（公開画面では数値を出さない）/ **pending** = 未取得。",
+    "- 「利用可能率」= verified と unverified（根拠付きで表示される事実）÷ 全項目。sample は**データとして数えません**。", "");
+  L.push("## 1. 都市 × 分野の充足", "", "| 都市 | 項目数 | verified | unverified | sample（非公開） | pending | 利用可能率 | verified率 |", "|---|---|---|---|---|---|---|---|");
+  const perCity: Record<string, Record<Status, number>> = {};
+  for (const c of cities) {
+    const n: Record<Status, number> = { verified: 0, unverified: 0, sample: 0, pending: 0 };
+    for (const s of sections) for (const f of s.fields) n[f.get(c).status]++;
+    perCity[c.id] = n; const tot = ST.reduce((a, k) => a + n[k], 0);
+    L.push(`| ${c.name.en} | ${tot} | ${n.verified} | ${n.unverified} | ${n.sample} | ${n.pending} | ${pct(n.verified + n.unverified, tot)} | ${pct(n.verified, tot)} |`);
+  }
+  L.push("", "### 分野別（verified / unverified / sample / pending）", "", `| 分野 | ${cities.map((c) => c.name.en).join(" | ")} |`, `|---|${cities.map(() => "---").join("|")}|`);
+  for (const s of sections) L.push(`| ${s.label.en} | ${cities.map((c) => { const n: Record<Status, number> = { verified: 0, unverified: 0, sample: 0, pending: 0 }; for (const f of s.fields) n[f.get(c).status]++; return ST.map((k) => n[k]).join(" / "); }).join(" | ")} |`);
+
+  L.push("", "## 2. 公式データポイント（data/official）", "", "| 都市 | 件数 | verified | unverified | 表示=数値可 | 表示=リンクのみ/保留 | 気候 | 最終確認から" + STALE + "日超 |", "|---|---|---|---|---|---|---|---|");
+  for (const c of cities) {
+    const o = officialData(c.id); if (!o) { L.push(`| ${c.name.en} | 0 | – | – | – | – | なし | – |`); continue; }
+    const shown = o.points.filter((p) => displayModeOf(p) === "full" || displayModeOf(p) === "figure-with-link").length;
+    const stale = o.points.filter((p) => { const d = days(p.checkedAt ?? p.retrievedAt); return d === null || d > STALE; }).length;
+    L.push(`| ${c.name.en} | ${o.points.length} | ${o.points.filter((p) => p.status === "verified").length} | ${o.points.filter((p) => p.status === "unverified").length} | ${shown} | ${o.points.length - shown} | ${o.climate ? `${o.climate.status}（${o.climate.period}）` : "なし"} | ${stale} |`);
+  }
+
+  L.push("", "## 3. 語学学校・大学", "", "| 都市 | 語学学校（表示） | 非表示 | 状態 | 大学（Ver.1.0引き継ぎ） |", "|---|---|---|---|---|");
+  for (const c of cities) {
+    const ls = c.profile.education.languageSchools, un = c.profile.education.universities;
+    const all = ls.value ?? []; L.push(`| ${c.name.en} | ${all.filter((i) => !i.hidden).length} | ${all.filter((i) => i.hidden).length} | ${ls.status} | ${un.value?.length ?? 0}（${un.status}） |`);
+  }
+
+  L.push("", "## 4. 出典の利用条件（権利管理）", "", "| 出典 | 都市 | 利用区分 | 表示 | 自動取得 |", "|---|---|---|---|---|");
+  for (const s of officialSources) { const r = rightsOfSource(s.id); L.push(`| ${r.sourceName} | ${s.cityIds.join(", ")} | ${r.reuseStatus} | ${r.display ?? "（区分から導出）"} | ${r.automation} |`); }
+
+  L.push("", "## 5. 未確認・仮データ一覧（項目ごと）", "");
+  for (const c of cities) {
+    const rows: string[] = [];
+    for (const s of sections) for (const f of s.fields) { const fact = f.get(c); if (fact.status === "sample") rows.push(`- **sample（数値は非公開）** ${s.label.en} / ${f.label.en}`); else if (fact.status === "unverified") rows.push(`- unverified: ${s.label.en} / ${f.label.en}${fact.checkedAt ? `（確認日 ${fact.checkedAt}）` : "（確認日なし）"}`); else if (fact.status === "pending") rows.push(`- pending: ${s.label.en} / ${f.label.en}`); }
+    L.push(`### ${c.name.en}`, "", ...(rows.length ? rows : ["- なし"]), "");
+  }
+  L.push("## 6. 古くなっている可能性（最終確認が" + STALE + "日より前、または日付なし）", "");
+  let any = false;
+  for (const c of cities) for (const p of officialData(c.id)?.points ?? []) { const d = days(p.checkedAt ?? p.retrievedAt); if (d === null || d > STALE) { any = true; L.push(`- ${c.name.en}: ${p.id}（${p.checkedAt ?? p.retrievedAt ?? "日付なし"}）`); } }
+  if (!any) L.push("- なし（すべて" + STALE + "日以内）");
+  L.push("", "## 7. 手書きの所見（2026-10-15）", "", FINDINGS);
+  return L.join("\n") + "\n";
+}
+
+const FINDINGS = [
+  "### 見つかった問題と対応",
+  "1. **架空のデモ数値が公開画面に出ていた**: Toronto / London / Sydney / Melbourne の `cost.rent` `cost.transport` `cost.totalMonthly` は Ver.1.0 のデモ値（status = sample。期間・含まれる項目・出典が未定義）。都市ページの主要数値と都市比較の表に「デモ用サンプル」ラベル付きで数値が表示されていた。→ 本PRで**数値を表示しない**（「データ準備中」）よう修正。値自体はデータに残し、監査上は「データなし」として数える。",
+  "2. **Ver.1.0 引き継ぎの概要文**（気候・住居の概要・交通・暮らし・大学名）は全都市で unverified。ラベル付きで表示されるが、出典はない。",
+  "3. **Toronto / London / Sydney / Melbourne** は公式データポイント・気候・語学学校がゼロ。実質的に「概要文＋準備中」のみで、公開品質に達していない。",
+  "4. 語学学校は Manchester 2校・Vancouver 3校（すべて unverified、料金なし）。Excel College / UKEC Academy は非表示。",
+  "5. 公式データは Manchester / Vancouver のみ。TfGM・TransLink・UBC の料金は利用条件が `needs-review` / `restricted` のため、数値表示はそれぞれの権利区分に従う。",
+  "6. 学生寮・ホームステイ・シェアハウスの1人あたり料金は、Manchester の University of Manchester 寮と大学見積もり以外に再利用可能な出典がなく「参考料金は準備中」。",
+  "",
+  "7. **Ver.1.3.1 で追加**: 英国・カナダの入国区分の概要（Visa）と、Manchester / Vancouver の医療保険の基本要件（Daily life / Healthcare）を、政府の公式ページを出典とする **unverified** の事実として追加（ページの突き合わせは未了。国籍・個別事情による違いを明記し、個人への判定はしない）。",
+  "8. **古い可能性**: Manchester の気候は 1971–2000、Vancouver は 1981–2010 の平年値。より新しい平年値（1991–2020）が公開されている可能性が高く、既存の GitHub Actions 収集の対象を更新して承認フローで差し替えるのが次の作業。",
+  "9. **地図タイル**: トップページの地図は MapLibre のデモタイルを使用（本番運用向けではない）。公開前に商用利用可能なタイル提供元へ切り替えが必要。",
+  "10. `Climate / Monthly` と `Living costs / Rent` が pending なのは、都市ページが公式データ（data/official）を直接使うため。上の表は profile 項目だけを数えるので、Manchester / Vancouver の実データ量を過小に見せる。実データ量は §2 を参照。",
+  "",
+  "### Planner で未計上になりやすい費用",
+  "授業料・航空券・ビザ・保険は公式データがなく、手入力が必要（Ver.1.2.9 / 1.3 で入力欄を用意）。語学留学の住居・食費・交通・通信は、Manchester は大学生向け見積もり（対象外）のため公式値が使えず、手入力か未計上。Vancouver は CMHC 市場家賃が手動選択扱い。Toronto 他3都市はそもそも都市データがなくプランナーで選べない。",
+].join("\n");
+
+if (require.main === module) { const out = path.resolve(__dirname, "../RELEASE_DATA_AUDIT.md"); writeFileSync(out, auditMarkdown()); console.log(`wrote ${out}`); }

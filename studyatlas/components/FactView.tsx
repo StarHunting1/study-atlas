@@ -9,6 +9,7 @@ import { ux } from "@/locales/ux";
 import { sc } from "@/locales/schoolCompare";
 import { compareHref } from "@/data/languageSchools";
 import Link from "next/link";
+import { publicFact } from "@/data/publicFacts";
 
 const badgeStyle: Record<Status, string> = {
   verified: "bg-sky-50 text-sky-700 ring-1 ring-sky-100",
@@ -39,8 +40,8 @@ function ClimateTable({ c }: { c: MonthlyClimate }) {
 }
 
 /** Renders one Fact: value, status badge, period / last-checked / sources, and the note. Pending facts show "Data coming soon". */
-export default function FactView({ fact, kind, compact, lean }: { fact: Fact<unknown>; kind: FieldKind; compact?: boolean; /** period, check date and sources go behind "Sources & conditions" */ lean?: boolean }) {
-  const { L } = useI18n();
+export default function FactView({ fact: rawFact, kind, compact, lean }: { fact: Fact<unknown>; kind: FieldKind; compact?: boolean; /** period, check date and sources go behind "Sources & conditions" */ lean?: boolean }) {
+  const { L } = useI18n(); const fact = publicFact(rawFact);   // demo "sample" numbers are never shown (Ver.1.3.1)
   if (fact.status === "pending" || fact.value === undefined) return <span className="text-sm text-slate-400">{L(d.pending)}</span>;
   const v = fact.value;
   const body =
