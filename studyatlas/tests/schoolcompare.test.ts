@@ -13,10 +13,10 @@ const wrap = (el: unknown) => renderToStaticMarkup(h(I18nProvider, null, el as n
 const view = (a?: string, b?: string) => wrap(h(SchoolCompareView, { a: getCompareSchool(a), b: getCompareSchool(b) }));
 const text = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-t("candidates: the five visible schools of both cities; the hidden Excel College / UKEC Academy is never offered, not even by id", () => {
+t("candidates: the four visible schools of both cities; the hidden Excel College / UKEC Academy and MC Academy are never offered, not even by id", () => {
   const ids = listCompareSchools().map((s) => s.id).sort();
-  assert.deepEqual(ids, ["man-express-english-college", "man-mc-academy", "van-ef", "van-international-house", "van-sprachcaffe"]);
-  assert.equal(getCompareSchool("man-excel-college"), undefined);
+  assert.deepEqual(ids, ["man-express-english-college", "van-ef", "van-international-house", "van-sprachcaffe"]);
+  assert.equal(getCompareSchool("man-excel-college"), undefined); assert.equal(getCompareSchool("man-mc-academy"), undefined);
   assert.ok(getCity("manchester")!.profile.education.languageSchools.value!.some((s) => s.id === "man-excel-college" && s.hidden), "its data is kept");
   assert.ok(listCompareSchools().every((s) => s.status === "unverified"));
 });
@@ -29,12 +29,12 @@ t("two schools side by side: location, courses, accommodation, tuition, status, 
   assert.ok(view("van-ef", "van-sprachcaffe").includes('data-cross-city="false"'));
 });
 t("unverified stays unverified (badge, check date, note) and is never shown as verified", () => {
-  const tx = text(view("man-mc-academy", "van-international-house"));
+  const tx = text(view("man-express-english-college", "van-international-house"));
   assert.ok(tx.includes("未確認") && tx.includes("2026-10-15") && tx.includes("学校公式サイトとの照合はまだです"));
-  assert.ok(!tx.replaceAll("確認済み料金はありません", "").includes("確認済み") && !/>\s*確認済み\s*</.test(view("man-mc-academy", "van-international-house")), "no verified badge");
+  assert.ok(!tx.replaceAll("確認済み料金はありません", "").includes("確認済み") && !/>\s*確認済み\s*</.test(view("man-express-english-college", "van-international-house")), "no verified badge");
 });
 t("missing information reads 未取得 (tuition for every school; EF's accommodation) and nothing is guessed", () => {
-  const out = view("van-ef", "man-mc-academy"); const tx = text(out);
+  const out = view("van-ef", "man-express-english-college"); const tx = text(out);
   assert.ok((out.match(/data-testid="missing"/g) ?? []).length >= 3);
   assert.ok(tx.includes("未取得") && tx.includes("確認済み料金はありません"));
   assert.ok(!/[£$¥]\s?\d|\d\s?(GBP|CAD|円)/.test(tx), "no price figure appears");
@@ -50,13 +50,13 @@ t("International House Vancouver keeps the New Westminster location in the compa
 });
 t("fewer than two schools: a prompt, no table; details and sources sit in disclosures (closed by default)", () => {
   assert.ok(view("van-ef").includes('data-testid="need-two"') && !view("van-ef").includes("school-compare"));
-  const out = view("man-mc-academy", "van-ef"); assert.ok(out.includes('data-testid="compare-more"') && !out.includes("englishuk.com"), "sources are not rendered while closed");
+  const out = view("man-express-english-college", "van-ef"); assert.ok(out.includes('data-testid="compare-more"') && !out.includes("englishuk.com"), "sources are not rendered while closed");
 });
 t("entry points: each visible school card links to the comparison; hidden or id-less entries do not", () => {
   const f = getCity("manchester")!.profile.education.languageSchools;
   const out = wrap(h(FactView, { fact: f, kind: "institutions" }));
-  assert.equal((out.match(/data-testid="compare-link"/g) ?? []).length, 2);
-  assert.ok(out.includes(compareHref("man-express-english-college")) && !out.includes("man-excel-college"));
+  assert.equal((out.match(/data-testid="compare-link"/g) ?? []).length, 1);
+  assert.ok(out.includes(compareHref("man-express-english-college")) && !out.includes("man-excel-college") && !out.includes("man-mc-academy"));
   assert.equal(compareHref("a", "b"), "/schools/compare?a=a&b=b");
 });
 t("ja and en text exist for every comparison string", () => {

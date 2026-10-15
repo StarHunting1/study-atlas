@@ -46,7 +46,7 @@
 |---|---|---|---|---|
 | Vancouver | 3 | 0 | unverified | 2（unverified） |
 | Toronto | 0 | 0 | pending | 2（unverified） |
-| Manchester | 2 | 1 | unverified | 2（unverified） |
+| Manchester | 1 | 2 | unverified | 2（unverified） |
 | London | 0 | 0 | pending | 3（unverified） |
 | Sydney | 0 | 0 | pending | 2（unverified） |
 | Melbourne | 0 | 0 | pending | 2（unverified） |
@@ -64,6 +64,21 @@
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) | vancouver | permitted | （区分から導出） | allowed |
 | Met Office – historical monthly station data (Ringway) | manchester | permitted | （区分から導出） | blocked |
 | UBC Student Housing and Community Services | vancouver | restricted | （区分から導出） | blocked |
+
+## 4b. 出典リンクの検査（Manchester / Vancouver）
+
+実行: GitHub Actions（2026-10-15、https://github.com/StarHunting1/study-atlas/actions/runs/38787463398）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
+
+| 対象 | 検証済み（2xx＋期待語を確認） | 到達（語は未確認/不一致） | アクセス拒否 | リンク切れ | 要求せず |
+|---|---|---|---|---|---|
+| 45 | 24 | 10 | 2 | 0 | 9 |
+
+- 「アクセス拒否」(401/403/429)は**リンク切れではありません**。ページは存在しうるが自動アクセスを拒むため、未検証のまま扱います。
+- 到達しても期待語が見つからないリンクは検証済みにしません（例: Express English College の公式サイトはタイトルに校名がなく、手動で English UK 掲載のサイトURLと一致を確認）。
+
+| 状態 | 件数 | 例 |
+|---|---|---|
+| アクセス拒否 | 2 | https://britishcouncil.org/sites/default/files/express_eng_college_2024_post_ma.pdf , https://ihvancouver.com/ |
 
 ## 5. 未確認・仮データ一覧（項目ごと）
 
@@ -246,6 +261,15 @@
 8. **古い可能性**: Manchester の気候は 1971–2000、Vancouver は 1981–2010 の平年値。より新しい平年値（1991–2020）が公開されている可能性が高く、既存の GitHub Actions 収集の対象を更新して承認フローで差し替えるのが次の作業。
 9. **地図タイル**: トップページの地図は MapLibre のデモタイルを使用（本番運用向けではない）。公開前に商用利用可能なタイル提供元へ切り替えが必要。
 10. `Climate / Monthly` と `Living costs / Rent` が pending なのは、都市ページが公式データ（data/official）を直接使うため。上の表は profile 項目だけを数えるので、Manchester / Vancouver の実データ量を過小に見せる。実データ量は §2 を参照。
+
+11. **Ver.1.3.2 の検査で見つかった誤り**: MC Academy に載せていた公式サイトURL（themcacademy.co.uk）は、現在は別の組織（Money Confidence Academy）のサイトだった → URLを削除。English UK の個別ページも開けず、公式サイト・営業状況・認定状況を確認できないため、一般向け一覧から**非表示**（Excel College / UKEC Academy と同じ扱い。データと記録は保持）。
+12. **気候 1991–2020**: ECCC の GeoMet API は 1981–2010 のみ。1991–2020 は気象庁のページから**一括CSV（zip）**でのみ提供され、Vancouver 国際空港は観測所IDが2013年に変わる合成観測所（1108447→1108395）のため、取り込みには別のPRで取得手順と観測所の扱いを確認する必要がある。Met Office は公式の 1991–2020 平年値に利用できるオープンデータのファイルが見つからず（data.gov.uk の UK Climate Averages は 1981–2010 の記述で、ライセンス・資源の記載なし）、サイト規約で自動取得も禁止されている → どちらも**取り込み保留**。既存の 1971–2000 / 1981–2010 は期間を明記し「最新の標準期間ではない」注意書きを都市ページに追加した。
+
+### 承認待ちの確認結果（verified にはしていません）
+2026-10-15 の Actions ページ確認（run 38787463398）で、言い換えた記述が公式ページの記載と一致することを確認した項目。人が承認するまで unverified のまま。
+- GOV.UK: 学生のIHSは年£776（その他の申請は年£1,035）、英国外から申請する6か月以内はIHS不要 / 英語コースは6か月超〜11か月が短期学習ビザ（6か月以内は訪問者、11か月超は Student visa）、短期学習ビザの申請料£228 / 訪問者として6か月までの学習が可能（認定機関）
+- BC州: 国際学生ヘルスフィーは月$75、有効な就学許可が6か月以上の学生が対象、加入前に待機期間（居住開始月の残り＋2か月）があり民間保険が必要
+- IRCC: 6か月以内のプログラムは就学許可不要だが渡航書類（eTAまたは訪問者ビザ）は必要 / eTAは査証免除国の国籍で航空機を使う場合に必要（陸路・バス・鉄道・船は不要）
 
 ### Planner で未計上になりやすい費用
 授業料・航空券・ビザ・保険は公式データがなく、手入力が必要（Ver.1.2.9 / 1.3 で入力欄を用意）。語学留学の住居・食費・交通・通信は、Manchester は大学生向け見積もり（対象外）のため公式値が使えず、手入力か未計上。Vancouver は CMHC 市場家賃が手動選択扱い。Toronto 他3都市はそもそも都市データがなくプランナーで選べない。

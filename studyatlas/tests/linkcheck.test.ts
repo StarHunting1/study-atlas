@@ -32,4 +32,13 @@ t("each key visa/health/school link has words to look for, so a reachable-but-wr
   for (const u of ["https://www.gov.uk/student-visa", "https://www.gov.uk/visa-to-study-english", "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", "https://expressenglishcollege.co.uk", "https://themcacademy.co.uk/", "https://ihvancouver.com/"]) assert.ok(expectFor(u), u);
   const ts = linkTargets(); for (const x of ts.filter((y) => /^(visa|health|school):/.test(y.where[0]))) assert.ok(x.expect, x.url);
 });
+t("recorded Actions result: every link that is requested has a result, nothing recorded is stale, access denied is kept apart from broken, and no broken link remains in the data", () => {
+  const { LINK_STATUS, linkStatusOf } = require("../data/linkStatus") as typeof import("../data/linkStatus");
+  const ts = linkTargets(); const urls = new Set(ts.map((x) => x.url));
+  for (const x of ts) assert.ok(linkStatusOf(x.url), `no recorded result for ${x.url}`);
+  for (const [u] of LINK_STATUS) assert.ok(urls.has(u), `recorded result for a link that is no longer used: ${u}`);
+  for (const x of ts) { const r = linkStatusOf(x.url)!; assert.equal(r[1] === "skipped", !!x.skip, x.url); assert.notEqual(r[1], "broken", `broken link in the data: ${x.url}`); }
+  const verified = LINK_STATUS.filter((r) => r[1] === "ok" && r[3] === true).length; assert.ok(verified >= 20, "verified links: " + verified);
+  assert.ok(LINK_STATUS.some((r) => r[1] === "access-denied"), "access-denied is recorded as its own verdict");
+});
 console.log(n, "link check tests passed");
