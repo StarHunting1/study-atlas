@@ -1,6 +1,6 @@
 /*
  * Result of the link check of the Manchester / Vancouver source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-15
- * (workflow "Collect official data", run 38793091211, commit f4ecff7). Pasted from the job log; one request per link, no retries.
+ * (workflow "Collect official data", run 38799750558, commit f9bbfaa). Pasted from the job log; one request per link, no retries.
  *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests)
  *   content: true = the page answered 2xx AND contains the words we expect (so it is the right page); false = answered but the words were
  *            not found; null = not checked for words (licence pages, catalogues) or not requested.
@@ -8,7 +8,7 @@
  */
 export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped";
 export const LINK_CHECKED_AT = "2026-10-15";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38793091211";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38799750558";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null][] = [
   ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null],
   ["https://climate.weather.gc.ca/climate_normals/", "ok", 200, null],
@@ -16,6 +16,7 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://ecenglish.com/en/schools/uk/learn-english-in-manchester/", "ok", 200, true],
   ["https://englishuk.com/member-directory?id=6665", "ok", 200, true],
   ["https://expressenglishcollege.co.uk", "ok", 200, false],
+  ["https://expressenglishcollege.co.uk/courses/general-english/", "ok", 200, false],
   ["https://ihmanchester.com/", "ok", 200, true],
   ["https://ihmanchester.com/prices-and-special-offers/", "ok", 200, true],
   ["https://ihvancouver.com/", "access-denied", 403, null],
@@ -42,6 +43,7 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.gov.uk/standard-visitor/visit-to-study", "ok", 200, true],
   ["https://www.gov.uk/student-visa", "ok", 200, true],
   ["https://www.gov.uk/visa-to-study-english", "ok", 200, true],
+  ["https://www.kaplaninternational.com/faq/prices-and-payment", "ok", 200, true],
   ["https://www.kaplaninternational.com/language-schools/united-kingdom/manchester", "ok", 200, true],
   ["https://www.languageinternational.co.uk/school/ukec-academy-formerly-excel-college-manchester-66291", "ok", 200, null],
   ["https://www.languagescanada.ca/en/listing-directory/students", "ok", 200, null],
@@ -62,6 +64,6 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.ubc.ca/site/legal.html", "skipped", null, null],
   ["https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301", "ok", 200, true],
   ["https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", "ok", 200, true],
-  ["https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp", "ok", 200, true]
+  ["https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp", "ok", 200, true],
 ];
 export const linkStatusOf = (url: string) => LINK_STATUS.find((r) => r[0] === url.replace(/#.*$/, ""));
