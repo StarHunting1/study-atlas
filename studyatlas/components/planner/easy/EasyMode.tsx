@@ -3,10 +3,10 @@ import { useMemo, useState } from "react";
 import { COUNTRIES, DESTINATIONS, ORIGINS, OTHER_AIRPORT, airportsIn, isIata } from "@/data/airports";
 import { useI18n } from "@/lib/i18n";
 import { usePersistentState } from "@/lib/persist";
-import { CITIES, CITY_CCY, CURRENCIES, HOUSING_TYPES, STUDY_TYPES, durationRange, goalRange, rangeFor, setRate, type Ccy, type Plan } from "@/lib/planner";
+import { CITIES, CITY_CCY, CURRENCIES, HOUSING_TYPES, STUDY_TYPES, stayWeeks, weeksToMonths, durationRange, goalRange, rangeFor, setRate, type Ccy, type Plan } from "@/lib/planner";
 import { isEmptyProfile } from "@/lib/profile";
 import { useProfile } from "@/lib/useProfile";
-import { DRAFT_KEY, SAVED_KEY, ASSUME_ITEMS, cleanEasy, cleanSaved, defaultBudget, defaultEasy, emptySaved, generate, groupPlans, savePlan, type Easy, type PlanGroup, type Saved } from "@/lib/smart";
+import { DRAFT_KEY, SAVED_KEY, ASSUME_ITEMS, MANUAL_COSTS, cleanEasy, cleanSaved, defaultBudget, defaultEasy, emptySaved, generate, groupPlans, savePlan, type Easy, type PlanGroup, type Saved } from "@/lib/smart";
 import Disclosure from "@/components/Disclosure";
 import { getCity } from "@/data/cities";
 import { pt } from "@/locales/planner";
@@ -117,7 +117,22 @@ export default function EasyMode({ onOpenAdvanced }: { onOpenAdvanced: (plan: Pl
                       {(["week", "month"] as const).map((u) => <button key={u} type="button" data-testid={`housing-per-${u}`} aria-pressed={per === u} onClick={() => set(v, u)} className={seg(per === u)}>{L(u === "week" ? st.perWeekUnit : st.perMonthUnit)}</button>)}</div>
                     <SliderField label={name} value={v} range={r} format={(n) => fmtMoney(n, cityCcy, lang)} onChange={(n) => set(n)} />
                     <p className="text-[11px] text-slate-400">{L(st.assumeHousingHint)}</p></div>);
-              })()}</div>
+              })()}
+              <Disclosure level="more" label={L(st.livingTitle)} testid="living-inputs" defaultOpen={MANUAL_COSTS.some((k) => easy.assume.costs?.[k] !== undefined)}>
+                <div className="space-y-4 pt-1" data-testid="living-body"><p className="text-xs text-slate-500">{L(st.livingLead)}</p>
+                  {MANUAL_COSTS.map((k) => {
+                    const c = easy.assume.costs?.[k]; const per = c?.per ?? "month"; const v = c?.amount ?? null; const r = rangeFor(k, per, cityCcy); const name = `${L(pt.items[k])} (${L(per === "week" ? st.perWeekUnit : st.perMonthUnit)})`;
+                    const set = (n: number | null, p2 = per) => upd((e) => { const { [k]: _drop, ...rest } = e.assume.costs ?? {}; const costs = n === null && p2 === "month" ? rest : { ...rest, [k]: { amount: n, per: p2 } }; const { costs: _old, ...a } = e.assume; return { ...e, assume: Object.keys(costs).length ? { ...a, costs } : a }; });
+                    return (
+                      <div key={k} className="space-y-1" data-assume={k}><div className="flex flex-wrap items-end justify-between gap-2"><span className={lab}>{name}</span>
+                        <span className="flex items-center gap-2"><span className="text-xl font-semibold tabular-nums text-slate-900">{v === null ? <span className="text-slate-300">{L(pt.notSet)}</span> : fmtMoney(v, cityCcy, lang)}</span>{v !== null && <button type="button" onClick={() => set(null)} className="text-xs text-slate-500 underline">{L(pt.clear)}</button>}</span></div>
+                        <div role="group" aria-label={L(pt.items[k])} className="inline-flex gap-1 rounded-full bg-slate-50 p-1 ring-1 ring-slate-200">
+                          {(["week", "month"] as const).map((u) => <button key={u} type="button" data-testid={`${k}-per-${u}`} aria-pressed={per === u} onClick={() => set(v, u)} className={seg(per === u)}>{L(u === "week" ? st.perWeekUnit : st.perMonthUnit)}</button>)}</div>
+                        <SliderField label={name} value={v} range={r} format={(n) => fmtMoney(n, cityCcy, lang)} onChange={(n) => set(n)} /></div>);
+                  })}
+                  <p className="text-[11px] text-slate-500" data-testid="conv-input">{tpl(L(st.convNote), { weeks: fmtNum(Math.round(stayWeeks({ duration: easy.duration }) * 10) / 10, lang), months: fmtNum(Math.round(weeksToMonths(stayWeeks({ duration: easy.duration })) * 10) / 10, lang) })}</p>
+                </div>
+              </Disclosure></div>
 
             <div className="flex flex-wrap items-center gap-2">
               {!isEmptyProfile(profile) && <button type="button" onClick={useProfile_} className="rounded-full bg-sky-50 px-4 py-2 text-xs font-medium text-sky-800 ring-1 ring-sky-100">{L(st.useProfile)}</button>}

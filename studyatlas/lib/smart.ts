@@ -16,6 +16,9 @@ export const MAIN_ITEMS: readonly ItemId[] = ["tuition", "housing", "food", "tra
 const LEVEL_ITEMS: readonly ItemId[] = ["tuition", "housing", "food", "transport", "phone", "leisure", "registration", "materials"];
 /** Items the user may give as an assumption in Easy mode (all optional). */
 export const ASSUME_ITEMS = ["tuition", "visa", "insurance"] as const;
+/** Living costs the user can enter by hand, per week or per month (Ver.1.3). A month is converted with WEEKS_PER_MONTH (52 ÷ 12 ≈ 4.33 weeks). */
+export const MANUAL_COSTS = ["food", "transport", "phone", "otherLiving"] as const;
+export type ManualCost = (typeof MANUAL_COSTS)[number];
 
 export type Easy = {
   origin: { country: string; airport: string; custom: string };
@@ -24,7 +27,8 @@ export type Easy = {
   /** manual exchange rates: 1 unit of the currency = rate × budget currency (the user enters them; no rate API is connected) */
   rates: Plan["rates"];
   assume: { tuitionWeek: number | null; visa: number | null; insurance: number | null; flight: { round: number | null; oneway: number | null };
-    /** housing the user enters themselves (Ver.1.2.9): an amount per week or per month; absent in older saved data = not entered */ housing?: { amount: number | null; per: "week" | "month" } };
+    /** housing the user enters themselves (Ver.1.2.9): an amount per week or per month; absent in older saved data = not entered */ housing?: { amount: number | null; per: "week" | "month" };
+    /** living costs the user enters themselves (Ver.1.3); absent in older saved data = not entered */ costs?: Partial<Record<ManualCost, { amount: number | null; per: "week" | "month" }>> };
 };
 export const defaultBudget = (c: Ccy) => (c === "JPY" ? 2_000_000 : c === "CAD" ? 15_000 : 10_000);
 export function defaultEasy(o: Partial<Pick<Easy, "cityId" | "studyType" | "duration" | "budget">> = {}): Easy {
@@ -91,6 +95,7 @@ function build(easy: Easy, tier: Tier, opts: { now?: string; allowSample?: boole
   assume("tuition", easy.assume.tuitionWeek, cityCcy, "week"); assume("visa", easy.assume.visa, cityCcy, "once"); assume("insurance", easy.assume.insurance, cityCcy, "once");
   assume("flights", flightPrice(easy), ccy, "once");
   assume("housing", easy.assume.housing?.amount ?? null, cityCcy, easy.assume.housing?.per ?? "week");
+  for (const k of MANUAL_COSTS) { const c = easy.assume.costs?.[k]; assume(k, c?.amount ?? null, cityCcy, c?.per ?? "month"); }
 
   // verified candidates, one level per tier
   const options: Partial<Record<ItemId, Opt[]>> = {}; const idx: Partial<Record<ItemId, number>> = {};
@@ -202,7 +207,8 @@ export function cleanEasy(v: unknown): Easy | undefined {
     cityId, studyType: oneOf(STUDY_TYPES, e.studyType, "language"), duration: { unit, value: Math.min(max, Math.max(1, num(e.duration?.value) ?? 12)) }, month: m !== null && m >= 1 && m <= 12 ? Math.round(m) : null,
     budget: { currency: ccy, amount: am !== null && am > 0 ? am : defaultBudget(ccy) }, housing: e.housing && (HOUSING_TYPES as readonly string[]).includes(e.housing) ? e.housing : null, trip: e.trip === "oneway" ? "oneway" : "round", rates,
     assume: { tuitionWeek: nn(e.assume?.tuitionWeek), visa: nn(e.assume?.visa), insurance: nn(e.assume?.insurance), flight: { round: nn(e.assume?.flight?.round), oneway: nn(e.assume?.flight?.oneway) },
-      ...(nn(e.assume?.housing?.amount) !== null || e.assume?.housing?.per === "month" ? { housing: { amount: nn(e.assume?.housing?.amount), per: e.assume?.housing?.per === "month" ? "month" as const : "week" as const } } : {}) } };
+      ...(nn(e.assume?.housing?.amount) !== null || e.assume?.housing?.per === "month" ? { housing: { amount: nn(e.assume?.housing?.amount), per: e.assume?.housing?.per === "month" ? "month" as const : "week" as const } } : {}),
+      ...(() => { const costs: NonNullable<Easy["assume"]["costs"]> = {}; for (const k of MANUAL_COSTS) { const c = e.assume?.costs?.[k]; if (nn(c?.amount) !== null || c?.per === "week") costs[k] = { amount: nn(c?.amount), per: c?.per === "week" ? "week" : "month" }; } return Object.keys(costs).length ? { costs } : {}; })() } };
 }
 export function cleanSaved(v: unknown): SavedStore | undefined {
   if (!v || typeof v !== "object") return undefined; const s = v as Partial<SavedStore>;
