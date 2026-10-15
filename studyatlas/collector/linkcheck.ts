@@ -24,7 +24,7 @@ const CITY_IDS = ["manchester", "vancouver"] as const;
 /** Words the page must contain for the link to count as "the right page". Matched case-insensitively against the page text. */
 const EXPECT: [RegExp, string][] = [
   [/gov\.uk\/student-visa/, "student visa"], [/gov\.uk\/check-uk-visa/, "visa"], [/gov\.uk\/visa-to-study-english/, "study english"],
-  [/gov\.uk\/standard-visitor\/visit-to-study/, "study"], [/gov\.uk\/healthcare-immigration-application\/how-much-pay/, "immigration health surcharge"],
+  [/gov\.uk\/standard-visitor\/visit-to-study/, "study"], [/gov\.uk\/healthcare-immigration-application\/how-much-pay/, "£776"],
   [/gov\.uk\/healthcare-immigration-application/, "immigration health surcharge"],
   [/canada\.ca\/.*study-permit\.html/, "study permit"], [/qnum=484/, "study permit"], [/qnum=1289/, "eta"],
   [/gov\.bc\.ca\/.*health-fee-international-students/, "health fee"], [/gov\.bc\.ca\/.*\/msp/, "medical services plan"],

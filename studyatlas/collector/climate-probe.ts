@@ -14,7 +14,7 @@ const title = (h: string) => short(htmlToText(/<title[^>]*>([\s\S]*?)<\/title>/i
 async function page(url: string, needles: (string | RegExp)[], ctx = 90) {
   const rb = await robots(url); if (!rb.allowed) { console.log(`- ${url}\n  robots: ${rb.reason} (not fetched)`); return; }
   const r = await get(url); const text = htmlToText(r.body).replace(/\s+/g, " "); console.log(`- ${url}\n  ${r.status} → ${r.url} · “${title(r.body)}”`);
-  for (const n of needles) { const re = typeof n === "string" ? new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi") : n; const hits = [...text.matchAll(re)].slice(0, 3).map((m) => text.slice(Math.max(0, (m.index ?? 0) - ctx), (m.index ?? 0) + m[0].length + ctx)); console.log(`  [${String(n)}] ${hits.length ? hits.map((h) => `…${h}…`).join(" | ") : "NOT FOUND"}`); }
+  for (const n of needles) { const re = typeof n === "string" ? new RegExp(n.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), "gi") : new RegExp(n.source, n.flags.includes("g") ? n.flags : n.flags + "g"); const hits = [...text.matchAll(re)].slice(0, 3).map((m) => text.slice(Math.max(0, (m.index ?? 0) - ctx), (m.index ?? 0) + m[0].length + ctx)); console.log(`  [${String(n)}] ${hits.length ? hits.map((h) => `…${h}…`).join(" | ") : "NOT FOUND"}`); }
   return r;
 }
 (async () => {

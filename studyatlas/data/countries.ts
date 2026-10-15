@@ -19,7 +19,7 @@ const gbrVisa = () => ({
 const canVisa = () => ({
   official: outline([{ url: "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", publisher: "IRCC (Government of Canada)" }, { url: "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", publisher: "IRCC (Government of Canada)" }], checkOfficial,
     { en: "IRCC says a study permit is generally not needed for a programme of 6 months or less, but you still need a valid travel document to enter (an eTA if you are from a visa-exempt country and fly in, or a visitor visa). For a longer programme, or if you may continue studying, IRCC advises applying for a study permit before you travel.", ja: "IRCCの案内では、6か月以内のプログラムなら一般に就学許可（study permit）は不要ですが、入国には有効な渡航書類が必要です（査証免除国の国籍で航空機を使う場合はeTA、それ以外は訪問者ビザなど）。プログラムが6か月を超える場合や、学習を続ける可能性がある場合は、渡航前に study permit を申請するようIRCCは案内しています。" }),
-  notes: outline([{ url: "https://ircc.canada.ca/English/helpcentre/answer.asp?qnum=1289&top=23&wbdisable=true", publisher: "IRCC (Government of Canada)" }], checkOfficial,
+  notes: outline([{ url: "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", publisher: "IRCC (Government of Canada)" }], checkOfficial,
     { en: "The eTA requirement depends on your nationality and how you travel (not needed by land, bus, train or boat). Provincial health coverage depends on the permit length and the province – see the Daily life section for British Columbia.", ja: "eTAが必要かどうかは国籍と移動手段で異なります（陸路・バス・鉄道・船では不要）。州の医療保険は就学許可の期間と州によって異なります。ブリティッシュコロンビア州は「暮らし」の項目をご覧ください。" }),
 });
 export const countries: Country[] = [

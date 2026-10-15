@@ -43,7 +43,7 @@ export const officialSources: OfficialSource[] = [
     pages: ["https://climate.weather.gc.ca/climate_normals/", "https://api.weather.gc.ca/collections/climate-normals"], cadenceDays: 180,
   },
   { id: "metoffice-station-data", publisher: "Met Office", name: { en: "Historical monthly data for meteorological stations (Ringway)", ja: "気象観測地点の月別履歴データ（リングウェイ）" }, country: "GBR", cityIds: ["manchester"], topic: "climate", method: "api",
-    pages: ["https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5", "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt"], cadenceDays: 90,
+    pages: ["https://www.data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5", "https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt"], cadenceDays: 90,
   },
   { id: "ubc-housing-fees", publisher: "UBC Student Housing and Community Services", name: { en: "Residence fees 2026/27 (reviewed, not used)", ja: "寮料金 2026/27（調査済み・掲載せず）" }, country: "CAN", cityIds: ["vancouver"], topic: "housing", method: "page",
     pages: ["https://vancouver.housing.ubc.ca/applications/fees-payments/", "https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/", "https://vancouver.housing.ubc.ca/applications/fees-payments/place-vanier/"], cadenceDays: 60,
