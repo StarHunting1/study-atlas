@@ -33,16 +33,16 @@ t("every school states its city; Express English College matches the English UK 
   for (const id of ["manchester", "vancouver"]) for (const s of schools(id).value!) assert.ok(/Manchester|Vancouver|New Westminster/.test(s.where!.en) && /マンチェスター|バンクーバー|ニューウェストミンスター/.test(s.where!.ja), s.name);
   const ex = schools("manchester").value!.find((s) => s.name === "Express English College")!;
   assert.ok(ex.where!.en.includes("130 Princess Road") && ex.where!.en.includes("M16 7BY") && ex.source!.url === "https://englishuk.com/member-directory?id=6665" && ex.url === "https://expressenglishcollege.co.uk");
-  const xl = schools("manchester").value!.find((s) => s.name.startsWith("Excel College"))!; assert.equal(xl.hidden, true, "kept as data, hidden from visitors"); assert.ok(schools("manchester").value!.length === 3 && schools("manchester").value!.filter((s) => !s.hidden).length === 2 && schools("vancouver").value!.every((s) => !s.hidden), "only Excel/UKEC is hidden; the other five stay shown");
+  const xl = schools("manchester").value!.find((s) => s.name.startsWith("Excel College"))!; assert.equal(xl.hidden, true, "kept as data, hidden from visitors"); assert.ok(schools("manchester").value!.length === 3 && schools("manchester").value!.filter((s) => !s.hidden).length === 1 && schools("vancouver").value!.every((s) => !s.hidden), "Excel/UKEC and MC Academy are hidden (not confirmable); Express English College and the three Vancouver schools stay shown");
   assert.ok(xl.name.includes("UKEC Academy") && xl.note!.ja.includes("未確認") && !xl.url && !/Oxford Street \d|Fairfield Street \d|M1 \d/.test(JSON.stringify(xl)));
-  const mc = schools("manchester").value!.find((s) => s.name === "MC Academy")!; assert.ok(!/\d+\s*(Oldham|Mosley)|21-23|M1 1JG|M2 3AN/.test(JSON.stringify(mc)));
+  const mc = schools("manchester").value!.find((s) => s.name === "MC Academy")!; assert.ok(!/\d+\s*(Oldham|Mosley)|21-23|M1 1JG|M2 3AN/.test(JSON.stringify(mc))); assert.equal(mc.hidden, true); assert.ok(!mc.url && !JSON.stringify(mc).includes("themcacademy.co.uk\""), "the wrong domain (now Money Confidence Academy) is gone");
   const ef = schools("vancouver").value!.find((s) => s.name === "EF Vancouver")!; assert.ok(!ef.stay, "EF accommodation stays unconfirmed");
   for (const id of ["manchester", "vancouver"]) assert.ok(schools(id).note!.ja.includes("営業状況") && schools(id).status === "unverified");
 });
 t("the school list renders name, area, courses, accommodation, source link and the 'unverified' badge (ja and en text exist)", () => {
   const out = wrap(h(FactView, { fact: schools("manchester"), kind: "institutions" }));
   assert.ok(out.includes("Express English College") && out.includes("所在地") && out.includes("主なコース") && out.includes("滞在先の手配") && out.includes("English UK") && out.includes("2026-10-15"));
-  assert.equal((out.match(/data-testid="institution"/g) ?? []).length, 2, "Excel College / UKEC Academy is hidden");
+  assert.equal((out.match(/data-testid="institution"/g) ?? []).length, 1, "Excel College / UKEC Academy and MC Academy are hidden");
   assert.ok(!out.includes("Excel College") && !out.includes("UKEC"));
   assert.equal((wrap(h(FactView, { fact: schools("vancouver"), kind: "institutions" })).match(/data-testid="institution"/g) ?? []).length, 3);
   for (const s of [...schools("manchester").value!, ...schools("vancouver").value!]) for (const f of [s.where, s.courses, s.stay, s.note]) if (f) assert.ok(f.en && f.ja);
@@ -50,7 +50,7 @@ t("the school list renders name, area, courses, accommodation, source link and t
 t("first view (education key): language mode names language schools first, university mode keeps universities first", () => {
   const k = keyFigure(getCity("manchester")!, "education"); assert.equal(k.kind, "schools");
   const lang = wrap(h(KeyView, { k, languageFirst: true })).replace(/<[^>]+>/g, ""), uni = wrap(h(KeyView, { k })).replace(/<[^>]+>/g, "");
-  assert.ok(lang.includes("語学学校 2校"), "hidden entry is not counted"); assert.ok(lang.indexOf("語学学校") >= 0 && lang.indexOf("語学学校") < lang.indexOf("大学"));
+  assert.ok(lang.includes("語学学校 1校"), "hidden entries are not counted"); assert.ok(lang.indexOf("語学学校") >= 0 && lang.indexOf("語学学校") < lang.indexOf("大学"));
   assert.ok(uni.indexOf("大学") < uni.indexOf("語学学校"));
 });
 t("housing: homestay, shared house, student halls and private rental are all explained with their check points – even where no price exists", () => {

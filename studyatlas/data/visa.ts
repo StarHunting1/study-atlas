@@ -35,7 +35,7 @@ export const visaLinks: Record<string, { label: Localized; link: Fact<string> }[
   CAN: [
     { label: { en: "IRCC – Study permit", ja: "IRCC – Study permit（就学許可）" }, link: { status: "unverified", value: "https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", note: unchecked } },
     { label: { en: "IRCC – Do I need a study permit for a course of 6 months or less?", ja: "IRCC – 6か月以内のコースでも就学許可は必要か" }, link: { status: "unverified", value: "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", note: found } },
-    { label: { en: "IRCC – Do I need an eTA to study for less than six months?", ja: "IRCC – 6か月未満の学習にeTAは必要か" }, link: { status: "unverified", value: "https://ircc.canada.ca/English/helpcentre/answer.asp?qnum=1289&top=23&wbdisable=true", note: found } },
+    { label: { en: "IRCC – Do I need an eTA to study for less than six months?", ja: "IRCC – 6か月未満の学習にeTAは必要か" }, link: { status: "unverified", value: "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", note: found } },
   ],
   AUS: [
     { label: { en: "Department of Home Affairs – Student visa (subclass 500)", ja: "内務省 – Student visa（subclass 500）" }, link: { status: "unverified", value: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500", note: unchecked } },

@@ -18,6 +18,7 @@ import FactView, { StatusBadge } from "@/components/FactView";
 import { CardGrid } from "@/components/official/DataCard";
 import { housingKindOf } from "@/data/official/housingKind";
 import ClimateCharts from "@/components/official/ClimateCharts";
+import { tpl } from "@/components/planner/format";
 import KeyView from "./KeyView";
 import { sc } from "@/locales/schoolCompare";
 import StudyModeSwitch from "./StudyModeSwitch";
@@ -104,6 +105,7 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
   if (topic === "transport") body = <><Group title={L(ot.transportAdult)} points={by("transport").filter((p) => p.audience === "adult")} /><Group title={L(ot.transportStudent)} points={by("transport").filter((p) => p.audience !== "adult")} /><Profile city={city} id="transport" /></>;
   if (topic === "climate") body = <>{data?.climate && showsFigure(displayModeOfClimate(data.climate)) && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}</span></div><ClimateCharts c={data.climate} />
     {data.climate.derived && <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">{L(ot.climateDerived)}</p>}
+    {Number(/(\d{4})\D*$/.exec(data.climate.period)?.[1] ?? 9999) < 2020 && <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 ring-1 ring-slate-200" data-testid="climate-old">{tpl(L(ot.climateOld), { period: data.climate.period })}</p>}
     <Disclosure level="sources"><p className="text-[11px] text-slate-500">{data.climate.evidence.map((e) => <span key={e.url}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(e.section)} </span>)}</p>{data.climate.note && <p className="mt-1 text-[11px] text-slate-400">{L(data.climate.note)}</p>}</Disclosure></>}
     {data?.climateNote && <p className="text-xs text-slate-500">{L(data.climateNote)}</p>}<Profile city={city} id="climate" /></>;
   if (topic === "education") body = <><Profile city={city} id="education" order={order} /><Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} />{mode === "language" && <Link href="/schools/compare" data-testid="compare-schools" className="mr-4 inline-block py-1 text-sm text-sky-700 underline">{L(sc.openCompareCity)}</Link>}<Link href="/schools" className="inline-block py-1 text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link></>;

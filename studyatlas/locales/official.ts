@@ -63,6 +63,7 @@ export const ot = {
     homestay: { en: "You live with a host family. Meals, the unit of the price (week or month) and the minimum stay differ by school or agency.", ja: "現地の家庭に滞在します。食事の有無、料金の単位（週額・月額）、最低滞在期間は学校や手配会社ごとに異なります。" },
     share: { en: "You rent one room in a house or flat shared with other tenants. The price is for the room, not the whole home divided by the number of people. Bills may or may not be included.", ja: "他の入居者と共有する住宅の個室を借ります。料金は個室1人分で、住宅全体の家賃を人数で割った値ではありません。光熱費が含まれるかは物件によって異なります。" },
   },
+  climateOld: { en: "Reference period {period}. This is not the latest standard (1991–2020) normal, so recent conditions may differ; a newer period has not been obtained yet.", ja: "基準期間は{period}です。最新の標準期間（1991–2020）の平年値ではないため、近年の気候とは差がある可能性があります（新しい期間のデータは未取得です）。" },
   housingChecks: {
     dorm: { en: "Check: who may apply (language students often cannot), contract length, meals and bills.", ja: "確認：入居できる対象（語学留学生は不可の場合が多い）・契約期間・食事と光熱費。" },
     homestay: { en: "Check: meals included, travel time to school, weekly price and minimum stay.", ja: "確認：食事の有無・学校までの通学時間・週額料金と最低滞在期間。" },

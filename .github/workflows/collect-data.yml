@@ -97,6 +97,10 @@ jobs:
           npx tsx collector/terms-probe.ts | tee -a "$GITHUB_STEP_SUMMARY"
           npx tsx collector/terms-probe.ts --v121 | tee -a "$GITHUB_STEP_SUMMARY"
 
+      - name: Link check of the Manchester / Vancouver source links (pull requests only; reviewer aid, nothing stored)
+        if: github.event_name == 'pull_request'
+        run: npx tsx collector/linkcheck.ts | tee -a "$GITHUB_STEP_SUMMARY"
+
       - name: Keep the collected files as an artifact
         if: always()
         uses: actions/upload-artifact@v4
