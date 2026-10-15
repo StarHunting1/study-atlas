@@ -19,6 +19,7 @@ import { CardGrid } from "@/components/official/DataCard";
 import { housingKindOf } from "@/data/official/housingKind";
 import ClimateCharts from "@/components/official/ClimateCharts";
 import KeyView from "./KeyView";
+import { sc } from "@/locales/schoolCompare";
 import StudyModeSwitch from "./StudyModeSwitch";
 import { fitOf, type StudyMode } from "@/data/official/studyType";
 import { useStudyMode } from "@/lib/studyMode";
@@ -105,7 +106,7 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
     {data.climate.derived && <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">{L(ot.climateDerived)}</p>}
     <Disclosure level="sources"><p className="text-[11px] text-slate-500">{data.climate.evidence.map((e) => <span key={e.url}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(e.section)} </span>)}</p>{data.climate.note && <p className="mt-1 text-[11px] text-slate-400">{L(data.climate.note)}</p>}</Disclosure></>}
     {data?.climateNote && <p className="text-xs text-slate-500">{L(data.climateNote)}</p>}<Profile city={city} id="climate" /></>;
-  if (topic === "education") body = <><Profile city={city} id="education" order={order} /><Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} /><Link href="/schools" className="inline-block text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link></>;
+  if (topic === "education") body = <><Profile city={city} id="education" order={order} /><Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} />{mode === "language" && <Link href="/schools/compare" data-testid="compare-schools" className="mr-4 inline-block py-1 text-sm text-sky-700 underline">{L(sc.openCompareCity)}</Link>}<Link href="/schools" className="inline-block py-1 text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link></>;
   const otherPts = topic === "education" ? all("housing").filter((p) => !!p.housing) : topic === "climate" ? [] : all(topic);
   body = <>{body}<OtherFit topic={topic} mode={mode} points={otherPts} /></>;
   return (

@@ -52,7 +52,7 @@ export type MonthlyClimate = {
 };
 
 /** `where`, `courses` and `stay` (accommodation arranged by the school) are short paraphrases, written only when a listing states them; `source` is the page the entry was read from. */
-export type Institution = { name: string; url?: string; note?: Localized; where?: Localized; courses?: Localized; stay?: Localized; source?: SourceRef;
+export type Institution = { /** stable key; set for language schools that can be compared */ id?: string; name: string; url?: string; note?: Localized; where?: Localized; courses?: Localized; stay?: Localized; source?: SourceRef;
   /** true = kept as research data but not shown to visitors (e.g. identity or operating status could not be confirmed) */ hidden?: true };
 
 export type CityProfile = {
