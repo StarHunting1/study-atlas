@@ -25,7 +25,7 @@ t("International House Vancouver is shown in New Westminster, never as a City-of
   const ih = schools("vancouver").value!.find((s) => s.name.startsWith("International House"))!; const raw = JSON.stringify(ih);
   assert.ok(ih.where!.ja.includes("ニューウェストミンスター") && ih.where!.ja.includes("バンクーバー市内ではなく") && ih.where!.en.includes("New Westminster") && ih.where!.en.includes("not in the City of Vancouver"));
   assert.ok(!/Chinatown|チャイナタウン|Pender|West Broadway|Stadium/.test(ih.where!.ja + ih.where!.en + (ih.courses?.en ?? "")), "no former downtown location");
-  assert.ok(!/\b10[38]\b|Suite|部屋番号は.*\d/.test(raw.replace("部屋番号は掲載により異なるため載せていません", "")), "no suite number");
+  assert.ok(raw.includes("103 – 960 Quayside Drive") || raw.includes("Suite 103, 960 Quayside Drive"), "the suite number comes from the school's own announcement");
   assert.ok(schools("vancouver").note!.ja.includes("バンクーバー市内とは限りません"));
   assert.equal(ih.url, "https://ihvancouver.com/");
 });

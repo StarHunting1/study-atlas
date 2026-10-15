@@ -1,9 +1,22 @@
-# RELEASE_READINESS – 公開準備の評価（Ver.1.3.2 時点・2026-10-15）
+# RELEASE_READINESS – 公開準備の評価（Ver.1.3.3 時点・2026-10-15）
 
 > **結論: 現時点では「一般公開できる」とは判断しません。** 根拠は下の「公開を妨げる問題」です。
 > 機能（比較・Planner・学校比較・日英・レスポンシブ）は動作しますが、**実データの量と確認状況が公開品質に届いていません**。
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
+
+## 0a. Ver.1.3.3 の結果（検証済み情報と語学学校の拡充）
+
+| 指標 | 件数 |
+|---|---|
+| Manchester の新規に公開した学校 | 2校（International House Manchester / Kaplan Manchester。表示校 1→3） |
+| 公式サイトと照合できた学校 | 5校（Manchester 3 + Vancouver 2。English UK / Languages Canada の掲載と住所を照合） |
+| 非表示にした学校 | 4校（EC Manchester, MC Academy, Excel/UKEC, Sprachcaffe Vancouver）。営業状況・認定を確認できないため |
+| verified にするため人の承認が必要な候補 | 10件（英国 U1–U6、カナダ C1–C4。`data/APPROVAL_CANDIDATES.md`） |
+| 公開情報の改善 | 公式料金ページへのリンク（IH Manchester/Vancouver）、出典ごとのライセンス表記（GOV.UK=OGL v3.0、BC州=言い換え＋リンクのみ）、IH Vancouver の所在（New Westminster）維持 |
+| 未検証 | British Council 認定状況（403）、各学校の料金・コース詳細、気候 1991–2020 ほか |
+
+自動確認だけで verified にしたものは 0 件です。
 
 ## 0. Ver.1.3.2 の結果（公式データの更新・リンク検査）
 
