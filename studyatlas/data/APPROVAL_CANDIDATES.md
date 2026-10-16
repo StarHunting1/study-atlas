@@ -1,10 +1,36 @@
-# 承認用の記録（人間の承認が必要な候補）— Ver.1.3.3
+# 承認用の記録（人間の承認が必要な候補）— Ver.1.3.4（Ver.1.3.3 の記録を再検証）
 
 **状態はすべて「承認待ち（unverified のまま）」です。** GitHub Actions のページ確認だけを理由に verified へ変更していません。承認する場合は、承認者・日付・比較した内容を記録した上で、該当する事実の `status` を `verified`、`sources` / `period` / `checkedAt` を満たす形で更新してください（`data/validate.ts` が検査します）。
 
 確認方法: GitHub Actions（run [38787463398](https://github.com/StarHunting1/study-atlas/actions/runs/38787463398)・[38791190742](https://github.com/StarHunting1/study-atlas/actions/runs/38791190742)・[この PR の最新 run]）。各ページを1回だけ取得し、記載の語・金額をページ本文と照合（再試行なし、robots.txt 遵守）。ページの更新日は GOV.UK の Content API（`public_updated_at`）、canada.ca / BC の `dcterms.modified` による。
 
 **Planner への自動計上は行いません。** ビザ・保険・医療関連費用は、どの区分に当てはまるかが国籍・コース・年齢・申請場所で変わるため、利用者が入力した値だけを計上します（`tests/releasecheck.test.ts` が、Manchester / Vancouver のどのプラン条件でも `visa` / `insurance` が自動で選ばれないことを検査）。
+
+## 0. Ver.1.3.4 の再検証結果（10件の分類）
+
+Actions run [38798253317](https://github.com/StarHunting1/study-atlas/actions/runs/38798253317)（2026-10-15、各ページ1回ずつ・再試行なし）で、条件・例外の記載を再確認しました。**どの候補も verified にはしていません。** 「承認推奨」は「ページの記載と一致し、適用条件・例外も記録できた」という意味で、承認するかは人が決めます。
+
+| # | 分類 | 再検証で分かったこと | 承認で見てほしい点 |
+|---|---|---|---|
+| U1 | **承認推奨** | 6か月以内・認定機関・英語コース含む・アカデミー/公立校は対象外、をページで再確認 | 国籍別のビザ/ETA要否は当サイトで判定しない旨 |
+| U2 | **承認推奨** | 6か月超〜11か月、6か月以内=訪問者、11か月超=Student visa、をページで再確認 | 16歳以上の記載は本ページにはなし（Student visa ページに記載） |
+| U3 | **承認推奨** | 「It costs £228 for a Short-term study visa」を再確認 | 金額は変更される。確認時点を明記済み |
+| U4 | **承認推奨** | 16歳以上・licensed student sponsor を再確認。申請料は£558（英国外から申請）も同ページに記載（当サイトは未掲載） | 16・17歳は保護者の同意が必要（Child Student visa の可能性）。Planner には計上しない |
+| U5 | **承認推奨** | 学生£776/年、18歳未満も£776、その他£1,035、6か月以内で英国外から申請=不要（英国内から=半額 £388）、6か月超〜1年未満=1年分、を再確認。短期学習ビザのページは「usually costs £776」 | Manchester の医療欄の文言を、ページ記載どおりに正確化（旧文言は「6か月以内のコースはIHS対象外」だけで、申請場所の条件が抜けていた） |
+| U6 | **承認推奨** | 「Depending on your nationality, you may need to get an electronic travel authorisation (ETA)」を確認（入口ページとしての役割） | 判定ツールへのリンクであり、事実の主張ではない |
+| C1 | **承認推奨**（利用条件の注記つき） | 「You don't need a study permit if your program or course is less than 6 months」＋「still need a valid travel document (eTA or visitor visa)」を再確認 | ページに更新日なし。Canada.ca の商用再利用は未確認 → 言い換え＋リンクのみ |
+| C2 | **承認推奨**（同上） | 「eTA … visa-exempt … by air」「don't need … car, bus, train or boat」を再確認 | 同上 |
+| C3 | **承認推奨**（同上） | 「Study permit: $CAN 150」を再確認 | 金額は変更される。同上 |
+| C4 | **修正が必要 → 本PRで修正済み（再確認推奨）** | 旧文言「6か月以上有効な就学許可」は不正確。ページは「a valid study permit **for at least six months of the year**」、成人はMSPから正式に脱退すれば対象外（未成年は不可）、待機期間と民間保険の案内あり | 修正後の文言（`data/profiles/vancouver.ts` の医療欄）をページと照合 |
+| 確認不能 | 0件 | — | — |
+
+**承認推奨 9件／修正が必要 1件（修正済み）／確認不能 0件。** C1〜C3・C4 は BC州・Canada.ca の利用条件上、文章の転載はせず「事実の言い換え＋リンク」のみです（商用での再利用許可は確認できていません）。
+
+### 1件ずつ承認するための手順
+1. 上の表の項目を選び、下の §1・§2 の「根拠」欄のURLを開いて、引用文が現在のページにあることを確認する。
+2. 該当する Fact を編集する（U1〜U4・U6 は `data/countries.ts` の `gbrVisa`、U5 は `data/profiles/manchester.ts` の `living.healthcare`、C1〜C3 は `data/countries.ts` の `canVisa`、C4 は `data/profiles/vancouver.ts` の `living.healthcare`）。`status: "verified"`、`sources`・`period`・`checkedAt` を設定し、`note` に「承認者・日付・比較した内容」を書く。`data/validate.ts` が不足を検査します。
+3. 承認しない／保留する場合は何もしない（unverified のまま表示され、画面に「未確認」と出ます）。
+4. どの項目も **Planner には自動で入りません**（ビザ・保険は利用者の手入力のみ。`tests/releasecheck.test.ts` が検査）。
 
 ## 1. 英国
 
@@ -60,3 +86,17 @@
 | MC Academy / Excel College (UKEC Academy) | Manchester | 公式サイト・営業状況を確認できない（PR #36） | — | — | 非表示（データ保持） |
 
 British Council の認定センター一覧ページは自動アクセスを拒否（403）するため、認定状況の最終確認は人が行う必要があります。再試行は行っていません。
+
+## 6. 語学学校の料金情報（Ver.1.3.4）— 金額は取り込んでいません
+
+調査の結論：**5校とも、公式サイトに料金の再利用を認める記載がなく**（Actions run 38798253317 で各校のフッター・規約を1回ずつ確認、`data/official/RIGHTS.md` の `language-school-fees`）、料金は週のレッスン数・期間・時期・含まれる費用で変わるため、金額・料金表は一切記録せず、公式料金ページへのリンクと「揃えるべき条件」の一覧だけを提供します。検索結果などで見かけた金額も使っていません。
+
+| 学校 | 公式の料金案内（リンクのみ） | 再利用条件の確認結果（2026-10-15） | 授業料・週の授業時間・最低期間・登録料・教材費・滞在費 |
+|---|---|---|---|
+| Express English College (Manchester) | `expressenglishcollege.co.uk/courses/general-english/`（コースページ） | サイト・規約に著作権/再利用の記載なし → 不明として扱う | 未取得（料金ページで確認） |
+| IH Manchester | `ihmanchester.com/prices-and-special-offers/` | 「© Copyright 2026 IH Manchester. All Rights Reserved.」 | 未取得 |
+| Kaplan International Manchester | `kaplaninternational.com/faq/prices-and-payment`（価格表の入手方法の案内） | 「Without our prior written permission, you may not copy … any material on this website」 | 未取得 |
+| International House Vancouver | `ihvancouver.com/ihv-price-list/` | サイトが自動アクセスにボット確認（403）を返したため規約は未読・再試行なし | 未取得 |
+| EF Vancouver | `ef.com/ca/ilsd/schools/vancouver/`（見積依頼のあるページ） | 「© Signum International AG 2026. All rights reserved.」 | 未取得 |
+
+人が許可を得る／法務確認をする場合は、`language-school-fees`（`expertReview: true`）を更新したうえで、学校ごとに「対象年度・通貨・週あたりのレッスン数・期間区分・含まれる費用」を添えて取り込む必要があります。取り込むまでは Planner の授業料は利用者の手入力のみで、主要費用が未入力の間は「暫定」と表示されます。

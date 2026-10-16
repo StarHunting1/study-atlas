@@ -54,3 +54,17 @@ Housing type descriptions (homestay, shared house, halls, private rental) and th
 Final check (PR review, 2026-10-15): city of each school, name, website and operating status were re-checked against public listings and search results only (the sandbox cannot open the schools' sites). “Operating today” could not be confirmed directly for any school; the display therefore says so and every entry stays `unverified`.
 
 Decision (2026-10-15): Excel College / UKEC Academy is hidden from the visitor-facing school list until its official site, operating status and accreditation are confirmed. The data entry and this record stay in the repository; remove `hidden` to show it again after a person has confirmed it. The other five schools stay shown as `unverified`.
+
+## Ver.1.3.4 – language school fees and government conditions (2026-10-15)
+
+Read once each via the GitHub Actions probe (run 38798253317; no retries; fee pages themselves were not read, only the sites' footers and terms):
+
+| School | Fee information (link only) | Reuse terms found |
+|---|---|---|
+| Express English College | /courses/general-english/ | none stated on the site or in its terms |
+| IH Manchester | /prices-and-special-offers/ | “© Copyright 2026 IH Manchester. All Rights Reserved.” |
+| Kaplan International Manchester | /faq/prices-and-payment | “Without our prior written permission, you may not copy, modify, alter, publish, broadcast, distribute, sell or transfer any material on this website” |
+| International House Vancouver | /ihv-price-list/ | site answered with a bot check (403): terms not read, not retried |
+| EF Vancouver | /ca/ilsd/schools/vancouver/ (price quotation request) | “© Signum International AG 2026. All rights reserved.” |
+
+Decision: no school fee figure is stored (terms unclear or reserving rights; fees vary with lessons per week, length, season and inclusions). Figures that appear in search-engine summaries of these pages were deliberately not used. Government conditions re-read: see `data/APPROVAL_CANDIDATES.md` §0 (9 recommended, 1 corrected, 0 unverifiable).
