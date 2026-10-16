@@ -1,17 +1,18 @@
 /*
  * Result of the link check of the Manchester / Vancouver source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-15
- * (workflow "Collect official data", run 38800687846, commit cd6ce2c). Pasted from the job log; one request per link, no retries.
- *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests)
+ * (workflow "Collect official data", run 38905921442, commit 40a2f74). Pasted from the job log; one request per link, no retries.
+ *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests) | robots-disallowed (robots.txt disallows the path, or could not be fetched, e.g. a timeout: then no request is made)
  *   content: true = the page answered 2xx AND contains the words we expect (so it is the right page); false = answered but the words were
  *            not found; null = not checked for words (licence pages, catalogues) or not requested.
  * "Verified link" in the audit = ok + content true. Access denied is NOT broken: the page may exist but refuses automated requests.
  */
-export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped";
-export const LINK_CHECKED_AT = "2026-10-15";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38800687846";
+export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped" | "robots-disallowed";
+export const LINK_CHECKED_AT = "2026-10-16";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38905921442";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null][] = [
-  ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null],
+  ["https://api.weather.gc.ca/collections/climate-normals", "robots-disallowed", null, null],
   ["https://climate.weather.gc.ca/climate_normals/", "ok", 200, null],
+  ["https://climate.weather.gc.ca/climate_normals/index_e.html", "ok", 200, true],
   ["https://eccc-msc.github.io/open-data/licence/readme_en/", "ok", 200, null],
   ["https://ecenglish.com/en/schools/uk/learn-english-in-manchester/", "ok", 200, true],
   ["https://englishuk.com/member-directory?id=6665", "ok", 200, true],
@@ -21,7 +22,7 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://ihmanchester.com/prices-and-special-offers/", "ok", 200, true],
   ["https://ihvancouver.com/", "ok", 200, true],
   ["https://ihvancouver.com/2024/11/08/new-campus/", "ok", 200, true],
-  ["https://ihvancouver.com/ihv-price-list/", "access-denied", 403, null],
+  ["https://ihvancouver.com/ihv-price-list/", "ok", 200, true],
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", "ok", 200, true],
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student", "ok", 200, true],

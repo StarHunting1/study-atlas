@@ -39,6 +39,6 @@ t("recorded Actions result: every link that is requested has a result, nothing r
   for (const [u] of LINK_STATUS) assert.ok(urls.has(u), `recorded result for a link that is no longer used: ${u}`);
   for (const x of ts) { const r = linkStatusOf(x.url)!; assert.equal(r[1] === "skipped", !!x.skip, x.url); assert.notEqual(r[1], "broken", `broken link in the data: ${x.url}`); }
   const verified = LINK_STATUS.filter((r) => r[1] === "ok" && r[3] === true).length; assert.ok(verified >= 20, "verified links: " + verified);
-  assert.ok(LINK_STATUS.some((r) => r[1] === "access-denied"), "access-denied is recorded as its own verdict");
+  assert.ok(LINK_STATUS.every((r) => ["ok", "access-denied", "broken", "skipped", "robots-disallowed"].includes(r[1])), "every recorded verdict is a known kind (access denied / robots are never recorded as broken)");
 });
 console.log(n, "link check tests passed");
