@@ -50,3 +50,6 @@ export function countryFitBounds(outline: [number, number, number, number] | und
   let [w, s, e, n] = outline ?? [pts[0][0], pts[0][1], pts[0][0], pts[0][1]]; for (const [x, y] of pts) { w = Math.min(w, x); e = Math.max(e, x); s = Math.min(s, y); n = Math.max(n, y); }
   return [w, s, e, n];
 }
+
+/** The country that is "active" on the map: the selected city's country, otherwise the selected country, otherwise none. */
+export const activeCountry = (cityList: { id: string; country: string }[], country: string | null, cityId: string | null): string => cityList.find((c) => c.id === cityId)?.country ?? country ?? "";

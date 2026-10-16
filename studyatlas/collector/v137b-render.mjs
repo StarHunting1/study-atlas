@@ -16,10 +16,10 @@ const OUTLINE = { CAN: [-141, 41.7, -52.6, 83.1], GBR: [-8.6, 49.9, 1.8, 60.8], 
     await page.goto(BASE + "/"); await page.waitForSelector('[data-testid="interactive-map"][data-map-state="idle"]', { timeout: 40000 }).catch(() => {}); await sleep(800); return { ctx, page, errs }; };
   const VPS = { phone: [{ width: 390, height: 844 }, true], ipad: [{ width: 820, height: 1180 }, true], pc: [{ width: 1280, height: 900 }, false] };
   for (const [name, [vp, touch]] of Object.entries(VPS)) {
-    const { ctx, page, errs } = await open(vp, "ja", touch); const r = (out[name] = {});
+    const { ctx, page, errs } = await open(vp, "ja", touch); const r = (out[name] = {}); try {
     r.state = await page.locator('[data-testid="interactive-map"]').getAttribute("data-map-state"); r.overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
     r.attribution = (await page.locator(".maplibregl-ctrl-attrib").innerText().catch(() => "")).replace(/\s+/g, " ");
-    r.colors = await page.evaluate(() => { const m = window.__saMap; if (!m) return "no debug map"; const o = {}; for (const l of m.getStyle().layers) { const sl = l["source-layer"]; if (["water", "landcover", "park", "boundary", "waterway"].includes(sl) || l.type === "background") (o[sl ?? "background"] ??= []).push(`${l.id}:${l.type}:${JSON.stringify(m.getPaintProperty(l.id, l.type === "background" ? "background-color" : l.type === "fill" ? "fill-color" : "line-color")).slice(0, 60)}`); } o.labels = m.getStyle().layers.filter((l) => l.type === "symbol" && l["source-layer"] === "place").slice(0, 4).map((l) => `${l.id}:${JSON.stringify(m.getLayoutProperty(l.id, "text-field")).slice(0, 120)}`); o.rendered = m.queryRenderedFeatures().length; return o; });
+    r.colors = await page.evaluate(() => { const m = window.__saMap; if (!m) return "no debug map"; const o = {}; for (const l of m.getStyle().layers) { const sl = l["source-layer"]; if (!["background", "fill", "line"].includes(l.type)) continue; if (["water", "landcover", "park", "boundary", "waterway"].includes(sl) || l.type === "background") (o[sl ?? "background"] ??= []).push(`${l.id}:${l.type}:${JSON.stringify(m.getPaintProperty(l.id, l.type === "background" ? "background-color" : l.type === "fill" ? "fill-color" : "line-color")).slice(0, 60)}`); } o.labels = m.getStyle().layers.filter((l) => l.type === "symbol" && l["source-layer"] === "place").slice(0, 4).map((l) => `${l.id}:${JSON.stringify(m.getLayoutProperty(l.id, "text-field")).slice(0, 120)}`); o.rendered = m.queryRenderedFeatures().length; return o; });
     if (name === "pc") { r.countries = {}; }
     await shot(page, `${name}-world-ja`);
     if (name === "pc" || name === "phone") {
@@ -33,7 +33,7 @@ const OUTLINE = { CAN: [-141, 41.7, -52.6, 83.1], GBR: [-8.6, 49.9, 1.8, 60.8], 
       await page.locator('[data-testid="city-card"] button[aria-label]').click(); await sleep(2200); r.afterClose = await page.evaluate(() => ({ zoom: +window.__saMap.getZoom().toFixed(2), card: !!document.querySelector('[data-testid="city-card"]') }));
       await page.getByTestId("back-countries").click(); await sleep(2200); r.back = await page.evaluate(() => ({ zoom: +window.__saMap.getZoom().toFixed(2), heading: !!document.querySelector('[data-testid="country-heading"]'), items: document.querySelectorAll('[data-testid="city-list"] li').length }));
     }
-    r.errs = errs.slice(0, 5); await ctx.close();
+    } catch (e) { r.failed = String(e).slice(0, 300); } r.errs = errs.slice(0, 5); await ctx.close();
   }
   // English
   { const { ctx, page } = await open(VPS.pc[0], "en", false); const r = (out.pc_en = {});

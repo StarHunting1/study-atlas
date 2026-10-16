@@ -90,7 +90,7 @@ t("fee pages of the schools are recorded as link-only in the rights record; no f
 t("the home-page map is production-safe: OpenFreeMap tiles (no key, no demo tiles), a bundled SVG fallback with a clickable path for every country and a button for every city", () => {
   const fs = require("node:fs") as typeof import("node:fs");
   const inter = fs.readFileSync("components/InteractiveMap.tsx", "utf8"), wrap = fs.readFileSync("components/WorldMap.tsx", "utf8"), stat = fs.readFileSync("components/StaticWorldMap.tsx", "utf8"), data = fs.readFileSync("data/worldMap.ts", "utf8");
-  assert.ok(/tiles\.openfreemap\.org\/styles\/positron/.test(inter) && !/demotiles|maplibre\.org\/style/.test(inter + wrap + stat + fs.readFileSync("package.json", "utf8")), "no MapLibre demo tiles");
+  assert.ok(/tiles\.openfreemap\.org\/styles\/liberty/.test(inter) && !/demotiles|maplibre\.org\/style/.test(inter + wrap + stat + fs.readFileSync("package.json", "utf8")), "no MapLibre demo tiles");
   assert.ok(!/api[_-]?key|access_token/i.test(inter), "no key in the map code"); assert.ok(/StaticWorldMap/.test(wrap) && /failed/.test(wrap), "falls back to the static map when the tile service fails");
   assert.ok(!/https?:\/\/|fetch\(|maplibre/i.test(stat), "the fallback makes no external request");
   assert.ok(!/demotiles/.test(fs.readFileSync("locales/en.ts", "utf8") + fs.readFileSync("locales/ja.ts", "utf8")), "no demo-tile credit left");

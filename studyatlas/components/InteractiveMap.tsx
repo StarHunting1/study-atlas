@@ -6,7 +6,7 @@ import { cities, countries } from "@/data/cities";
 import { boundsOf, COUNTRY_SHAPES } from "@/data/countryShapes";
 import { useI18n } from "@/lib/i18n";
 import { countryName, cityName } from "@/lib/names";
-import { countryFitBounds, fitPadding, isLabelLayer, labelExpression, paintOverrides, PALETTE, type StyleLayer } from "@/lib/mapStyle";
+import { activeCountry, countryFitBounds, fitPadding, isLabelLayer, labelExpression, paintOverrides, PALETTE, type StyleLayer } from "@/lib/mapStyle";
 
 /**
  * Background map style (Ver.1.3.7): OpenFreeMap "liberty" – a free public vector-tile service (commercial use allowed, no API key, no account, no request limit;
@@ -111,7 +111,7 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
   }
   /** highlight the selected country on the map and mark the active pins */
   function syncSelection() {
-    const m = map.current; const active = cities.find((c) => c.id === selectedRef.current.city)?.country ?? selectedRef.current.country ?? "";
+    const m = map.current; const active = activeCountry(cities, selectedRef.current.country, selectedRef.current.city);
     if (m && ready.current) for (const id of ["sa-country-sel-fill", "sa-country-sel-line"]) m.setFilter(id, ["==", ["get", "code"], active] as never);
     markers.current.forEach((b, id) => { b.dataset.selected = String(id === selectedRef.current.city); b.dataset.active = String(!!active && b.dataset.country === active); b.setAttribute("aria-pressed", String(id === selectedRef.current.city)); });
     clusters.current.forEach((b, code) => { b.dataset.active = String(code === active); });
