@@ -1,4 +1,5 @@
-import { pending, type CityProfile } from "../schema";
+import { pending, type Claim, type CityProfile } from "../schema";
+import { claim, factFromClaims, source } from "../claims";
 import official from "../official/manchester";
 import { moneyFact, pointById, textFact } from "../official/toFact";
 // Ver.1.0 text below was written without a checked source, so it is kept as "unverified".
@@ -7,6 +8,18 @@ import { moneyFact, pointById, textFact } from "../official/toFact";
 const P = (id: string) => pointById(official.points, id);
 const ugEstimate = (what: string, ja: string) => ({ en: `${what} – University of Manchester estimate for a single undergraduate (2026/27, 41-week year)`, ja: `${ja} – マンチェスター大学の単身学部生向け見積もり（2026/27、41週）` });
 const carried = { en: "Initial summary from StudyAtlas Ver.1.0; not yet checked against an official source.", ja: "StudyAtlas Ver.1.0時点の概要です。公式情報との照合はまだ行っていません。" };
+const IHS = source("https://www.gov.uk/healthcare-immigration-application/how-much-pay", "GOV.UK (Home Office)");
+const ukWhere = "Manchester city page → Daily life → Healthcare";
+export const UK_HEALTH_CLAIMS: Claim[] = [
+  claim({ id: "U5a", candidate: "U5", sources: [IHS, source("https://www.gov.uk/visa-to-study-english", "GOV.UK (Home Office)")], where: ukWhere, verdict: "recommend",
+    text: { en: "With a Student visa or Short-term study visa you normally pay the Immigration Health Surcharge (IHS) with the visa application, and can then use the NHS. On the page read on 2026-10-15 the student rate is £776 per year (£1,035 per year for most other applications).", ja: "Student visa や短期学習ビザでは、通常、ビザ申請時に医療付加金（IHS）を支払い、その後NHSを利用できます。2026-10-15に確認したページでは学生料金は年£776（その他の多くの申請は年£1,035）です。" },
+    conditions: { en: "Student visa / Short-term study visa applicants. £776 a year also applies to applicants under 18; £1,035 for other applications; the amount depends on the visa length and the place of application (U5b). Never auto-added to the planner.", ja: "Student visa／短期学習ビザの申請者。18歳未満も年£776、その他は年£1,035。金額はビザの期間と申請場所で変わる（U5b）。Plannerには自動計上しない。" },
+    reason: { en: "Matches gov.uk/healthcare-immigration-application/how-much-pay (updated 2024-11-28) and the short-term study visa page (“usually costs £776”). Rates change: keep the date.", ja: "gov.uk/healthcare-immigration-application/how-much-pay（更新 2024-11-28）および短期学習ビザのページ（「usually costs £776」）と一致。料金は変わるので日付を維持。" } }),
+  claim({ id: "U5b", candidate: "U5", sources: [IHS], where: ukWhere, verdict: "recommend",
+    text: { en: "It depends on the length of the visa and where you apply from: for 6 months or less you do not pay when applying from outside the UK (half the yearly cost when applying from inside the UK); for more than 6 months but less than a year you pay a full year.", ja: "金額はビザの期間と申請場所で変わります：6か月以内は英国外から申請する場合は不要（英国内から申請する場合は年額の半額）、6か月超〜1年未満は1年分です。" },
+    conditions: { en: "Applies to the visa length actually granted; inside-UK applications at half rate (e.g. £388 for students); dependants and exemptions follow separate rules.", ja: "実際に付与されるビザの期間に対して適用。英国内からの申請は半額（学生は£388など）。同伴者・免除は別規定。" },
+    reason: { en: "Matches the “Cost for part of a year” section of the same page. The earlier sentence that a visitor stay “has no IHS, so needs its own insurance” was removed: it was an inference, not a statement on the pages read.", ja: "同ページの「Cost for part of a year」の記載と一致。旧文言の「訪問者の滞在にはIHSがなく保険が必要」は読んだページにない推論のため削除。" } }),
+];
 const profile: CityProfile = {
   cost: {
     rent: pending({ en: "No official city-wide rent statistic yet (ONS source planned). See the Housing tab for University of Manchester hall prices.", ja: "市全体の公式家賃統計はまだありません（ONS を予定）。大学寮の料金は「住居」タブをご覧ください。" }),
@@ -32,8 +45,6 @@ const profile: CityProfile = {
     ] }, tuition: pending() },
   transport: { modes: { status: "unverified", note: carried, value: { en: "Metrolink tram, buses, rail.", ja: "メトロリンク（トラム）、バス、鉄道。" } },
     studentDiscount: textFact([P("man-anybus-28day-student")!, P("man-bus-allterms-student")!], { en: "Students aged 16–26: Bee AnyBus 28-day £63.30 (adult £87.40). Students at a Greater Manchester college/university: All Terms Bee Bus ticket £330 (1 Sep – 30 Jun).", ja: "16〜26歳の学生：Bee AnyBus 28日券 £63.30（大人 £87.40）。グレーター・マンチェスターの大学・カレッジの学生：All Terms Bee Bus 券 £330（9月1日〜6月30日）。" }) },
-  living: { studentLife: { status: "unverified", note: carried, value: { en: "Music, football and a large student population.", ja: "音楽やサッカー、学生が多い街。" } }, healthcare: { status: "unverified", period: "2026-10", checkedAt: "2026-10-15", sources: [{ url: "https://www.gov.uk/healthcare-immigration-application/how-much-pay", publisher: "GOV.UK (Home Office)", terms: "Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0" }],
-    note: { en: "Paraphrased from the government page. On 2026-10-15 the amounts and periods below were compared with the page text by a GitHub Actions page check (runs 38787463398 and 38798253317); this is awaiting a person's approval, so the status stays unverified. Amounts change – check the official page. Not insurance advice.", ja: "政府ページの内容を言い換えたものです。2026-10-15に GitHub Actions のページ確認（run 38787463398・38798253317）で、下記の金額・期間がページの記載と一致することを確認しましたが、人の承認待ちのため未確認のままです。金額は変更されるため公式ページで確認してください。保険の助言ではありません。" },
-    value: { en: "With a Student visa or Short-term study visa you normally pay the Immigration Health Surcharge (IHS) with the visa application, and can then use the NHS. On the page read on 2026-10-15 the student rate is £776 per year (£1,035 per year for most other applications). It depends on the length of the visa and where you apply from: for 6 months or less you do not pay when applying from outside the UK (half the yearly cost when applying from inside the UK); for more than 6 months but less than a year you pay a full year. A visitor stay of 6 months or less has no IHS, so it needs its own travel or health insurance.", ja: "Student visa や短期学習ビザでは、通常、ビザ申請時に医療付加金（IHS）を支払い、その後NHSを利用できます。2026-10-15に確認したページでは学生料金は年£776（その他の多くの申請は年£1,035）です。金額はビザの期間と申請場所で変わります：6か月以内は英国外から申請する場合は不要（英国内から申請する場合は年額の半額）、6か月超〜1年未満は1年分です。6か月以内の訪問者としての滞在にはIHSがなく、旅行保険など自分で保険を用意する必要があります。" } }, sim: pending(), banking: pending(), studentFacilities: pending() },
+  living: { studentLife: { status: "unverified", note: carried, value: { en: "Music, football and a large student population.", ja: "音楽やサッカー、学生が多い街。" } }, healthcare: factFromClaims(UK_HEALTH_CLAIMS, { en: "Paraphrased from the government page. On 2026-10-15 the amounts and periods below were compared with the page text by a GitHub Actions page check (runs 38787463398 and 38798253317); this is awaiting a person's approval, so the status stays unverified. Amounts change – check the official page. Not insurance advice.", ja: "政府ページの内容を言い換えたものです。2026-10-15に GitHub Actions のページ確認（run 38787463398・38798253317）で、下記の金額・期間がページの記載と一致することを確認しましたが、人の承認待ちのため未確認のままです。金額は変更されるため公式ページで確認してください。保険の助言ではありません。" }), sim: pending(), banking: pending(), studentFacilities: pending() },
 };
 export default profile;

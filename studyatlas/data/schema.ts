@@ -22,6 +22,29 @@ export type SourceRef = {
   terms?: string;
 };
 
+/**
+ * One statement inside a Fact (Ver.1.3.6), with its own source, conditions and verification state, so a person can approve statements one at a time.
+ * A Fact that has `claims` is "verified" only when EVERY claim is verified (computed in data/claims.ts, enforced in validate.ts).
+ * A claim becomes "verified" only with an `approval` (who, when, what was compared): an automated page check never promotes it.
+ */
+export type Claim = {
+  id: string;
+  /** the approval candidate this statement belongs to (U1–U6, C1–C4) */
+  candidate: string;
+  text: Localized;
+  status: Status;
+  sources: SourceRef[];
+  period?: string;
+  checkedAt?: string;
+  /** who may it apply to: nationality, stay length, course / visa type, exceptions */
+  conditions: Localized;
+  /** where a visitor sees it, e.g. "Country page → Visa → Official information" */
+  where: string;
+  /** the reviewer's recommendation (a recommendation is not an approval) */
+  review: { verdict: "recommend" | "conditional" | "hold"; reason: Localized };
+  approval?: { by: string; at: string; compared: string };
+};
+
 export type Fact<T> = {
   status: Status;
   value?: T;
@@ -32,6 +55,8 @@ export type Fact<T> = {
   checkedAt?: string;
   /** Japanese/English explanation, caveats, what is included */
   note?: Localized;
+  /** statements that can be approved one by one; `value` is their text joined, and `status` is derived from them */
+  claims?: Claim[];
 };
 
 /** Money in its original currency. Never converted: different currencies are shown side by side, not compared. */

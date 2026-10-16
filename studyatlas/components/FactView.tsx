@@ -54,7 +54,10 @@ export default function FactView({ fact: rawFact, kind, compact, lean }: { fact:
         {i.feesUrl && <div><dt className="inline text-slate-500">{L(ux.school.fees)}: </dt><dd className="inline"><a href={i.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="fees-link" className="text-sky-700 underline">{L(ux.school.feesOpen)}</a></dd></div>}
         {i.id && <div><Link href={compareHref(i.id)} data-testid="compare-link" className="inline-block py-1 text-sky-700 underline">{L(sc.openCompare)}</Link></div>}
         {i.source && <div className="text-[11px] text-slate-400">{L(d.source)}: <a href={i.source.url} target="_blank" rel="noopener noreferrer" className="underline">{i.source.publisher}</a></div>}</dl>}</li>)}</ul> :
-    <span>{L(v as Localized)}</span>;
+    fact.claims?.some((c) => c.status === "verified")
+      // Ver.1.3.6: once some statements are approved and others are not, each statement shows its own status (never one badge for a mixed Fact)
+      ? <ul className="space-y-1.5" data-testid="claims">{fact.claims.map((c) => <li key={c.id} data-testid="claim" data-claim={c.id} data-status={c.status}>{L(c.text)} <StatusBadge status={c.status} /></li>)}</ul>
+      : <span>{L(v as Localized)}</span>;
   const includes = kind === "money" ? (v as Money).includes : undefined;
   const meta = (fact.period || fact.checkedAt || fact.sources?.length) ? (
         <p className="text-[11px] text-slate-400">
