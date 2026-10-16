@@ -1,5 +1,5 @@
 # StudyAtlas Ver.1.4 (dev/test only)
-Next.js (App Router) + TypeScript + Tailwind + MapLibre GL JS.
+Next.js (App Router) + TypeScript + Tailwind (home-page map: bundled Natural Earth SVG, no map tiles).
 - Run locally: `npm install && npm run dev` -> http://localhost:3000 (`npm run build` to verify)
 - Deploy (GitHub Private + Vercel, protected): see [DEPLOY.md](./DEPLOY.md)
 - Env vars: see `.env.example` (all optional). Cost numbers are DEMO SAMPLES, not verified data.

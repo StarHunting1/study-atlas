@@ -10,7 +10,7 @@ const ja: Dict = {
   transport: "交通", climate: "気候", student: "学生生活", areas: "人気エリア", schools: "主な大学",
   official: "公式情報", updated: "最終更新日", sample: "デモ用サンプル（未検証）", pending: "データ準備中",
   mapFail: "地図を読み込めませんでした。検索バーや国ボタンから都市を探せます。",
-  details: "詳細を見る", mapNote: "地図: MapLibreデモタイル", dataNote: "各情報に確認状況を表示しています。未確認の情報にはその旨を明記しています。",
+  details: "詳細を見る", mapNote: "地図: Natural Earth（パブリックドメイン）", dataNote: "各情報に確認状況を表示しています。未確認の情報にはその旨を明記しています。",
   notFoundTitle: "ページが見つかりません", notFoundBody: "お探しのページまたは都市は存在しません。",
   mapFailed: "地図を読み込めませんでした。下の一覧または検索から国・都市を選べます。",
   photoCredits: "写真クレジット", photoNote: "写真はWikimedia Commonsより取得し、本サイト用にサイズを調整しています。各写真は記載のライセンスで提供されています。", photo: "写真",

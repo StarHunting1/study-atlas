@@ -68,3 +68,9 @@ Read once each via the GitHub Actions probe (run 38798253317; no retries; fee pa
 | EF Vancouver | /ca/ilsd/schools/vancouver/ (price quotation request) | “© Signum International AG 2026. All rights reserved.” |
 
 Decision: no school fee figure is stored (terms unclear or reserving rights; fees vary with lessons per week, length, season and inclusions). Figures that appear in search-engine summaries of these pages were deliberately not used. Government conditions re-read: see `data/APPROVAL_CANDIDATES.md` §0 (9 recommended, 1 corrected, 0 unverifiable).
+
+## Ver.1.3.5 – climate 1991–2020 and map (2026-10-16)
+
+- ECCC: the 1991–2020 Canadian Climate Normals are only on the website (bulk CSV in a zip, one GET per province: `/climate_normals/download/1991_e.html?area=province&province[]=BC&product[]=data&product[]=station_inventory`); the GeoMet API collection `climate-normals` holds 1981–2010 only (checked: items for 1108447 are period 1981–2010, items for 1108395 are empty). The BC file (218,915 bytes, Actions run 38904919856) has the composite station VANCOUVER INTERNATIONAL (AIRPORT) = climate IDs 1108447 + 1108395; values are in `data/official/vancouver.ts` as the unverified candidate `climateAlt`.
+- Manchester: not imported (see `data/APPROVAL_CANDIDATES.md` §−2).
+- Map: `data/MAP_OPTIONS.md`.
