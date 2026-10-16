@@ -1,4 +1,32 @@
-# 地図の本番対応（Ver.1.3.5）
+# 地図の本番対応（Ver.1.3.7 で更新）
+
+## 現状（Ver.1.3.7）
+トップページの地図を、**MapLibre GL JS ＋ OpenFreeMap（無料の公開ベクタータイル）** のインタラクティブ地図に戻しました（ドラッグ移動・スクロール/ピンチでズーム・都市ピン・ピン選択で都市カード・一覧やカード選択で該当都市へ移動）。タイルに接続できない場合（またはWebGLが使えない場合）は、Ver.1.3.5 の同梱SVG地図に自動で切り替わり、都市探索は止まりません。MapLibre のデモタイルは使っていません。有料契約・APIキー・アカウント登録は不要です。
+
+### OpenFreeMap の確認結果（公式ページ・Actions run 38911674070、2026-10-16 に各ページ1回取得）
+| 項目 | 公式の記載・確認結果 |
+|---|---|
+| 商用利用 | 公式トップの FAQ「Is commercial usage allowed? **Yes.**」 |
+| 料金・上限 | 「Using our public instance is completely free: there are **no limits on the number of map views or requests**.」 |
+| APIキー・登録 | 「There's no registration, no user database, no API keys, and no cookies.」 |
+| 帰属表示 | 「**Attribution is required.** If you are using MapLibre, they are automatically added」。表示文言: 「OpenFreeMap © OpenMapTiles Data from OpenStreetMap」（OpenFreeMap の部分は任意）。本サイトでは地図内の帰属表示（MapLibre が自動表示）に加え、ページ下部にも表示 |
+| 利用規約 | https://openfreemap.org/tos/（2026-10-14 更新）: 「completely free service provided “as-is,” with no warranties」。可用性の保証なし（SLAなし）。**これが唯一のリスク**で、接続できない場合は同梱SVG地図に切り替わる |
+| 運営・費用 | 寄付・サポートプランで運営（Hyperknot Software）。自前ホスト用の週次プラネットダウンロードもある（将来の選択肢） |
+| 動作確認 | スタイル `https://tiles.openfreemap.org/styles/positron`・TileJSON・世界タイル1枚がすべて 200、`access-control-allow-origin: *`（ブラウザから利用可）。タイルは `max-age=315360000` で長期キャッシュ |
+| オフライン保存 | 1回3,000タイルまたは50MBまで可（本サイトでは使用しない） |
+
+### VersaTiles との比較（採用せず）
+公式トップ: 「no API keys, charges no usage fees, and does not track your users」「free of any commercial interests」。スタイル（`/assets/styles/colorful/style.json`）とタイル（`/tiles/osm/2/1/1`）は 200・CORS 可で、**同じく利用可能な代替**。ただし利用条件の専用ページ（docs の use_tiles ページは 404）と帰属表示の文言を公式ページで確認できなかったため、第一候補にはしていない。OpenFreeMap が止まった場合の切替先候補（`NEXT_PUBLIC_MAP_STYLE_URL` で差し替え可能）。
+
+### 設定・運用
+- 既定スタイル: OpenFreeMap `positron`（落ち着いた配色で、都市ピンが見やすい）。`NEXT_PUBLIC_MAP_STYLE_URL` で別スタイルに変更できる（ブラウザに公開されるため秘密キーは入れない）。
+- 接続失敗の判定: スタイル取得エラー、または9秒以内に読み込みが終わらない場合。失敗時は画面上部に「簡易地図を表示しています」と表示。
+- スマホ（タッチ端末）では2本指で地図を動かす設定（ページのスクロールを妨げないため）。キーボードは地図の矢印キー・＋/−、ピンはタブで移動して Enter。
+- 同じ国の近いピン（画面上で44px未満）は国のバッジ（件数つき）にまとめ、押すとその国の都市が見えるまでズームする。
+
+---
+
+# 以前の記録（Ver.1.3.5）
 
 ## 結論
 トップページの地図を **サイト同梱の静的SVG（Natural Earth 1:110m の国境、パブリックドメイン）** に切り替え、MapLibre のデモタイルは使わなくなりました。外部への地図リクエスト・APIキー・アカウント・料金・アクセス制限・利用規模の上限は一切ありません（Playwright で表示を確認し、外部リクエスト 0 件）。`maplibre-gl` 依存も削除しました。

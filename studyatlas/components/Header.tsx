@@ -14,10 +14,10 @@ export default function Header() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-x-6 gap-y-2 px-4 py-2 sm:py-3">
         <Link href="/" className="text-xl font-bold tracking-tight text-[#0b2a5b]">StudyAtlas</Link>
         <nav className="order-3 -mx-4 flex w-[calc(100%+2rem)] gap-5 overflow-x-auto whitespace-nowrap px-4 text-sm sm:order-none sm:mx-0 sm:w-auto sm:px-0">
-          {nav.map(([h, l]) => <Link key={h} href={h} className={active(h) ? "font-semibold text-[#0b2a5b]" : "text-slate-500 hover:text-slate-900"}>{l}{h === "/compare" && ids.length > 0 && <span className="ml-1 rounded-full bg-sky-100 px-1.5 text-xs text-sky-700">{ids.length}</span>}</Link>)}
+          {nav.map(([h, l]) => <Link key={h} href={h} className={`inline-flex min-h-[44px] items-center ${active(h) ? "font-semibold text-[#0b2a5b]" : "text-slate-500 hover:text-slate-900"}`}>{l}{h === "/compare" && ids.length > 0 && <span className="ml-1 rounded-full bg-sky-100 px-1.5 text-xs text-sky-700">{ids.length}</span>}</Link>)}
         </nav>
         <div className="ml-auto flex rounded-full bg-slate-100 p-1 text-xs">
-          {LOCALES.map((l) => <button key={l.code} onClick={() => setLang(l.code)} className={`rounded-full px-3 py-1 ${lang === l.code ? "bg-white font-semibold shadow" : "text-slate-500"}`}>{l.label}</button>)}
+          {LOCALES.map((l) => <button key={l.code} onClick={() => setLang(l.code)} className={`min-h-[36px] rounded-full px-3 py-1.5 ${lang === l.code ? "bg-white font-semibold shadow" : "text-slate-500"}`}>{l.label}</button>)}
         </div>
       </div>
     </header>

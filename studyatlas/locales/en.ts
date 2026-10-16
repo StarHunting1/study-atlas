@@ -9,7 +9,7 @@ const en = {
   transport: "Transport", climate: "Climate", student: "Student life", areas: "Popular areas", schools: "Universities",
   official: "Official information", updated: "Last updated", sample: "Demo sample – not verified", pending: "Data coming soon",
   mapFail: "Map failed to load. Use the search bar or country buttons to browse cities.",
-  details: "View details", mapNote: "Map: Natural Earth (public domain)", dataNote: "Every figure shows whether it is verified; unverified information is labelled.",
+  details: "View details", mapNote: "Map: OpenFreeMap", dataNote: "Every figure shows whether it is verified; unverified information is labelled.",
   notFoundTitle: "Page not found", notFoundBody: "The page or city you requested does not exist.",
   mapFailed: "The map could not be loaded. Choose a country or city from the list or search instead.",
   photoCredits: "Photo credits", photoNote: "Photos from Wikimedia Commons, resized for this site. Each photo is available under the license shown.", photo: "Photo",
