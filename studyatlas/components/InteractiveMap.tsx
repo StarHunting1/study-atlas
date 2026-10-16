@@ -6,6 +6,7 @@ import { cities, countries } from "@/data/cities";
 import { boundsOf, COUNTRY_SHAPES } from "@/data/countryShapes";
 import { useI18n } from "@/lib/i18n";
 import { countryName, cityName } from "@/lib/names";
+import { classifyWheel, newWheelState, panDelta } from "@/lib/wheel";
 import { activeCountry, countryFitBounds, fitPadding, isLabelLayer, labelExpression, paintOverrides, PALETTE, type StyleLayer } from "@/lib/mapStyle";
 
 /**
@@ -51,6 +52,24 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
     map.current = m; const host = el.current!; host.dataset.mapState = "loading";
     if (process.env.NEXT_PUBLIC_MAP_DEBUG) (window as unknown as { __saMap?: maplibregl.Map }).__saMap = m;   // browser checks in CI only (build-time flag)
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
+    // Trackpad (Ver.1.3.7c): a two-finger swipe pans the map; pinch (ctrl+wheel, or Safari's gesture events) and a real mouse wheel keep zooming; touch screens are left alone.
+    // Our listener runs first (capture phase on the map's host); for a swipe it stops the event before MapLibre's own wheel zoom sees it.
+    const cleanups: (() => void)[] = [];
+    if (!touch) {
+      const ws = newWheelState();
+      const onWheel = (e: WheelEvent) => {
+        const kind = classifyWheel({ deltaX: e.deltaX, deltaY: e.deltaY, deltaMode: e.deltaMode, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, wheelDeltaY: (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY }, ws, performance.now());
+        host.dataset.wheel = kind; if (kind !== "trackpad") return;
+        e.preventDefault(); e.stopPropagation(); const [dx, dy] = panDelta(e); m.panBy([dx, dy], { animate: false });
+      };
+      host.addEventListener("wheel", onWheel, { capture: true, passive: false }); cleanups.push(() => host.removeEventListener("wheel", onWheel, { capture: true } as EventListenerOptions));
+      // Safari sends a trackpad pinch as gesture events instead of ctrl+wheel
+      if ("GestureEvent" in window) {
+        let startZoom = 0; type G = Event & { scale: number; clientX: number; clientY: number };
+        const gs = (e: Event) => { e.preventDefault(); startZoom = m.getZoom(); }, gc = (e: Event) => { e.preventDefault(); const g = e as G; const r = host.getBoundingClientRect(); m.easeTo({ zoom: startZoom + Math.log2(g.scale || 1), around: m.unproject([g.clientX - r.left, g.clientY - r.top]), duration: 0 }); };
+        host.addEventListener("gesturestart", gs); host.addEventListener("gesturechange", gc); cleanups.push(() => { host.removeEventListener("gesturestart", gs); host.removeEventListener("gesturechange", gc); });
+      }
+    }
     let loaded = false;
     const fail = () => { if (!loaded) { host.dataset.mapState = "failed"; cb.current.onStatus?.("failed"); } };
     const timer = setTimeout(fail, LOAD_TIMEOUT_MS);
@@ -102,7 +121,7 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
       ready.current = true; host.dataset.mapState = "loaded"; m.once("idle", () => { host.dataset.mapState = "idle"; });
       applyLabels(m); syncSelection(); regroup(); report(); cb.current.onStatus?.("ok");
     });
-    return () => { clearTimeout(timer); ready.current = false; markers.current.clear(); clusters.current.clear(); m.remove(); map.current = null; };
+    return () => { cleanups.forEach((f) => f()); clearTimeout(timer); ready.current = false; markers.current.clear(); clusters.current.clear(); m.remove(); map.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
