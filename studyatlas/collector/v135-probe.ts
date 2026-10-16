@@ -20,14 +20,10 @@ async function html(url: string, res: RegExp[], linkRe: RegExp) {
   return r;
 }
 (async () => {
-  console.log("## A. ECCC bulk-download form (1991–2020) and licence attribution");
-  const r = await get("https://climate.weather.gc.ca/climate_normals/index_e.html");
-  const b = r.body; const i = b.search(/Bulk Data Download of the 1991/i);
-  console.log(`- index ${r.status}; bulk section at ${i}`);
-  const seg = i >= 0 ? b.slice(i, i + 6000) : "";
-  console.log("  forms/inputs/selects:", [...seg.matchAll(/<(form|input|select|option|button|a)\b[^>]*>/gi)].map((m) => short(m[0], 220)).slice(0, 60).join("\n  "));
-  console.log("  scripts near:", [...b.matchAll(/<script\b[^>]*src="([^"]*(bulk|normals|download)[^"]*)"/gi)].map((m) => m[1]).join(" ") || "none");
-  console.log("  zip/csv urls anywhere:", [...new Set([...b.matchAll(/["'(]([^"'()\s]*(\.zip|bulk_data|bulk_e)[^"'()\s]*)/gi)].map((m) => m[1]))].slice(0, 20).join(" ") || "none");
-  const l = await get("https://eccc-msc.github.io/open-data/licence/readme_en/"); const lt = htmlToText(l.body).replace(/\s+/g, " ");
-  console.log(`- licence ${l.status}: ${ctx(lt, /Contains information/i, 40, 3).join(" | ")}`); console.log(`  exemptions: ${ctx(lt, /4\. Exemptions/i, 10, 2).join(" | ")} ${short(lt.slice(lt.lastIndexOf("4. Exemptions"), lt.lastIndexOf("4. Exemptions") + 700), 700)}`);
+  console.log("## A2. ECCC bulk-download script and the rest of the form");
+  const r = await get("https://climate.weather.gc.ca/climate_normals/index_e.html"); const b = r.body; const i = b.search(/Bulk Data Download of the 1991/i);
+  const seg = i >= 0 ? b.slice(i, i + 14000) : ""; const j = seg.indexOf('value="QC"');
+  console.log("  after QC:", short(seg.slice(j, j + 3500), 3500));
+  const js = await get("https://climate.weather.gc.ca/assets/min/js/climate_normals/bulk_download.min.js", "*/*");
+  console.log(`- bulk_download.min.js ${js.status} (${js.body.length} chars)`); console.log(short(js.body, 6000));
 })();
