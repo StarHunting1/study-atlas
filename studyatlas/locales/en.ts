@@ -1,6 +1,6 @@
 const en = {
   heroTitle: "Explore the world. Find your place.", heroSub: "Study-abroad info, all in one place.",
-  search: "Search country, city, keyword", noResults: "No results found", searchHint: "Try “Manchester”, “UK”, “university”",
+  search: "Search country, city, keyword", noResults: "No results found", searchHint: "Try “Manchester”, “United Kingdom”, “university”",
   explore: "Explore", compare: "Compare", about: "About", popular: "Popular destinations",
   pickCountry: "Click a highlighted country on the map, or choose below.", noData: "No data for this country yet.",
   cities: "Cities", back: "Back", home: "Home", addCompare: "Add to compare", remove: "Remove from compare", goCompare: "Go to compare",

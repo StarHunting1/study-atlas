@@ -3,16 +3,20 @@ import { useEffect, useRef } from "react";
 import maplibregl from "maplibre-gl";
 import "maplibre-gl/dist/maplibre-gl.css";
 import { cities, countries } from "@/data/cities";
+import { boundsOf, COUNTRY_SHAPES } from "@/data/countryShapes";
 import { useI18n } from "@/lib/i18n";
+import { countryName, cityName } from "@/lib/names";
+import { countryFitBounds, fitPadding, isLabelLayer, labelExpression, paintOverrides, PALETTE, type StyleLayer } from "@/lib/mapStyle";
 
 /**
- * Background map style (Ver.1.3.7): OpenFreeMap "positron" – a free public vector-tile service (no API key, no account, no request limit stated;
- * data © OpenStreetMap contributors, tiles © OpenMapTiles). See data/MAP_OPTIONS.md for the terms that were checked.
- * NEXT_PUBLIC_MAP_STYLE_URL can point to another style (it is public in the browser: never put a secret key in it).
+ * Background map style (Ver.1.3.7): OpenFreeMap "liberty" – a free public vector-tile service (commercial use allowed, no API key, no account, no request limit;
+ * data © OpenStreetMap contributors, tiles © OpenMapTiles; the attribution control of the style is kept). See data/MAP_OPTIONS.md for the terms that were checked.
+ * The look is recoloured in lib/mapStyle.ts. NEXT_PUBLIC_MAP_STYLE_URL can point to another style (public in the browser: never put a secret key in it).
  */
-export const MAP_STYLE_URL = process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://tiles.openfreemap.org/styles/positron";
+export const MAP_STYLE_URL = process.env.NEXT_PUBLIC_MAP_STYLE_URL || "https://tiles.openfreemap.org/styles/liberty";
 export const LOAD_TIMEOUT_MS = 9000;
 export const CITY_ZOOM = 8.5;
+export const WORLD_BOUNDS: [[number, number], [number, number]] = [[-170, -50], [175, 72]];
 
 export type MapProps = {
   country: string | null; selectedCity: string | null;
@@ -23,64 +27,113 @@ export type MapProps = {
 
 const reduced = () => typeof window !== "undefined" && window.matchMedia?.("(prefers-reduced-motion: reduce)").matches;
 const JA_GESTURES = { "CooperativeGesturesHandler.WindowsHelpText": "Ctrl キーを押しながらスクロールで地図を拡大縮小", "CooperativeGesturesHandler.MacHelpText": "⌘ キーを押しながらスクロールで地図を拡大縮小", "CooperativeGesturesHandler.MobileHelpText": "2本指で地図を動かせます" };
+const SUPPORTED = countries.map((c) => c.code).filter((code) => COUNTRY_SHAPES.some((f) => f.id === code));
 
 export default function InteractiveMap({ country, selectedCity, onCity, onCountry, onStatus }: MapProps) {
   const { L, lang } = useI18n();
-  const el = useRef<HTMLDivElement>(null); const map = useRef<maplibregl.Map | null>(null);
+  const el = useRef<HTMLDivElement>(null); const map = useRef<maplibregl.Map | null>(null); const ready = useRef(false);
   const markers = useRef<Map<string, HTMLButtonElement>>(new Map()); const clusters = useRef<Map<string, HTMLButtonElement>>(new Map());
-  const cbc = useRef<(code: string) => void>(() => {});
-  const cb = useRef({ onCity, onStatus }); cb.current = { onCity, onStatus }; cbc.current = onCountry;
+  const cb = useRef({ onCity, onStatus, onCountry }); cb.current = { onCity, onStatus, onCountry };
+  const langRef = useRef(lang); langRef.current = lang;
+
+  /** fit the view to a whole country and its registered cities, with padding that suits the screen */
+  const fitCountry = (m: maplibregl.Map, code: string, duration: number) => {
+    const list = cities.filter((c) => c.country === code); const b = countryFitBounds(boundsOf(code), list.map((c) => c.coords)); if (!b) return;
+    m.fitBounds([[b[0], b[1]], [b[2], b[3]]], { padding: fitPadding(el.current?.clientWidth ?? 600, el.current?.clientHeight ?? 400), maxZoom: 6.5, duration });
+  };
 
   useEffect(() => {
     const touch = window.matchMedia?.("(pointer: coarse)").matches ?? false;
     let m: maplibregl.Map;
     try {
-      m = new maplibregl.Map({ container: el.current!, style: MAP_STYLE_URL, center: [10, 30], zoom: 1.2, minZoom: 0.8, maxZoom: 14, attributionControl: { compact: true }, cooperativeGestures: touch, ...(lang === "ja" ? { locale: JA_GESTURES } : {}) });
+      m = new maplibregl.Map({ container: el.current!, style: MAP_STYLE_URL, bounds: WORLD_BOUNDS, fitBoundsOptions: { padding: 8 }, minZoom: 0.8, maxZoom: 14, attributionControl: { compact: true }, cooperativeGestures: touch, ...(langRef.current === "ja" ? { locale: JA_GESTURES } : {}) });
     } catch { cb.current.onStatus?.("failed"); return; }   // e.g. WebGL is not available
-    map.current = m;
+    map.current = m; const host = el.current!; host.dataset.mapState = "loading";
+    if (process.env.NEXT_PUBLIC_MAP_DEBUG) (window as unknown as { __saMap?: maplibregl.Map }).__saMap = m;   // browser checks in CI only (build-time flag)
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
     let loaded = false;
-    const fail = () => { if (!loaded) cb.current.onStatus?.("failed"); };
+    const fail = () => { if (!loaded) { host.dataset.mapState = "failed"; cb.current.onStatus?.("failed"); } };
     const timer = setTimeout(fail, LOAD_TIMEOUT_MS);
     m.on("error", fail);                       // a failing style request before the first load
-    m.on("load", () => { loaded = true; clearTimeout(timer); cb.current.onStatus?.("ok"); });
-    const label = () => el.current?.classList.toggle("sa-zoomed", m.getZoom() >= 3.2);
+    const report = () => { host.dataset.zoom = m.getZoom().toFixed(2); const c = m.getCenter(); host.dataset.center = `${c.lng.toFixed(2)},${c.lat.toFixed(2)}`; };
+    m.on("moveend", report);
+    const label = () => host.classList.toggle("sa-zoomed", m.getZoom() >= 3.2);
     m.on("zoom", label); label();
+
+    // ---- pins (HTML buttons: keyboard and screen-reader friendly, 44px tap area)
     cities.forEach((c) => {
-      const b = document.createElement("button"); b.type = "button"; b.className = "sa-pin"; b.dataset.city = c.id; b.setAttribute("aria-label", `${c.name.en} / ${c.name.ja}`);
-      b.innerHTML = `<span class="sa-pin-dot"></span><span class="sa-pin-label">${c.name.en}</span>`;
+      const b = document.createElement("button"); b.type = "button"; b.className = "sa-pin"; b.dataset.city = c.id; b.dataset.country = c.country;
+      b.innerHTML = `<span class="sa-pin-dot"></span><span class="sa-pin-label"></span>`;
       b.onclick = (ev) => { ev.stopPropagation(); cb.current.onCity(c.id); };
-      markers.current.set(c.id, b); new maplibregl.Marker({ element: b, anchor: "bottom" }).setLngLat(c.coords).addTo(m);
-      b.setAttribute("aria-label", `${c.name.en} / ${c.name.ja}`);   // MapLibre sets its own generic label on markers: set ours afterwards
+      markers.current.set(c.id, b); new maplibregl.Marker({ element: b, anchor: "bottom" }).setLngLat(c.coords).addTo(m);   // MapLibre sets a generic aria-label: ours is set in the language effect
     });
-    // Pins of one country that would sit on top of each other (closer than 44px on screen) are shown as one country badge; pressing it zooms to the country's cities.
+    // Pins of one country that would sit on top of each other (closer than 44px on screen) are shown as one country badge; pressing it selects the country.
     const groups = countries.map((co) => ({ co, list: cities.filter((c) => c.country === co.code) })).filter((g) => g.list.length > 1);
     groups.forEach(({ co, list }) => {
-      const b = document.createElement("button"); b.type = "button"; b.className = "sa-pin sa-cluster"; b.hidden = true; b.setAttribute("aria-label", `${co.name.en} / ${co.name.ja}: ${list.length}`);
-      b.innerHTML = `<span class="sa-pin-dot sa-cluster-dot">${list.length}</span>`; b.onclick = (ev) => { ev.stopPropagation(); cbc.current(co.code); };
+      const b = document.createElement("button"); b.type = "button"; b.className = "sa-pin sa-cluster"; b.hidden = true; b.dataset.country = co.code;
+      b.innerHTML = `<span class="sa-pin-dot sa-cluster-dot">${list.length}</span>`; b.onclick = (ev) => { ev.stopPropagation(); cb.current.onCountry(co.code); };
       clusters.current.set(co.code, b); const lng = list.reduce((n, c) => n + c.coords[0], 0) / list.length, lat = list.reduce((n, c) => n + c.coords[1], 0) / list.length;
-      new maplibregl.Marker({ element: b, anchor: "bottom" }).setLngLat([lng, lat]).addTo(m); b.setAttribute("aria-label", `${co.name.en} / ${co.name.ja}: ${list.length}`);
+      new maplibregl.Marker({ element: b, anchor: "bottom" }).setLngLat([lng, lat]).addTo(m);
     });
     const regroup = () => groups.forEach(({ co, list }) => {
       const pts = list.map((c) => m.project(c.coords)); let min = Infinity;
       for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) min = Math.min(min, Math.hypot(pts[i].x - pts[j].x, pts[i].y - pts[j].y));
       const together = min < 44; clusters.current.get(co.code)!.hidden = !together; list.forEach((c) => { markers.current.get(c.id)!.hidden = together; });
     });
-    m.on("zoom", regroup); m.on("load", regroup); regroup();
-    return () => { clearTimeout(timer); markers.current.clear(); clusters.current.clear(); m.remove(); map.current = null; };
+    m.on("zoom", regroup); regroup();
+
+    m.on("load", () => {
+      loaded = true; clearTimeout(timer);
+      // 1. recolour what the style draws (water, land cover, borders) – by what a layer draws, not by its id
+      const layers = (m.getStyle().layers ?? []) as StyleLayer[];
+      for (const l of layers) { const o = paintOverrides(l); if (o) for (const [k, v] of Object.entries(o)) { try { m.setPaintProperty(l.id, k, v as never); } catch { /* a property this layer does not have */ } } }
+      // 2. soft outline + fill for the countries StudyAtlas covers; the selected one is stronger. Fades out when zoomed in (the tiles' own borders take over).
+      const firstSymbol = layers.find((l) => l.type === "symbol")?.id;
+      m.addSource("sa-countries", { type: "geojson", data: { type: "FeatureCollection", features: COUNTRY_SHAPES.filter((f) => SUPPORTED.includes(f.id)) as never } });
+      const sup = ["in", ["get", "code"], ["literal", SUPPORTED]];
+      m.addLayer({ id: "sa-country-fill", type: "fill", source: "sa-countries", filter: sup as never, paint: { "fill-color": PALETTE.country, "fill-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.3, 5, 0.2, 8, 0] } }, firstSymbol);
+      m.addLayer({ id: "sa-country-line", type: "line", source: "sa-countries", filter: sup as never, paint: { "line-color": PALETTE.country, "line-width": 1.4, "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.9, 7, 0.5, 9, 0] } }, firstSymbol);
+      m.addLayer({ id: "sa-country-sel-fill", type: "fill", source: "sa-countries", filter: ["==", ["get", "code"], ""], paint: { "fill-color": PALETTE.countrySel, "fill-opacity": ["interpolate", ["linear"], ["zoom"], 0, 0.5, 6, 0.32, 9, 0] } }, firstSymbol);
+      m.addLayer({ id: "sa-country-sel-line", type: "line", source: "sa-countries", filter: ["==", ["get", "code"], ""], paint: { "line-color": PALETTE.navy, "line-width": 2.6, "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 1, 8, 0.7, 10, 0] } }, firstSymbol);
+      m.on("click", "sa-country-fill", (e) => { const code = e.features?.[0]?.properties?.code as string | undefined; if (code) cb.current.onCountry(code); });
+      m.on("mouseenter", "sa-country-fill", () => (m.getCanvas().style.cursor = "pointer")); m.on("mouseleave", "sa-country-fill", () => (m.getCanvas().style.cursor = ""));
+      ready.current = true; host.dataset.mapState = "loaded"; m.once("idle", () => { host.dataset.mapState = "idle"; });
+      applyLabels(m); syncSelection(); regroup(); report(); cb.current.onStatus?.("ok");
+    });
+    return () => { clearTimeout(timer); ready.current = false; markers.current.clear(); clusters.current.clear(); m.remove(); map.current = null; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // keep the pin styles and the camera in step with the page (country pills, city cards, pins)
+  /** the page language for place labels drawn by the map tiles (only layers that carry names; falls back to the local name) */
+  function applyLabels(m: maplibregl.Map) {
+    const expr = labelExpression(langRef.current);
+    for (const l of (m.getStyle().layers ?? []) as StyleLayer[]) if (isLabelLayer(l)) { try { m.setLayoutProperty(l.id, "text-field", expr as never); } catch { /* keep the provider's label */ } }
+  }
+  /** highlight the selected country on the map and mark the active pins */
+  function syncSelection() {
+    const m = map.current; const active = cities.find((c) => c.id === selectedRef.current.city)?.country ?? selectedRef.current.country ?? "";
+    if (m && ready.current) for (const id of ["sa-country-sel-fill", "sa-country-sel-line"]) m.setFilter(id, ["==", ["get", "code"], active] as never);
+    markers.current.forEach((b, id) => { b.dataset.selected = String(id === selectedRef.current.city); b.dataset.active = String(!!active && b.dataset.country === active); b.setAttribute("aria-pressed", String(id === selectedRef.current.city)); });
+    clusters.current.forEach((b, code) => { b.dataset.active = String(code === active); });
+  }
+  const selectedRef = useRef({ country, city: selectedCity }); selectedRef.current = { country, city: selectedCity };
+
+  // keep the camera and the highlights in step with the page (country buttons, city list/cards, pins)
   useEffect(() => {
-    markers.current.forEach((b, id) => { b.dataset.selected = String(id === selectedCity); b.setAttribute("aria-pressed", String(id === selectedCity)); });
-    const m = map.current; if (!m) return; const duration = reduced() ? 0 : 900;
+    syncSelection(); const m = map.current; if (!m) return; const duration = reduced() ? 0 : 900;
     const city = cities.find((c) => c.id === selectedCity);
-    if (city) { m.flyTo({ center: city.coords, zoom: CITY_ZOOM, duration, essential: false }); return; }
-    const co = countries.find((x) => x.code === country); const list = cities.filter((c) => c.country === country);
-    if (co && list.length > 1) { const b = new maplibregl.LngLatBounds(list[0].coords, list[0].coords); list.forEach((c) => b.extend(c.coords)); m.fitBounds(b, { padding: 90, maxZoom: 7, duration }); }
-    else if (co) m.flyTo({ center: co.center, zoom: co.zoom, duration }); else m.flyTo({ center: [10, 30], zoom: 1.2, duration });
+    if (city) { const small = (el.current?.clientHeight ?? 600) < 520; m.flyTo({ center: city.coords, zoom: CITY_ZOOM, duration, padding: { top: 0, left: 0, right: 0, bottom: small ? 170 : 0 }, essential: false }); return; }
+    if (country) fitCountry(m, country, duration); else m.fitBounds(WORLD_BOUNDS, { padding: 8, duration });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [country, selectedCity]);
+
+  // language: pin names (and accessible names), the tiles' place labels and the map's own hint text
+  useEffect(() => {
+    markers.current.forEach((b, id) => { const c = cities.find((x) => x.id === id)!; const lbl = b.querySelector(".sa-pin-label"); if (lbl) lbl.textContent = cityName(c, L); b.setAttribute("aria-label", `${cityName(c, L)} (${countryName(c.country, L)})`); });
+    clusters.current.forEach((b, code) => { b.setAttribute("aria-label", `${countryName(code, L)}: ${cities.filter((c) => c.country === code).length}`); });
+    const m = map.current; if (m && ready.current) applyLabels(m);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lang]);
 
   return <div ref={el} className="sa-map h-full w-full" data-testid="interactive-map" role="region" aria-label={L({ en: "Map of study destinations: drag to move, scroll or pinch to zoom, press a pin to see the city", ja: "留学先の地図：ドラッグで移動、スクロールまたはピンチで拡大縮小、ピンを押すと都市の概要が表示されます" })} />;
 }

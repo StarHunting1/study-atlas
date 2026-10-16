@@ -1,8 +1,11 @@
 "use client";
 import { useEffect, useMemo } from "react";
 import { cities, countries } from "@/data/cities";
+import { boundsOf } from "@/data/countryShapes";
 import { COUNTRY_PATHS, LAND_PATH, MAP_VIEW, project } from "@/data/worldMap";
 import { useI18n } from "@/lib/i18n";
+import { countryFitBounds, PALETTE } from "@/lib/mapStyle";
+import { cityName } from "@/lib/names";
 
 type Props = {
   country: string | null;
@@ -23,20 +26,22 @@ export default function StaticWorldMap({ country, selectedCity, onCountry, onCit
   const { L } = useI18n();
   useEffect(() => { onStatus?.("ok"); }, [onStatus]);
   const supported = useMemo(() => countries.filter((c) => COUNTRY_PATHS[c.code]), []);
-  const sel = countries.find((x) => x.code === country);
-  const factor = sel ? Math.max(1, Math.pow(2, sel.zoom - 1.2)) : 1;
-  const w = MAP_VIEW.w / factor, h = MAP_VIEW.h / factor;
-  let x = MAP_VIEW.x, y = MAP_VIEW.y;
-  if (sel) { const [cx, cy] = project(sel.center[0], sel.center[1]); x = Math.min(Math.max(cx - w / 2, 0), MAP_VIEW.w - w); y = Math.min(Math.max(cy - h / 2, MAP_VIEW.y), MAP_VIEW.y + MAP_VIEW.h - h); }
+  // the view follows the page like the tile map does: a whole country (outline + its cities) fits the view, a selected city is shown close up
+  const ratio = MAP_VIEW.w / MAP_VIEW.h; const city = cities.find((c) => c.id === selectedCity);
+  const box = country ? countryFitBounds(boundsOf(country), cities.filter((c) => c.country === country).map((c) => c.coords)) : undefined;
+  let x = MAP_VIEW.x, y = MAP_VIEW.y, w = MAP_VIEW.w, h = MAP_VIEW.h;
+  if (city) { const [cx, cy] = project(city.coords[0], city.coords[1]); w = MAP_VIEW.w / 14; h = w / ratio; x = cx - w / 2; y = cy - h / 2; }
+  else if (box) { const [x1, y1] = project(box[0], box[3]), [x2, y2] = project(box[2], box[1]); const bw = Math.max(x2 - x1, 1), bh = Math.max(y2 - y1, 1); w = Math.min(MAP_VIEW.w, Math.max(bw * 1.3, bh * 1.3 * ratio, MAP_VIEW.w / 40)); h = w / ratio; x = (x1 + x2) / 2 - w / 2; y = (y1 + y2) / 2 - h / 2; }
+  x = Math.min(Math.max(x, 0), MAP_VIEW.w - w); y = Math.min(Math.max(y, MAP_VIEW.y), MAP_VIEW.y + MAP_VIEW.h - h);
   const k = w / MAP_VIEW.w; // keeps markers and outlines the same size on screen when zoomed
   return (
-    <svg viewBox={`${x} ${y} ${w} ${h}`} preserveAspectRatio="xMidYMid meet" className="h-full w-full bg-sky-50" role="group" aria-label="World map" data-testid="world-map">
-      <path d={LAND_PATH} fill="#e2e8f0" stroke="#cbd5e1" strokeWidth={0.6 * k} />
+    <svg viewBox={`${x} ${y} ${w} ${h}`} preserveAspectRatio="xMidYMid meet" className="h-full w-full" style={{ background: PALETTE.water }} role="group" aria-label="World map" data-testid="world-map">
+      <path d={LAND_PATH} fill={PALETTE.land} stroke={PALETTE.borderSoft} strokeWidth={0.6 * k} />
       {supported.map((c) => {
         const on = c.code === country;
         const act = () => onCountry(c.code);
         return <path key={c.code} d={COUNTRY_PATHS[c.code].d} data-testid={`country-${c.code}`} role="button" tabIndex={0} aria-pressed={on} aria-label={L(c.name)}
-          fill={on ? "#0284c7" : "#38bdf8"} fillOpacity={on ? 0.75 : 0.5} stroke="#0369a1" strokeWidth={0.8 * k} className="cursor-pointer outline-none focus-visible:stroke-[3px]"
+          fill={on ? PALETTE.countrySel : PALETTE.country} fillOpacity={on ? 0.7 : 0.42} stroke={on ? PALETTE.navy : PALETTE.country} strokeWidth={(on ? 1.8 : 1) * k} className="cursor-pointer outline-none focus-visible:stroke-[3px]"
           onClick={act} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); act(); } }} />;
       })}
       {cities.map((c) => {
@@ -45,7 +50,8 @@ export default function StaticWorldMap({ country, selectedCity, onCountry, onCit
           <g key={c.id} role="button" tabIndex={0} aria-label={c.name.en} data-testid={`city-${c.id}`} className="cursor-pointer outline-none" onClick={(e) => { e.stopPropagation(); onCity(c.id); }}
             onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onCity(c.id); } }}>
             <circle cx={cx} cy={cy} r={16 * k} fill="transparent" />
-            <circle cx={cx} cy={cy} r={(c.id === selectedCity ? 9 : 6) * k} fill={c.id === selectedCity ? "#0b2a5b" : "#f43f5e"} stroke="#fff" strokeWidth={2 * k} />
+            {(c.id === selectedCity || (country && c.country === country)) && <text x={cx} y={cy - 14 * k} textAnchor="middle" fontSize={13 * k} fontWeight={600} fill={PALETTE.navy} stroke="#fff" strokeWidth={3.5 * k} paintOrder="stroke" data-testid={`label-${c.id}`}>{cityName(c, L)}</text>}
+            <circle cx={cx} cy={cy} r={(c.id === selectedCity ? 9 : 6.5) * k} fill={c.id === selectedCity ? PALETTE.navy : c.country === country ? PALETTE.countrySel : PALETTE.navy} stroke="#fff" strokeWidth={2.5 * k} />
           </g>
         );
       })}

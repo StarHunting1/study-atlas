@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { cities, countries } from "@/data/cities";
 import { officialData } from "@/data/official";
 import { useI18n } from "@/lib/i18n";
+import { countryName as nameOf, cityName } from "@/lib/names";
 import { useCompare } from "@/lib/store";
 import { panel, pill, pillOff, pillOn } from "@/lib/ui";
 import { home } from "@/locales/home";
@@ -17,11 +18,11 @@ const WorldMap = dynamic(() => import("@/components/WorldMap"), { ssr: false, lo
 const hasData = (id: string) => !!officialData(id);
 
 function Home() {
-  const { t, L } = useI18n(); const sp = useSearchParams(); const { has, toggle, full } = useCompare();
+  const { t, L, lang } = useI18n(); const sp = useSearchParams(); const { has, toggle, full } = useCompare();
   const [country, setCountry] = useState<string | null>(null); const [sel, setSel] = useState<string | null>(null); const [failed, setFailed] = useState(false);
   useEffect(() => { const c = sp.get("country"); if (c && countries.some((x) => x.code === c)) setCountry(c); }, [sp]);
   const list = country ? cities.filter((c) => c.country === country) : cities;
-  const chosen = cities.find((c) => c.id === sel); const countryName = (code: string) => L(countries.find((c) => c.code === code)!.name);
+  const chosen = cities.find((c) => c.id === sel); const countryName = (code: string) => nameOf(code, L);
   const pickCountry = (code: string | null) => { setCountry(code); setSel(null); };
   const pickCity = (id: string | null) => { setSel(id); if (id) setCountry(cities.find((c) => c.id === id)!.country); };
   return (
@@ -41,8 +42,8 @@ function Home() {
           {failed && <div role="status" className="pointer-events-none absolute inset-x-0 top-0 z-10 bg-amber-50 px-4 py-2 text-center text-xs text-amber-800">{L(home.mapFailed)}</div>}
           {chosen && (
             <aside data-testid="city-card" aria-label={L(home.selectedCity)} className="absolute inset-x-3 bottom-3 z-10 max-w-md rounded-2xl bg-white/95 p-4 shadow-lg ring-1 ring-slate-200 backdrop-blur sm:right-auto">
-              <div className="flex items-start justify-between gap-2"><div><p className="text-xs text-slate-500">{countryName(chosen.country)}</p><h2 className="text-lg font-semibold text-[#0b2a5b]">{L(chosen.name)}</h2></div>
-                <button onClick={() => pickCity(null)} aria-label={L(home.close)} className="-mr-2 -mt-2 h-11 w-11 rounded-full text-xl text-slate-400 hover:bg-slate-100">×</button></div>
+              <div className="flex items-start justify-between gap-2"><div><p className="text-xs text-slate-500">{countryName(chosen.country)}</p><h2 className="text-lg font-semibold text-[#0b2a5b]">{cityName(chosen, L)}</h2></div>
+                <button onClick={() => pickCity(null)} aria-label={L(home.close)} title={L(home.close)} className="-mr-2 -mt-2 h-11 w-11 rounded-full text-xl text-slate-400 hover:bg-slate-100">×</button></div>
               <p className="mt-1 text-sm text-slate-600">{L(chosen.blurb)}</p>
               <p className={`mt-2 inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ${hasData(chosen.id) ? "bg-sky-50 text-sky-800 ring-1 ring-sky-100" : "bg-slate-100 text-slate-500"}`} data-testid="data-badge">{L(hasData(chosen.id) ? home.data.official : home.data.preparing)}</p>
               <div className="mt-3 flex flex-wrap gap-2">
@@ -56,10 +57,12 @@ function Home() {
             <button aria-pressed={country === null} onClick={() => pickCountry(null)} className={`${pill} min-h-[44px] ${country === null ? pillOn : pillOff}`}>{L(home.all)}</button>
             {countries.map((c) => <button key={c.code} aria-pressed={country === c.code} onClick={() => pickCountry(country === c.code ? null : c.code)} className={`${pill} min-h-[44px] ${country === c.code ? pillOn : pillOff}`}>{L(c.name)}</button>)}
           </div>
-          <p className="text-sm text-slate-500">{L(home.hint)}</p>
+          {country ? <div className="flex flex-wrap items-center justify-between gap-2" data-testid="country-heading"><h2 className="text-base font-semibold text-[#0b2a5b]">{lang === "ja" ? `${countryName(country)}の都市` : `Cities in ${countryName(country)}`}</h2>
+            <button onClick={() => pickCountry(null)} data-testid="back-countries" className="inline-flex min-h-[44px] items-center text-sm text-sky-700 underline">← {L(home.backToCountries)}</button></div>
+            : <p className="text-sm text-slate-500">{L(home.hint)}</p>}
           {list.length === 0 ? <p className="text-sm text-slate-500">{L(home.noCities)}</p> : <ul className="space-y-2" data-testid="city-list">{list.map((c) => (
             <li key={c.id} className={`flex items-center justify-between gap-3 rounded-2xl bg-white px-4 py-2 shadow-sm ${sel === c.id ? "ring-2 ring-sky-500" : "ring-1 ring-slate-200"}`}>
-              <button onClick={() => pickCity(c.id)} aria-pressed={sel === c.id} className="min-h-[44px] flex-1 text-left"><span className="block font-medium text-slate-900">{L(c.name)}</span><span className="block text-xs text-slate-500">{countryName(c.country)} · {L(hasData(c.id) ? home.data.official : home.data.preparing)}</span></button>
+              <button onClick={() => pickCity(c.id)} aria-pressed={sel === c.id} className="min-h-[44px] flex-1 text-left"><span className="block font-medium text-slate-900">{cityName(c, L)}</span><span className="block text-xs text-slate-500">{countryName(c.country)} · {L(hasData(c.id) ? home.data.official : home.data.preparing)}</span></button>
               <Link href={`/city/${c.id}`} className="inline-flex min-h-[44px] items-center text-sm text-sky-700 underline">{t("details")}</Link></li>))}</ul>}
         </div>
       </section>
