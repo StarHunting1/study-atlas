@@ -46,7 +46,7 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
     const touch = window.matchMedia?.("(pointer: coarse)").matches ?? false;
     let m: maplibregl.Map;
     try {
-      m = new maplibregl.Map({ container: el.current!, style: MAP_STYLE_URL, bounds: WORLD_BOUNDS, fitBoundsOptions: { padding: 8 }, minZoom: 0.8, maxZoom: 14, attributionControl: { compact: true }, cooperativeGestures: touch, ...(langRef.current === "ja" ? { locale: JA_GESTURES } : {}) });
+      m = new maplibregl.Map({ container: el.current!, style: MAP_STYLE_URL, bounds: WORLD_BOUNDS, fitBoundsOptions: { padding: 8 }, minZoom: -1, maxZoom: 14, attributionControl: { compact: true }, cooperativeGestures: touch, ...(langRef.current === "ja" ? { locale: JA_GESTURES } : {}) });
     } catch { cb.current.onStatus?.("failed"); return; }   // e.g. WebGL is not available
     map.current = m; const host = el.current!; host.dataset.mapState = "loading";
     if (process.env.NEXT_PUBLIC_MAP_DEBUG) (window as unknown as { __saMap?: maplibregl.Map }).__saMap = m;   // browser checks in CI only (build-time flag)
@@ -97,6 +97,8 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
       m.addLayer({ id: "sa-country-sel-line", type: "line", source: "sa-countries", filter: ["==", ["get", "code"], ""], paint: { "line-color": PALETTE.navy, "line-width": 2.6, "line-opacity": ["interpolate", ["linear"], ["zoom"], 0, 1, 8, 0.7, 10, 0] } }, firstSymbol);
       m.on("click", "sa-country-fill", (e) => { const code = e.features?.[0]?.properties?.code as string | undefined; if (code) cb.current.onCountry(code); });
       m.on("mouseenter", "sa-country-fill", () => (m.getCanvas().style.cursor = "pointer")); m.on("mouseleave", "sa-country-fill", () => (m.getCanvas().style.cursor = ""));
+      // on a small screen the credit starts collapsed behind the (i) button (it is also printed under the map on the page); on wider screens it stays open
+      if (host.clientWidth < 640) host.querySelector(".maplibregl-ctrl-attrib")?.classList.remove("maplibregl-compact-show");
       ready.current = true; host.dataset.mapState = "loaded"; m.once("idle", () => { host.dataset.mapState = "idle"; });
       applyLabels(m); syncSelection(); regroup(); report(); cb.current.onStatus?.("ok");
     });

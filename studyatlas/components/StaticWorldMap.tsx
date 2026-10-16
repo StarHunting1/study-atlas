@@ -30,7 +30,7 @@ export default function StaticWorldMap({ country, selectedCity, onCountry, onCit
   const ratio = MAP_VIEW.w / MAP_VIEW.h; const city = cities.find((c) => c.id === selectedCity);
   const box = country ? countryFitBounds(boundsOf(country), cities.filter((c) => c.country === country).map((c) => c.coords)) : undefined;
   let x = MAP_VIEW.x, y = MAP_VIEW.y, w = MAP_VIEW.w, h = MAP_VIEW.h;
-  if (city) { const [cx, cy] = project(city.coords[0], city.coords[1]); w = MAP_VIEW.w / 14; h = w / ratio; x = cx - w / 2; y = cy - h / 2; }
+  if (city) { const [cx, cy] = project(city.coords[0], city.coords[1]); w = MAP_VIEW.w / 5; h = w / ratio; x = cx - w / 2; y = cy - h / 2; }
   else if (box) { const [x1, y1] = project(box[0], box[3]), [x2, y2] = project(box[2], box[1]); const bw = Math.max(x2 - x1, 1), bh = Math.max(y2 - y1, 1); w = Math.min(MAP_VIEW.w, Math.max(bw * 1.3, bh * 1.3 * ratio, MAP_VIEW.w / 40)); h = w / ratio; x = (x1 + x2) / 2 - w / 2; y = (y1 + y2) / 2 - h / 2; }
   x = Math.min(Math.max(x, 0), MAP_VIEW.w - w); y = Math.min(Math.max(y, MAP_VIEW.y), MAP_VIEW.y + MAP_VIEW.h - h);
   const k = w / MAP_VIEW.w; // keeps markers and outlines the same size on screen when zoomed
