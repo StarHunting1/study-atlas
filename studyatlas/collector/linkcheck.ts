@@ -29,7 +29,7 @@ const EXPECT: [RegExp, string][] = [
   [/canada\.ca\/.*study-permit\.html/, "study permit"], [/qnum=484/, "study permit"], [/qnum=1289/, "eta"],
   [/gov\.bc\.ca\/.*health-fee-international-students/, "health fee"], [/gov\.bc\.ca\/.*\/msp/, "medical services plan"],
   [/englishuk\.com\/member-directory\?id=6665/, "express english college"], [/englishuk\.com\/member-directory\?id=878/, "international house"], [/englishuk\.com\/member-directory\?id=897/, "kaplan"],
-  [/ihmanchester\.com\/prices/, "price"], [/kaplaninternational\.com\/faq\/prices/, "price"], [/expressenglishcollege\.co\.uk\/courses\/general-english/, "english courses"], [/ihmanchester\.com/, "ih manchester"], [/kaplaninternational\.com/, "manchester"], [/ecenglish\.com/, "manchester"], [/ihvancouver\.com\/ihv-price-list/, "price"],
+  [/climate\.weather\.gc\.ca\/climate_normals\/index_e/, "1991-2020"], [/ihmanchester\.com\/prices/, "price"], [/kaplaninternational\.com\/faq\/prices/, "price"], [/expressenglishcollege\.co\.uk\/courses\/general-english/, "english courses"], [/ihmanchester\.com/, "ih manchester"], [/kaplaninternational\.com/, "manchester"], [/ecenglish\.com/, "manchester"], [/ihvancouver\.com\/ihv-price-list/, "price"],
   [/languagescanada\.ca\/.*ef-international/, "ef"], [/englishuk\.com\/.*id=228/, "mc academy"],
   [/expressenglishcollege\.co\.uk/, "express english"], [/themcacademy\.co\.uk/, "mc academy"],
   [/languagescanada\.ca\/.*international-house-vancouver/, "international house"], [/ihvancouver\.com/, "international house"],

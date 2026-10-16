@@ -6,6 +6,16 @@
 
 **Planner への自動計上は行いません。** ビザ・保険・医療関連費用は、どの区分に当てはまるかが国籍・コース・年齢・申請場所で変わるため、利用者が入力した値だけを計上します（`tests/releasecheck.test.ts` が、Manchester / Vancouver のどのプラン条件でも `visa` / `insurance` が自動で選ばれないことを検査）。
 
+## −2. 気候データの承認候補（Ver.1.3.5）
+
+| # | 内容 | 出典・観測地点・期間・単位 | 利用条件 | 状態 |
+|---|---|---|---|---|
+| K1 | Vancouver 1991–2020 平年値（日平均 4.1/4.7/6.7/9.4/13.0/15.8/18.2/18.2/15.2/10.3/6.4/3.9 ℃、日最高 6.8/7.9/10.1/13.1/16.9/19.6/22.4/22.4/19.1/13.5/9.3/6.6 ℃、日最低 1.4/1.5/3.3/5.7/9.0/11.9/13.9/14.0/11.2/7.0/3.6/1.2 ℃、降水量 174.0/90.8/106.4/85.5/59.1/51.1/34.1/36.1/51.9/123.9/174.6/172.2 mm、年 1159.5 mm） | ECCC「Canadian Climate Normals 1991–2020」ブリティッシュコロンビア州の一括CSV（2026-10-16 に1回取得、Actions run 38904919856）。観測所は**合成観測所** VANCOUVER INTERNATIONAL (AIRPORT)（normals code C）で、気候ID **1108447（VANCOUVER INT'L A）と 1108395（VANCOUVER INTL A、WMO 71892、YVR）** の合成、北緯49.20・西経123.18・標高4.3 m。気温の品質コードは B、降水量は C | ECCC Data Services End-use Licence v2.1.1（商用利用可・出典表示が必要：「Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada.」） | **承認待ち（unverified の `climateAlt`）。画面にはまだ出していない**。画面は確認済みの 1981–2010 のまま（「最新の標準期間ではない」の注意書きつき） |
+
+承認する場合: `data/official/vancouver.ts` で `climateAlt` を `climate` に入れ替え（旧 1981–2010 は `climateAlt` へ）、`status` を `verified`、`note` に承認者・日付を記録する。合成観測所の扱い（2013年前後で観測所IDが変わる）が利用目的に合うかを確認してください。
+
+**Manchester の 1991–2020 は取り込めていません（旧 1971–2000 のまま）**。理由: ①Met Office の 1991–2020 の地点別平年値は、同社サイトの JavaScript ページにあり、公開APIやダウンロードファイルが見つからない。②サイトの規約が自動取得を禁じている（`metoffice-station-data` は自動アクセス不可）。③地点ページが Ringway（マンチェスター空港）を網羅するか未確認（「公式観測所のみ・地理的に均等な地点」と説明されている）。④代替の NOAA GHCN-Monthly v4 は公開データだが、公式の平年値ではなく、StudyAtlas が月平均から30年平均を計算することになり（「公式の平年値」と区別が必要）、降水量は別データセット、Manchester Airport の観測所IDと欠測の確認も未了のため、今回は実装していません。次の候補: 人が Met Office のページ（または Ringway 月別データ）から1991–2020を確認して提供するか、NOAA GHCNm から「StudyAtlas 計算値」として扱う設計を承認する。
+
 ## −1. 承認レビュー表（Ver.1.3.5）— 1件ずつ確認する用
 
 **verified への変更は人間の明示的な承認があるまで行いません（現在10件すべて unverified）。** 新規の調査は行わず、§0〜§2 の既存の確認結果（Actions run 38787463398・38798253317、確認日 2026-10-15）を整理しました。

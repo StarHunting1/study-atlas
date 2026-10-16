@@ -71,11 +71,32 @@ const climate: ClimateNormals = {
   evidence: [{ url: D_ECCC, publisher: "Environment and Climate Change Canada", section: { en: "Canadian Climate Normals 1981–2010, station VANCOUVER INT'L A (1108447): mean daily temperature, mean daily max/min temperature, total precipitation", ja: "カナダ気候平年値 1981–2010、観測地点 VANCOUVER INT'L A（1108447）：日平均気温、日最高・最低気温の平均、降水量" }, quote: `Mean daily temperature deg C: ${mean.join(", ")}` }],
   collectedIds: ["eccc-climate-normals:1108447:temp-mean", "eccc-climate-normals:1108447:temp-max", "eccc-climate-normals:1108447:temp-min", "eccc-climate-normals:1108447:precip"],
   retrievedAt: D, checkedAt: D, status: "verified",
-  note: { en: "Values as published by the ECCC GeoMet OGC API (climate-normals collection, normals 1981–2010; calculated 2012-10-10). Newer 1991–2020 normals exist on the ECCC website but are not in this API.", ja: "ECCC GeoMet OGC API（climate-normals、1981–2010 平年値、2012-10-10 計算）の公表値です。より新しい 1991–2020 平年値は ECCC のウェブサイトにありますが、この API には含まれていません。" },
+  note: { en: "Values as published by the ECCC GeoMet OGC API (climate-normals collection, normals 1981–2010; calculated 2012-10-10). The newer 1991–2020 normals are not in this API; they were read from the ECCC bulk download and are kept as an unverified approval candidate (climateAlt).", ja: "ECCC GeoMet OGC API（climate-normals、1981–2010 平年値、2012-10-10 計算）の公表値です。より新しい 1991–2020 平年値はこの API には含まれず、ECCC の一括ダウンロードから読み取って承認待ちの候補（climateAlt）として保持しています。" },
+};
+
+/*
+ * 1991–2020 normals (Ver.1.3.5): read on 2026-10-16 from ECCC's bulk download of the Canadian Climate Normals 1991–2020 for British Columbia
+ * (Actions run 38904919856; one request, robots.txt allowed). Station: composite "VANCOUVER INTERNATIONAL (AIRPORT)" (normals code C), made from
+ * climate IDs 1108447 (VANCOUVER INT'L A) and 1108395 (VANCOUVER INTL A, WMO 71892, YVR), 49.20 N / -123.18 E, elevation 4.3 m.
+ * Rows used: "Daily Average (°C)", "Daily Maximum (°C)", "Daily Minimum (°C)" (quality code B) and "Precipitation (mm)" (code C).
+ * Licence: ECCC Data Services End-use Licence (commercial use allowed; attribution required). It is an approval CANDIDATE: status "unverified",
+ * kept as `climateAlt`, not shown on the city page and not replacing the verified 1981–2010 values until a person approves (see data/APPROVAL_CANDIDATES.md).
+ */
+const D_NEW = "2026-10-16";
+const mean2 = [4.1, 4.7, 6.7, 9.4, 13.0, 15.8, 18.2, 18.2, 15.2, 10.3, 6.4, 3.9];
+const max2 = [6.8, 7.9, 10.1, 13.1, 16.9, 19.6, 22.4, 22.4, 19.1, 13.5, 9.3, 6.6];
+const min2 = [1.4, 1.5, 3.3, 5.7, 9.0, 11.9, 13.9, 14.0, 11.2, 7.0, 3.6, 1.2];
+const precip2 = [174.0, 90.8, 106.4, 85.5, 59.1, 51.1, 34.1, 36.1, 51.9, 123.9, 174.6, 172.2];
+const climateAlt: ClimateNormals = {
+  id: "van-climate-eccc-1991-2020", cityId: "vancouver", sourceId: "eccc-climate-normals", station: "VANCOUVER INTERNATIONAL (AIRPORT) – composite of 1108447 and 1108395", stationId: "1108447+1108395", period: "1991–2020",
+  months: mean2.map((m, i) => ({ meanC: m, maxC: max2[i], minC: min2[i], precipMm: precip2[i] })),
+  evidence: [{ url: "https://climate.weather.gc.ca/climate_normals/index_e.html", publisher: "Environment and Climate Change Canada", section: { en: "Canadian Climate Normals 1991–2020, bulk download for British Columbia (CSV): composite station VANCOUVER INTERNATIONAL (AIRPORT): Daily Average / Daily Maximum / Daily Minimum (°C), Precipitation (mm)", ja: "カナダ気候平年値 1991–2020、ブリティッシュコロンビア州の一括ダウンロード（CSV）：合成観測所 VANCOUVER INTERNATIONAL (AIRPORT) の日平均・日最高・日最低気温（°C）と降水量（mm）" }, quote: `Daily Average (°C): ${mean2.join(", ")}; Precipitation (mm): ${precip2.join(", ")}` }],
+  retrievedAt: D_NEW, checkedAt: D_NEW, status: "unverified",
+  note: { en: "Official 1991–2020 normals for the composite station (climate IDs 1108447 and 1108395; 49.20 N, 123.18 W; 4.3 m). Awaiting a person's approval; until then the page keeps showing the verified 1981–2010 values with a notice. Contains information licensed under the Environment and Climate Change Canada Data Services End-use Licence.", ja: "合成観測所（気候ID 1108447 と 1108395、北緯49.20度・西経123.18度、標高4.3m）の公式な 1991–2020 平年値です。人の承認待ちで、それまでは確認済みの 1981–2010 の値を注意書きつきで表示します。Environment and Climate Change Canada Data Services End-use Licence に基づく情報を含みます。" },
 };
 
 const ubc = (path: string) => `https://vancouver.housing.ubc.ca/applications/fees-payments/${path}`;
-const data: OfficialCityData = { cityId: "vancouver", points, climate,
+const data: OfficialCityData = { cityId: "vancouver", points, climate, climateAlt,
   notices: [{ topic: "housing", sourceId: "ubc-housing-fees",
     text: {
       en: "UBC residence fees (2026/27) were reviewed on 14 Oct 2026 but are not shown here: UBC's Terms of Use allow only short, unmodified extracts for personal non-commercial use and require written consent for any republication. Please check the official fee pages. (Room types, contract dates and who can apply are also on those pages.) StudyAtlas will add them if UBC gives permission.",
