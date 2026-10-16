@@ -20,17 +20,14 @@ async function html(url: string, res: RegExp[], linkRe: RegExp) {
   return r;
 }
 (async () => {
-  console.log("## A. ECCC climate normals 1991–2020: where is the data?");
-  const idx = await html("https://climate.weather.gc.ca/climate_normals/index_e.html", [/1991/i, /bulk|download/i, /composite/i], /bulk|csv|zip|download|normals|inventory/i);
-  const bulk = idx ? links(idx.body, idx.url, /bulk|download/i)[0] : undefined;
-  if (bulk) await html(bulk, [/1991/i, /csv|zip/i, /Vancouver|British Columbia/i, /station.*inventory|composite/i], /csv|zip|bulk|inventory|BC|british/i);
-  console.log("\n## B. GeoMet API: collections about normals, and what a Vancouver record carries");
-  const c = await get("https://api.weather.gc.ca/collections?f=json&lang=en", "application/json");
-  console.log(`- collections ${c.status}`); try { const j = JSON.parse(c.body); console.log("  " + (j.collections ?? []).filter((x: { id: string; title: string }) => /normal/i.test(x.id + x.title)).map((x: { id: string; title: string }) => `${x.id}: ${x.title}`).join(" | ")); } catch { console.log("  " + short(c.body, 200)); }
-  const q = await get("https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108447&limit=2", "application/json");
-  console.log(`- items(1108447) ${q.status}: ${short(q.body, 900)}`);
-  const q2 = await get("https://api.weather.gc.ca/collections/climate-normals/items?f=json&CLIMATE_IDENTIFIER=1108395&limit=2", "application/json");
-  console.log(`- items(1108395) ${q2.status}: ${short(q2.body, 900)}`);
-  console.log("\n## C. ECCC terms for the data");
-  await html("https://eccc-msc.github.io/open-data/licence/readme_en/", [/licen[cs]e/i, /commercial/i, /attribution|acknowledg/i], /licen/i);
+  console.log("## A. ECCC bulk-download form (1991–2020) and licence attribution");
+  const r = await get("https://climate.weather.gc.ca/climate_normals/index_e.html");
+  const b = r.body; const i = b.search(/Bulk Data Download of the 1991/i);
+  console.log(`- index ${r.status}; bulk section at ${i}`);
+  const seg = i >= 0 ? b.slice(i, i + 6000) : "";
+  console.log("  forms/inputs/selects:", [...seg.matchAll(/<(form|input|select|option|button|a)\b[^>]*>/gi)].map((m) => short(m[0], 220)).slice(0, 60).join("\n  "));
+  console.log("  scripts near:", [...b.matchAll(/<script\b[^>]*src="([^"]*(bulk|normals|download)[^"]*)"/gi)].map((m) => m[1]).join(" ") || "none");
+  console.log("  zip/csv urls anywhere:", [...new Set([...b.matchAll(/["'(]([^"'()\s]*(\.zip|bulk_data|bulk_e)[^"'()\s]*)/gi)].map((m) => m[1]))].slice(0, 20).join(" ") || "none");
+  const l = await get("https://eccc-msc.github.io/open-data/licence/readme_en/"); const lt = htmlToText(l.body).replace(/\s+/g, " ");
+  console.log(`- licence ${l.status}: ${ctx(lt, /Contains information/i, 40, 3).join(" | ")}`); console.log(`  exemptions: ${ctx(lt, /4\. Exemptions/i, 10, 2).join(" | ")} ${short(lt.slice(lt.lastIndexOf("4. Exemptions"), lt.lastIndexOf("4. Exemptions") + 700), 700)}`);
 })();

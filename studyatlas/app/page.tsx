@@ -23,7 +23,7 @@ function Home() {
         <SearchBox />
       </section>
       <section className="grid gap-6 lg:grid-cols-5">
-        {/* isolate: keeps MapLibre's controls and markers inside their own stacking context, below the sticky header */}
+        {/* isolate: keeps the map inside its own stacking context, below the sticky header */}
         <div className={`relative isolate h-[320px] overflow-hidden md:h-[460px] lg:col-span-3 lg:h-[560px] ${panel}`}>
           <WorldMap country={country} onCountry={(c) => { setCountry(c); setSel(null); setWarn(false); }} onUnsupported={() => setWarn(true)} onCity={(id) => { setCountry(cities.find((x) => x.id === id)!.country); setSel(id); setWarn(false); }} onStatus={(s) => setMapFailed(s === "failed")} />
           {mapFailed && <div className="pointer-events-none absolute inset-x-0 bottom-0 z-10 bg-amber-50 px-4 py-2 text-center text-xs text-amber-800">{t("mapFailed")}</div>}
