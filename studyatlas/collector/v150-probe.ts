@@ -41,19 +41,21 @@ async function ons() {
   for (const s of ["Cover sheet", "Notes"]) if (wb.sheets[s]) { const t: string[] = []; for await (const r of sheetRows(wb, s)) for (const v of Object.values(r.cells)) if (typeof v === "string") t.push(v); log(`SHEET ${s}:`, t.join(" ¦ ").slice(0, 3500)); }
 }
 const PAGES = [
-  "https://www.ef.com/ca/campaign/ilsd/canada/toronto/", "https://www.ilac.com/", "https://ilac.com/toronto/", "https://www.kaplaninternational.com/language-schools/canada/toronto",
-  "https://www.languagescanada.ca/en/listing-directory/students/ef-international-language-schools-canada-toronto", "https://www.languagescanada.ca/en/listing-directory/students/ilac-toronto",
-  "https://www.languagescanada.ca/en/listing-directory/students/kaplan-international-languages-toronto",
-  "https://www.kaplaninternational.com/language-schools/united-kingdom/london", "https://www.ef.com/ca/ilsd/schools/london/", "https://www.ef.com/wwen/ilsd/schools/uk/", "https://www.englishuk.com/en/students/where-in-the-uk/london",
-  "https://www.ttc.ca/fares-and-passes", "https://www.ttc.ca/fares-and-passes/fare-information/fares", "https://tfl.gov.uk/fares", "https://tfl.gov.uk/fares/find-fares/tube-and-rail-fares", "https://tfl.gov.uk/fares/free-and-discounted-travel/18plus-student-oyster-photocard",
+  "https://www.kaplaninternational.com/language-schools/canada/toronto", "https://www.kaplaninternational.com/language-schools/united-kingdom/london",
+  "https://www.ilac.com/", "https://www.ilac.com/contact-us/", "https://www.ilac.com/toronto/",
+  "https://www.languagescanada.ca/sitemap.xml",
+  "https://www.stgiles-international.com/", "https://www.wimbledonschoolofenglish.com/", "https://www.francesking.com/", "https://www.englishuk.com/en/students/where-in-the-uk/london",
+  "https://www.ef.com/uk/ilsd/schools/london/", "https://www.ef.com/wwen/ilsd/schools/london/",
 ];
 async function pages() {
   for (const u of PAGES) {
     try { const rb = await robotsFor(u); if (!rb.allowed) { log("PAGE", u, "robots disallow"); continue; }
       const r = await fetchText(u); const title = /<title[^>]*>([^<]*)/i.exec(r.body)?.[1]?.trim();
       const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, "\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
-      const hit = [...new Set(text.filter((l) => l.length < 260 && (/[A-Z]\d[A-Z] ?\d[A-Z]\d|\b[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|accredit|Languages Canada|British Council|English UK|\bage[ds]?\b|years? old|\b1[68]\+|\b[0-9]+ (?:Yonge|Bloor|King|Adelaide|Wellington|Bay|Charles|Oxford|Regent|Southampton)/i.test(l))))].slice(0, 14);
-      log("PAGE", u, r.status, r.url, "|", title, "\n   " + hit.join("\n   "));
+      const hit = [...new Set(text.filter((l) => l.length < 260 && (/[A-Z]\d[A-Z] ?\d[A-Z]\d|\b[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|accredit|Street|Road|Place|Avenue|Square|Languages Canada|British Council|English UK|\bage[ds]?\b|years? old|\b1[68]\+|\b[0-9]+ (?:Yonge|Bloor|King|Adelaide|Wellington|Bay|Charles|Oxford|Regent|Southampton)/i.test(l))))].slice(0, 26);
+      const locs = u.endsWith("sitemap.xml") ? [...r.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).filter((x) => /kaplan|ilac|toronto|london|ef-/i.test(x)).slice(0, 40) : [];
+      const nav = [...new Set([...r.body.matchAll(/href="([^"#]+)"/gi)].map((m) => m[1]).filter((h) => /contact|campus|location|school|accredit/i.test(h)))].slice(0, 12);
+      log("PAGE", u, r.status, r.url, "|", title, "\n   " + hit.join("\n   "), locs.length ? "\n   LOCS " + locs.join("\n   ") : "", "\n   NAV " + nav.join(" "));
     } catch (e) { log("PAGE", u, "ERR", String(e)); }
     await sleep(1200);
   }
