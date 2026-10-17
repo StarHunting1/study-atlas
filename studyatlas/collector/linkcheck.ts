@@ -20,7 +20,7 @@ export type LinkTarget = { url: string; where: string[]; expect?: string; skip?:
 export type Verdict = "ok" | "redirected" | "access-denied" | "broken" | "client-error" | "server-error" | "unreachable" | "robots-disallowed" | "skipped";
 export type LinkResult = { url: string; where: string[]; verdict: Verdict; status: number | null; finalUrl?: string; title?: string; contentOk: boolean | null; note?: string };
 
-const CITY_IDS = ["manchester", "vancouver"] as const;
+const CITY_IDS = ["manchester", "vancouver", "toronto", "london"] as const;
 /** Words the page must contain for the link to count as "the right page". Matched case-insensitively against the page text. */
 const EXPECT: [RegExp, string][] = [
   [/gov\.uk\/student-visa/, "student visa"], [/gov\.uk\/check-uk-visa/, "visa"], [/gov\.uk\/visa-to-study-english/, "study english"],
@@ -34,6 +34,8 @@ const EXPECT: [RegExp, string][] = [
   [/expressenglishcollege\.co\.uk/, "express english"], [/themcacademy\.co\.uk/, "mc academy"],
   [/languagescanada\.ca\/.*international-house-vancouver/, "international house"], [/ihvancouver\.com/, "international house"],
   [/sprachcaffe\.com.*vancouver|sprachcaffe\.com\/english\/adults-english-courses-canada/, "vancouver"], [/ef\.com\/ca\/ilsd\/schools\/vancouver/, "price"],
+  [/ef\.com\/ca\/ilsd\/schools\/toronto/, "toronto"], [/kaplaninternational\.com\/language-schools\/canada\/toronto/, "toronto"], [/kaplaninternational\.com\/language-schools\/united-kingdom\/london/, "london"],
+  [/francesking\.com.*course-prices/, "price"], [/francesking\.com/, "frances king"], [/stgiles-international\.com/, "st giles"],
   [/ons\.gov\.uk/, "private rent"], [/statcan\.gc\.ca|statcan/, "rent"], [/manchester\.ac\.uk/, "manchester"], [/tfgm\.com/, "tfgm|bee|ticket"],
 ];
 export const expectFor = (url: string): string | undefined => EXPECT.find(([re]) => re.test(url))?.[1];

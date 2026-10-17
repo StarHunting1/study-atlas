@@ -26,6 +26,8 @@ export const cu = {
   /** Short "what exactly is this number" line per rent statistic, taken from the conditions recorded with each figure. */
   rentBasis: {
     "housing.privateRent.average": t("ONS · all private rented dwellings · Manchester city", "ONS・民間賃貸住宅すべて・マンチェスター市"),
+    "housing.privateRent.regionAverage": t("ONS · all private rented dwellings · whole London region (33 boroughs; not one borough)", "ONS・民間賃貸住宅すべて・ロンドン地域全体（33の区の平均で、特定の区ではない）"),
+    "housing.marketRent.1br@toronto": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Toronto census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・トロント都市圏（市より広い）"),
     "housing.marketRent.1br": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Vancouver census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・バンクーバー都市圏（市より広い）"),
   } as Record<string, Localized>,
   remove: t("Remove from comparison", "比較から外す"), details: t("City details", "都市の詳細"),

@@ -49,7 +49,7 @@ t("compare: Manchester's ONS rent sits beside Vancouver's CMHC rent, and the row
   const r = rowVerdict(row, [m, v]); assert.equal(r.verdict, "notDirect"); assert.equal(r.currenciesDiffer, true);
   assert.match(row.basis!.en, /Not directly comparable/); assert.match(row.basis!.en, /currency/); assert.match(row.basis!.en, /not converted/i);
   assert.match(row.basis!.ja, /直接は比較できません/); assert.match(row.basis!.ja, /換算なし/); assert.match(row.basis!.ja, /判定しません/);
-  assert.match(row.hint!.en, /Neither is student housing/); assert.match(row.hint!.ja, /学生向け住居ではありません/);
+  assert.match(row.hint!.en, /None is student housing/); assert.match(row.hint!.ja, /学生向け住居ではありません/);
 });
 
 t("no verdict is ever 'cheaper': the row logic returns only missing / issues / notDirect / sameBasis", () => {

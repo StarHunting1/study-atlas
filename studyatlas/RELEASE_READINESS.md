@@ -5,6 +5,18 @@
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
 
+## 0l. Ver.1.5.0 の結果（Toronto・London のデータ拡充。家賃は承認待ちで数値は未掲載）
+
+| 項目 | 結果 |
+|---|---|
+| 家賃統計（候補・未承認） | Toronto＝CMHC 平均家賃（Statistics Canada 表 34-10-0133-01、トロント都市圏〔国勢調査都市圏コード535〕、調査年2025、構造3戸以上、間取り別 4件）。London＝ONS PIPR（ロンドン地域 E12000007、2026年8月、全住宅の平均 1件）。Actions のプローブ（run 39058754956）で公式データから取得。**`TORONTO_RENT_APPROVAL` / `LONDON_RENT_APPROVAL`（`data/official/cityRents.ts`）が null の間は、数値・カード・比較に一切出ません**（承認記録を設定するまで verified にしません）。 |
+| 画面での扱い | 都市ページ（Housing）に「数値は未表示・承認待ち」の説明と公式リンク、定義（トロント都市圏／ロンドン地域全体、学生向け住居ではない）を表示。都市比較は「料金掲載見合わせ」と同じ“公式リンク＋条件”表示。 |
+| 比較の区別 | Toronto と Vancouver＝同じ CMHC 表・構造・年・都市圏定義（承認後は同じ基準）。London（地域全体・ONS）と Manchester（1自治体・ONS）は別の統計で常に「参考値のみ」。異なる統計・通貨は並べるだけで順位付け・換算なし。 |
+| 語学学校 | 4校を追加（EF Toronto・Kaplan Toronto・Kaplan London・Frances King London）。すべて unverified・住所は学校の公式ページ（EFはLanguages Canada掲載とも一致）・料金は公式ページへのリンクのみ。学校比較に接続。St Giles London Central は認定を確認できず非表示。 |
+| 交通 | TTC・TfL の運賃は再利用条件を確認していないためリンクのみ（金額・表・文章を転載せず、学生割引を前提にしない旨を表示）。TfL は自動アクセスに HTTP 403 で読み取れず、再試行・回避なし。 |
+| 見送り | Toronto の気候平年値（ECCC）・London の気候（Met Office は規約上スクレイピング不可）・生活費の公的データ。Planner の計算・保存形式は変更なし。 |
+| 変更していないもの | Manchester / Vancouver の承認済みデータ・比較条件・承認記録、Planner、地図、ビザ・医療の claim 承認システム |
+
 ## 0k. Ver.1.4.3 の結果（Vancouver 1991–2020 気候を正式承認・本番反映）
 
 | 項目 | 結果 |

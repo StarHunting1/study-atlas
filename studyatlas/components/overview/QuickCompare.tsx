@@ -44,7 +44,7 @@ const whyKey = (av: Availability, cmp: Cmp): keyof typeof cu.why => (av === "par
 
 /** What exactly the number is, in one line: the statistic and area for market rents, the university for student housing. */
 const basisOf = (k: Key, topic?: CmpTopic): Localized | undefined => { if (k.kind !== "point") return undefined;
-  if (topic === "rent") return cu.rentBasis[k.point.metric];
+  if (topic === "rent") return cu.rentBasis[`${k.point.metric}@${k.point.cityId}`] ?? cu.rentBasis[k.point.metric];
   if (topic === "housing" && k.point.housing) return { en: k.point.housing.school, ja: k.point.housing.school }; return undefined; };
 function Cells({ cities, keys, topic }: { cities: City[]; keys: Key[]; topic?: CmpTopic }) {
   const { L, lang } = useI18n();

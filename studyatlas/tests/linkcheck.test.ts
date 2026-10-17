@@ -26,7 +26,7 @@ t("targets: Manchester and Vancouver links only; sources whose rights block auto
   for (const x of ts) { const host = new URL(x.url).hostname; if (/translink\.ca$|ubc\.ca$|(^|\.)metoffice\.gov\.uk$/.test(host)) assert.ok(x.skip, `${x.url} must be skipped`); }
   assert.ok(ts.find((x) => x.url.includes("data.gov.uk"))?.skip === undefined, "the catalogue page is checkable");
   assert.ok(blockedHosts().has("translink.ca") && blockedHosts().has("ubc.ca") && blockedHosts().has("metoffice.gov.uk"));
-  assert.ok(!ts.some((x) => /toronto|london|sydney|melbourne/.test(x.where.join(" "))), "only Manchester / Vancouver");
+  assert.ok(!ts.some((x) => /sydney|melbourne/.test(x.where.join(" "))), "Sydney and Melbourne are not checked (Toronto and London since Ver.1.5.0)");
 });
 t("each key visa/health/school link has words to look for, so a reachable-but-wrong page is not counted as verified", () => {
   for (const u of ["https://www.gov.uk/student-visa", "https://www.gov.uk/visa-to-study-english", "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", "https://expressenglishcollege.co.uk", "https://themcacademy.co.uk/", "https://ihvancouver.com/"]) assert.ok(expectFor(u), u);
