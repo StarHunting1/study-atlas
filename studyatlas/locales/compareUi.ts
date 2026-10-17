@@ -14,7 +14,8 @@ export const cu = {
   glanceTitle: t("What can be compared", "比較できる項目の状況"),
   glanceNote: t("Only items with the same basis on both sides count as comparable.", "どの都市も同じ基準で揃っている項目だけを「比較可能」としています。"),
   comparable: t("Comparable", "比較可能"), reference: t("Reference only", "参考値のみ"), notYet: t("Not obtained", "未取得"), linkOnly: t("Official link only", "公式リンクのみ"),
-  heldHere: t("Figure not shown (publisher's terms)", "規約により数値は非表示"), heldLink: t("See the official page", "公式ページで確認"), noticeHere: t("Held back (see note)", "掲載見合わせ（注記あり）"),
+  heldHere: t("Figure not shown (publisher's terms)", "規約により数値は非表示"), heldLink: t("See the official page", "公式ページで確認"), noticeHere: t("Fees not shown (held back)", "料金掲載見合わせ"),
+  heldDetail: t("Official fees are published, but under the publisher's terms of use StudyAtlas does not show the figures.", "公式料金は公開されていますが、利用条件によりStudyAtlasでは数値を掲載していません。"),
   /** Housing is split in two rows so a per-student price is never read as a market statistic (and the other way round). */
   studentHousingTitle: t("Student housing cost (per person)", "学生向け住居費（1人あたり）"), rentTitle: t("General rental market rent", "一般賃貸市場の家賃"),
   studentHousingNote: t("University-run housing for that university's students. Not the general market.", "大学が運営する住居で、その大学の学生が対象です。一般の賃貸市場ではありません。"),

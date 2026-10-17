@@ -63,10 +63,22 @@ t("page: two housing rows with their conditions, chips use the states, no rankin
   assert.ok(text(rent).includes("ONS") && text(rent).includes("CMHC") && /GBP/.test(rent) && /CAD/.test(rent) && text(rent).includes("2026年8月"), "ONS Aug 2026, CMHC 2025, each currency");
   assert.ok(text(rent).includes("2025年") && text(rent).includes("民間賃貸住宅すべて") && text(rent).includes("バンクーバー都市圏") && text(rent).includes("賃貸世帯全体"), "area, dwelling type, year, audience are shown");
   assert.ok(/£555/.test(hous) && !/1,807/.test(hous) && !/£1,373/.test(hous), "student row: Manchester hall price only, no market rent");
-  assert.ok(/未取得/.test(text(hous)), "Vancouver student housing is 'not obtained'");
+  assert.ok(/料金掲載見合わせ/.test(text(hous)) && !/未取得/.test(text(hous)), "Vancouver student housing: held back, not 'not obtained'");
   assert.ok(html.includes('data-testid="key-link"') && html.includes("translink.ca"), "Vancouver transport is an official link");
   for (const p of allOfficialData().flatMap((d) => d.points).filter((p) => p.value && !isFigureShown(p))) assert.ok(!html.includes(String(p.value!.amount).replace(/\.0+$/, "") + " ") || p.value!.amount < 10, `held figure ${p.metric} not in the page`);
   assert.ok(!/おすすめ|最安|best|cheapest|cheaper|安い/i.test(tx), "no ranking words");
+});
+t("Vancouver student housing: held back by terms (not 'no data'); wording in ja and en; the notice keeps the eligibility note and the official UBC links; real gaps stay 'not obtained'", () => {
+  const { hasHeldNotice } = require("@/data/official/compare") as typeof import("@/data/official/compare"); const { cu } = require("@/locales/compareUi") as typeof import("@/locales/compareUi");
+  assert.ok(hasHeldNotice("vancouver", "housing") && !hasHeldNotice("manchester", "housing") && !hasHeldNotice("vancouver", "living"));
+  assert.equal(cu.noticeHere.ja, "料金掲載見合わせ"); assert.equal(cu.heldDetail.ja, "公式料金は公開されていますが、利用条件によりStudyAtlasでは数値を掲載していません。");
+  assert.ok(cu.noticeHere.en && cu.heldDetail.en && cu.noticeHere.en !== cu.notYet.en);
+  const row = compareRows.find((r) => r.id === "uniHalls")!; const m = missingReason("vancouver", row);
+  assert.ok(m?.kind === "notice" && /who can apply|入居資格/.test(m.text.en + m.text.ja) && m.links.length > 0 && m.links.every((l) => /ubc\.ca/.test(l.url)));
+  const ja = wrap(h(QuickCompare, { ids: ["manchester", "vancouver"] })), tx = text(ja);
+  const sec = (id: string, next: string) => text(ja.slice(ja.indexOf(`id="cmp-${id}"`), ja.indexOf(`id="cmp-${next}"`)));
+  assert.ok(sec("housing", "rent").includes("料金掲載見合わせ") && !sec("housing", "rent").includes("未取得"));
+  assert.ok(sec("living", "housing").includes("未取得"), "a real gap is still 'not obtained'");
 });
 t("no status was promoted: every compared point keeps its recorded status; nothing is 'verified' that the data does not say", () => {
   const html = wrap(h(QuickCompare, { ids: ["manchester", "toronto"] })); 

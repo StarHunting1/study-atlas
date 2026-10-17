@@ -61,6 +61,9 @@ export function missingReason(cityId: string, row: CompareRow): MissingReason | 
   return n ? { kind: "notice", text: n.text, links: n.links } : undefined;
 }
 
+/** The city has official figures for this topic that were reviewed and deliberately not shown (a notice, e.g. UBC residence fees), as opposed to having no data at all. */
+export const hasHeldNotice = (cityId: string, topic: string) => !!officialData(cityId)?.notices?.some((n) => n.topic === topic);
+
 /** Climate figures per city for the compare table: warmest/coolest month of the mean daily max and min, and the sum of the 12 monthly precipitation values. */
 export type ClimateCompare = { tmax?: [number, number]; tmin?: [number, number]; mean?: [number, number]; precipTotal?: number; station: string; period: string; derived: boolean; status: DataPoint["status"] };
 export function climateCompare(cityId: string): ClimateCompare | undefined {
