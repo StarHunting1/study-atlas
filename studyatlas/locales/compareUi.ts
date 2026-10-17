@@ -15,5 +15,17 @@ export const cu = {
   glanceNote: t("Only items with the same basis on both sides count as comparable.", "どの都市も同じ基準で揃っている項目だけを「比較可能」としています。"),
   comparable: t("Comparable", "比較可能"), reference: t("Reference only", "参考値のみ"), notYet: t("Not obtained", "未取得"), linkOnly: t("Official link only", "公式リンクのみ"),
   heldHere: t("Figure not shown (publisher's terms)", "規約により数値は非表示"), heldLink: t("See the official page", "公式ページで確認"), noticeHere: t("Held back (see note)", "掲載見合わせ（注記あり）"),
+  /** Housing is split in two rows so a per-student price is never read as a market statistic (and the other way round). */
+  studentHousingTitle: t("Student housing cost (per person)", "学生向け住居費（1人あたり）"), rentTitle: t("General rental market rent", "一般賃貸市場の家賃"),
+  studentHousingNote: t("University-run housing for that university's students. Not the general market.", "大学が運営する住居で、その大学の学生が対象です。一般の賃貸市場ではありません。"),
+  rentWhy: {
+    differ: t("Different statistics (publisher, area, dwelling type, year or currency): shown side by side as reference, never as a direct comparison. Currencies are not converted.", "統計の種類（発表元・地域・住居タイプ・年・通貨）が異なるため、参考として並べるだけで、直接は比較しません（通貨は換算しません）。"),
+    same: t("The same statistic, area basis, period and currency.", "同じ統計・同じ期間・同じ通貨です。"),
+  },
+  /** Short "what exactly is this number" line per rent statistic, taken from the conditions recorded with each figure. */
+  rentBasis: {
+    "housing.privateRent.average": t("ONS · all private rented dwellings · Manchester city", "ONS・民間賃貸住宅すべて・マンチェスター市"),
+    "housing.marketRent.1br": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Vancouver census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・バンクーバー都市圏（市より広い）"),
+  } as Record<string, Localized>,
   remove: t("Remove from comparison", "比較から外す"), details: t("City details", "都市の詳細"),
 };

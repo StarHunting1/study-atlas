@@ -7,8 +7,8 @@ import { moneyComparability } from "@/data/comparability";
 import { climateCompare, climateIssues, compareRows, missingReason, pickPoint, rowVerdict, type ClimateCompare, type Issue } from "@/data/official/compare";
 import { officialData } from "@/data/official";
 import type { Fact, Money } from "@/data/types";
-import { useI18n } from "@/lib/i18n";
-import { availability, compareKey, compareKeys, EXTRA_TOPICS, extraKey, TOPICS, type Availability, type Cmp, type ExtraTopic, type Key, type Topic } from "@/lib/overview";
+import { useI18n, type Localized } from "@/lib/i18n";
+import { availability, compareKeys, EXTRA_TOPICS, extraKey, keyFigure, rentCmp, rentKey, TOPICS, type Availability, type Cmp, type ExtraTopic, type Key, type Topic } from "@/lib/overview";
 import { panel } from "@/lib/ui";
 import { dataText as d } from "@/locales/data";
 import { ot } from "@/locales/official";
@@ -25,7 +25,12 @@ import KeyView from "./KeyView";
  * figures share a basis; "詳しく見る" opens every official figure and profile fact behind it (with sources one more click away).
  * "さらに比較する" adds safety, visa, healthcare and student life. Currencies are never converted and gaps are never filled.
  */
-const ROWS_OF: Record<Topic, string[]> = { living: ["livingTotal"], housing: ["uniHalls", "marketRent"], transport: ["single", "monthlyAdult", "studentTransit"], climate: [], education: [] };
+const ROWS_OF: Record<Topic, string[]> = { living: ["livingTotal"], housing: ["uniHalls"], transport: ["single", "monthlyAdult", "studentTransit"], climate: [], education: [] };
+/** Comparison rows: the five key topics, with the general rental market as its own row right after student housing. */
+type CmpTopic = Topic | "rent"; const CMP_TOPICS: CmpTopic[] = ["living", "housing", "rent", "transport", "climate", "education"];
+const keysOf = (cities: City[], t: CmpTopic): Key[] => cities.map((c) => (t === "rent" ? rentKey(c) : keyFigure(c, t)));
+const cmpOf = (keys: Key[], t: CmpTopic): Cmp => (t === "rent" ? rentCmp(keys) : compareKeys(keys));
+const titleOf = (t: CmpTopic, L: (x: Localized) => string) => (t === "rent" ? L(cu.rentTitle) : t === "housing" ? L(cu.studentHousingTitle) : L(ux.topics[t]));
 const SECTION_OF: Record<Topic, string> = { living: "cost", housing: "housing", transport: "transport", climate: "climate", education: "education" };
 const EXTRA_FIELDS: Record<ExtraTopic, string[]> = { safety: ["safety.crimeStats", "safety.advice"], visa: ["visa.official", "visa.notes"], medical: ["living.healthcare"], daily: ["living.studentLife", "living.sim", "living.banking", "living.studentFacilities"] };
 const issueText: Record<Issue, keyof typeof ot> = { missing: "cmpMissing", notVerified: "cmpUnverified", period: "cmpPer", audience: "cmpAudience" };
@@ -37,11 +42,15 @@ const chip: Record<Availability, { label: keyof typeof cu; kind: "ok" | "ref" | 
 };
 const whyKey = (av: Availability, cmp: Cmp): keyof typeof cu.why => (av === "partial" || av === "linkOnly" ? av : cmp);
 
-function Cells({ cities, keys }: { cities: City[]; keys: Key[] }) {
+/** What exactly the number is, in one line: the statistic and area for market rents, the university for student housing. */
+const basisOf = (k: Key, topic?: CmpTopic): Localized | undefined => { if (k.kind !== "point") return undefined;
+  if (topic === "rent") return cu.rentBasis[k.point.metric];
+  if (topic === "housing" && k.point.housing) return { en: k.point.housing.school, ja: k.point.housing.school }; return undefined; };
+function Cells({ cities, keys, topic }: { cities: City[]; keys: Key[]; topic?: CmpTopic }) {
   const { L, lang } = useI18n();
   return (
     <div className="grid gap-x-6 gap-y-3" style={{ gridTemplateColumns: `repeat(${Math.min(cities.length, 4)}, minmax(0, 1fr))` }}>
-      {cities.map((c, i) => <div key={c.id} data-city={c.id} className="min-w-0"><p className="mb-1 truncate text-xs font-medium text-slate-500">{L(c.name)}</p><KeyView k={keys[i]} noneText={cu.notYet} />{keys[i].kind === "point" && <p className="mt-0.5 text-[11px] leading-snug text-slate-400" data-testid="key-period">{validForShort(keys[i].point.validFor, lang)}</p>}</div>)}
+      {cities.map((c, i) => <div key={c.id} data-city={c.id} className="min-w-0"><p className="mb-1 truncate text-xs font-medium text-slate-500">{L(c.name)}</p><KeyView k={keys[i]} noneText={cu.notYet} />{keys[i].kind === "point" && <p className="mt-0.5 text-[11px] leading-snug text-slate-400" data-testid="key-period">{validForShort(keys[i].point.validFor, lang)}</p>}{basisOf(keys[i], topic) && <p className="text-[11px] leading-snug text-slate-500" data-testid="key-basis">{L(basisOf(keys[i], topic)!)}</p>}</div>)}
     </div>
   );
 }
@@ -59,8 +68,8 @@ function DetailRow({ label, note, noteCls = "text-slate-400", extra, cities, cel
   );
 }
 
-function OfficialDetail({ cities, topic }: { cities: City[]; topic: Topic }) {
-  const { L, lang } = useI18n(); const rows = compareRows.filter((r) => ROWS_OF[topic].includes(r.id));
+function OfficialDetail({ cities, topic }: { cities: City[]; topic: CmpTopic }) {
+  const { L, lang } = useI18n(); const rows = compareRows.filter((r) => (topic === "rent" ? ["marketRent"] : ROWS_OF[topic]).includes(r.id));
   const showClimate = topic === "climate" && cities.some((c) => climateCompare(c.id));
   if (!rows.length && !showClimate) return null;
   const none = <span className="text-xs text-slate-400">{L(ot.cmpMissing)}</span>;
@@ -102,13 +111,14 @@ function FactDetail({ cities, sectionIds, fieldIds }: { cities: City[]; sectionI
   );
 }
 
-function Row({ id, title, cities, keys, cmp, children }: { id: string; title: string; cities: City[]; keys: Key[]; cmp: Cmp; children: React.ReactNode }) {
+function Row({ id, title, cities, keys, cmp, topic, note, why, children }: { id: string; title: string; cities: City[]; keys: Key[]; cmp: Cmp; topic?: CmpTopic; note?: Localized; why?: Localized; children: React.ReactNode }) {
   const { L } = useI18n(); const av = availability(keys, cmp); const c = cmp === "n/a" ? null : chip[av];
   return (
     <section id={`cmp-${id}`} data-testid={`cmp-${id}`} data-cmp={cmp} data-av={av} className={`${panel} space-y-3 p-4 sm:p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold text-[#0b2a5b]">{title}</h2>{c && <span data-testid={`chip-${id}`} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ${c.cls}`}>{L(cu[c.label] as never)}</span>}</div>
-      <p data-testid={`why-${id}`} className="-mt-1 text-xs leading-snug text-slate-500">{L(cu.why[whyKey(av, cmp)])}</p>
-      <Cells cities={cities} keys={keys} />
+      <p data-testid={`why-${id}`} className="-mt-1 text-xs leading-snug text-slate-500">{L(why ?? cu.why[whyKey(av, cmp)])}</p>
+      {note && <p className="-mt-1 text-xs leading-snug text-slate-500" data-testid={`note-${id}`}>{L(note)}</p>}
+      <Cells cities={cities} keys={keys} topic={topic} />
       <Disclosure level="more" testid={`more-${id}`}><div className="space-y-4">{children}</div></Disclosure>
     </section>
   );
@@ -124,12 +134,12 @@ export default function QuickCompare({ ids }: { ids: string[] }) {
       <p className="text-xs text-slate-500">{L(ux.cmpIntro)}</p>
       <nav aria-label={L(cu.glanceTitle)} data-testid="glance" className={`${panel} p-4`}>
         <h2 className="text-sm font-semibold text-[#0b2a5b]">{L(cu.glanceTitle)}</h2><p className="mb-2 text-[11px] text-slate-500">{L(cu.glanceNote)}</p>
-        <ul className="flex flex-wrap gap-2">{TOPICS.map((t) => { const keys = cities.map((c) => compareKey(c, t)); const av = availability(keys, compareKeys(keys)); const kind = chip[av].kind;
-          return <li key={t}><a href={`#cmp-${t}`} data-testid={`glance-${t}`} data-kind={kind} className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium ring-1 ${chip[av].cls}`}>{L(ux.topics[t])}<span className="font-normal">· {L(cu[chip[av].label] as never)}</span></a></li>; })}</ul>
+        <ul className="flex flex-wrap gap-2">{CMP_TOPICS.map((t) => { const keys = keysOf(cities, t); const av = availability(keys, cmpOf(keys, t)); const kind = chip[av].kind;
+          return <li key={t}><a href={`#cmp-${t}`} data-testid={`glance-${t}`} data-kind={kind} className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium ring-1 ${chip[av].cls}`}>{titleOf(t, L)}<span className="font-normal">· {L(cu[chip[av].label] as never)}</span></a></li>; })}</ul>
       </nav>
-      {TOPICS.map((t) => { const keys = cities.map((c) => compareKey(c, t));
-        return <Row key={t} id={t} title={L(ux.topics[t])} cities={cities} keys={keys} cmp={compareKeys(keys)}>
-          {anyOfficial && <OfficialDetail cities={cities} topic={t} />}<FactDetail cities={cities} sectionIds={[SECTION_OF[t]]} />
+      {CMP_TOPICS.map((t) => { const keys = keysOf(cities, t); const cmp = cmpOf(keys, t); const av = availability(keys, cmp);
+        return <Row key={t} id={t} title={titleOf(t, L)} cities={cities} keys={keys} cmp={cmp} topic={t} note={t === "housing" ? cu.studentHousingNote : undefined} why={t === "rent" && av !== "partial" && av !== "notYet" ? cu.rentWhy[cmp === "same" ? "same" : "differ"] : undefined}>
+          {anyOfficial && <OfficialDetail cities={cities} topic={t} />}{t !== "rent" && <FactDetail cities={cities} sectionIds={[SECTION_OF[t]]} />}
           {t === "education" && <Link href="/schools" className="inline-block text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link>}
         </Row>; })}
       <div className="flex justify-center"><button type="button" data-testid="more-compare" aria-expanded={more} onClick={() => setMore(!more)} className="min-h-[44px] rounded-full bg-white px-6 text-sm font-medium text-[#0b2a5b] ring-1 ring-slate-300 hover:bg-slate-50">{more ? L(ux.lessCompare) : L(ux.moreCompare)}</button></div>

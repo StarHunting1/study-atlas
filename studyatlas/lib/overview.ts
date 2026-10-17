@@ -89,16 +89,21 @@ export function extraKey(c: City, topic: ExtraTopic): Key {
 }
 
 /**
- * Key figure for the comparison page (Ver.1.3.8). Same as `keyFigure`, except housing: a city with no verified per-person student price
- * falls back to its shown whole-market rent (the audience line says "all renters"), so existing official data is not hidden behind
- * "in preparation". The two figures then differ in audience, so they are only ever shown as reference values, never as a verdict.
+ * The general rental market row of the comparison page (Ver.1.3.8): a city's shown whole-market rent statistic (ONS, CMHC…), kept apart from the
+ * per-student price of the housing row so the two are never read as one thing. A city without such a figure gets `none` ("not obtained").
  */
-export function compareKey(c: City, topic: Topic): Key {
-  const k = keyFigure(c, topic);
-  if (topic !== "housing" || k.kind === "point") return k;
+export function rentKey(c: City): Key {
   const rent = (officialData(c.id)?.points ?? []).filter((p) => p.topic === "housing" && p.audience === "renter" && p.value && shown(p.status) && isFigureShown(p));
   const p = rent.find((x) => x.highlight && x.status === "verified") ?? rent.find((x) => x.status === "verified") ?? rent[0];
-  return p ? { kind: "point", point: p } : k;
+  return p ? { kind: "point", point: p } : { kind: "none" };
+}
+/** Market rent statistics are directly comparable only when it is the very same statistic: same metric, currency, reference period and every figure verified. Different publishers' statistics (ONS vs CMHC) never are. */
+export function rentCmp(keys: Key[]): Cmp {
+  const pts = keys.flatMap((k) => (k.kind === "point" ? [k.point] : []));
+  if (pts.length < 2) return "missing";
+  if (pts.some((p) => p.status !== "verified")) return "unverified";
+  const same = (f: (p: DataPoint) => string) => new Set(pts.map(f)).size === 1;
+  return same((p) => p.metric) && same((p) => p.sourceId) && same((p) => p.value!.currency) && same((p) => p.value!.per) && same((p) => p.validFor) ? "same" : "differ";
 }
 
 /**
