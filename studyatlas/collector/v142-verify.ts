@@ -33,16 +33,20 @@ const ours: Record<string, number[]> = { "Daily Average": alt.months.map((m) => 
       const head = csv(lines[0]); console.log(`### ${n}: ${lines.length} lines; header: ${short(lines[0], 700)}`);
       if (/inventory/i.test(n)) { for (const l of lines.filter((x) => /VANCOUVER INT|1108447|1108395/i.test(x)).slice(0, 12)) console.log("  INV " + short(l, 500)); continue; }
       const rows = lines.filter((l) => /VANCOUVER INTERNATIONAL \(AIRPORT\)|1108447|1108395/i.test(l)); console.log(`  Vancouver rows: ${rows.length}`);
+      const col = (name: string) => head.findIndex((h) => h.replace(/^\uFEFF|^ï»¿/, "").replace(/"/g, "").toUpperCase() === name);
+      const iEl = col("NORMALS_ELEMENT"), iGrp = col("ELEMENT_GROUP"), iPer = col("PERIOD_OF_RECORD"), iJan = col("JAN"), iYear = col("YEAR"), iCode = col("CODE");
+      console.log(`  columns: element=${iEl} group=${iGrp} period=${iPer} jan=${iJan} year=${iYear} code=${iCode}`);
+      const wanted: Record<string, string> = { "Daily Average": "Daily Average", "Daily Maximum": "Daily Maximum", "Daily Minimum": "Daily Minimum", "Precipitation": "Precipitation" };
       for (const l of rows) {
-        const c = csv(l); const label = c.find((x) => /^(Daily Average|Daily Maximum|Daily Minimum|Precipitation)/i.test(x)); if (!label) { console.log("  (other) " + short(l, 300)); continue; }
-        const key = Object.keys(ours).find((k) => label.toLowerCase().startsWith(k.toLowerCase()))!;
-        let start = -1; for (let i = 0; i + 12 < c.length; i++) { if (c.slice(i, i + 13).every((x) => !Number.isNaN(num(x)))) { start = i; break; } }
-        if (start < 0) { console.log(`  ${label}: no 13-number run in: ${short(l, 300)}`); continue; }
-        const vals = c.slice(start, start + 12).map(num), year = num(c[start + 12]); const codes = c.slice(start + 13, start + 27).join("|");
+        const c = csv(l); const el = c[iEl] ?? ""; const grp = c[iGrp] ?? ""; const per = c[iPer] ?? "";
+        if (/Normal/i.test(per) === false && !/^Normal$/i.test(per)) { /* period-of-record column differs per file; keep going */ }
+        const key = Object.keys(wanted).find((k) => el.toLowerCase().startsWith(k.toLowerCase()) && !/days|extreme|rainfall|snow|date/i.test(el));
+        if (!key || !/Temperature|Precipitation/i.test(grp)) { if (/Temperature|Precipitation/i.test(grp)) console.log(`  (not compared) ${grp} / ${el} [${per}]`); continue; }
+        const vals = c.slice(iJan, iJan + 12).map(num); const year = num(c[iYear]); const code = c[iCode];
         found++; const diffs = vals.map((v, i) => (Math.abs(v - ours[key][i]) < 0.005 ? "" : `${MO[i]}: ECCC ${v} vs ours ${ours[key][i]}`)).filter(Boolean);
         const sum = Number(vals.reduce((a, b) => a + b, 0).toFixed(1)); const mean = Number((vals.reduce((a, b) => a + b, 0) / 12).toFixed(2));
         if (diffs.length) bad++; else ok++;
-        console.log(`  ${label} [${c.slice(0, start).filter((x) => x).slice(0, 4).join(" / ")}]: ${diffs.length ? "MISMATCH " + diffs.join("; ") : "all 12 monthly values match"}; ECCC annual=${year}; sum of months=${sum}; mean of months=${mean}; codes=${codes}`);
+        console.log(`  ELEMENT "${el}" [${grp} / ${c[iPer]}]: ${diffs.length ? "MISMATCH " + diffs.join("; ") : "all 12 monthly values match"}; ECCC annual=${year}; sum of months=${sum}; mean of months=${mean}; code=${code}`);
         console.log(`    ECCC monthly: ${vals.join(", ")}`);
       }
     }
