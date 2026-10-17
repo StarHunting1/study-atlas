@@ -34,5 +34,14 @@ export const cu = {
     "housing.marketRent.1br@toronto": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Toronto census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・トロント都市圏（市より広い）"),
     "housing.marketRent.1br": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Vancouver census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・バンクーバー都市圏（市より広い）"),
   } as Record<string, Localized>,
+  /** Why two whole-market rents are not on the same footing, named from the parts that really differ (rentBasis.ts). */
+  rentDiff: {
+    fields: {
+      publisher: t("publisher", "発表元"), table: t("statistic / table", "統計の種類・表"), measure: t("what is averaged", "平均の取り方"), structure: t("dwelling types included", "対象の住宅の種類"), unitKey: t("bedroom size", "間取り"),
+      area: t("kind of area (region, metropolitan area or one local authority)", "地域区分（地域全体・都市圏・1つの自治体）"), year: t("year or month", "対象年・月"), currency: t("currency", "通貨"), per: t("period unit", "期間の単位"),
+    } as Record<string, Localized>,
+    why: t("Not the same statistic. It differs in: {fields}. Shown side by side as reference, never as a direct comparison. Currencies are not converted.", "同じ統計ではありません（違い：{fields}）。参考として並べるだけで、直接は比較しません。通貨は換算しません。"),
+    note: t("Not directly comparable. It differs in: {fields}. No “cheaper” verdict is given and currencies are not converted.", "直接は比較できません（違い：{fields}）。どちらが安いかは判定せず、通貨は換算しません。"),
+  },
   remove: t("Remove from comparison", "比較から外す"), details: t("City details", "都市の詳細"),
 };

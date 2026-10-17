@@ -10,8 +10,8 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | TransLink (`translink-fares`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | 12 link-only |
 | The University of Manchester (`uom-cost-of-living`) | **needs-review** | figure-with-link | page-check-only | page-check | 2026-10-14 | yes | 10 figure-with-link |
 | The University of Manchester (accommodation) (`uom-accommodation`) | **needs-review** | figure-with-link | page-check-only | page-check | 2026-10-14 | yes | 5 figure-with-link |
-| Office for National Statistics – Price Index of Private Rents (Manchester) (`ons-private-rents`) | **permitted** | full | allowed | open-data-file | 2026-10-17 | no | 1 full |
-| Statistics Canada / CMHC – average rents (table 34-10-0133-01) (`statcan-cmhc-rents`) | **permitted** | full | allowed | open-api | 2026-10-17 | no | 4 full |
+| Office for National Statistics – Price Index of Private Rents (Manchester) (`ons-private-rents`) | **permitted** | full | allowed | open-data-file | 2026-10-17 | no | 2 full |
+| Statistics Canada / CMHC – average rents (table 34-10-0133-01) (`statcan-cmhc-rents`) | **permitted** | full | allowed | open-api | 2026-10-17 | no | 8 full |
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 1 full |
 | Met Office – historical monthly station data (Ringway) (`metoffice-station-data`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | 1 full |
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |

@@ -168,7 +168,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
 
   await t("consistency report: published figures vs API values", async () => {
     const real = { ...emptySnapshot(), records: Object.fromEntries(["bachelor", "1br", "2br", "3br"].map((k, i) => [`statcan-cmhc-rents:vancouver:${k}`, { value: { number: [1667, 1807, 2364, 2820][i] }, period: "2025" }])) } as never;
-    const rows = officialConsistency(real).filter((c) => c.collectedId.startsWith("statcan"));
+    const rows = officialConsistency(real).filter((c) => c.collectedId.startsWith("statcan-cmhc-rents:vancouver"));
     assert.equal(rows.length, 4); assert.ok(rows.every((r) => r.result === "match"));
     const moved = JSON.parse(JSON.stringify(real)); moved.records["statcan-cmhc-rents:vancouver:1br"].value.number = 1900;
     assert.equal(officialConsistency(moved).filter((c) => c.result === "differs").length, 1);

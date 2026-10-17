@@ -136,8 +136,11 @@ export function approvalSheet(): string {
     "- [ ] 画面を切り替えたときの影響（上記）を読み、1981–2010 を履歴（`climateAlt`）に残す手順に同意した",
     "- [x] 承認の記録を書いた（2026-10-17、StarHunting1。`data/approvals.ts`）", "",
     "**Manchester**: 1991–2020 は取り込めていません（旧 1971–2000 のまま）。理由は `data/APPROVAL_CANDIDATES.md` の「気候データの承認候補」を参照。");
-  L.push("", "## 6. Toronto・London の家賃統計（Ver.1.5.1）: 照合済み・承認待ち（verified ではありません）", "",
-    "公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。ここに書いてあるのは承認の**準備**だけです。承認記録（`RENT_APPROVALS`）が空の間、数値は画面にも比較にも出ず、どれも verified になりません。承認は**数値ごと**（Toronto 4件・London 1件）に別々にできます。",
+  const rentDone = ALL_RENT_CANDIDATES.every((c) => !!RENT_APPROVALS[c.id]); const box = rentDone ? "x" : " ";
+  L.push("", rentDone ? "## 6. Toronto・London の家賃統計（Ver.1.5.2）: 承認済み・本番反映（5件）" : "## 6. Toronto・London の家賃統計（Ver.1.5.1）: 照合済み・承認待ち（verified ではありません）", "",
+    rentDone
+      ? "公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。この5件（Toronto 4件・London 1件）は、2026-10-17 に StarHunting1 が数値・出典・統計定義を明示して公開を承認し、`RENT_APPROVALS` に**数値ごと**の記録を登録しました（承認した内容と違う数値・出典・期間・定義はダイジェスト不一致でビルドが失敗します）。他のデータの状態は変わっていません。"
+      : "公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。ここに書いてあるのは承認の**準備**だけです。承認記録（`RENT_APPROVALS`）が空の間、数値は画面にも比較にも出ず、どれも verified になりません。承認は**数値ごと**（Toronto 4件・London 1件）に別々にできます。",
     "", "| 項目 | 内容 |", "|---|---|",
     "| Toronto の出典 | Statistics Canada 表 34-10-0133-01（CMHC 賃貸市場調査）。地域メンバー125「Toronto, Ontario」＝国勢調査都市圏（CMA）コード535（geoLevel 503）。Toronto 市そのものではなく、より広い都市圏全体 |",
     "| Toronto の定義 | 構造タイプ3「Row and apartment structures of three units and over」の、間取り別の平均家賃（調査対象年2025、2025-12-17公表）。学生向け住居・語学学校の滞在先・留学生の平均ではない |",
@@ -160,10 +163,10 @@ export function approvalSheet(): string {
     "4. 数値・出典・期間・定義を後から変更すると、ダイジェストが一致せずビルドが失敗します（承認した内容と違うものは公開されません）。変更した場合は公式データと再照合して承認し直してください。",
     "5. 承認していない数値は、都市ページでは「承認待ち」の説明と公式リンクが残り、都市比較では「承認待ち（数値は未掲載）」と表示されます。Smart Planner には自動計上されません（Toronto・London には Planner の規則がありません）。", "",
     "### 6.3 承認チェックリスト", "",
-    "- [ ] Toronto 4値（Bachelor 1,491／1BR 1,761／2BR 2,045／3BR 2,294 CAD/月、2025、CMA 535）を公式の表と照合した",
-    "- [ ] London 1値（£2,332/月、2026年8月、London region E12000007、全住宅）を公式と照合した",
-    "- [ ] CMHC ライセンス（商用利用可・出典表示必須・取消可能）と OGL v3.0 を確認した",
-    "- [ ] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した",
-    "- [ ] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）");
+    `- [${box}] Toronto 4値（Bachelor 1,491／1BR 1,761／2BR 2,045／3BR 2,294 CAD/月、2025、CMA 535）を公式の表と照合した`,
+    `- [${box}] London 1値（£2,332/月、2026年8月、London region E12000007、全住宅）を公式と照合した`,
+    `- [${box}] CMHC ライセンス（商用利用可・出典表示必須・取消可能）と OGL v3.0 を確認した`,
+    `- [${box}] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した`,
+    `- [${box}] 承認記録を \`RENT_APPROVALS\` に書いた（数値ごと）`);
   return L.join("\n") + "\n";
 }

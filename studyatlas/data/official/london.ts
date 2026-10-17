@@ -1,17 +1,18 @@
 import type { OfficialCityData, TopicNotice } from "./types";
-import { londonRentPoints, pendingRentIds } from "./cityRents";
+import { RENT_APPROVALS, londonRentPoints, pendingRentIds, type RentApproval } from "./cityRents";
 /*
  * London – official data (Ver.1.5.0). The ONS rent comes from cityRents.ts and exists here ONLY after a person's approval (LONDON_RENT_APPROVAL).
  * Until then the city page and the comparison show the conditions and the official links below instead of numbers.
  * TfL fares are link-only: tfl.gov.uk answered an automated request with HTTP 403, so the pages were neither read nor retried and no amount is copied.
  */
 const PIPR = "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics";
-const data: OfficialCityData = {
+/** The London data for a given set of rent approvals (the real one by default). Tests call it with other sets to check the unapproved and partly approved states. */
+export const londonData = (approvals: Record<string, RentApproval> = RENT_APPROVALS): OfficialCityData => ({
   cityId: "london",
-  points: [...londonRentPoints()],
+  points: [...londonRentPoints(approvals)],
   notices: [
     // the "awaiting approval" notice stays while any of this city's rent figures is still unapproved
-    ...(pendingRentIds("london").length === 0 ? [] : [{ topic: "housing", sourceId: "ons-private-rents", why: "awaiting-approval",
+    ...(pendingRentIds("london", approvals).length === 0 ? [] : [{ topic: "housing", sourceId: "ons-private-rents", why: "awaiting-approval",
       text: {
         en: "A public rent statistic exists for London (Office for National Statistics, Price Index of Private Rents: average monthly private rent of all dwellings in the London region, August 2026, in pounds). It has been collected but has not been checked and approved by a person yet, so StudyAtlas does not show that number. When approved it will appear as a region-wide average (ONS code E12000007, all 33 local authorities of Greater London; boroughs differ a lot) – not student housing, not university halls and not language-school housing. It will not be treated as the same statistic as Manchester's figure, which covers one local authority only.",
         ja: "ロンドンの公的な家賃統計（英国国家統計局 ONS の民間家賃指数：ロンドン地域の民間賃貸住宅すべての平均月額家賃、2026年8月、ポンド）はありますが、人による確認と承認が済んでいないため、StudyAtlasでは数値を表示していません。承認後は、地域全体の平均（ONS地域コード E12000007、グレーター・ロンドンの33自治体すべて。区ごとの差は大きい）として表示します（学生向け住居・大学寮・語学学校の滞在先の料金ではありません）。単一の自治体を対象とするマンチェスターの値と同じ統計としては扱いません。",
@@ -24,5 +25,5 @@ const data: OfficialCityData = {
       },
       links: [{ label: { en: "TfL – Fares", ja: "TfL – 運賃" }, url: "https://tfl.gov.uk/fares" }] },
   ],
-};
-export default data;
+});
+export default londonData();
