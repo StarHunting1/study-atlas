@@ -101,10 +101,6 @@ jobs:
         if: github.event_name == 'pull_request'
         run: npx tsx collector/linkcheck.ts | tee -a "$GITHUB_STEP_SUMMARY"
 
-      - name: Ver.1.4.2 climate check (pull requests only; temporary reviewer aid, nothing stored)
-        if: github.event_name == 'pull_request'
-        run: npx tsx collector/v142-verify.ts | tee -a "$GITHUB_STEP_SUMMARY"
-
       - name: Keep the collected files as an artifact
         if: always()
         uses: actions/upload-artifact@v4
