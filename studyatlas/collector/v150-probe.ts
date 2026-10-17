@@ -52,7 +52,7 @@ async function pages() {
     try { const rb = await robotsFor(u); if (!rb.allowed) { log("PAGE", u, "robots disallow"); continue; }
       const r = await fetchText(u); const title = /<title[^>]*>([^<]*)/i.exec(r.body)?.[1]?.trim();
       const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, "\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
-      const hit = [...new Set(text.filter((l) => l.length < 260 && (/[A-Z]\d[A-Z] ?\d[A-Z]\d|\b[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|accredit|Languages Canada|British Council|English UK|\bage[ds]?\b|years? old|\b1[68]\+|\b[0-9]+ (?:Yonge|Bloor|King|Adelaide|Wellington|Bay|Charles|Oxford|Regent|Southampton)/i.test(l)))].slice(0, 14);
+      const hit = [...new Set(text.filter((l) => l.length < 260 && (/[A-Z]\d[A-Z] ?\d[A-Z]\d|\b[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|accredit|Languages Canada|British Council|English UK|\bage[ds]?\b|years? old|\b1[68]\+|\b[0-9]+ (?:Yonge|Bloor|King|Adelaide|Wellington|Bay|Charles|Oxford|Regent|Southampton)/i.test(l))))].slice(0, 14);
       log("PAGE", u, r.status, r.url, "|", title, "\n   " + hit.join("\n   "));
     } catch (e) { log("PAGE", u, "ERR", String(e)); }
     await sleep(1200);
