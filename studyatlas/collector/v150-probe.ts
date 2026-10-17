@@ -1,6 +1,7 @@
 /* Ver.1.5.0 temporary read-only probe (removed before the PR is finished). Respects robots.txt, one request at a time, no retries beyond util defaults. */
-import { robotsFor } from "./probe";
-import { fetchBinary, fetchText, postJson, sleep } from "./util";
+import { makeRobots } from "./robots";
+import { fetchBinary, fetchText, postJson, sleep, USER_AGENT } from "./util";
+const robotsFor = makeRobots((u) => fetchText(u, { accept: "text/plain" }), USER_AGENT);
 import { latestEdition, PIPR_PAGE } from "./sources/onsrent";
 import { openWorkbook, sheetRows } from "./sources/xlsx";
 
