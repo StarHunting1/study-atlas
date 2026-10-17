@@ -6,7 +6,7 @@ import { cities, countries } from "@/data/cities";
 import { boundsOf, COUNTRY_SHAPES } from "@/data/countryShapes";
 import { useI18n } from "@/lib/i18n";
 import { countryName, cityName } from "@/lib/names";
-import { classifyWheel, newWheelState, panDelta } from "@/lib/wheel";
+import { classifyWheel, isMacLike, newWheelState, panDelta } from "@/lib/wheel";
 import { activeCountry, countryFitBounds, fitPadding, isLabelLayer, labelExpression, paintOverrides, PALETTE, type StyleLayer } from "@/lib/mapStyle";
 
 /**
@@ -44,7 +44,9 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
   };
 
   useEffect(() => {
-    const touch = window.matchMedia?.("(pointer: coarse)").matches ?? false;
+    // A touch-first device (phone, iPad): no hover AND a coarse pointer. `(pointer: coarse)` alone is not enough: some laptops/browsers report a coarse primary pointer while a
+    // trackpad is in use, and MapLibre's "two fingers" cooperative gestures then block the trackpad completely (Ver.1.3.7d).
+    const touch = window.matchMedia?.("(hover: none) and (pointer: coarse)").matches ?? false;
     let m: maplibregl.Map;
     try {
       m = new maplibregl.Map({ container: el.current!, style: MAP_STYLE_URL, bounds: WORLD_BOUNDS, fitBoundsOptions: { padding: 8 }, minZoom: -1, maxZoom: 14, attributionControl: { compact: true }, cooperativeGestures: touch, ...(langRef.current === "ja" ? { locale: JA_GESTURES } : {}) });
@@ -52,13 +54,13 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
     map.current = m; const host = el.current!; host.dataset.mapState = "loading";
     if (process.env.NEXT_PUBLIC_MAP_DEBUG) (window as unknown as { __saMap?: maplibregl.Map }).__saMap = m;   // browser checks in CI only (build-time flag)
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-    // Trackpad (Ver.1.3.7c): a two-finger swipe pans the map; pinch (ctrl+wheel, or Safari's gesture events) and a real mouse wheel keep zooming; touch screens are left alone.
+    // Trackpad (Ver.1.3.7c/d): a two-finger swipe pans the map; pinch (ctrl+wheel, or Safari's gesture events) and a real mouse wheel keep zooming; touch screens are left alone.
     // Our listener runs first (capture phase on the map's host); for a swipe it stops the event before MapLibre's own wheel zoom sees it.
     const cleanups: (() => void)[] = [];
-    if (!touch) {
-      const ws = newWheelState();
+    {   // always installed: wheel events only ever come from a wheel or trackpad (never from touch), so this cannot affect touch screens
+      const ws = newWheelState(); const mac = isMacLike(navigator.userAgent);
       const onWheel = (e: WheelEvent) => {
-        const kind = classifyWheel({ deltaX: e.deltaX, deltaY: e.deltaY, deltaMode: e.deltaMode, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, wheelDeltaY: (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY }, ws, performance.now());
+        const kind = classifyWheel({ deltaX: e.deltaX, deltaY: e.deltaY, deltaMode: e.deltaMode, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, wheelDeltaY: (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY }, ws, performance.now(), mac);
         host.dataset.wheel = kind; if (kind !== "trackpad") return;
         e.preventDefault(); e.stopPropagation(); const [dx, dy] = panDelta(e); m.panBy([dx, dy], { animate: false });
       };
