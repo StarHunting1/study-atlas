@@ -126,4 +126,11 @@ t("display: the country page lists each claim with its own status (U1/U2/U6 veri
   const man = wrap(h(FactView, { fact: getCity("manchester")!.profile.living.healthcare, kind: "text" })); assert.ok(/data-claim="U5b"[^>]*data-status="verified"/.test(man) && /data-claim="U5a"[^>]*data-status="unverified"/.test(man));
   for (const f of [g.official, g.notes]) { assert.ok(f.value!.ja && f.value!.en); }
 });
+t("Ver.1.4.2: the ECCC CSV check is recorded in the approval sheet (48/48 values, station IDs, annual values, licence) and the candidate stays unverified and not displayed", () => {
+  const sheet = approvalSheet();
+  for (const w of ["ECCC の元 CSV との照合結果", "39051554489", "48個すべて", "12/12 一致", "1159.5", "1159.7", "最大 ±0.6 mm", "断定はできません", "1108447", "1108395", "Version 2.1.1", "人による承認ではありません"]) assert.ok(sheet.includes(w), w);
+  const sum = Number(official.climateAlt!.months.reduce((n, m) => n + m.precipMm!, 0).toFixed(1)); assert.equal(sum, 1159.7); assert.ok(Math.abs(sum - ECCC_ANNUAL_PRECIP_1991_2020) <= 0.6);
+  assert.equal(official.climateAlt!.status, "unverified"); assert.equal(official.climate!.period, "1981–2010"); assert.equal(official.climate!.status, "verified");
+  assert.ok(!readFileSync("../.github/workflows/collect-data.yml", "utf8").includes("v142-verify"), "the temporary probe step is removed");
+});
 console.log(n, "approval tests passed");

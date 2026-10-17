@@ -28,7 +28,7 @@ export function climateChecks(c: ClimateNormals, annualPrecip?: number): Check[]
   const range = m.every((x) => [x.meanC!, x.maxC!, x.minC!].every((v) => v > -40 && v < 45) && x.precipMm! >= 0 && x.precipMm! < 1000);
   out.push({ label: "値が現実的な範囲（気温 −40〜45 ℃、月降水量 0〜1000 mm）", ok: range, detail: range ? "範囲内" : "範囲外の値あり" });
   const sum = Number(m.reduce((n, x) => n + (x.precipMm ?? 0), 0).toFixed(1));
-  if (annualPrecip !== undefined) out.push({ label: `月降水量の合計が公表の年値（${annualPrecip} mm）と一致（四捨五入の誤差 ±1.0 mm）`, ok: Math.abs(sum - annualPrecip) <= 1.0, detail: `合計 ${sum} mm、差 ${(sum - annualPrecip).toFixed(1)} mm` });
+  if (annualPrecip !== undefined) out.push({ label: `月降水量の合計が公表の年値（${annualPrecip} mm）と、月値12個の四捨五入の最大誤差（±0.6 mm）以内で一致`, ok: Math.abs(sum - annualPrecip) <= 0.6, detail: `合計 ${sum} mm、差 ${(sum - annualPrecip).toFixed(1)} mm` });
   const mean = m.map((x) => x.meanC!); const warm = mean.indexOf(Math.max(...mean)), cold = mean.indexOf(Math.min(...mean));
   out.push({ label: "最暖月が7〜8月、最寒月が12〜2月（北半球の気候として自然）", ok: [6, 7].includes(warm) && [11, 0, 1].includes(cold), detail: `最暖 ${warm + 1}月、最寒 ${cold + 1}月` });
   out.push({ label: "観測所ID・期間・出典URL・取得日・引用が記録されている", ok: !!(c.stationId && c.period && c.evidence[0]?.url && c.retrievedAt && c.evidence[0]?.quote), detail: `${c.stationId}／${c.period}／${c.retrievedAt}` });
@@ -115,9 +115,19 @@ export function approvalSheet(): string {
     ...climateChecks(nw, ECCC_ANNUAL_PRECIP_1991_2020).map((k) => `| ${k.label} | ${k.ok ? "✅ 一致" : "❌ 要確認"} | ${esc(k.detail)} |`),
     "", "- 年平均気温など、気温の年値は記録していません。承認者が ECCC の CSV（Year 列）と月別値を照合してください。",
     "- 旧 1981–2010 との差は上表のとおり（気温は最大 ±0.4 ℃、月降水量は最大 −14.3〜+10.3 mm）。基準期間が10年ずれたこと（1981–2010 → 1991–2020）と、観測所が単独の 1108447 から合成観測所（1108447＋1108395）に変わったことの両方が考えられ、この資料だけではどちらの影響かを分けられません。",
+    "", "### ECCC の元 CSV との照合結果（Ver.1.4.2、GitHub Actions run 39051554489・2026-10-17）", "",
+    "ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリティッシュコロンビア州、HTTP 200、1回だけ取得、robots.txt 許可）の「VANCOUVER INTERNATIONAL (AIRPORT)」の Normal の行と、保存済みの値を列の見出し（NORMALS_ELEMENT）で突き合わせた結果です。取得したCSVは保存していません。", "",
+    "| 要素（CSV の NORMALS_ELEMENT） | 月別12値 | ECCC の年値 | 月値の平均／合計 | コード |", "|---|---|---|---|---|",
+    "| Daily Average (°C) | **12/12 一致** | 10.5 | 平均 10.49 | B |", "| Daily Maximum (°C) | **12/12 一致** | 14.0 | 平均 13.98 | B |", "| Daily Minimum (°C) | **12/12 一致** | 7.0 | 平均 6.97 | B |", "| Precipitation (mm) | **12/12 一致** | 1159.5 | 合計 1159.7 | C |", "",
+    "- **一致**：48個すべて（4要素×12か月）。不一致は 0 件。",
+    "- **年値**：気温の年値は月値の平均を小数第1位に丸めた値と一致（10.49→10.5、13.98→14.0、6.97→7.0）。降水量は ECCC の年値 1159.5 mm と月値の合計 1159.7 mm で **0.2 mm 差**。月値12個はそれぞれ小数第1位への四捨五入なので、合計には最大 ±0.6 mm の誤差が入りうる範囲に収まっている（0.2 mm は範囲内）。ただし ECCC が年値をどう算出しているか（月値の合計か、年ごとの値の平均か）は CSV や資料に書かれておらず、**差の原因を断定はできません**。",
+    "- **観測所**（観測所一覧より）：合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)（NORMALS_CODE C）。構成：VANCOUVER INT'L A（気候ID 1108447、TC識別子 YVR、WMO なし、北緯49.20・西経-123.18、標高4.3 m）と VANCOUVER INTL A（気候ID 1108395、WMO 71892、YVR、北緯49.19・西経-123.18、標高4.3 m）。ID は保存値（1108447＋1108395）と一致。",
+    "- **単位・期間**：気温 °C、降水量 mm。ECCC の 1991–2020 カナダ気候平年値（Normal）。保存値の期間表記 1991–2020 と一致。",
+    "- **ライセンス**（ECCC の公式ページで確認、HTTP 200）：Environment and Climate Change Canada Data Services End-use Licence **Version 2.1.1（2026年8月版）**。「商用目的を含めて」世界的・無償・永続的・非独占で利用可。出典表示：「Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada.」（本サイトはこの文言を表示する設定）。保存値の記録は v2.1 と書いているので、版番号を 2.1.1 に直す余地がある（内容の違いは未確認）。",
+    "- **未確認・未解決**：①コード B（気温）・C（降水量）の意味（ECCC の凡例）は今回確認していません。②降水量の年値の差 0.2 mm の算出方法。③この照合は Actions が取得した CSV と保存値の機械的な一致で、**人による承認ではありません**。",
     "", "### 気候データ承認チェックリスト（K1）", "",
     "- [ ] ECCC の公式ページ／一括CSVを開き、観測所（合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)、気候ID 1108447・1108395）が一致している",
-    "- [ ] 月別の日平均・日最高・日最低（℃）と降水量（mm）の48個の値が上表の「新」と一致している（年値も照合）",
+    "- [ ] 月別の日平均・日最高・日最低（℃）と降水量（mm）の48個の値が上表の「新」と一致している（年値も照合）— Actions の機械照合では全一致（上の結果）。人の最終確認はここ",
     "- [ ] 単位・基準期間（1991–2020）・品質コード（気温 B、降水量 C）を確認した",
     "- [ ] ライセンス（ECCC Data Services End-use Licence v2.1）と出典表示の文言が画面に出る設定になっている",
     "- [ ] 画面を切り替えたときの影響（上記）を読み、1981–2010 を `climateAlt` に残す手順に同意した",
