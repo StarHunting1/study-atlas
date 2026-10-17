@@ -17,8 +17,7 @@ export function officialConsistency(snap: Snapshot): Consistency[] {
       const same = r.value.number === p.value?.amount && (r.period ?? "") === p.validFor.slice(0, (r.period ?? "").length);
       out.push({ id: p.id, collectedId: p.collectedId, result: same ? "match" : "differs", detail: same ? undefined : `site ${p.value?.amount} (${p.validFor}) vs API ${r.value.number} (${r.period})` });
     }
-    const cl = c.climate;
-    for (const cid of cl?.collectedIds ?? []) {
+    for (const cl of [c.climate, c.climateAlt]) for (const cid of cl?.collectedIds ?? []) {
       const r = snap.records[cid];
       if (!r) { out.push({ id: cl!.id, collectedId: cid, result: "not-collected" }); continue; }
       const key = ({ "temp-mean": "meanC", "temp-max": "maxC", "temp-min": "minC", precip: "precipMm", tmax: "maxC", tmin: "minC", rain: "precipMm" } as const)[cid.split(":").pop() as "tmax"] ?? "precipMm";

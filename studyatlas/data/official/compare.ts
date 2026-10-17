@@ -71,7 +71,7 @@ export function climateCompare(cityId: string): ClimateCompare | undefined {
   const col = (k: "maxC" | "minC" | "meanC" | "precipMm") => c.months.map((m) => m[k]).filter((v): v is number => v !== undefined);
   const rng = (v: number[]): [number, number] | undefined => (v.length === 12 ? [Math.min(...v), Math.max(...v)] : undefined);
   const rain = col("precipMm");
-  return { tmax: rng(col("maxC")), tmin: rng(col("minC")), mean: rng(col("meanC")), precipTotal: rain.length === 12 ? Math.round(rain.reduce((a, b) => a + b, 0)) : undefined, station: c.station, period: c.period, derived: !!c.derived, status: c.status };
+  return { tmax: rng(col("maxC")), tmin: rng(col("minC")), mean: rng(col("meanC")), precipTotal: c.annual?.precipMm !== undefined ? c.annual.precipMm : rain.length === 12 ? Math.round(rain.reduce((a, b) => a + b, 0)) : undefined, station: c.station, period: c.period, derived: !!c.derived, status: c.status };
 }
 /** Climate rows can be compared only when the averaging periods are the same (and both are verified). */
 export function climateIssues(list: (ClimateCompare | undefined)[]): Issue[] {

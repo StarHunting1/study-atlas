@@ -103,7 +103,7 @@ What each publisher's published terms permit, how the data may be accessed, and 
 
 - reuseStatus: **permitted** · collector: **allowed** · access: open-api · last reviewed: 2026-10-14
 - source: https://api.weather.gc.ca/collections/climate-normals
-- terms / licence: https://eccc-msc.github.io/open-data/licence/readme_en/ (Environment and Climate Change Canada Data Services End-use Licence v2.1)
+- terms / licence: https://eccc-msc.github.io/open-data/licence/readme_en/ (Environment and Climate Change Canada Data Services End-use Licence v2.1.1 (August 2026))
 - restrictions: attribution-required, robots-disallows-api-path
 - attribution required: “Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada.”
 - robots.txt exception: `https://api.weather.gc.ca/collections/climate-normals/` — The MSC Open Data Services Usage Policy documents programmatic use of the GeoMet API (limit: about 1 request per second); robots.txt disallows /collections/*/items for crawlers and points to that policy. (https://eccc-msc.github.io/open-data/usage-policy/readme_en)

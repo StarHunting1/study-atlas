@@ -5,6 +5,16 @@
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
 
+## 0k. Ver.1.4.3 の結果（Vancouver 1991–2020 気候を正式承認・本番反映）
+
+| 項目 | 結果 |
+|---|---|
+| verified にしたデータ | Vancouver の気候平年値 1991–2020：日平均・日最高・日最低・降水量の月別48値（ECCC、合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)＝気候ID 1108447＋1108395）。承認者 StarHunting1、承認日 2026-10-17、根拠＝ユーザーの明示的な公開承認＋PR #46 の元CSV全48値照合。記録と承認した数値は `data/approvals.ts`（承認後に変更するとビルドが失敗） |
+| 本番表示 | 都市ページの気候（グラフ・概要・月別表）と都市比較が 1991–2020 に切り替わり、年間降水量は ECCC 公表の年値 1159.5 mm を表示（月別合計 1159.7 mm ではない。0.2 mm 差の原因は断定しない）。旧 1981–2010 は履歴として保持し、どの画面にも出さない（値の混在なし）。「最新の標準期間ではありません」の注意書きは Vancouver から消え、Manchester（1971–2000）に残る |
+| 出典・ライセンス | ECCC Data Services End-use Licence v2.1.1（2026年8月、商用可・出典表示必須）。出典表示「Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada.」と出典URL・確認日・基準期間・観測所を気候カードに表示 |
+| Manchester との比較 | Manchester は 1971–2000（Met Office Ringway、StudyAtlas 計算）のまま。基準期間が異なるため「参考値のみ」で、同じ基準期間として直接比較しない（比較表に「統計期間が異なります」を表示） |
+| 変更していないもの | 他のデータの verified 状態（承認済み claim は5件のまま）、Planner、学校比較、地図、ビザ・医療の claim 承認システム |
+
 ## 0j. Ver.1.4.2 の結果（Vancouver 1991–2020 気候の最終照合。verified への変更・本番切り替えなし）
 
 | 項目 | 結果 |

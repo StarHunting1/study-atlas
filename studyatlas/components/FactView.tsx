@@ -31,7 +31,7 @@ function MoneyText({ m }: { m: Money }) {
 function ClimateTable({ c }: { c: MonthlyClimate }) {
   const { L, lang } = useI18n(); const months = d.months[lang === "ja" ? "ja" : "en"];
   return (
-    <div className="overflow-x-auto"><table className="w-full min-w-[560px] text-center text-xs">
+    <div className="min-w-0 max-w-full overflow-x-auto"><table className="w-full min-w-[560px] text-center text-xs">
       <thead><tr><th /> {months.map((m) => <th key={m} className="px-1 py-1 font-medium text-slate-500">{m}</th>)}</tr></thead>
       <tbody>
         <tr><th className="pr-2 text-left font-medium text-slate-500">{L(d.tempC)}</th>{c.meanTempC.map((v, i) => <td key={i} className="px-1 py-1">{v}</td>)}</tr>
@@ -70,8 +70,8 @@ export default function FactView({ fact: rawFact, kind, compact, lean }: { fact:
         </p>
   ) : null;
   return (
-    <div className="space-y-1">
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">{body}{!(lean && shownStatus === "verified") && <StatusBadge status={shownStatus} />}</div>
+    <div className="min-w-0 space-y-1">
+      <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">{body}{!(lean && shownStatus === "verified") && <StatusBadge status={shownStatus} />}</div>
       {includes && <p className="text-xs text-slate-500">{L(d.includes)}: {L(includes)}</p>}
       {lean ? (meta && <Disclosure level="sources">{meta}</Disclosure>) : meta}
       {!compact && fact.note && <p className="text-[11px] leading-relaxed text-slate-400">{L(fact.note)}</p>}

@@ -6,6 +6,7 @@ import type { DataPoint, OfficialCityData } from "@/data/official/types";
 import { officialSources } from "@/data/official";
 import { sections } from "@/data/fields";
 import { displayModeOfClimate, showsFigure } from "@/data/official/rights";
+import { RIGHTS } from "@/data/official/rights.data";
 import { healthLinks, visaLinks } from "@/data/visa";
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
@@ -77,7 +78,7 @@ function Profile({ city, id, order, skip }: { city: City; id: string; /** field 
     <dl className="divide-y divide-slate-100">
       {fields.map((f) => (
         <div key={f.id} className="grid gap-1 py-2.5 text-sm sm:grid-cols-[9rem_1fr] sm:gap-3">
-          <dt className="text-slate-500">{L(f.label)}</dt><dd className="text-slate-700"><FactView fact={f.get(city)} kind={f.kind} lean /></dd>
+          <dt className="text-slate-500">{L(f.label)}</dt><dd className="min-w-0 text-slate-700"><FactView fact={f.get(city)} kind={f.kind} lean /></dd>
         </div>
       ))}
     </dl>
@@ -104,16 +105,17 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
     <Disclosure level="more" label={L(ot.housingMarketMore)} testid="market-more"><div className="space-y-3"><p className="text-xs leading-relaxed text-slate-500">{L(ot.housingMarketMoreNote)}</p>
       <Group title={L(ot.housingMarket)} points={by("housing").filter((p) => housingKindOf(p) === "market")} /></div></Disclosure><Profile city={city} id="housing" order={order} /></>;
   if (topic === "transport") body = <><Group title={L(ot.transportAdult)} points={by("transport").filter((p) => p.audience === "adult")} /><Group title={L(ot.transportStudent)} points={by("transport").filter((p) => p.audience !== "adult")} /><Profile city={city} id="transport" /></>;
-  if (topic === "climate") body = <>{data?.climate && showsFigure(displayModeOfClimate(data.climate)) && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}</span></div><ClimateCharts c={data.climate} />
+  if (topic === "climate") body = <>{data?.climate && showsFigure(displayModeOfClimate(data.climate)) && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}{data.climate.checkedAt ? ` · ${L(d.checked)}: ${data.climate.checkedAt}` : ""}</span></div><ClimateCharts c={data.climate} />
     {data.climate.derived && <p className="rounded-lg bg-amber-50 px-3 py-2 text-xs text-amber-900">{L(ot.climateDerived)}</p>}
     {Number(/(\d{4})\D*$/.exec(data.climate.period)?.[1] ?? 9999) < 2020 && <p className="rounded-lg bg-slate-50 px-3 py-2 text-xs text-slate-600 ring-1 ring-slate-200" data-testid="climate-old">{tpl(L(ot.climateOld), { period: data.climate.period })}</p>}
+    {RIGHTS[data.climate.sourceId]?.attribution && <p className="text-[11px] leading-snug text-slate-500" data-testid="climate-attribution">{RIGHTS[data.climate.sourceId].attribution}{RIGHTS[data.climate.sourceId].licence ? ` (${RIGHTS[data.climate.sourceId].licence})` : ""}</p>}
     <Disclosure level="sources"><p className="text-[11px] text-slate-500">{data.climate.evidence.map((e) => <span key={e.url}>{L(ot.source)}: <a href={e.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{e.publisher}</a> — {L(e.section)} </span>)}</p>{data.climate.note && <p className="mt-1 text-[11px] text-slate-400">{L(data.climate.note)}</p>}</Disclosure></>}
     {data?.climateNote && <p className="text-xs text-slate-500">{L(data.climateNote)}</p>}<Profile city={city} id="climate" /></>;
   if (topic === "education") body = <><Profile city={city} id="education" order={order} /><Group title={L(ot.housingUni)} points={by("housing").filter((p) => p.housing)} />{mode === "language" && <Link href="/schools/compare" data-testid="compare-schools" className="mr-4 inline-block py-1 text-sm text-sky-700 underline">{L(sc.openCompareCity)}</Link>}<Link href="/schools" className="inline-block py-1 text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link></>;
   const otherPts = topic === "education" ? all("housing").filter((p) => !!p.housing) : topic === "climate" ? [] : all(topic);
   body = <>{body}<OtherFit topic={topic} mode={mode} points={otherPts} /></>;
   return (
-    <article id={topic} data-testid={`card-${topic}`} className={`${panel} scroll-mt-24 self-start p-4 sm:p-5 ${open ? "md:col-span-2" : ""}`}>
+    <article id={topic} data-testid={`card-${topic}`} className={`${panel} min-w-0 scroll-mt-24 self-start p-4 sm:p-5 ${open ? "md:col-span-2" : ""}`}>
       <h2 className="text-base font-semibold text-[#0b2a5b]">{L(ux.topics[topic])}</h2>
       <p className="mb-2 text-xs text-slate-500">{L(ux.blurb[topic])}</p>
       <div data-testid={`key-${topic}`}><KeyView k={k} big languageFirst={mode === "language"} /></div>

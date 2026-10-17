@@ -63,10 +63,10 @@ t("the approval sheet is generated from the data and is up to date; it lists the
   for (const w of ["保留すべき情報", "C4-ref", "合成観測所", "1108447", "1108395", "End-use Licence", "切り替えたときの影響", "承認の状況（Ver.1.4.0）"]) assert.ok(sheet.includes(w), w);
   for (const c of claims) assert.ok(sheet.includes(`### ${c.id}（候補 ${c.candidate}）`), c.id);
 });
-t("Vancouver climate: the verified 1981–2010 values are untouched and the 1991–2020 candidate is unverified and not displayed; Manchester is unchanged", () => {
-  assert.equal(official.climate!.period, "1981–2010"); assert.equal(official.climate!.status, "verified"); assert.equal(official.climate!.months[0].meanC, 4.13);
-  assert.equal(official.climateAlt!.status, "unverified"); assert.equal(official.climateAlt!.period, "1991–2020");
-  const monthly = getCity("vancouver")!.profile.climate.monthly; assert.equal(monthly.period, "1981–2010"); assert.equal(monthly.status, "verified");
+t("Vancouver climate (Ver.1.4.3): the approved 1991–2020 values are shown and verified with an approval record; the 1981–2010 record is history only; Manchester is unchanged", () => {
+  assert.equal(official.climate!.period, "1991–2020"); assert.equal(official.climate!.status, "verified"); assert.equal(official.climate!.months[0].meanC, 4.1); assert.equal(official.climate!.approval?.by, "StarHunting1");
+  assert.equal(official.climateAlt!.period, "1981–2010"); assert.equal(official.climateAlt!.months[0].meanC, 4.13);
+  const monthly = getCity("vancouver")!.profile.climate.monthly; assert.equal(monthly.period, "1991–2020"); assert.equal(monthly.status, "verified");
   assert.ok(!/1991/.test(manchester.climate!.period));
 });
 t("Ver.1.3.9: every claim has a scope (nationality, stay, visa class), a difference note and a decision for the approver; the checklist and procedure are in the sheet", () => {
@@ -79,13 +79,13 @@ t("Ver.1.3.9: every claim has a scope (nationality, stay, visa class), a differe
   const tally = (v: string) => claims.filter((c) => c.review.verdict === v).length; assert.deepEqual([tally("recommend"), tally("conditional"), tally("hold")], [5, 8, 1], "U4 and U5a were reworded, so they need a fresh comparison (conditional)");
   for (const c of claims.filter((x) => x.candidate.startsWith("C"))) assert.ok(/言い換え|paraphrase|リンク|link/i.test(SCOPE[c.id].decide + c.sources.map((s) => s.terms).join()), `${c.id}: Canada.ca/BC reuse is not assumed`);
 });
-t("Vancouver 1991–2020 climate: mechanical checks pass for the candidate (12 months, min ≤ mean ≤ max, plausible, monthly precipitation adds up to the published annual value, station/period/evidence recorded); a broken record is caught; the candidate stays unverified", () => {
-  const cand = official.climateAlt!; assert.equal(cand.status, "unverified");
+t("Vancouver 1991–2020 climate: mechanical checks pass for the approved record (12 months, min ≤ mean ≤ max, plausible, monthly precipitation adds up to the published annual value, station/period/evidence recorded); a broken record is caught; the candidate stays unverified", () => {
+  const cand = official.climate!; assert.equal(cand.status, "verified");
   const r = climateChecks(cand, ECCC_ANNUAL_PRECIP_1991_2020); assert.ok(r.length >= 6 && r.every((k) => k.ok), JSON.stringify(r.filter((k) => !k.ok)));
   assert.ok(cand.stationId!.includes("1108447") && cand.stationId!.includes("1108395") && /Daily Average/.test(cand.evidence[0].quote));
   const bad = { ...cand, months: cand.months.map((m, i) => (i === 3 ? { ...m, minC: m.maxC! + 1, precipMm: m.precipMm! + 50 } : m)) };
   const rb = climateChecks(bad, ECCC_ANNUAL_PRECIP_1991_2020); assert.ok(rb.filter((k) => !k.ok).length >= 2, "an inconsistent record is flagged");
-  assert.equal(official.climate!.period, "1981–2010"); assert.equal(official.climate!.status, "verified");
+  assert.equal(official.climateAlt!.period, "1981–2010");
 });
 t("verified count: exactly 5 claims verified, each with an approval record; Planner does not read visa or healthcare facts", () => {
   assert.equal(claims.filter((c) => c.status === "verified").length, 5); assert.equal(claims.filter((c) => c.status === "verified" && !c.approval).length, 0);
@@ -126,11 +126,11 @@ t("display: the country page lists each claim with its own status (U1/U2/U6 veri
   const man = wrap(h(FactView, { fact: getCity("manchester")!.profile.living.healthcare, kind: "text" })); assert.ok(/data-claim="U5b"[^>]*data-status="verified"/.test(man) && /data-claim="U5a"[^>]*data-status="unverified"/.test(man));
   for (const f of [g.official, g.notes]) { assert.ok(f.value!.ja && f.value!.en); }
 });
-t("Ver.1.4.2: the ECCC CSV check is recorded in the approval sheet (48/48 values, station IDs, annual values, licence) and the candidate stays unverified and not displayed", () => {
+t("Ver.1.4.2/1.4.3: the ECCC CSV check is recorded in the approval sheet (48/48 values, station IDs, annual values, licence) and the approved record is the one shown", () => {
   const sheet = approvalSheet();
-  for (const w of ["ECCC の元 CSV との照合結果", "39051554489", "48個すべて", "12/12 一致", "1159.5", "1159.7", "最大 ±0.6 mm", "断定はできません", "1108447", "1108395", "Version 2.1.1", "人による承認ではありません"]) assert.ok(sheet.includes(w), w);
-  const sum = Number(official.climateAlt!.months.reduce((n, m) => n + m.precipMm!, 0).toFixed(1)); assert.equal(sum, 1159.7); assert.ok(Math.abs(sum - ECCC_ANNUAL_PRECIP_1991_2020) <= 0.6);
-  assert.equal(official.climateAlt!.status, "unverified"); assert.equal(official.climate!.period, "1981–2010"); assert.equal(official.climate!.status, "verified");
+  for (const w of ["ECCC の元 CSV との照合結果", "39051554489", "48個すべて", "12/12 一致", "1159.5", "1159.7", "最大 ±0.6 mm", "断定はできません", "1108447", "1108395", "Version 2.1.1", "承認済み・本番反映", "履歴"]) assert.ok(sheet.includes(w), w);
+  const sum = Number(official.climate!.months.reduce((n, m) => n + m.precipMm!, 0).toFixed(1)); assert.equal(sum, 1159.7); assert.ok(Math.abs(sum - ECCC_ANNUAL_PRECIP_1991_2020) <= 0.6);
+  assert.equal(official.climate!.annual?.precipMm, 1159.5, "the published annual value, not the sum of the months");
   assert.ok(!readFileSync("../.github/workflows/collect-data.yml", "utf8").includes("v142-verify"), "the temporary probe step is removed");
 });
 console.log(n, "approval tests passed");
