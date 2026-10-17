@@ -11,6 +11,8 @@ import { allClaims, approvalSheet, CANDIDATES, CLAIM_GROUPS } from "@/data/appro
 import { countries } from "@/data/cities";
 import { getCity } from "@/data/cities";
 import official from "@/data/official/vancouver";
+import { climateChecks, ECCC_ANNUAL_PRECIP_1991_2020 } from "@/data/approvalSheet";
+import { SCOPE, TERMS_CHECK } from "@/data/approvalScope";
 import manchester from "@/data/official/manchester";
 let n = 0; const t = (name: string, f: () => void) => { f(); n++; console.log("ok", name); };
 const wrap = (el: unknown) => renderToStaticMarkup(h(I18nProvider, null, el as never));
@@ -61,5 +63,27 @@ t("Vancouver climate: the verified 1981–2010 values are untouched and the 1991
   assert.equal(official.climateAlt!.status, "unverified"); assert.equal(official.climateAlt!.period, "1991–2020");
   const monthly = getCity("vancouver")!.profile.climate.monthly; assert.equal(monthly.period, "1981–2010"); assert.equal(monthly.status, "verified");
   assert.ok(!/1991/.test(manchester.climate!.period));
+});
+t("Ver.1.3.9: every claim has a scope (nationality, stay, visa class), a difference note and a decision for the approver; the checklist and procedure are in the sheet", () => {
+  assert.deepEqual(Object.keys(SCOPE).sort(), claims.map((c) => c.id).sort());
+  for (const c of claims) { const k = SCOPE[c.id]; assert.ok(k.who && k.stay && k.visa && k.changed && k.decide, c.id); }
+  const sheet = approvalSheet();
+  assert.equal((sheet.match(/\*\*承認チェックリスト（/g) ?? []).length, claims.length, "one checklist per claim");
+  for (const w of ["承認者名", "全部に印が付くまで", "再利用条件が未確認の出典", "一部だけ承認したとき", "気候データ承認チェックリスト"]) assert.ok(sheet.includes(w), w);
+  assert.ok(TERMS_CHECK.length === 2 && TERMS_CHECK.every((x) => x.pages.every((p) => p.url.startsWith("https://"))));
+  const tally = (v: string) => claims.filter((c) => c.review.verdict === v).length; assert.deepEqual([tally("recommend"), tally("conditional"), tally("hold")], [8, 6, 1]);
+  for (const c of claims.filter((x) => x.candidate.startsWith("C"))) assert.ok(/言い換え|paraphrase|リンク|link/i.test(SCOPE[c.id].decide + c.sources.map((s) => s.terms).join()), `${c.id}: Canada.ca/BC reuse is not assumed`);
+});
+t("Vancouver 1991–2020 climate: mechanical checks pass for the candidate (12 months, min ≤ mean ≤ max, plausible, monthly precipitation adds up to the published annual value, station/period/evidence recorded); a broken record is caught; the candidate stays unverified", () => {
+  const cand = official.climateAlt!; assert.equal(cand.status, "unverified");
+  const r = climateChecks(cand, ECCC_ANNUAL_PRECIP_1991_2020); assert.ok(r.length >= 6 && r.every((k) => k.ok), JSON.stringify(r.filter((k) => !k.ok)));
+  assert.ok(cand.stationId!.includes("1108447") && cand.stationId!.includes("1108395") && /Daily Average/.test(cand.evidence[0].quote));
+  const bad = { ...cand, months: cand.months.map((m, i) => (i === 3 ? { ...m, minC: m.maxC! + 1, precipMm: m.precipMm! + 50 } : m)) };
+  const rb = climateChecks(bad, ECCC_ANNUAL_PRECIP_1991_2020); assert.ok(rb.filter((k) => !k.ok).length >= 2, "an inconsistent record is flagged");
+  assert.equal(official.climate!.period, "1981–2010"); assert.equal(official.climate!.status, "verified");
+});
+t("verified count: still 0 claims verified and no approval records anywhere; Planner does not read visa or healthcare facts", () => {
+  assert.equal(claims.filter((c) => c.status === "verified" || c.approval).length, 0);
+  for (const f of ["lib/planner.ts", "lib/budget.ts", "lib/smart.ts"]) assert.ok(!/healthcare|visa\.|IHS|healthSurcharge/i.test(readFileSync(f, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), f);
 });
 console.log(n, "approval tests passed");
