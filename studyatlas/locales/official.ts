@@ -108,6 +108,7 @@ export const ot = {
     en: "Shown in each city's own currency. A row is marked comparable only when the figures are verified and describe the same thing (same period, same group of people). Currencies are not converted.",
     ja: "各都市の通貨のまま表示します。確認済みで、同じ期間・同じ対象者の数値どうしのときだけ「比較可」とします。通貨換算は行いません。",
   },
+  cmpOkSameCur: { en: "Same basis and the same currency", ja: "条件も通貨も同じ" },
   cmpOk: { en: "Same basis – different currencies, not converted", ja: "条件は同じ（通貨が異なるため換算なし）" },
   cmpOkSame: { en: "Same basis", ja: "条件は同じ" },
   cmpPer: { en: "Not comparable: different period", ja: "比較不可：期間の単位が異なる" },

@@ -576,9 +576,9 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 
 **Manchester**: 1991–2020 は取り込めていません（旧 1971–2000 のまま）。理由は `data/APPROVAL_CANDIDATES.md` の「気候データの承認候補」を参照。
 
-## 6. Toronto・London の家賃統計（Ver.1.5.1）: 照合済み・承認待ち（verified ではありません）
+## 6. Toronto・London の家賃統計（Ver.1.5.2）: 承認済み・本番反映（5件）
 
-公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。ここに書いてあるのは承認の**準備**だけです。承認記録（`RENT_APPROVALS`）が空の間、数値は画面にも比較にも出ず、どれも verified になりません。承認は**数値ごと**（Toronto 4件・London 1件）に別々にできます。
+公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。この5件（Toronto 4件・London 1件）は、2026-10-17 に StarHunting1 が数値・出典・統計定義を明示して公開を承認し、`RENT_APPROVALS` に**数値ごと**の記録を登録しました（承認した内容と違う数値・出典・期間・定義はダイジェスト不一致でビルドが失敗します）。他のデータの状態は変わっていません。
 
 | 項目 | 内容 |
 |---|---|
@@ -594,11 +594,11 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 
 | 数値 | 公式（2026-10-17に取得） | サイトの候補 | 照合 | 比較の基準 | 承認の状態 | 承認で記録するダイジェスト |
 |---|---|---|---|---|---|---|
-| tor-cmhc-rent-bachelor | CMA 535 ・ 1,491 CAD/月 ・ 2025 | 1,491 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Bachelor units・2025 | **未承認**（非表示） | `4a79633baf6e7b89bdd7e14393229e1674567a418856ca355e824e5739eab8cf` |
-| tor-cmhc-rent-1br | CMA 535 ・ 1,761 CAD/月 ・ 2025 | 1,761 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・One bedroom units・2025 | **未承認**（非表示） | `abbbf002fa77176f0b4b2c9fc214de335c9faefd166c739b4fbf153f180185c1` |
-| tor-cmhc-rent-2br | CMA 535 ・ 2,045 CAD/月 ・ 2025 | 2,045 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Two bedroom units・2025 | **未承認**（非表示） | `5085d74860e41547259c36aeb9e6a911d5b64b6a444ba58427f0429c13f08381` |
-| tor-cmhc-rent-3br | CMA 535 ・ 2,294 CAD/月 ・ 2025 | 2,294 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Three bedroom units・2025 | **未承認**（非表示） | `923365e8fe0775666ae8e0f82f996234670d48cdb7c8f912a37392859361fdb0` |
-| lon-ons-pipr-private-rent-region-month | E12000007 ・ 2,332 GBP/月 ・ 2026-08 | 2,332 GBP/月 | 一致 | region・all dwellings・all sizes・2026-08 | **未承認**（非表示） | `8122055734968c0c56c89125164f69d6ca1650924078dc93cb5710c026cdda09` |
+| tor-cmhc-rent-bachelor | CMA 535 ・ 1,491 CAD/月 ・ 2025 | 1,491 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Bachelor units・2025 | 承認済み（StarHunting1・2026-10-17） | `4a79633baf6e7b89bdd7e14393229e1674567a418856ca355e824e5739eab8cf` |
+| tor-cmhc-rent-1br | CMA 535 ・ 1,761 CAD/月 ・ 2025 | 1,761 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・One bedroom units・2025 | 承認済み（StarHunting1・2026-10-17） | `abbbf002fa77176f0b4b2c9fc214de335c9faefd166c739b4fbf153f180185c1` |
+| tor-cmhc-rent-2br | CMA 535 ・ 2,045 CAD/月 ・ 2025 | 2,045 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Two bedroom units・2025 | 承認済み（StarHunting1・2026-10-17） | `5085d74860e41547259c36aeb9e6a911d5b64b6a444ba58427f0429c13f08381` |
+| tor-cmhc-rent-3br | CMA 535 ・ 2,294 CAD/月 ・ 2025 | 2,294 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Three bedroom units・2025 | 承認済み（StarHunting1・2026-10-17） | `923365e8fe0775666ae8e0f82f996234670d48cdb7c8f912a37392859361fdb0` |
+| lon-ons-pipr-private-rent-region-month | E12000007 ・ 2,332 GBP/月 ・ 2026-08 | 2,332 GBP/月 | 一致 | region・all dwellings・all sizes・2026-08 | 承認済み（StarHunting1・2026-10-17） | `8122055734968c0c56c89125164f69d6ca1650924078dc93cb5710c026cdda09` |
 
 ### 6.2 承認の手順（人が行う）
 
@@ -611,8 +611,8 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 
 ### 6.3 承認チェックリスト
 
-- [ ] Toronto 4値（Bachelor 1,491／1BR 1,761／2BR 2,045／3BR 2,294 CAD/月、2025、CMA 535）を公式の表と照合した
-- [ ] London 1値（£2,332/月、2026年8月、London region E12000007、全住宅）を公式と照合した
-- [ ] CMHC ライセンス（商用利用可・出典表示必須・取消可能）と OGL v3.0 を確認した
-- [ ] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した
-- [ ] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）
+- [x] Toronto 4値（Bachelor 1,491／1BR 1,761／2BR 2,045／3BR 2,294 CAD/月、2025、CMA 535）を公式の表と照合した
+- [x] London 1値（£2,332/月、2026年8月、London region E12000007、全住宅）を公式と照合した
+- [x] CMHC ライセンス（商用利用可・出典表示必須・取消可能）と OGL v3.0 を確認した
+- [x] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した
+- [x] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）
