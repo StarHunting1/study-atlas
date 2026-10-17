@@ -87,3 +87,31 @@ export function extraKey(c: City, topic: ExtraTopic): Key {
   const f = sections.flatMap((s) => s.fields).find((x) => x.id === EXTRA_FIELD[topic]); const fact = f?.get(c) as Fact<Localized> | undefined;
   return has(fact) ? { kind: "text", fact } : { kind: "none" };
 }
+
+/**
+ * Key figure for the comparison page (Ver.1.3.8). Same as `keyFigure`, except housing: a city with no verified per-person student price
+ * falls back to its shown whole-market rent (the audience line says "all renters"), so existing official data is not hidden behind
+ * "in preparation". The two figures then differ in audience, so they are only ever shown as reference values, never as a verdict.
+ */
+export function compareKey(c: City, topic: Topic): Key {
+  const k = keyFigure(c, topic);
+  if (topic !== "housing" || k.kind === "point") return k;
+  const rent = (officialData(c.id)?.points ?? []).filter((p) => p.topic === "housing" && p.audience === "renter" && p.value && shown(p.status) && isFigureShown(p));
+  const p = rent.find((x) => x.highlight && x.status === "verified") ?? rent.find((x) => x.status === "verified") ?? rent[0];
+  return p ? { kind: "point", point: p } : k;
+}
+
+/**
+ * What a topic can offer on the comparison page, in the user's words:
+ *  comparable – every city has a verified figure on the same basis;  reference – figures are shown but must not be compared as the same thing;
+ *  partial – only some cities have a figure (shown as reference);  linkOnly – the data exists but the publisher's terms allow only a link;
+ *  notYet – nothing obtained.
+ */
+export type Availability = "comparable" | "reference" | "partial" | "linkOnly" | "notYet";
+export function availability(keys: Key[], cmp: Cmp): Availability {
+  if (cmp === "same") return "comparable";
+  if (cmp !== "missing") return "reference";
+  const figures = keys.filter((k) => k.kind !== "none" && k.kind !== "link").length, links = keys.filter((k) => k.kind === "link").length;
+  if (figures > 0) return "partial";
+  return links > 0 ? "linkOnly" : "notYet";
+}
