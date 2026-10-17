@@ -71,7 +71,7 @@ t("Ver.1.3.9: every claim has a scope (nationality, stay, visa class), a differe
   assert.equal((sheet.match(/\*\*承認チェックリスト（/g) ?? []).length, claims.length, "one checklist per claim");
   for (const w of ["承認者名", "全部に印が付くまで", "再利用条件が未確認の出典", "一部だけ承認したとき", "気候データ承認チェックリスト"]) assert.ok(sheet.includes(w), w);
   assert.ok(TERMS_CHECK.length === 2 && TERMS_CHECK.every((x) => x.pages.every((p) => p.url.startsWith("https://"))));
-  const tally = (v: string) => claims.filter((c) => c.review.verdict === v).length; assert.deepEqual([tally("recommend"), tally("conditional"), tally("hold")], [8, 6, 1]);
+  const tally = (v: string) => claims.filter((c) => c.review.verdict === v).length; assert.deepEqual([tally("recommend"), tally("conditional"), tally("hold")], [5, 8, 1], "U4 and U5a were reworded, so they need a fresh comparison (conditional)");
   for (const c of claims.filter((x) => x.candidate.startsWith("C"))) assert.ok(/言い換え|paraphrase|リンク|link/i.test(SCOPE[c.id].decide + c.sources.map((s) => s.terms).join()), `${c.id}: Canada.ca/BC reuse is not assumed`);
 });
 t("Vancouver 1991–2020 climate: mechanical checks pass for the candidate (12 months, min ≤ mean ≤ max, plausible, monthly precipitation adds up to the published annual value, station/period/evidence recorded); a broken record is caught; the candidate stays unverified", () => {
@@ -85,5 +85,21 @@ t("Vancouver 1991–2020 climate: mechanical checks pass for the candidate (12 m
 t("verified count: still 0 claims verified and no approval records anywhere; Planner does not read visa or healthcare facts", () => {
   assert.equal(claims.filter((c) => c.status === "verified" || c.approval).length, 0);
   for (const f of ["lib/planner.ts", "lib/budget.ts", "lib/smart.ts"]) assert.ok(!/healthcare|visa\.|IHS|healthSurcharge/i.test(readFileSync(f, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), f);
+});
+t("UK corrections (Ver.1.3.10): U5-visa is no longer an approval candidate; U4 does not say the course length alone decides the Student visa; U5a keeps £776/£1,035 but does not promise NHS use; U1, U2, U3, U5b, U6 are unchanged; nothing is verified", () => {
+  assert.ok(!claims.some((c) => c.id === "U5-visa") && !approvalSheet().includes("### U5-visa") && claims.length === 14);
+  for (const id of ["U1", "U2", "U3", "U5a", "U5b", "U6", "U4"]) assert.ok(claims.some((c) => c.id === id), id);
+  const u4 = claims.find((c) => c.id === "U4")!, u5a = claims.find((c) => c.id === "U5a")!;
+  for (const l of ["en", "ja"] as const) { assert.ok(u4.text[l] && u5a.text[l]); }
+  assert.ok(/length of the course alone does not decide/.test(u4.text.en) && /コースの期間だけで決まるわけではありません/.test(u4.text.ja));
+  for (const w of ["licensed student sponsor", "16 or over", "enough money", "English", "age, nationality"]) assert.ok(u4.text.en.includes(w), `U4 en: ${w}`);
+  for (const w of ["licensed student sponsor", "16歳以上", "資金", "英語力", "年齢"]) assert.ok(u4.text.ja.includes(w), `U4 ja: ${w}`);
+  assert.ok(!/^Longer courses need a Student visa/.test(u4.text.en) && !/それより長いコースは/.test(u4.text.ja), "the old wording is gone");
+  assert.ok(u5a.text.en.includes("£776") && u5a.text.en.includes("£1,035") && u5a.text.ja.includes("£776") && u5a.text.ja.includes("£1,035"));
+  assert.ok(!/and can then use the NHS|その後NHSを利用できます/.test(u5a.text.en + u5a.text.ja), "no unconditional NHS access");
+  assert.ok(/depends on the visa you apply for/.test(u5a.text.en) && /ビザの種類・期間・申請場所・個々の事情によって異なります/.test(u5a.text.ja) && /can give you access/.test(u5a.text.en) && /利用できる場合があります/.test(u5a.text.ja));
+  assert.ok(/Standard Visitor/.test(claims.find((c) => c.id === "U1")!.text.en) && /国籍によってビザ|ETA/.test(claims.find((c) => c.id === "U1")!.conditions.ja) && /nationality/.test(claims.find((c) => c.id === "U6")!.text.en));
+  assert.ok(claims.filter((c) => c.candidate.startsWith("U")).every((c) => c.sources.every((s) => /Open Government Licence v3\.0/.test(s.terms!) && s.url.startsWith("https://www.gov.uk/"))), "OGL v3.0 source lines kept");
+  assert.ok(claims.every((c) => c.status === "unverified" && !c.approval), "no claim verified, no approval record");
 });
 console.log(n, "approval tests passed");

@@ -54,6 +54,7 @@ export function approvalSheet(): string {
   L.push("", `集計: 主張 ${all.length} 件（推奨 ${all.filter((c) => c.review.verdict === "recommend").length}／条件つき推奨 ${all.filter((c) => c.review.verdict === "conditional").length}／保留 ${hold.length}）。verified は ${all.filter((c) => c.status === "verified").length} 件。`, "");
   L.push("## 3. 保留すべき情報", "");
   for (const c of hold) L.push(`- **${c.id}**（候補 ${c.candidate}）: ${c.review.reason.ja}`);
+  L.push("- **U5-visa（承認候補から除外）**: U5a・U5b と内容が重複する（同じ料金ページを根拠に、IHS の前払いと6か月以内の免除だけを言い直した文）ため、Ver.1.3.10 で claim から外した。U5 は U5a・U5b で承認する。国ページには医療情報への案内リンクのみを置く場合も、承認対象の claim にはしない。", "- **U4・U5a（文言を修正、条件つき）**: Ver.1.3.10 で、U4 は「長いコース＝Student visa」と読めない形に、U5a は「IHSを支払えばNHSを利用できる」と断定しない形に直した。修正後の文言は、承認者が出典ページと照合してから承認する。");
   L.push("- **U5（旧文言）の「訪問者の滞在にはIHSがなく保険が必要」**: 読んだページにない推論のため画面から削除済み（承認対象にしていない）。", "- **C3 の旧文言「渡航前に申請」「学習を続ける可能性がある場合」**: 逐語の記載が確認できず、確認できた記載に置き換え済み。", "- **Canada.ca の商用再利用（C1・C2・C3）と BC州の転載（C4a〜c）**: 利用条件が未確認／書面許可が必要なため、承認する場合も「言い換え＋リンクのみ」で足りるという判断が必要。許可を得ない限り引用・転載はしない。", "");
   L.push("## 3b. 承認の判断サマリー（人が決めること）", "", "| 主張 | 判断 | 対象（国籍／滞在期間／ビザ区分） | 承認前に人が決めること |", "|---|---|---|---|");
   for (const c of all) { const k = SCOPE[c.id]; L.push(`| ${c.id} | ${VERDICT[c.review.verdict]} | ${esc(k.who)}／${esc(k.stay)}／${esc(k.visa)} | ${esc(k.decide)} |`); }

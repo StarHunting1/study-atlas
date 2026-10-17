@@ -18,19 +18,21 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | U1 | U1 | U1: 推奨 | U1: unverified |
 | U2 | U2 | U2: 推奨 | U2: unverified |
 | U3 | U3 | U3: 推奨 | U3: unverified |
-| U4 | U4 | U4: 推奨 | U4: unverified |
-| U5 | U5-visa, U5a, U5b | U5-visa: 推奨 / U5a: 推奨 / U5b: 推奨 | U5-visa: unverified, U5a: unverified, U5b: unverified |
+| U4 | U4 | U4: 条件つき推奨 | U4: unverified |
+| U5 | U5a, U5b | U5a: 条件つき推奨 / U5b: 推奨 | U5a: unverified, U5b: unverified |
 | U6 | U6 | U6: 推奨 | U6: unverified |
 | C1 | C1 | C1: 条件つき推奨 | C1: unverified |
 | C2 | C2 | C2: 条件つき推奨 | C2: unverified |
 | C3 | C3 | C3: 条件つき推奨 | C3: unverified |
 | C4 | C4-ref, C4a, C4b, C4c | C4-ref: 保留 / C4a: 条件つき推奨 / C4b: 条件つき推奨 / C4c: 条件つき推奨 | C4-ref: unverified, C4a: unverified, C4b: unverified, C4c: unverified |
 
-集計: 主張 15 件（推奨 8／条件つき推奨 6／保留 1）。verified は 0 件。
+集計: 主張 14 件（推奨 5／条件つき推奨 8／保留 1）。verified は 0 件。
 
 ## 3. 保留すべき情報
 
 - **C4-ref**（候補 C4）: 保留：出典のページにある記述ではなく、StudyAtlas 自身の案内文。C4a〜C4c を承認する方が適切で、この文はリンクのみに書き換え可能。
+- **U5-visa（承認候補から除外）**: U5a・U5b と内容が重複する（同じ料金ページを根拠に、IHS の前払いと6か月以内の免除だけを言い直した文）ため、Ver.1.3.10 で claim から外した。U5 は U5a・U5b で承認する。国ページには医療情報への案内リンクのみを置く場合も、承認対象の claim にはしない。
+- **U4・U5a（文言を修正、条件つき）**: Ver.1.3.10 で、U4 は「長いコース＝Student visa」と読めない形に、U5a は「IHSを支払えばNHSを利用できる」と断定しない形に直した。修正後の文言は、承認者が出典ページと照合してから承認する。
 - **U5（旧文言）の「訪問者の滞在にはIHSがなく保険が必要」**: 読んだページにない推論のため画面から削除済み（承認対象にしていない）。
 - **C3 の旧文言「渡航前に申請」「学習を続ける可能性がある場合」**: 逐語の記載が確認できず、確認できた記載に置き換え済み。
 - **Canada.ca の商用再利用（C1・C2・C3）と BC州の転載（C4a〜c）**: 利用条件が未確認／書面許可が必要なため、承認する場合も「言い換え＋リンクのみ」で足りるという判断が必要。許可を得ない限り引用・転載はしない。
@@ -41,11 +43,10 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 |---|---|---|---|
 | U1 | 推奨 | 国籍を問わず（国籍によりビザ/ETAが別途必要）／6か月以内のコース／訪問者（Standard Visitor） | 例外を文言に入れなくてよいか（簡略化であり誤りではないと判断）。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | U2 | 推奨 | 国籍を問わず（国籍別の渡航認証は別）／英語コースで6か月超〜11か月／短期学習ビザ（Short-term study visa） | 18歳未満は別扱いである点を文言に入れなくてよいか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
-| U4 | 推奨 | 国籍を問わず（16歳以上）／11か月を超えるコースなど長期／Student visa | 16・17歳の保護者同意（Child Student visa の可能性）に触れなくてよいか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
+| U4 | 条件つき推奨 | 国籍を問わず（16歳以上）／長期の学習（コースの期間だけでは決まらない）／Student visa | 修正後の文言を gov.uk/student-visa と照合。短いコースは U1・U2 の区分になる場合があると読めるか。OGL v3.0 の範囲で再利用可（出典表示）。 |
 | U6 | 推奨 | すべての申請者（国籍で要否が異なる）／—（渡航前の確認）／ビザ／電子渡航認証（ETA） | OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | U3 | 推奨 | 短期学習ビザの申請者／6か月超〜11か月の英語コース／短期学習ビザ | 金額は変わりうる。確認日つきで掲載することでよいか（承認後も陳腐化するので、再確認の期限を決める）。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
-| U5-visa | 推奨 | ビザ申請者／6か月以内（英国外から申請）で不要／Student visa／短期学習ビザ | U5a/U5b と内容が重複する。両方承認するか、どちらかに寄せるか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
-| U5a | 推奨 | Student visa／短期学習ビザの申請者／ビザの期間による（年額）／Student visa／短期学習ビザ | 金額は変わる。Planner には自動計上しない（承認後も同じ）。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
+| U5a | 条件つき推奨 | Student visa／短期学習ビザの申請者／ビザの期間による（年額）／Student visa／短期学習ビザ | 修正後の文言を料金ページと照合。金額は変わる。Planner には自動計上しない（承認後も同じ）。OGL v3.0 の範囲で再利用可（出典表示）。 |
 | U5b | 推奨 | ビザ申請者（英国外／英国内で異なる）／6か月以内／6か月超〜1年未満／Student visa／短期学習ビザ | 同伴者・免除の規定に触れなくてよいか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | C1 | 条件つき推奨 | 国籍により eTA または訪問者ビザ（C2 参照）／6か月以内のプログラム／就学許可（study permit）不要／eTA・訪問者ビザ | Canada.ca の商用再利用が未確認。「言い換え＋リンク」で足りると判断して承認するか、書面で確認するか、リンクのみにするか。 |
 | C3 | 条件つき推奨 | 国籍を問わず／6か月を超えるプログラム／就学許可（study permit） | C1 と同じ（Canada.ca の再利用条件）。 |
@@ -69,7 +70,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 画面の項目（Fact） | 含まれる主張 | 一部だけ承認したとき |
 |---|---|---|
 | United Kingdom · visa.official | U1, U2, U4, U6 | 承認した主張だけが「確認済み」、残りは「未確認」。Fact 全体は全主張が承認されるまで「未確認」 |
-| United Kingdom · visa.notes | U3, U5-visa | 承認した主張だけが「確認済み」、残りは「未確認」。Fact 全体は全主張が承認されるまで「未確認」 |
+| United Kingdom · visa.notes | U3 | 承認した主張だけが「確認済み」、残りは「未確認」。Fact 全体は全主張が承認されるまで「未確認」 |
 | Manchester · living.healthcare | U5a, U5b | 承認した主張だけが「確認済み」、残りは「未確認」。Fact 全体は全主張が承認されるまで「未確認」 |
 | Canada · visa.official | C1, C3 | 承認した主張だけが「確認済み」、残りは「未確認」。Fact 全体は全主張が承認されるまで「未確認」 |
 | Canada · visa.notes | C2, C4-ref | 承認した主張だけが「確認済み」、残りは「未確認」。Fact 全体は全主張が承認されるまで「未確認」 |
@@ -135,24 +136,24 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 - [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
 - [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
-### U4（候補 U4）— 推奨
+### U4（候補 U4）— 条件つき推奨
 
 | 項目 | 内容 |
 |---|---|
-| 公開予定の文言（日本語） | それより長いコースは Student visa で、認可を受けた学校（licensed student sponsor）での受講許可が必要です（16歳以上）。 |
-| 公開予定の文言（English） | Longer courses need a Student visa, which requires a place on a course with a licensed student sponsor (age 16 or over). |
+| 公開予定の文言（日本語） | Student visa は、英国で長めに学ぶときの区分ですが、コースの期間だけで決まるわけではありません。16歳以上で、認可を受けた学校（licensed student sponsor）から受講許可を得ていること、十分な資金と必要な水準の英語力を示せることが条件です（16・17歳は保護者の同意も必要）。どの区分になるかは年齢・国籍・学習の計画によっても変わるため、公式ページで確認してください。 |
+| 公開予定の文言（English） | A Student visa is the route for longer study in the UK, but the length of the course alone does not decide it. You need to be 16 or over, to have been offered a place on a course by a licensed student sponsor (a school the Home Office has licensed), and to show you have enough money and the required level of English (16- and 17-year-olds also need a parent's consent). Which route applies to you also depends on your age, nationality and plans, so check the official page. |
 | 公式出典 | [GOV.UK (Home Office)](https://www.gov.uk/student-visa) |
 | 確認日・対象期間 | 2026-10-15・2026-10（Actions のページ確認） |
-| 適用条件と例外 | 16歳以上、licensed student sponsor の受講許可、資金・英語力など。16・17歳は保護者の同意が必要（Child Student visa の可能性）。ページの申請料£558は画面に載せていない。 |
+| 適用条件と例外 | 16歳以上、licensed student sponsor の受講許可、資金・英語力。16・17歳は保護者の同意が必要（Child Student visa の可能性）。短いコースは短期学習ビザや訪問者の区分になる場合がある（U1・U2）。年齢・国籍・計画も関わる。ページの申請料£558は画面に載せていない。 |
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
-| 推奨と理由 | **推奨**：gov.uk/student-visa（ページ更新 2024-10-31）と一致。旧文言の「学位取得も」は読んだページに直接の根拠がなく削除。 |
+| 推奨と理由 | **条件つき推奨**：依頼により文言を修正（Ver.1.3.10）：旧文言は「長いコース＝Student visa」と読める恐れがあった。修正後の文言は、承認者が gov.uk/student-visa（ページ更新 2024-10-31）と照合してから承認する。 |
 | 画面上の表示場所 | Country page → Visa → Official information（United Kingdom · visa.official） |
 | 現在の状態 | unverified（承認記録なし） |
 | 対象（国籍） | 国籍を問わず（16歳以上） |
-| 対象（滞在期間・コース） | 11か月を超えるコースなど長期 |
+| 対象（滞在期間・コース） | 長期の学習（コースの期間だけでは決まらない） |
 | 対象（ビザ区分） | Student visa |
-| 既存表示との違い | 旧文言の「学位取得も」を削除（ページに直接の根拠なし）。申請料£558は画面に載せていない |
-| 承認前に人が決めること | 16・17歳の保護者同意（Child Student visa の可能性）に触れなくてよいか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
+| 既存表示との違い | Ver.1.3.10 で文言を修正：「長いコース＝Student visa」と読める表現をやめ、licensed student sponsor・資金・英語力・年齢（16歳以上、16・17歳は保護者の同意）を明記。旧「学位取得も」は削除済み。申請料£558は画面に載せていない |
+| 承認前に人が決めること | 修正後の文言を gov.uk/student-visa と照合。短いコースは U1・U2 の区分になる場合があると読めるか。OGL v3.0 の範囲で再利用可（出典表示）。 |
 | 編集する場所 | `data/countries.ts` の `GBR_VISA_CLAIMS`（claim `U4`） |
 
 **承認チェックリスト（U4）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
@@ -222,53 +223,24 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 - [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
 - [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
-### U5-visa（候補 U5）— 推奨
+### U5a（候補 U5）— 条件つき推奨
 
 | 項目 | 内容 |
 |---|---|
-| 公開予定の文言（日本語） | 医療付加金（IHS）は申請時に前払いし、英国外から申請する6か月以内のコースでは支払い不要とされています。 |
-| 公開予定の文言（English） | The healthcare surcharge (IHS) is paid upfront with the application; it is not payable when you apply from outside the UK for 6 months or less. |
-| 公式出典 | [GOV.UK (Home Office)](https://www.gov.uk/healthcare-immigration-application/how-much-pay) |
-| 確認日・対象期間 | 2026-10-15・2026-10（Actions のページ確認） |
-| 適用条件と例外 | 金額と6か月の扱いは、ビザの期間・申請場所・年齢で変わります。Manchester の「暮らし → 医療」の記述を参照。 |
-| 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
-| 推奨と理由 | **推奨**：gov.uk/healthcare-immigration-application/how-much-pay（ページ更新 2024-11-28）と一致。Manchester の医療欄の記述と同じ候補。 |
-| 画面上の表示場所 | Country page → Visa → Points to note（United Kingdom · visa.notes） |
-| 現在の状態 | unverified（承認記録なし） |
-| 対象（国籍） | ビザ申請者 |
-| 対象（滞在期間・コース） | 6か月以内（英国外から申請）で不要 |
-| 対象（ビザ区分） | Student visa／短期学習ビザ |
-| 既存表示との違い | U5a/U5b と同じ根拠の簡略版（国のビザ欄） |
-| 承認前に人が決めること | U5a/U5b と内容が重複する。両方承認するか、どちらかに寄せるか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
-| 編集する場所 | `data/countries.ts` の `GBR_NOTES_CLAIMS`（claim `U5-visa`） |
-
-**承認チェックリスト（U5-visa）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
-
-- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
-- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
-- [ ] 再利用条件を判断した（OGL v3.0：出典表示で可）
-- [ ] 金額・日付がある場合、確認日が文言に併記されている
-- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
-- [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
-
-### U5a（候補 U5）— 推奨
-
-| 項目 | 内容 |
-|---|---|
-| 公開予定の文言（日本語） | Student visa や短期学習ビザでは、通常、ビザ申請時に医療付加金（IHS）を支払い、その後NHSを利用できます。2026-10-15に確認したページでは学生料金は年£776（その他の多くの申請は年£1,035）です。 |
-| 公開予定の文言（English） | With a Student visa or Short-term study visa you normally pay the Immigration Health Surcharge (IHS) with the visa application, and can then use the NHS. On the page read on 2026-10-15 the student rate is £776 per year (£1,035 per year for most other applications). |
+| 公開予定の文言（日本語） | Student visa や短期学習ビザでは、通常、ビザ申請時に医療付加金（IHS）を支払います。支払うとNHSの医療を利用できる場合がありますが、支払いが必要かどうか、どの範囲でNHSを利用できるかは、申請するビザの種類・期間・申請場所・個々の事情によって異なります（次の記述も参照）。公式ページで確認してください。2026-10-15に確認したページでは学生料金は年£776（その他の多くの申請は年£1,035）です。 |
+| 公開予定の文言（English） | For a Student visa or a Short-term study visa the Immigration Health Surcharge (IHS) is usually paid with the visa application. Paying it can give you access to NHS care, but whether you must pay, and what NHS access you get, depends on the visa you apply for, its length, where you apply from and your circumstances (see the next statement) – check the official page. On the page read on 2026-10-15 the student rate is £776 per year (£1,035 per year for most other applications). |
 | 公式出典 | [GOV.UK (Home Office)](https://www.gov.uk/healthcare-immigration-application/how-much-pay)<br>[GOV.UK (Home Office)](https://www.gov.uk/visa-to-study-english) |
 | 確認日・対象期間 | 2026-10-15・2026-10（Actions のページ確認） |
-| 適用条件と例外 | Student visa／短期学習ビザの申請者。18歳未満も年£776、その他は年£1,035。金額はビザの期間と申請場所で変わる（U5b）。Plannerには自動計上しない。 |
+| 適用条件と例外 | Student visa／短期学習ビザの申請者。IHSの要否とNHSの利用範囲は、ビザの種類・期間・申請場所・個々の事情で変わる（U5b。免除・同伴者は別規定）。18歳未満も年£776、その他は年£1,035。Plannerには自動計上しない。 |
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
-| 推奨と理由 | **推奨**：gov.uk/healthcare-immigration-application/how-much-pay（更新 2024-11-28）および短期学習ビザのページ（「usually costs £776」）と一致。料金は変わるので日付を維持。 |
+| 推奨と理由 | **条件つき推奨**：依頼により文言を修正（Ver.1.3.10）：旧文言は「IHSを支払えばNHSを利用できる」と無条件に読める恐れがあった。年£776／£1,035は維持（ページ更新 2024-11-28、短期学習ビザのページ「usually costs £776」）。修正後の文言は承認者がページと照合してから承認する。料金は変わるので日付を維持。 |
 | 画面上の表示場所 | Manchester city page → Daily life → Healthcare（Manchester · living.healthcare） |
 | 現在の状態 | unverified（承認記録なし） |
 | 対象（国籍） | Student visa／短期学習ビザの申請者 |
 | 対象（滞在期間・コース） | ビザの期間による（年額） |
 | 対象（ビザ区分） | Student visa／短期学習ビザ |
-| 既存表示との違い | 金額（学生 年£776／その他 年£1,035）に確認日を併記 |
-| 承認前に人が決めること | 金額は変わる。Planner には自動計上しない（承認後も同じ）。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
+| 既存表示との違い | Ver.1.3.10 で文言を修正：「IHSを支払えばNHSを利用できる」という無条件の表現をやめ、ビザの種類・期間・申請場所・個々の事情で支払いとNHS利用の扱いが異なることを明記。年£776／£1,035は維持 |
+| 承認前に人が決めること | 修正後の文言を料金ページと照合。金額は変わる。Planner には自動計上しない（承認後も同じ）。OGL v3.0 の範囲で再利用可（出典表示）。 |
 | 編集する場所 | `data/profiles/manchester.ts` の `UK_HEALTH_CLAIMS`（claim `U5a`） |
 
 **承認チェックリスト（U5a）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
