@@ -152,7 +152,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 公開予定の文言（English） | A Student visa is the route for longer study in the UK, but the length of the course alone does not decide it. You need to be 16 or over, to have been offered a place on a course by a licensed student sponsor (a school the Home Office has licensed), and to show you have enough money and the required level of English (16- and 17-year-olds also need a parent's consent). Which route applies to you also depends on your age, nationality and plans, so check the official page. |
 | 公式出典 | [GOV.UK (Home Office)](https://www.gov.uk/student-visa) |
 | 確認日・対象期間 | 2026-10-15・2026-10（Actions のページ確認） |
-| 適用条件と例外 | 16歳以上、licensed student sponsor の受講許可、資金・英語力。16・17歳は保護者の同意が必要（Child Student visa の可能性）。短いコースは短期学習ビザや訪問者の区分になる場合がある（U1・U2）。年齢・国籍・計画も関わる。ページの申請料£558は画面に載せていない。 |
+| 適用条件と例外 | 16歳以上、licensed student sponsor の受講許可、資金・英語力。16・17歳は保護者の同意が必要（Child Student visa の可能性）。短いコースは短期学習ビザや訪問者の区分になる場合がある。年齢・国籍・計画も関わる。ページの申請料£558は画面に載せていない。 |
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **条件つき推奨**：依頼により文言を修正（Ver.1.3.10）：旧文言は「長いコース＝Student visa」と読める恐れがあった。修正後の文言は、承認者が gov.uk/student-visa（ページ更新 2024-10-31）と照合してから承認する。 |
 | 画面上の表示場所 | Country page → Visa → Official information（United Kingdom · visa.official） |
@@ -239,7 +239,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 公開予定の文言（English） | For a Student visa or a Short-term study visa the Immigration Health Surcharge (IHS) is usually paid with the visa application. Paying it can give you access to NHS care, but whether you must pay, and what NHS access you get, depends on the visa you apply for, its length, where you apply from and your circumstances (see the next statement) – check the official page. On the page read on 2026-10-15 the student rate is £776 per year (£1,035 per year for most other applications). |
 | 公式出典 | [GOV.UK (Home Office)](https://www.gov.uk/healthcare-immigration-application/how-much-pay)<br>[GOV.UK (Home Office)](https://www.gov.uk/visa-to-study-english) |
 | 確認日・対象期間 | 2026-10-15・2026-10（Actions のページ確認） |
-| 適用条件と例外 | Student visa／短期学習ビザの申請者。IHSの要否とNHSの利用範囲は、ビザの種類・期間・申請場所・個々の事情で変わる（U5b。免除・同伴者は別規定）。18歳未満も年£776、その他は年£1,035。Plannerには自動計上しない。 |
+| 適用条件と例外 | Student visa／短期学習ビザの申請者。IHSの要否とNHSの利用範囲は、ビザの種類・期間・申請場所・個々の事情で変わる（免除・同伴者は別規定）。18歳未満も年£776、その他は年£1,035。Plannerには自動計上しない。 |
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **条件つき推奨**：依頼により文言を修正（Ver.1.3.10）：旧文言は「IHSを支払えばNHSを利用できる」と無条件に読める恐れがあった。年£776／£1,035は維持（ページ更新 2024-11-28、短期学習ビザのページ「usually costs £776」）。修正後の文言は承認者がページと照合してから承認する。料金は変わるので日付を維持。 |
 | 画面上の表示場所 | Manchester city page → Daily life → Healthcare（Manchester · living.healthcare） |

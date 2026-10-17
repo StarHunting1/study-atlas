@@ -20,6 +20,7 @@ import { housingKindOf } from "@/data/official/housingKind";
 import ClimateCharts from "@/components/official/ClimateCharts";
 import { tpl } from "@/components/planner/format";
 import KeyView from "./KeyView";
+import VisaGuide, { cardsFor, hasGuide } from "./VisaGuide";
 import { sc } from "@/locales/schoolCompare";
 import StudyModeSwitch from "./StudyModeSwitch";
 import { fitOf, type StudyMode } from "@/data/official/studyType";
@@ -69,9 +70,9 @@ function Group({ title, note, points }: { title: string; note?: string; points: 
   return <section className="space-y-2"><h4 className="text-sm font-semibold text-[#0b2a5b]">{title}</h4>{note && <p className="text-xs leading-relaxed text-slate-500">{note}</p>}<CardGrid points={points} /></section>;
 }
 /** A profile section (Ver.1.3 facts) with sources behind "出典・適用条件". */
-function Profile({ city, id, order }: { city: City; id: string; /** field ids to show first (study type) */ order?: string[] }) {
+function Profile({ city, id, order, skip }: { city: City; id: string; /** field ids to show first (study type) */ order?: string[]; /** field ids shown elsewhere (the visa guide) */ skip?: string[] }) {
   const { L } = useI18n(); const s = sections.find((x) => x.id === id); if (!s) return null;
-  const rank = (f: string) => { const i = order?.indexOf(f) ?? -1; return i < 0 ? 99 : i; }; const fields = order ? [...s.fields].sort((a, b) => rank(a.id) - rank(b.id)) : s.fields;
+  const rank = (f: string) => { const i = order?.indexOf(f) ?? -1; return i < 0 ? 99 : i; }; const fields = (order ? [...s.fields].sort((a, b) => rank(a.id) - rank(b.id)) : s.fields).filter((f) => !skip?.includes(f.id));
   return (
     <dl className="divide-y divide-slate-100">
       {fields.map((f) => (
@@ -141,14 +142,15 @@ export default function CityOverview({ city, country, data }: { city: City; coun
         <h2 id="more-info" className="text-base font-semibold text-[#0b2a5b]">{L(ux.moreInfo)}</h2><p className="mb-2 text-xs text-slate-500">{L(ux.moreInfoLead)}</p>
         <div className="divide-y divide-slate-100">
           <Disclosure {...rowProps("visa")}>
+            {hasGuide(country) ? <VisaGuide city={city} country={country} /> :
             <div className="space-y-3"><p className="rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">{L(ot.visaIntro)}</p>
               <h3 className="text-sm font-semibold text-[#0b2a5b]">{L(ot.officialPages)} – {L(country.name)}</h3>
               <ul className="space-y-2 text-sm">{[...(visaLinks[country.code] ?? []), ...(healthLinks[country.code] ?? [])].map((l) => (
                 <li key={l.link.value}><a href={l.link.value} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(l.label)} ↗</a><span className="ml-2 text-[11px] text-slate-500">{l.link.status === "verified" ? `${L(d.checked)}: ${l.link.checkedAt}` : `(${L(ot.linkUnchecked)})`}</span></li>))}</ul>
-              <Profile city={city} id="visa" /></div>
+              <Profile city={city} id="visa" /></div>}
           </Disclosure>
           <Disclosure {...rowProps("safety")}><Profile city={city} id="safety" /></Disclosure>
-          <Disclosure {...rowProps("daily")}><Profile city={city} id="living" /></Disclosure>
+          <Disclosure {...rowProps("daily")}><Profile city={city} id="living" skip={hasGuide(country) && cardsFor(city, country).some((c) => c.id.endsWith("-health")) ? ["living.healthcare"] : []} /></Disclosure>
           <Disclosure {...rowProps("data")}>
             <div className="space-y-3"><p className="text-xs text-slate-500">{L(ot.officialIntro)}</p>
               <div className="flex flex-wrap gap-2">{(["verified", "unverified", "sample", "pending"] as Status[]).map((s) => <span key={s} className="flex items-center gap-1 text-sm"><StatusBadge status={s} /><span className="text-slate-600">{counts[s] ?? 0}</span></span>)}</div>
