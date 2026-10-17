@@ -15,6 +15,10 @@ export const cu = {
   glanceNote: t("Only items with the same basis on both sides count as comparable.", "どの都市も同じ基準で揃っている項目だけを「比較可能」としています。"),
   comparable: t("Comparable", "比較可能"), reference: t("Reference only", "参考値のみ"), notYet: t("Not obtained", "未取得"), linkOnly: t("Official link only", "公式リンクのみ"),
   heldHere: t("Figure not shown (publisher's terms)", "規約により数値は非表示"), heldLink: t("See the official page", "公式ページで確認"), noticeHere: t("Fees not shown (held back)", "料金掲載見合わせ"),
+  rentPendingHere: t("Awaiting approval (figure not shown)", "承認待ち（数値は未掲載）"),
+  rentPendingDetail: t("A public statistic has been collected, but a person has not approved it yet, so StudyAtlas does not show the number. See the official page.", "公的統計は取得済みですが、人による承認が済むまでStudyAtlasでは数値を表示しません。公式ページをご確認ください。"),
+  unreviewedHere: t("Official link only", "公式リンクのみ"),
+  unreviewedDetail: t("StudyAtlas has not reviewed whether the publisher's terms allow reuse, so no amounts are copied. See the official page.", "発表元の利用条件で再利用が認められるかを確認していないため、金額は転載していません。公式ページをご確認ください。"),
   heldDetail: t("Official fees are published, but under the publisher's terms of use StudyAtlas does not show the figures.", "公式料金は公開されていますが、利用条件によりStudyAtlasでは数値を掲載していません。"),
   /** Housing is split in two rows so a per-student price is never read as a market statistic (and the other way round). */
   studentHousingTitle: t("Student housing cost (per person)", "学生向け住居費（1人あたり）"), rentTitle: t("General rental market rent", "一般賃貸市場の家賃"),
@@ -26,6 +30,8 @@ export const cu = {
   /** Short "what exactly is this number" line per rent statistic, taken from the conditions recorded with each figure. */
   rentBasis: {
     "housing.privateRent.average": t("ONS · all private rented dwellings · Manchester city", "ONS・民間賃貸住宅すべて・マンチェスター市"),
+    "housing.privateRent.regionAverage": t("ONS · all private rented dwellings · whole London region (33 boroughs; not one borough)", "ONS・民間賃貸住宅すべて・ロンドン地域全体（33の区の平均で、特定の区ではない）"),
+    "housing.marketRent.1br@toronto": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Toronto census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・トロント都市圏（市より広い）"),
     "housing.marketRent.1br": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Vancouver census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・バンクーバー都市圏（市より広い）"),
   } as Record<string, Localized>,
   remove: t("Remove from comparison", "比較から外す"), details: t("City details", "都市の詳細"),

@@ -85,5 +85,7 @@ export type ClimateNormals = {
 };
 
 /** A topic where data was reviewed but is NOT shown (e.g. terms of use not satisfied), with the official pages to check instead. */
-export type TopicNotice = { topic: Topic; sourceId: string; text: Localized; links: { label: Localized; url: string }[] };
+/** Why nothing is shown: "restricted" = the publisher's terms do not allow it (default); "awaiting-approval" = collected but not yet approved by a person; "unreviewed" = reuse terms not reviewed, link only. */
+export type NoticeWhy = "restricted" | "awaiting-approval" | "unreviewed";
+export type TopicNotice = { topic: Topic; sourceId: string; why?: NoticeWhy; text: Localized; links: { label: Localized; url: string }[] };
 export type OfficialCityData = { cityId: string; points: DataPoint[]; climate?: ClimateNormals; climateAlt?: ClimateNormals; notices?: TopicNotice[]; /** Why climate data is missing / caveats */ climateNote?: Localized };

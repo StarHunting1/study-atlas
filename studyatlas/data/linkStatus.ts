@@ -1,16 +1,16 @@
 /*
- * Result of the link check of the Manchester / Vancouver source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-15
- * (workflow "Collect official data", run 38905921442, commit 40a2f74). Pasted from the job log; one request per link, no retries.
+ * Result of the link check of the Manchester / Vancouver source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-17
+ * (workflow "Collect official data", run 39060315008, commit 47971c7). Pasted from the job log; one request per link, no retries.
  *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests) | robots-disallowed (robots.txt disallows the path, or could not be fetched, e.g. a timeout: then no request is made)
  *   content: true = the page answered 2xx AND contains the words we expect (so it is the right page); false = answered but the words were
  *            not found; null = not checked for words (licence pages, catalogues) or not requested.
  * "Verified link" in the audit = ok + content true. Access denied is NOT broken: the page may exist but refuses automated requests.
  */
 export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped" | "robots-disallowed";
-export const LINK_CHECKED_AT = "2026-10-16";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/38905921442";
+export const LINK_CHECKED_AT = "2026-10-17";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39060315008";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null][] = [
-  ["https://api.weather.gc.ca/collections/climate-normals", "robots-disallowed", null, null],
+  ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null],
   ["https://climate.weather.gc.ca/climate_normals/", "ok", 200, null],
   ["https://climate.weather.gc.ca/climate_normals/index_e.html", "ok", 200, true],
   ["https://eccc-msc.github.io/open-data/licence/readme_en/", "ok", 200, null],
@@ -18,15 +18,19 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://englishuk.com/member-directory?id=6665", "ok", 200, true],
   ["https://expressenglishcollege.co.uk", "ok", 200, false],
   ["https://expressenglishcollege.co.uk/courses/general-english/", "ok", 200, true],
+  ["https://francesking.com/contact/", "ok", 200, true],
+  ["https://francesking.com/school-of-english-london/", "ok", 200, true],
+  ["https://francesking.com/school-of-english-london/course-prices/", "ok", 200, true],
   ["https://ihmanchester.com/", "ok", 200, true],
   ["https://ihmanchester.com/prices-and-special-offers/", "ok", 200, true],
-  ["https://ihvancouver.com/", "ok", 200, true],
-  ["https://ihvancouver.com/2024/11/08/new-campus/", "ok", 200, true],
-  ["https://ihvancouver.com/ihv-price-list/", "ok", 200, true],
+  ["https://ihvancouver.com/", "access-denied", 403, null],
+  ["https://ihvancouver.com/2024/11/08/new-campus/", "access-denied", 403, null],
+  ["https://ihvancouver.com/ihv-price-list/", "access-denied", 403, null],
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", "ok", 200, true],
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/bus-tickets", "ok", 200, true],
+  ["https://tfl.gov.uk/fares", "skipped", null, null],
   ["https://vancouver.housing.ubc.ca/applications/eligibility/", "skipped", null, null],
   ["https://vancouver.housing.ubc.ca/applications/fees-payments/", "skipped", null, null],
   ["https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/", "skipped", null, null],
@@ -34,8 +38,10 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", "ok", 200, true],
   ["https://www.cmhc-schl.gc.ca/about-us/terms-conditions/hmip-terms-conditions", "ok", 200, null],
   ["https://www.data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5", "ok", 200, null],
+  ["https://www.ef.com/ca/ilsd/schools/toronto/", "ok", 200, true],
   ["https://www.ef.com/ca/ilsd/schools/vancouver/", "ok", 200, true],
   ["https://www.englishuk.com/", "ok", 200, null],
+  ["https://www.englishuk.com/en/students/where-in-the-uk/london", "ok", 200, null],
   ["https://www.englishuk.com/member-directory?id=878", "ok", 200, true],
   ["https://www.englishuk.com/member-directory?id=897", "ok", 200, true],
   ["https://www.gov.uk/check-uk-visa", "ok", 200, true],
@@ -45,9 +51,12 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.gov.uk/student-visa", "ok", 200, true],
   ["https://www.gov.uk/visa-to-study-english", "ok", 200, true],
   ["https://www.kaplaninternational.com/faq/prices-and-payment", "ok", 200, true],
+  ["https://www.kaplaninternational.com/language-schools/canada/toronto", "ok", 200, true],
+  ["https://www.kaplaninternational.com/language-schools/united-kingdom/london", "ok", 200, true],
   ["https://www.kaplaninternational.com/language-schools/united-kingdom/manchester", "ok", 200, true],
   ["https://www.languageinternational.co.uk/school/ukec-academy-formerly-excel-college-manchester-66291", "ok", 200, null],
   ["https://www.languagescanada.ca/en/listing-directory/students", "ok", 200, null],
+  ["https://www.languagescanada.ca/en/listing-directory/students/ef-international-language-schools-canada-toronto", "ok", 200, true],
   ["https://www.languagescanada.ca/en/listing-directory/students/ef-international-language-schools-canada-vancouver", "ok", 200, true],
   ["https://www.languagescanada.ca/en/listing-directory/students/international-house-vancouver", "ok", 200, true],
   ["https://www.manchester.ac.uk/copyright/", "ok", 200, true],
@@ -59,12 +68,14 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics", "ok", 200, true],
   ["https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003", "ok", 200, true],
   ["https://www.sprachcaffe.com/en/uc/adults/canada/vancouver.htm", "ok", 200, true],
+  ["https://www.stgiles-international.com/english-language-schools/london-central/", "ok", 200, true],
   ["https://www.translink.ca/terms-and-conditions", "skipped", null, null],
   ["https://www.translink.ca/transit-fares/pricing-and-fare-zones", "skipped", null, null],
   ["https://www.translink.ca/transit-fares/u-pass-bc", "skipped", null, null],
+  ["https://www.ttc.ca/fares-and-passes", "skipped", null, null],
   ["https://www.ubc.ca/site/legal.html", "skipped", null, null],
   ["https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301", "ok", 200, true],
-  ["https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", "ok", 200, true],
-  ["https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp", "ok", 200, true],
+  ["https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", "robots-disallowed", null, null],
+  ["https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp", "robots-disallowed", null, null],
 ];
 export const linkStatusOf = (url: string) => LINK_STATUS.find((r) => r[0] === url.replace(/#.*$/, ""));

@@ -19,8 +19,8 @@ export function AmountText({ p, big }: { p: DataPoint; big?: boolean }) {
   if (!p.value) return null;
   const v = p.value;
   return (
-    <span className="whitespace-nowrap">
-      <span className={`${big ? "text-2xl" : "text-base"} font-semibold tabular-nums text-slate-900`}>{money(v.amount, v.currency, lang)}{v.max !== undefined ? `–${money(v.max, v.currency, lang)}` : ""}</span>
+    <span>
+      <span className={`${big ? "text-2xl" : "text-base"} whitespace-nowrap font-semibold tabular-nums text-slate-900`}>{money(v.amount, v.currency, lang)}{v.max !== undefined ? `–${money(v.max, v.currency, lang)}` : ""}</span>
       <span className="ml-1 text-xs text-slate-500">{v.currency} · {L(ot.per[v.per])}</span>
     </span>
   );

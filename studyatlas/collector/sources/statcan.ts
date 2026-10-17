@@ -10,7 +10,11 @@ import { sha256 } from "../util";
 const PID = 34100133;
 const TABLE_URL = "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301";
 type Geo = { memberId: number; name: string; cityId: string };
-export const STATCAN_GEOS: Geo[] = [{ memberId: 184, name: "Vancouver, British Columbia", cityId: "vancouver" }];
+export const STATCAN_GEOS: Geo[] = [
+  { memberId: 184, name: "Vancouver, British Columbia", cityId: "vancouver" },
+  /** Toronto census metropolitan area (CMA code 535): member id and name read from getCubeMetadata in the Ver.1.5.0 probe (Actions run 39058754956, 2026-10-17). Not "London, Ontario" (member 96). */
+  { memberId: 125, name: "Toronto, Ontario", cityId: "toronto" },
+];
 /** Type of structure 3 = "Row and apartment structures of three units and over" (the broadest category) */
 const STRUCTURE = { memberId: 3, name: "Row and apartment structures of three units and over" };
 export const STATCAN_UNITS = [

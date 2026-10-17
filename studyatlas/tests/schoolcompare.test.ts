@@ -13,9 +13,10 @@ const wrap = (el: unknown) => renderToStaticMarkup(h(I18nProvider, null, el as n
 const view = (a?: string, b?: string) => wrap(h(SchoolCompareView, { a: getCompareSchool(a), b: getCompareSchool(b) }));
 const text = (s: string) => s.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-t("candidates: the five visible schools of both cities; the hidden Excel College / UKEC Academy, MC Academy, EC Manchester and Sprachcaffe Vancouver are never offered, not even by id", () => {
+t("candidates: the nine visible schools of the four cities (Ver.1.5.0 added Toronto and London); the hidden Excel College / UKEC Academy, MC Academy, EC Manchester and Sprachcaffe Vancouver are never offered, not even by id", () => {
   const ids = listCompareSchools().map((s) => s.id).sort();
-  assert.deepEqual(ids, ["man-ih-manchester", "man-kaplan", "man-express-english-college", "van-ef", "van-international-house"].sort());
+  assert.deepEqual(ids, ["man-ih-manchester", "man-kaplan", "man-express-english-college", "van-ef", "van-international-house", "tor-ef", "tor-kaplan", "lon-kaplan", "lon-frances-king"].sort());
+  assert.equal(getCompareSchool("lon-st-giles-central"), undefined, "unconfirmed accreditation: kept as data, never offered");
   assert.equal(getCompareSchool("man-excel-college"), undefined); assert.equal(getCompareSchool("man-mc-academy"), undefined); assert.equal(getCompareSchool("man-ec-manchester"), undefined); assert.equal(getCompareSchool("van-sprachcaffe"), undefined);
   assert.ok(getCity("manchester")!.profile.education.languageSchools.value!.some((s) => s.id === "man-excel-college" && s.hidden), "its data is kept");
   assert.ok(listCompareSchools().every((s) => s.status === "unverified"));

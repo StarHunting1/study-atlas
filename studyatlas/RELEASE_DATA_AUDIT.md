@@ -10,9 +10,9 @@
 | 都市 | 項目数 | verified | unverified | sample（非公開） | pending | 利用可能率 | verified率 |
 |---|---|---|---|---|---|---|---|
 | Vancouver | 25 | 2 | 9 | 0 | 14 | 44% | 8% |
-| Toronto | 25 | 0 | 7 | 3 | 15 | 28% | 0% |
+| Toronto | 25 | 0 | 8 | 3 | 14 | 32% | 0% |
 | Manchester | 25 | 6 | 8 | 0 | 11 | 56% | 24% |
-| London | 25 | 1 | 6 | 3 | 15 | 28% | 4% |
+| London | 25 | 1 | 7 | 3 | 14 | 32% | 4% |
 | Sydney | 25 | 0 | 5 | 3 | 17 | 20% | 0% |
 | Melbourne | 25 | 0 | 5 | 3 | 17 | 20% | 0% |
 
@@ -24,7 +24,7 @@
 | Housing | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 |
 | Climate | 1 / 1 / 0 / 0 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 |
 | Safety | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
-| Education | 0 / 2 / 0 / 1 | 0 / 1 / 0 / 2 | 0 / 2 / 0 / 1 | 0 / 1 / 0 / 2 | 0 / 1 / 0 / 2 | 0 / 1 / 0 / 2 |
+| Education | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 1 / 0 / 2 | 0 / 1 / 0 / 2 |
 | Transport | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 1 / 1 / 0 / 0 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 |
 | Visa | 0 / 2 / 0 / 0 | 0 / 2 / 0 / 0 | 1 / 1 / 0 / 0 | 1 / 1 / 0 / 0 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
 | Daily life | 0 / 2 / 0 / 3 | 0 / 1 / 0 / 4 | 0 / 2 / 0 / 3 | 0 / 1 / 0 / 4 | 0 / 1 / 0 / 4 | 0 / 1 / 0 / 4 |
@@ -34,9 +34,9 @@
 | 都市 | 件数 | verified | unverified | 表示=数値可 | 表示=リンクのみ/保留 | 気候 | 最終確認から180日超 |
 |---|---|---|---|---|---|---|---|
 | Vancouver | 16 | 16 | 0 | 4 | 12 | verified（1991–2020） | 0 |
-| Toronto | 0 | – | – | – | – | なし | – |
+| Toronto | 0 | 0 | 0 | 0 | 0 | なし | 0 |
 | Manchester | 25 | 25 | 0 | 25 | 0 | verified（1971–2000） | 0 |
-| London | 0 | – | – | – | – | なし | – |
+| London | 0 | 0 | 0 | 0 | 0 | なし | 0 |
 | Sydney | 0 | – | – | – | – | なし | – |
 | Melbourne | 0 | – | – | – | – | なし | – |
 
@@ -45,9 +45,9 @@
 | 都市 | 語学学校（表示） | 非表示 | 状態 | 大学（Ver.1.0引き継ぎ） |
 |---|---|---|---|---|
 | Vancouver | 2 | 1 | unverified | 2（unverified） |
-| Toronto | 0 | 0 | pending | 2（unverified） |
+| Toronto | 2 | 0 | unverified | 2（unverified） |
 | Manchester | 3 | 3 | unverified | 2（unverified） |
-| London | 0 | 0 | pending | 3（unverified） |
+| London | 2 | 1 | unverified | 3（unverified） |
 | Sydney | 0 | 0 | pending | 2（unverified） |
 | Melbourne | 0 | 0 | pending | 2（unverified） |
 
@@ -59,26 +59,28 @@
 | TransLink | vancouver | restricted | （区分から導出） | blocked |
 | The University of Manchester | manchester | needs-review | （区分から導出） | page-check-only |
 | The University of Manchester (accommodation) | manchester | needs-review | （区分から導出） | page-check-only |
-| Office for National Statistics – Price Index of Private Rents (Manchester) | manchester | permitted | （区分から導出） | allowed |
-| Statistics Canada / CMHC – average rents (table 34-10-0133-01) | vancouver | permitted | （区分から導出） | allowed |
+| Office for National Statistics – Price Index of Private Rents (Manchester) | manchester, london | permitted | （区分から導出） | allowed |
+| Statistics Canada / CMHC – average rents (table 34-10-0133-01) | vancouver, toronto | permitted | （区分から導出） | allowed |
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) | vancouver | permitted | （区分から導出） | allowed |
 | Met Office – historical monthly station data (Ringway) | manchester | permitted | （区分から導出） | blocked |
 | UBC Student Housing and Community Services | vancouver | restricted | （区分から導出） | blocked |
+| Toronto Transit Commission (TTC) – fares and passes | toronto | unknown | link-only | blocked |
+| Transport for London (TfL) – fares and discounts | london | unknown | link-only | blocked |
 
 ## 4b. 出典リンクの検査（Manchester / Vancouver）
 
-実行: GitHub Actions（2026-10-16、https://github.com/StarHunting1/study-atlas/actions/runs/38905921442）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
+実行: GitHub Actions（2026-10-17、https://github.com/StarHunting1/study-atlas/actions/runs/39060315008）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
 
 | 対象 | 検証済み（2xx＋期待語を確認） | 到達（語は未確認/不一致） | アクセス拒否 | リンク切れ | 要求せず |
 |---|---|---|---|---|---|
-| 56 | 37 | 9 | 0 | 0 | 9 |
+| 67 | 40 | 11 | 3 | 0 | 11 |
 
 - 「アクセス拒否」(401/403/429)は**リンク切れではありません**。ページは存在しうるが自動アクセスを拒むため、未検証のまま扱います。
 - 到達しても期待語が見つからないリンクは検証済みにしません（例: Express English College の公式サイトはタイトルに校名がなく、手動で English UK 掲載のサイトURLと一致を確認）。
 
 | 状態 | 件数 | 例 |
 |---|---|---|
-| アクセス拒否 | 0 |  |
+| アクセス拒否 | 3 | https://ihvancouver.com/ , https://ihvancouver.com/2024/11/08/new-campus/ , https://ihvancouver.com/ihv-price-list/ |
 
 ## 5. 未確認・仮データ一覧（項目ごと）
 
@@ -124,7 +126,7 @@
 - pending: Safety / Official crime statistics
 - pending: Safety / Safety advice
 - unverified: Education / Universities（確認日なし）
-- pending: Education / Language schools
+- unverified: Education / Language schools（確認日 2026-10-17）
 - pending: Education / Tuition fees
 - unverified: Transport / Main transport（確認日なし）
 - pending: Transport / Student discounts
@@ -174,7 +176,7 @@
 - pending: Safety / Official crime statistics
 - pending: Safety / Safety advice
 - unverified: Education / Universities（確認日なし）
-- pending: Education / Language schools
+- unverified: Education / Language schools（確認日 2026-10-17）
 - pending: Education / Tuition fees
 - unverified: Transport / Main transport（確認日なし）
 - pending: Transport / Student discounts
@@ -250,7 +252,7 @@
 ### 見つかった問題と対応
 1. **架空のデモ数値が公開画面に出ていた**: Toronto / London / Sydney / Melbourne の `cost.rent` `cost.transport` `cost.totalMonthly` は Ver.1.0 のデモ値（status = sample。期間・含まれる項目・出典が未定義）。都市ページの主要数値と都市比較の表に「デモ用サンプル」ラベル付きで数値が表示されていた。→ 本PRで**数値を表示しない**（「データ準備中」）よう修正。値自体はデータに残し、監査上は「データなし」として数える。
 2. **Ver.1.0 引き継ぎの概要文**（気候・住居の概要・交通・暮らし・大学名）は全都市で unverified。ラベル付きで表示されるが、出典はない。
-3. **Toronto / London / Sydney / Melbourne** は公式データポイント・気候・語学学校がゼロ。実質的に「概要文＋準備中」のみで、公開品質に達していない。
+3. **Sydney / Melbourne** は公式データポイント・気候・語学学校がゼロ（Toronto / London は Ver.1.5.0 で項目34のとおり拡充。ただし家賃は承認待ちで数値は未掲載）。実質的に「概要文＋準備中」のみで、公開品質に達していない。
 4. 語学学校は Manchester 2校・Vancouver 3校（すべて unverified、料金なし）。Excel College / UKEC Academy は非表示。
 5. 公式データは Manchester / Vancouver のみ。TfGM・TransLink・UBC の料金は利用条件が `needs-review` / `restricted` のため、数値表示はそれぞれの権利区分に従う。
 6. 学生寮・ホームステイ・シェアハウスの1人あたり料金は、Manchester の University of Manchester 寮と大学見積もり以外に再利用可能な出典がなく「参考料金は準備中」。
@@ -283,6 +285,7 @@
 31. **Ver.1.4.0 英国の政府 claim 5件を正式承認**: 人（StarHunting1）の明示的な承認指示（2026-10-17）に基づき、U1・U2・U3・U5b・U6 の5件だけを `verified` に変更（記録は `data/approvals.ts`、承認時の文言・条件・出典も保存。承認後に変更するとビルド失敗）。U4・U5a・Canada.ca の C1〜C3・BC州の C4a〜C4c・C4-ref は未承認（unverified）のまま、Vancouver 気候 1991–2020 も未承認。Fact は全 claim が verified のときだけ verified（英国「注意点」＝U3 のみ → verified、英国「公式情報」・Manchester 医療 → 未確認のまま、claim ごとに表示）。ビザ・IHS は Planner に自動計上しない。
 32. **Ver.1.4.2 Vancouver 1991–2020 の元CSV照合**: ECCC の一括CSV（BC州）を既存の GitHub Actions で1回だけ取得（run 39051554489）し、合成観測所の Normal の行と保存値を列見出しで照合。気温3要素と降水量の**48値すべて一致**（不一致 0）。年値：気温 10.5／14.0／7.0 ℃（月値の平均と一致）、降水量 1159.5 mm（月値の合計 1159.7 mm との差 0.2 mm は、四捨五入の最大誤差 ±0.6 mm の範囲内。算出方法は資料になく原因は断定しない）。観測所（1108447・1108395）と ECCC Data Services End-use Licence v2.1.1（商用利用可・出典表示必須）を確認。**承認と切り替えは人の最終承認待ち**（verified 変更なし）。
 33. **Ver.1.4.3 Vancouver 1991–2020 気候を正式承認・本番反映**: 人（StarHunting1）の明示的な公開承認（2026-10-17）と、PR #46 での ECCC 元CSVとの全48値照合に基づき、1991–2020（合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)＝気候ID 1108447＋1108395）を verified に変更し本番表示に切り替え（承認記録と承認した数値は `data/approvals.ts`、承認後に変えるとビルド失敗）。年間降水量は ECCC の公表値 1159.5 mm を表示（月別合計 1159.7 mm との 0.2 mm 差は丸めの範囲内だが、ECCC の算出方法は未確認のため原因は断定しない）。旧 1981–2010 は履歴として保持し非表示。ライセンスの版表記を v2.1.1（2026年8月）に更新。Manchester（1971–2000）とは基準期間が異なるため、比較は「参考」のまま（同じ基準期間として比べない）。
+34. **Ver.1.5.0 Toronto / London の拡充**: 家賃統計を**候補として準備し、人の承認まで数値は表示しない**。Toronto＝CMHC 賃貸市場調査（Statistics Canada 表 34-10-0133-01、トロント都市圏〔国勢調査都市圏コード535・メンバー125〕、調査年2025、構造3戸以上、バチェラー1,491／1BR 1,761／2BR 2,045／3BR 2,294 カナダドル／月）。London＝ONS PIPR（ロンドン地域 E12000007、2026年8月、全住宅の平均 £2,332／月、16 Sep 2026版 Table 1）。いずれも Actions のプローブ（run 39058754956、2026-10-17）で公式データから読み取り。同時にロンドンの区別の値の差が大きいこと（例: Camden £2,819、Westminster £3,196）も確認（掲載はしない）。**Toronto とバンクーバーは同じ CMHC 定義・同じ年のため同じ基準、London（地域全体）と Manchester（1自治体）は別の統計**として扱い、後者は常に「参考値のみ」。語学学校は4校を追加表示（EF Toronto・Kaplan Toronto・Kaplan London・Frances King London、すべて unverified・料金はリンクのみ）、St Giles London Central は認定を確認できず非表示。TTC・TfL の運賃は再利用条件を確認していないためリンクのみ（TfL は自動アクセスに HTTP 403、再試行・回避なし）。気候・生活費は今回は見送り（理由は PR 本文）。
 
 ### 承認待ちの確認結果（承認済みの5件を除き verified にはしていません）
 2026-10-15 の Actions ページ確認（run 38787463398）で、言い換えた記述が公式ページの記載と一致することを確認した項目。人が承認するまで unverified のまま。

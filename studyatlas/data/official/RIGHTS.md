@@ -15,9 +15,11 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 1 full |
 | Met Office – historical monthly station data (Ringway) (`metoffice-station-data`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | 1 full |
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |
+| Toronto Transit Commission (TTC) – fares and passes (`ttc-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
+| Transport for London (TfL) – fares and discounts (`tfl-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | GOV.UK (Content API) (`govuk-content`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
 | Open Government Canada (CKAN API) (`canada-open-gov`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
-| Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver) (`language-school-fees`) | **needs-review** | link-only | page-check-only | manual-link | 2026-10-15 | yes | — |
+| Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver, EF Toronto, Kaplan Toronto, Kaplan London, Frances King London) (`language-school-fees`) | **needs-review** | link-only | page-check-only | manual-link | 2026-10-15 | yes | — |
 
 ## Details
 
@@ -142,6 +144,26 @@ What each publisher's published terms permit, how the data may be accessed, and 
   - https://www.ubc.ca/robots.txt (2026-10-14) — crawl rules
   - https://vancouver.housing.ubc.ca/robots.txt (2026-10-14) — crawl rules (housing site)
 
+### Toronto Transit Commission (TTC) – fares and passes — `ttc-fares`
+
+- reuseStatus: **unknown** · collector: **blocked** · access: manual-link · last reviewed: never
+- source: https://www.ttc.ca/fares-and-passes
+- terms / licence: none published
+- restrictions: none recorded
+- review notes: Ver.1.5.0: the fares page was opened once by the GitHub Actions probe on 2026-10-17 (robots.txt allowed, HTTP 200) to confirm that the link works. The TTC's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read the page. Only a link and our own wording about who should check what are shown.
+- pages read:
+  - none yet
+
+### Transport for London (TfL) – fares and discounts — `tfl-fares`
+
+- reuseStatus: **unknown** · collector: **blocked** · access: manual-link · last reviewed: never
+- source: https://tfl.gov.uk/fares
+- terms / licence: none published
+- restrictions: none recorded
+- review notes: Ver.1.5.0: tfl.gov.uk answered the GitHub Actions probe's automated requests (2026-10-17, fares pages) with HTTP 403. The pages were therefore not read, not retried and no workaround was attempted. TfL's terms and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not request the site. Only a link and our own wording about who should check what are shown.
+- pages read:
+  - none yet
+
 ### GOV.UK (Content API) — `govuk-content`
 
 - reuseStatus: **permitted** · collector: **allowed** · access: open-api · last reviewed: 2026-10-14
@@ -169,13 +191,13 @@ What each publisher's published terms permit, how the data may be accessed, and 
   - https://open.canada.ca/robots.txt (2026-10-14) — Crawl-delay: 20
   - https://open.canada.ca/data/api/action/license_list (2026-10-14) — licence list: ca-ogl-lgo = Open Government Licence - Canada
 
-### Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver) — `language-school-fees`
+### Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver, EF Toronto, Kaplan Toronto, Kaplan London, Frances King London) — `language-school-fees`
 
 - reuseStatus: **needs-review** · collector: **page-check-only** · access: manual-link · last reviewed: 2026-10-15
 - source: https://ihmanchester.com/prices-and-special-offers/
 - terms / licence: none published
 - restrictions: no-reproduction-without-consent
-- review notes: None of the five schools' sites grants a licence to reuse its prices. IH Manchester: “© Copyright 2026 IH Manchester. All Rights Reserved.”; its terms of sale concern bookings, not data reuse. Kaplan International: “Without our prior written permission, you may not copy, modify, alter, publish, broadcast, distribute, sell or transfer any material on this website”. EF: “© Signum International AG 2026. All rights reserved.”; its programme terms say nothing about reuse. Express English College: no copyright or reuse statement was found on the site or in its terms. IH Vancouver: the site answered the automated request with a bot check (403), so its terms were not read and the request was not repeated. Because fees differ by weekly lessons, length, season and inclusions, and no school permits reuse, StudyAtlas records no fee figure: each school shows a link to its own fee information, and the comparison lists the conditions that must be matched before any two quotes are compared. The link check only confirms that the page loads and mentions prices; no figure is read or stored.
+- review notes: None of the five schools' sites grants a licence to reuse its prices. IH Manchester: “© Copyright 2026 IH Manchester. All Rights Reserved.”; its terms of sale concern bookings, not data reuse. Kaplan International: “Without our prior written permission, you may not copy, modify, alter, publish, broadcast, distribute, sell or transfer any material on this website”. EF: “© Signum International AG 2026. All rights reserved.”; its programme terms say nothing about reuse. Express English College: no copyright or reuse statement was found on the site or in its terms. IH Vancouver: the site answered the automated request with a bot check (403), so its terms were not read and the request was not repeated. Because fees differ by weekly lessons, length, season and inclusions, and no school permits reuse, StudyAtlas records no fee figure: each school shows a link to its own fee information, and the comparison lists the conditions that must be matched before any two quotes are compared. The link check only confirms that the page loads and mentions prices; no figure is read or stored. Ver.1.5.0 added EF Toronto, Kaplan Toronto, Kaplan London and Frances King London as link-only entries on the same basis: Kaplan and EF terms are the ones quoted above; the Frances King site's terms were not read, so its reuse status is unknown and nothing from its price page is copied.
 - pages read:
   - https://ihmanchester.com/terms-conditions-sale/ (2026-10-14) — Terms of sale and footer copyright (2026-10-15)
   - https://www.kaplaninternational.com/terms-and-conditions (2026-10-14) — Website material clause (2026-10-15)

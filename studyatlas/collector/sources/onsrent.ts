@@ -19,6 +19,11 @@ import { excelDate, openWorkbook, sheetRows, type CellValue, type Row } from "./
 export const PIPR_PAGE = "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics";
 export const AREA_CODE = "E08000003";
 export const AREA_NAME = "Manchester";
+/** Areas read from Table 1. Manchester is a local authority (E08); London is the English region (E12), a much wider area, so the two are not the same statistic. */
+export type Area = { code: string; name: string; cityId: string; kind: "local authority" | "region"; scope: { en: string; ja: string } };
+export const MANCHESTER: Area = { code: AREA_CODE, name: AREA_NAME, cityId: "manchester", kind: "local authority", scope: { en: "Mean monthly private rent of ALL privately rented dwellings in Manchester local authority (new and existing tenancies). Not university halls, not student housing, not an average for international students, not by bedroom or property type.", ja: "マンチェスター市（地方自治体）の民間賃貸住宅すべての月額家賃の平均（新規契約と既存契約）。大学寮・学生向け住居・留学生の平均ではなく、寝室数や物件タイプ別でもありません。" } };
+export const LONDON: Area = { code: "E12000007", name: "London", cityId: "london", kind: "region", scope: { en: "Mean monthly private rent of ALL privately rented dwellings in the London region (Greater London, 33 local authorities; new and existing tenancies). A region-wide average: not the City of London alone, not a borough, not university halls or student housing, not an average for international students, not by bedroom or property type.", ja: "ロンドン地域（ロンドン広域圏＝33の自治体）の民間賃貸住宅すべての月額家賃の平均（新規契約と既存契約）。地域全体の平均であり、シティ・オブ・ロンドンだけでも特定の区でもなく、大学寮・学生向け住居・留学生の平均ではなく、寝室数や物件タイプ別でもありません。" } };
+export const AREAS: Area[] = [MANCHESTER, LONDON];
 export const SHEET = "Table 1";
 const MONTHS = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"];
 const pad = (n: number) => String(n).padStart(2, "0");
@@ -53,7 +58,9 @@ export type Extracted = {
 };
 const texts = async (rows: AsyncGenerator<Row>) => { const out: string[] = []; for await (const r of rows) for (const v of Object.values(r.cells)) if (typeof v === "string") out.push(v); return out; };
 
-export async function extractManchester(buf: Buffer): Promise<Extracted> {
+export const extractManchester = (buf: Buffer) => extractArea(buf, MANCHESTER);
+export async function extractArea(buf: Buffer, area: Area): Promise<Extracted> {
+  const AREA_CODE = area.code, AREA_NAME = area.name;
   const wb = openWorkbook(buf); const idx = wb.shared.indexOf(AREA_CODE);
   let head: Record<string, string> | undefined; const rows: Row[] = [];
   for await (const r of sheetRows(wb, SHEET, (raw, n) => n <= 12 || raw.includes(AREA_CODE) || (idx >= 0 && raw.includes(`>${idx}</v>`)))) {
@@ -86,11 +93,41 @@ export async function extractManchester(buf: Buffer): Promise<Extracted> {
   };
 }
 
+async function buildRecord(ctx: { now: string }, buf: Buffer, ed: { url: string; date: string }, area: Area, id: string): Promise<CollectedRecord> {
+  const x = await extractArea(buf, area);
+  if (x.published && x.published !== ed.date) throw new Error(`the workbook says it was published on ${x.published} but its edition folder is ${ed.date}; not imported`);
+  const published = x.published ?? ed.date; const period = x.month.slice(0, 7);
+  const rights = rightsOfSource("ons-private-rents");
+  const checks = {
+    valueIsWholePounds: true, monthIsFirstOfMonth: true, areaCodeMatchesName: true, publishedDateCrossChecked: !!x.published,
+    unitConfirmedInNotes: x.unit, definitionConfirmedInCover: x.definition, indexBaseConfirmedInNotes: x.base, licenceRecorded: rights.reuseStatus === "permitted" && !!rights.lastReviewedAt,
+  };
+  const unconfirmed = [
+    ...(x.unit ? [] : ["unit: the workbook notes did not state that rents are rounded to the nearest £1"]),
+    ...(x.definition ? [] : ["definition: the cover sheet did not state that PIPR covers new and existing tenancies"]),
+    ...(x.published ? [] : ["publication date: taken from the edition folder name only; the cover sheet statement was not found"]),
+  ];
+  const record: CollectedRecord = {
+    id, sourceId: "ons-private-rents", country: "GBR", cityId: area.cityId, field: "housing.privateRentAverage",
+    label: { en: `Average monthly private rent, all dwellings (${x.areaName}, ONS PIPR)`, ja: `平均月額民間家賃・全住宅（${x.areaName}、ONS PIPR）` },
+    value: { number: x.price, currency: "GBP", unit: "month", text: `£${x.price.toLocaleString("en-GB")} per month, mean rent of all privately rented dwellings in ${x.areaName} ${area.kind} (${area.code}), ${period}; new and existing tenancies. Not university halls or student housing.` },
+    period, sourceUrl: PIPR_PAGE, apiUrl: ed.url, retrievedAt: ctx.now, sourcePublishedAt: published, sourceUpdatedAt: published,
+    evidence: { path: `${SHEET} row ${x.row}, column ${x.col} (Rental price)`, quote: `${x.areaName} ${area.code} ${x.month} Rental price ${x.price}` },
+    contentHash: sha256(JSON.stringify([x.price, period, published, checks])), licence: rights.licence, status: "unverified", review: "standard",
+    meta: {
+      areaCode: area.code, areaName: x.areaName, region: x.region, edition: ed.date, workbook: ed.url, attribution: rights.attribution,
+      scope: area.scope,
+      unit: "GBP per month, rounded to the nearest £1", statisticalStatus: x.statisticalStatus, monthsInWorkbook: x.manchesterMonths, areaKind: area.kind, checks, unconfirmed,
+      fairUse: "ONS fair use policy (last updated 30 April 2026): bots must follow the technical guidance and identify themselves with a contact in the User-Agent.",
+    },
+  };
+  return record;
+}
 export const onsRent: Source = {
-  id: "ons-private-rents", name: "ONS Price Index of Private Rents (PIPR) – Manchester average monthly rent", country: "GBR", access: "implemented", cadenceDays: 30,
+  id: "ons-private-rents", name: "ONS Price Index of Private Rents (PIPR) – average monthly rent: Manchester (local authority) and London (region)", country: "GBR", access: "implemented", cadenceDays: 30,
   docs: "https://developer.ons.gov.uk/bots/", licence: rightsOfSource("ons-private-rents").licence,
   domains: ["www.ons.gov.uk"], topics: ["housing"],
-  note: "Official Excel workbook (not the API: PIPR is not in it). One monthly request pair: the dataset page, then the newest workbook; the area code E08000003 row of Table 1 only. Average private rent of all dwellings in the local authority – not university halls or student housing.",
+  note: "Official Excel workbook (not the API: PIPR is not in it). One monthly request pair: the dataset page, then the newest workbook; the rows of Table 1 for area codes E08000003 (Manchester) and E12000007 (London region) only; a London row that cannot be read is skipped. Average private rent of all dwellings in the local authority – not university halls or student housing.",
   async fetch(ctx): Promise<Fetched> {
     const rb = await ctx.robots(PIPR_PAGE); if (!rb.allowed) throw new Error(`${PIPR_PAGE}: ${rb.reason} – not requested`);
     const page = await ctx.fetchText(PIPR_PAGE); if (page.status !== 200) throw new Error(`HTTP ${page.status} for ${PIPR_PAGE}`);
@@ -98,33 +135,12 @@ export const onsRent: Source = {
     const rb2 = await ctx.robots(ed.url); if (!rb2.allowed) throw new Error(`${ed.url}: ${rb2.reason} – not requested`);
     if (ctx.paceMs) await sleep(ctx.paceMs); // ONS bot guide: well under 15 requests / 10 s; this is two requests a month
     const file = await ctx.fetchBinary(ed.url); if (file.status !== 200 || !file.body.length) throw new Error(`HTTP ${file.status} for ${ed.url}`);
-    const x = await extractManchester(file.body);
-    if (x.published && x.published !== ed.date) throw new Error(`the workbook says it was published on ${x.published} but its edition folder is ${ed.date}; not imported`);
-    const published = x.published ?? ed.date; const period = x.month.slice(0, 7);
-    const rights = rightsOfSource("ons-private-rents");
-    const checks = {
-      valueIsWholePounds: true, monthIsFirstOfMonth: true, areaCodeMatchesName: true, publishedDateCrossChecked: !!x.published,
-      unitConfirmedInNotes: x.unit, definitionConfirmedInCover: x.definition, indexBaseConfirmedInNotes: x.base, licenceRecorded: rights.reuseStatus === "permitted" && !!rights.lastReviewedAt,
-    };
-    const unconfirmed = [
-      ...(x.unit ? [] : ["unit: the workbook notes did not state that rents are rounded to the nearest £1"]),
-      ...(x.definition ? [] : ["definition: the cover sheet did not state that PIPR covers new and existing tenancies"]),
-      ...(x.published ? [] : ["publication date: taken from the edition folder name only; the cover sheet statement was not found"]),
-    ];
-    const record: CollectedRecord = {
-      id: "ons-private-rents:manchester:rental-price", sourceId: "ons-private-rents", country: "GBR", cityId: "manchester", field: "housing.privateRentAverage",
-      label: { en: `Average monthly private rent, all dwellings (${x.areaName}, ONS PIPR)`, ja: `平均月額民間家賃・全住宅（${x.areaName}、ONS PIPR）` },
-      value: { number: x.price, currency: "GBP", unit: "month", text: `£${x.price.toLocaleString("en-GB")} per month, mean rent of all privately rented dwellings in ${x.areaName} local authority (${AREA_CODE}), ${period}; new and existing tenancies. Not university halls or student housing.` },
-      period, sourceUrl: PIPR_PAGE, apiUrl: ed.url, retrievedAt: ctx.now, sourcePublishedAt: published, sourceUpdatedAt: published,
-      evidence: { path: `${SHEET} row ${x.row}, column ${x.col} (Rental price)`, quote: `${x.areaName} ${AREA_CODE} ${x.month} Rental price ${x.price}` },
-      contentHash: sha256(JSON.stringify([x.price, period, published, checks])), licence: rights.licence, status: "unverified", review: "standard",
-      meta: {
-        areaCode: AREA_CODE, areaName: x.areaName, region: x.region, edition: ed.date, workbook: ed.url, attribution: rights.attribution,
-        scope: { en: "Mean monthly private rent of ALL privately rented dwellings in Manchester local authority (new and existing tenancies). Not university halls, not student housing, not an average for international students, not by bedroom or property type.", ja: "マンチェスター市（地方自治体）の民間賃貸住宅すべての月額家賃の平均（新規契約と既存契約）。大学寮・学生向け住居・留学生の平均ではなく、寝室数や物件タイプ別でもありません。" },
-        unit: "GBP per month, rounded to the nearest £1", statisticalStatus: x.statisticalStatus, manchesterMonthsInWorkbook: x.manchesterMonths, checks, unconfirmed,
-        fairUse: "ONS fair use policy (last updated 30 April 2026): bots must follow the technical guidance and identify themselves with a contact in the User-Agent.",
-      },
-    };
-    return { records: [record], texts: {} };
+    const records: CollectedRecord[] = []; const failedIds: string[] = [];
+    for (const area of AREAS) {
+      const id = `ons-private-rents:${area.cityId}:rental-price`;
+      try { records.push(await buildRecord(ctx, file.body, ed, area, id)); }
+      catch (e) { if (area === MANCHESTER) throw e; failedIds.push(id); } // an additional area that cannot be read is skipped, never guessed; the earlier record stays
+    }
+    return { records, texts: failedIds.length ? {} : {}, failedIds };
   },
 };

@@ -1,7 +1,7 @@
 import type { Localized } from "@/lib/i18n";
 import { officialData } from "./index";
 import { displayModeOfClimate, isFigureShown, showsFigure } from "./rights";
-import type { DataPoint } from "./types";
+import type { DataPoint, NoticeWhy } from "./types";
 /*
  * City comparison rows for official data. A row names the kind of figure; for each city the first data point whose
  * `metric` is listed is used. Two figures are put side by side as "comparable" only when both are verified and
@@ -20,8 +20,8 @@ export const compareRows: CompareRow[] = [
     hint: { en: "Manchester sells 28-day tickets; Vancouver sells calendar-month passes.", ja: "マンチェスターは28日券、バンクーバーは暦月のパスです。" } },
   { id: "studentTransit", label: { en: "Student transit pass", ja: "学生向け交通パス" }, metrics: ["transport.periodPassAllOperators.student", "transport.studentProgramPass"] },
   { id: "uniHalls", label: { en: "University halls", ja: "大学寮" }, metrics: ["housing.universityHalls.selfCatered"] },
-  { id: "marketRent", label: { en: "Average rent in the private rental market", ja: "民間賃貸市場の平均家賃" }, metrics: ["housing.privateRent.average", "housing.marketRent.1br"],
-    hint: { en: "Manchester: all private dwellings (ONS). Vancouver: 1-bedroom units (CMHC). Neither is student housing.", ja: "マンチェスター：民間賃貸住宅すべて（ONS）。バンクーバー：1ベッドルーム（CMHC）。どちらも学生向け住居ではありません。" },
+  { id: "marketRent", label: { en: "Average rent in the private rental market", ja: "民間賃貸市場の平均家賃" }, metrics: ["housing.privateRent.average", "housing.privateRent.regionAverage", "housing.marketRent.1br"],
+    hint: { en: "Manchester: all private dwellings in one local authority (ONS). London: all private dwellings in the whole London region (ONS). Vancouver and Toronto: 1-bedroom units in the census metropolitan area (CMHC). None is student housing.", ja: "マンチェスター：1つの自治体の民間賃貸住宅すべて（ONS）。ロンドン：ロンドン地域全体の民間賃貸住宅すべて（ONS）。バンクーバー・トロント：都市圏の1ベッドルーム（CMHC）。いずれも学生向け住居ではありません。" },
     basis: { en: "Not directly comparable: the statistic, year, housing type and currency differ (not converted). No “cheaper” verdict is given.", ja: "直接は比較できません：統計の種類・対象年・住居タイプ・通貨が異なります（換算なし）。どちらが安いかは判定しません。" } },
   { id: "livingTotal", label: { en: "Student living-cost estimate (total per month)", ja: "学生の生活費見積もり（月額合計）" }, metrics: ["living.universityEstimate.total"] },
 ];
@@ -52,17 +52,20 @@ export const pickPoint = (cityId: string, row: CompareRow) => officialData(cityI
  * Why a city has no figure in a compare row although the row exists for others: the figure is recorded but the publisher's terms allow only a link
  * ("link"), or the topic was reviewed and held back with a notice ("notice"). Nothing is shown from either; undefined = really no data.
  */
-export type MissingReason = { kind: "link"; url: string; publisher: string } | { kind: "notice"; text: Localized; links: { label: Localized; url: string }[] };
+export type MissingReason = { kind: "link"; url: string; publisher: string } | { kind: "notice"; why: NoticeWhy; text: Localized; links: { label: Localized; url: string }[] };
 export function missingReason(cityId: string, row: CompareRow): MissingReason | undefined {
   const d = officialData(cityId); if (!d) return undefined;
   const held = d.points.find((p) => row.metrics.includes(p.metric) && p.value && !isFigureShown(p));
   if (held) return { kind: "link", url: held.evidence[0].url, publisher: held.evidence[0].publisher };
-  const topic = row.metrics[0].split(".")[0]; const n = (d.notices ?? []).find((x) => x.topic === topic);
-  return n ? { kind: "notice", text: n.text, links: n.links } : undefined;
+  const topic = row.metrics[0].split(".")[0];
+  // a notice belongs to the row it is about: "awaiting approval" notices are the whole-market rent statistic, never the student-housing row
+  const n = (d.notices ?? []).find((x) => x.topic === topic && ((x.why ?? "restricted") === "awaiting-approval") === (row.id === "marketRent"));
+  return n ? { kind: "notice", why: n.why ?? "restricted", text: n.text, links: n.links } : undefined;
 }
 
-/** The city has official figures for this topic that were reviewed and deliberately not shown (a notice, e.g. UBC residence fees), as opposed to having no data at all. */
-export const hasHeldNotice = (cityId: string, topic: string) => !!officialData(cityId)?.notices?.some((n) => n.topic === topic);
+export const hasHeldNotice = (cityId: string, topic: string) => !!officialData(cityId)?.notices?.some((n) => n.topic === topic && n.why !== "awaiting-approval");
+/** The whole-market rent statistic of this city is collected but waits for a person's approval (nothing is shown). */
+export const hasRentPending = (cityId: string) => !!officialData(cityId)?.notices?.some((n) => n.topic === "housing" && n.why === "awaiting-approval");
 
 /** Climate figures per city for the compare table: warmest/coolest month of the mean daily max and min, and the sum of the 12 monthly precipitation values. */
 export type ClimateCompare = { tmax?: [number, number]; tmin?: [number, number]; mean?: [number, number]; precipTotal?: number; station: string; period: string; derived: boolean; status: DataPoint["status"] };

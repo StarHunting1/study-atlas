@@ -31,7 +31,7 @@ export async function fixtureFetchAll(url: string): Promise<unknown> {
 /* Statistics Canada WDS: invented metadata (same member names as the real table) and invented rents (1000, 2000, …) */
 export async function fixturePost(url: string, body: unknown): Promise<unknown> {
   if (/getCubeMetadata$/.test(url)) return [{ status: "SUCCESS", object: { cubeTitleEn: "[FIXTURE]", releaseTime: "2000-01-01T08:30", dimension: [
-    { dimensionNameEn: "Geography", member: [{ memberId: 184, memberNameEn: "Vancouver, British Columbia" }] },
+    { dimensionNameEn: "Geography", member: [{ memberId: 125, memberNameEn: "Toronto, Ontario" }, { memberId: 184, memberNameEn: "Vancouver, British Columbia" }] },
     { dimensionNameEn: "Type of structure", member: [{ memberId: 3, memberNameEn: "Row and apartment structures of three units and over" }] },
     { dimensionNameEn: "Type of unit", member: ["Bachelor units", "One bedroom units", "Two bedroom units", "Three bedroom units"].map((n, i) => ({ memberId: i + 1, memberNameEn: n })) },
   ] } }];
