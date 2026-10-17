@@ -6,7 +6,7 @@ import { getCity } from "../data/cities";
 import { listCompareSchools, getCompareSchool } from "../data/languageSchools";
 import { officialData, officialSources } from "../data/official";
 import { LONDON_RENT_APPROVAL, LONDON_RENT_CANDIDATE, TORONTO_RENTS, TORONTO_RENT_APPROVAL, TORONTO_RENT_CANDIDATES, londonRentPoints, reconcileCollected, reconcileStatic, torontoRentPoints } from "../data/official/cityRents";
-import { compareRows, compareIssues, missingReason, pickPoint, rowVerdict } from "../data/official/compare";
+import { compareRows, compareIssues, hasHeldNotice, hasRentPending, missingReason, pickPoint, rowVerdict } from "../data/official/compare";
 import { isFigureShown, rightsOfSource } from "../data/official/rights";
 import { checkPoint } from "../data/official/validate";
 import { blockedHosts } from "../collector/linkcheck";
@@ -71,7 +71,14 @@ t("rent definitions are kept apart: Toronto and Vancouver share one CMHC definit
 
 t("held rent: while unapproved, the comparison names the topic as held with official links (not as 'no data') and shows no number", () => {
   const row = compareRows.find((r) => r.id === "marketRent")!;
-  for (const id of ["toronto", "london"]) { assert.equal(pickPoint(id, row), undefined); const r = missingReason(id, row)!; assert.equal(r.kind, "notice"); assert.ok(r.kind === "notice" && r.links.length >= 1); }
+  for (const id of ["toronto", "london"]) {
+    assert.equal(pickPoint(id, row), undefined); const r = missingReason(id, row)!; assert.equal(r.kind, "notice"); assert.ok(r.kind === "notice" && r.why === "awaiting-approval" && r.links.length >= 1);
+    assert.ok(hasRentPending(id)); assert.equal(hasHeldNotice(id, "housing"), false, "the rent notice is not the student-housing 'fees held back' notice");
+    assert.equal(missingReason(id, compareRows.find((x) => x.id === "uniHalls")!), undefined, "the student-housing row never borrows the rent notice");
+    const tr = missingReason(id, compareRows.find((x) => x.id === "single")!)!; assert.ok(tr.kind === "notice" && tr.why === "unreviewed", "transport: link only, terms not reviewed");
+  }
+  assert.ok(!hasRentPending("manchester") && !hasRentPending("vancouver"));
+  assert.ok(cu.rentPendingHere.ja.includes("承認待ち") && cu.rentPendingHere.en.includes("Awaiting approval") && cu.unreviewedDetail.ja && cu.unreviewedDetail.en);
 });
 
 t("collected records: a missing record is reported, never assumed; matching records reconcile; a disagreeing one fails", () => {

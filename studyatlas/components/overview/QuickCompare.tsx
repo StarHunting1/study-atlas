@@ -4,7 +4,7 @@ import { useState } from "react";
 import { getCity, type City } from "@/data/cities";
 import { sections } from "@/data/fields";
 import { moneyComparability } from "@/data/comparability";
-import { climateCompare, climateIssues, compareRows, hasHeldNotice, missingReason, pickPoint, rowVerdict, type ClimateCompare, type Issue } from "@/data/official/compare";
+import { climateCompare, climateIssues, compareRows, hasHeldNotice, hasRentPending, missingReason, pickPoint, rowVerdict, type ClimateCompare, type Issue } from "@/data/official/compare";
 import { officialData } from "@/data/official";
 import type { Fact, Money } from "@/data/types";
 import { useI18n, type Localized } from "@/lib/i18n";
@@ -50,7 +50,7 @@ function Cells({ cities, keys, topic }: { cities: City[]; keys: Key[]; topic?: C
   const { L, lang } = useI18n();
   return (
     <div className="grid gap-x-6 gap-y-3" style={{ gridTemplateColumns: `repeat(${Math.min(cities.length, 4)}, minmax(0, 1fr))` }}>
-      {cities.map((c, i) => <div key={c.id} data-city={c.id} className="min-w-0"><p className="mb-1 truncate text-xs font-medium text-slate-500">{L(c.name)}</p><KeyView k={keys[i]} noneText={topic === "housing" && hasHeldNotice(c.id, "housing") ? cu.noticeHere : cu.notYet} />{keys[i].kind === "point" && <p className="mt-0.5 text-[11px] leading-snug text-slate-400" data-testid="key-period">{validForShort(keys[i].point.validFor, lang)}</p>}{basisOf(keys[i], topic) && <p className="text-[11px] leading-snug text-slate-500" data-testid="key-basis">{L(basisOf(keys[i], topic)!)}</p>}</div>)}
+      {cities.map((c, i) => <div key={c.id} data-city={c.id} className="min-w-0"><p className="mb-1 truncate text-xs font-medium text-slate-500">{L(c.name)}</p><KeyView k={keys[i]} noneText={topic === "rent" && hasRentPending(c.id) ? cu.rentPendingHere : topic === "housing" && hasHeldNotice(c.id, "housing") ? cu.noticeHere : cu.notYet} />{keys[i].kind === "point" && <p className="mt-0.5 text-[11px] leading-snug text-slate-400" data-testid="key-period">{validForShort(keys[i].point.validFor, lang)}</p>}{basisOf(keys[i], topic) && <p className="text-[11px] leading-snug text-slate-500" data-testid="key-basis">{L(basisOf(keys[i], topic)!)}</p>}</div>)}
     </div>
   );
 }
@@ -77,11 +77,11 @@ function OfficialDetail({ cities, topic }: { cities: City[]; topic: CmpTopic }) 
   const gap = (cityId: string, row: (typeof compareRows)[number]) => { const m = missingReason(cityId, row); if (!m) return none;
     return m.kind === "link"
       ? <div className="space-y-1" data-testid="gap-link"><p className="text-xs text-slate-500">{L(cu.heldHere)}</p><a href={m.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[40px] items-center text-xs font-medium text-sky-700 underline">{L(cu.heldLink)} ↗ <span className="ml-1 font-normal text-slate-500">{m.publisher}</span></a></div>
-      : <div className="space-y-1" data-testid="gap-notice"><p className="text-xs font-medium text-slate-600">{L(cu.noticeHere)}</p><p className="text-[11px] leading-snug text-slate-500">{L(cu.heldDetail)}</p><Disclosure level="sources"><p className="text-[11px] leading-snug text-slate-500">{L(m.text)}</p><ul className="mt-1 space-y-0.5">{m.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-[11px] text-sky-700 underline">{L(l.label)} ↗</a></li>)}</ul></Disclosure></div>; };
+      : <div className="space-y-1" data-testid="gap-notice"><p className="text-xs font-medium text-slate-600">{L(m.why === "awaiting-approval" ? cu.rentPendingHere : m.why === "unreviewed" ? cu.unreviewedHere : cu.noticeHere)}</p><p className="text-[11px] leading-snug text-slate-500">{L(m.why === "awaiting-approval" ? cu.rentPendingDetail : m.why === "unreviewed" ? cu.unreviewedDetail : cu.heldDetail)}</p><Disclosure level="sources"><p className="text-[11px] leading-snug text-slate-500">{L(m.text)}</p><ul className="mt-1 space-y-0.5">{m.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-[11px] text-sky-700 underline">{L(l.label)} ↗</a></li>)}</ul></Disclosure></div>; };
   return (
     <div className="space-y-3">
       {rows.map((row) => {
-        const pts = cities.map((c) => pickPoint(c.id, row)); if (!pts.some(Boolean) && !cities.some((c) => missingReason(c.id, row)?.kind === "link")) return null; const { verdict, issues } = rowVerdict(row, pts);
+        const pts = cities.map((c) => pickPoint(c.id, row)); if (!pts.some(Boolean) && !cities.some((c) => { const m = missingReason(c.id, row); return m?.kind === "link" || (m?.kind === "notice" && m.why !== "restricted"); })) return null; const { verdict, issues } = rowVerdict(row, pts);
         return <DetailRow key={row.id} label={L(row.label)} note={verdict === "notDirect" ? L(row.basis!) : verdict === "missing" && cities.some((c) => missingReason(c.id, row)?.kind === "link") ? L(cu.why.linkOnly) : cities.some((c) => missingReason(c.id, row)?.kind === "notice") && (verdict === "missing" || verdict === "issues") ? undefined : issues.length ? issues.map((i) => L(ot[issueText[i]] as never)).join(" / ") : L(ot.cmpOk)} noteCls={issues.length || verdict === "notDirect" ? "text-amber-700" : "text-emerald-700"} extra={row.hint ? L(row.hint) : undefined} cities={cities}
           cells={pts.map((p, i) => p ? <div className="space-y-1"><AmountText p={p} /> {p.status !== "verified" && <StatusBadge status={p.status} />}
             <p className="text-[11px] text-slate-500">{L(ot.audience[p.audience])} · {validForShort(p.validFor, lang)}</p><p className="text-[11px] leading-snug text-slate-500">{L(p.conditions)}</p>

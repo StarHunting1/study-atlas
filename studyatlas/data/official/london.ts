@@ -10,13 +10,13 @@ const data: OfficialCityData = {
   cityId: "london",
   points: [...londonRentPoints()],
   notices: [
-    { topic: "housing", sourceId: "ons-private-rents",
+    { topic: "housing", sourceId: "ons-private-rents", why: "awaiting-approval",
       text: {
         en: "A public rent statistic exists for London (Office for National Statistics, Price Index of Private Rents: average monthly private rent of all dwellings in the London region, August 2026, in pounds). It has been collected but has not been checked and approved by a person yet, so StudyAtlas does not show the number. When approved it will appear as a region-wide average (ONS code E12000007, all 33 local authorities of Greater London; boroughs differ a lot) – not student housing, not university halls and not language-school housing. It will not be treated as the same statistic as Manchester's figure, which covers one local authority only.",
         ja: "ロンドンの公的な家賃統計（英国国家統計局 ONS の民間家賃指数：ロンドン地域の民間賃貸住宅すべての平均月額家賃、2026年8月、ポンド）はありますが、人による確認と承認が済んでいないため、StudyAtlasでは数値を表示していません。承認後は、地域全体の平均（ONS地域コード E12000007、グレーター・ロンドンの33自治体すべて。区ごとの差は大きい）として表示します（学生向け住居・大学寮・語学学校の滞在先の料金ではありません）。単一の自治体を対象とするマンチェスターの値と同じ統計としては扱いません。",
       },
       links: [{ label: { en: "ONS – Price Index of Private Rents (monthly price statistics)", ja: "ONS – 民間家賃指数（月次価格統計）" }, url: PIPR }] },
-    { topic: "transport", sourceId: "tfl-fares",
+    { topic: "transport", sourceId: "tfl-fares", why: "unreviewed",
       text: {
         en: "TfL fares (adult fares, zones, passes, discounts, who qualifies by age or student status) are not copied here, and StudyAtlas could not read the TfL pages: they refused an automated request (HTTP 403), which was not retried or worked around. Open the official pages in your browser. Do not assume that language-school students get a student discount, and do not turn a pay-as-you-go fare into a monthly amount without the cap rules. The Planner keeps your own input.",
         ja: "TfLの運賃（大人運賃・ゾーン・パス・割引・年齢や学生資格による対象）はここに転載していません。また、TfLのページは自動アクセスを拒否した（HTTP 403）ため読み取れておらず、再試行や回避もしていません。公式ページをブラウザでご確認ください。語学学校の学生が学生割引を受けられるとは限りません。1回ごとの運賃を、上限（キャップ）の規則を見ずに月額へ換算することもしないでください。プランナーはご自身の入力のままです。",
