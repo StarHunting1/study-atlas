@@ -5,7 +5,7 @@ import path from "node:path";
 import { getCity } from "../data/cities";
 import { listCompareSchools, getCompareSchool } from "../data/languageSchools";
 import { officialData, officialSources } from "../data/official";
-import { LONDON_RENT_APPROVAL, LONDON_RENT_CANDIDATE, TORONTO_RENTS, TORONTO_RENT_APPROVAL, TORONTO_RENT_CANDIDATES, londonRentPoints, reconcileCollected, reconcileStatic, torontoRentPoints } from "../data/official/cityRents";
+import { ALL_RENT_CANDIDATES, LONDON_RENT_CANDIDATE, RENT_APPROVALS, TORONTO_RENTS, TORONTO_RENT_CANDIDATES, londonRentPoints, rentDigest, reconcileCollected, reconcileStatic, torontoRentPoints } from "../data/official/cityRents";
 import { compareRows, compareIssues, hasHeldNotice, hasRentPending, missingReason, pickPoint, rowVerdict } from "../data/official/compare";
 import { isFigureShown, rightsOfSource } from "../data/official/rights";
 import { checkPoint } from "../data/official/validate";
@@ -17,7 +17,7 @@ import type { DataPoint } from "../data/official/types";
 
 let n = 0; const t = (name: string, fn: () => void) => { fn(); n++; console.log("ok", name); };
 const root = path.resolve(__dirname, "..");
-const sample = { approvedBy: "Test Reviewer", approvedAt: "2026-10-20", basis: "test: publisher pages compared" };
+const sample = Object.fromEntries(ALL_RENT_CANDIDATES.map((c) => [c.id, { approvedBy: "Test Reviewer", approvedAt: "2026-10-20", basis: "test: publisher pages compared", digest: rentDigest(c) }]));
 const key = (p: DataPoint): Key => ({ kind: "point", point: p });
 
 t("reconciliation: every Toronto/London candidate agrees with the source registry, rights record and its own evidence", () => {
@@ -27,7 +27,7 @@ t("reconciliation: every Toronto/London candidate agrees with the source registr
 });
 
 t("before approval nothing is published: no rent points for Toronto or London, no verified claim, and the pages carry conditions and official links instead", () => {
-  assert.equal(TORONTO_RENT_APPROVAL, null); assert.equal(LONDON_RENT_APPROVAL, null);
+  assert.deepEqual(RENT_APPROVALS, {}, "no approval has been recorded");
   for (const id of ["toronto", "london"]) {
     const d = officialData(id)!; assert.ok(d, id); assert.equal(d.points.length, 0, `${id}: no numbers before approval`);
     const housing = d.notices!.find((x) => x.topic === "housing")!; const transport = d.notices!.find((x) => x.topic === "transport")!;
@@ -41,7 +41,8 @@ t("before approval nothing is published: no rent points for Toronto or London, n
 });
 
 t("an approval needs a name, a date and what was compared; only then do the points exist, as verified, in the existing housing group (renter audience)", () => {
-  assert.throws(() => torontoRentPoints({ ...sample, approvedBy: " " }), /approvedBy/); assert.throws(() => londonRentPoints({ ...sample, approvedAt: "20/10/2026" }), /approvedAt/); assert.throws(() => londonRentPoints({ ...sample, basis: "" }), /basis/);
+  const bad = (patch: object) => ({ ...sample, "lon-ons-pipr-private-rent-region-month": { ...sample["lon-ons-pipr-private-rent-region-month"], ...patch } });
+  assert.throws(() => londonRentPoints(bad({ approvedBy: " " })), /approvedBy/); assert.throws(() => londonRentPoints(bad({ approvedAt: "20/10/2026" })), /approvedAt/); assert.throws(() => londonRentPoints(bad({ basis: "" })), /basis/);
   const tor = torontoRentPoints(sample), lon = londonRentPoints(sample);
   assert.equal(tor.length, 4); assert.equal(lon.length, 1);
   for (const p of [...tor, ...lon]) { assert.equal(p.status, "verified"); assert.equal(p.checkedAt, "2026-10-20"); assert.equal(p.audience, "renter"); assert.equal(p.topic, "housing"); assert.ok(isFigureShown(p)); assert.deepEqual(checkPoint(p, officialSources), [], p.id); }
@@ -57,9 +58,10 @@ t("rent definitions are kept apart: Toronto and Vancouver share one CMHC definit
   assert.equal(lon.metric, "housing.privateRent.regionAverage"); assert.notEqual(lon.metric, "housing.privateRent.average");
   assert.equal(rentCmp([key(lon), key(van)]), "differ"); assert.equal(rentCmp([key(tor), key(man)]), "differ");
   assert.equal(availability([key(lon), key(man)], rentCmp([key(lon), key(man)])), "reference");
-  // the detailed compare row never calls any pair "same basis" or ranks it: it is always flagged as not directly comparable
+  // the detailed compare row calls a pair "same basis" only when every part of the rent definition matches (rentBasis.ts); it never ranks
   const row = compareRows.find((r) => r.id === "marketRent")!; assert.ok(row.metrics.includes("housing.privateRent.regionAverage") && row.metrics.includes("housing.marketRent.1br"));
-  for (const [a, b] of [[tor, van], [lon, man], [lon, tor]]) assert.equal(rowVerdict(row, [a, b]).verdict, "notDirect");
+  assert.equal(rowVerdict(row, [tor, van]).verdict, "sameBasis", "Toronto and Vancouver: every part of the definition matches (Ver.1.5.1)");
+  for (const [a, b] of [[lon, man], [lon, tor], [man, van], [lon, van]]) assert.equal(rowVerdict(row, [a, b]).verdict, "notDirect");
   assert.match(row.hint!.en, /whole London region/); assert.match(row.hint!.ja, /ロンドン地域全体/);
   assert.equal(compareIssues([tor, van]).length, 0);
   // one-line basis per city so the cards say which area they mean

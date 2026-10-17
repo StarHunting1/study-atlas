@@ -1,3 +1,4 @@
+import { sameRentBasis } from "@/data/official/rentBasis";
 import type { City } from "@/data/cities";
 import type { Fact, Institution, Money, Status } from "@/data/types";
 import type { Localized } from "@/lib/i18n";
@@ -103,7 +104,7 @@ export function rentCmp(keys: Key[]): Cmp {
   if (pts.length < 2) return "missing";
   if (pts.some((p) => p.status !== "verified")) return "unverified";
   const same = (f: (p: DataPoint) => string) => new Set(pts.map(f)).size === 1;
-  return same((p) => p.metric) && same((p) => p.sourceId) && same((p) => p.value!.currency) && same((p) => p.value!.per) && same((p) => p.validFor) ? "same" : "differ";
+  return same((p) => p.metric) && same((p) => p.sourceId) && same((p) => p.value!.currency) && same((p) => p.value!.per) && same((p) => p.validFor) && sameRentBasis(pts) ? "same" : "differ";
 }
 
 /**

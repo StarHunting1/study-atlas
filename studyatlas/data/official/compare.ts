@@ -1,6 +1,7 @@
 import type { Localized } from "@/lib/i18n";
 import { officialData } from "./index";
 import { displayModeOfClimate, isFigureShown, showsFigure } from "./rights";
+import { sameRentBasis } from "./rentBasis";
 import type { DataPoint, NoticeWhy } from "./types";
 /*
  * City comparison rows for official data. A row names the kind of figure; for each city the first data point whose
@@ -42,7 +43,7 @@ export type RowVerdict = "missing" | "issues" | "notDirect" | "sameBasis";
 export function rowVerdict(row: CompareRow, points: (DataPoint | undefined)[]): { verdict: RowVerdict; issues: Issue[]; currenciesDiffer: boolean } {
   const issues = compareIssues(points); const have = points.filter((p): p is DataPoint => !!p?.value);
   const currenciesDiffer = new Set(have.map((p) => p.value!.currency)).size > 1;
-  const verdict: RowVerdict = issues.includes("missing") ? "missing" : issues.length ? "issues" : row.basis ? "notDirect" : "sameBasis";
+  const verdict: RowVerdict = issues.includes("missing") ? "missing" : issues.length ? "issues" : row.basis && !(row.id === "marketRent" && sameRentBasis(have)) ? "notDirect" : "sameBasis";
   return { verdict, issues, currenciesDiffer };
 }
 /** A figure the publisher's terms allow to be shown (rights.ts); held-back figures are treated as "no figure" and never compared. */
