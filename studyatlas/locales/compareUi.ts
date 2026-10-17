@@ -7,10 +7,26 @@ export const cu = {
     differ: t("Unit, period, audience or kind of figure differs: do not compare the sizes of the numbers.", "単位・期間・対象・種類のいずれかが異なるため、数値の大小は比べません。"),
     unverified: t("Includes unverified values: shown for reference, not as a verdict.", "未確認の値を含むため、参考として並べています（優劣は示しません）。"),
     missing: t("Not enough data to compare (not obtained yet).", "比べられるだけのデータがありません（未取得）。"),
+    partial: t("Only some of the cities have a figure: shown as reference, not compared.", "一部の都市のみ数値があります。参考として表示し、比較はしません。"),
+    linkOnly: t("The figure exists, but the publisher's terms allow only a link: see the official page.", "数値は取得済みですが、提供元の規約により公式ページへのリンクのみ案内しています。"),
     "n/a": t("Shown side by side as text; not judged as the same basis.", "文章として並べています（同じ基準かどうかは判定しません）。"),
   },
   glanceTitle: t("What can be compared", "比較できる項目の状況"),
   glanceNote: t("Only items with the same basis on both sides count as comparable.", "どの都市も同じ基準で揃っている項目だけを「比較可能」としています。"),
-  comparable: t("Comparable", "比較可能"), reference: t("For reference", "参考表示"), notYet: t("Not obtained", "未取得"),
+  comparable: t("Comparable", "比較可能"), reference: t("Reference only", "参考値のみ"), notYet: t("Not obtained", "未取得"), linkOnly: t("Official link only", "公式リンクのみ"),
+  heldHere: t("Figure not shown (publisher's terms)", "規約により数値は非表示"), heldLink: t("See the official page", "公式ページで確認"), noticeHere: t("Fees not shown (held back)", "料金掲載見合わせ"),
+  heldDetail: t("Official fees are published, but under the publisher's terms of use StudyAtlas does not show the figures.", "公式料金は公開されていますが、利用条件によりStudyAtlasでは数値を掲載していません。"),
+  /** Housing is split in two rows so a per-student price is never read as a market statistic (and the other way round). */
+  studentHousingTitle: t("Student housing cost (per person)", "学生向け住居費（1人あたり）"), rentTitle: t("General rental market rent", "一般賃貸市場の家賃"),
+  studentHousingNote: t("University-run housing for that university's students. Not the general market.", "大学が運営する住居で、その大学の学生が対象です。一般の賃貸市場ではありません。"),
+  rentWhy: {
+    differ: t("Different statistics (publisher, area, dwelling type, year or currency): shown side by side as reference, never as a direct comparison. Currencies are not converted.", "統計の種類（発表元・地域・住居タイプ・年・通貨）が異なるため、参考として並べるだけで、直接は比較しません（通貨は換算しません）。"),
+    same: t("The same statistic, area basis, period and currency.", "同じ統計・同じ期間・同じ通貨です。"),
+  },
+  /** Short "what exactly is this number" line per rent statistic, taken from the conditions recorded with each figure. */
+  rentBasis: {
+    "housing.privateRent.average": t("ONS · all private rented dwellings · Manchester city", "ONS・民間賃貸住宅すべて・マンチェスター市"),
+    "housing.marketRent.1br": t("CMHC · 1-bedroom, apartments & row houses of 3+ units · Vancouver census area (wider than the city)", "CMHC・1ベッドルーム（3戸以上の集合住宅・長屋）・バンクーバー都市圏（市より広い）"),
+  } as Record<string, Localized>,
   remove: t("Remove from comparison", "比較から外す"), details: t("City details", "都市の詳細"),
 };

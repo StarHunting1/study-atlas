@@ -87,3 +87,36 @@ export function extraKey(c: City, topic: ExtraTopic): Key {
   const f = sections.flatMap((s) => s.fields).find((x) => x.id === EXTRA_FIELD[topic]); const fact = f?.get(c) as Fact<Localized> | undefined;
   return has(fact) ? { kind: "text", fact } : { kind: "none" };
 }
+
+/**
+ * The general rental market row of the comparison page (Ver.1.3.8): a city's shown whole-market rent statistic (ONS, CMHC…), kept apart from the
+ * per-student price of the housing row so the two are never read as one thing. A city without such a figure gets `none` ("not obtained").
+ */
+export function rentKey(c: City): Key {
+  const rent = (officialData(c.id)?.points ?? []).filter((p) => p.topic === "housing" && p.audience === "renter" && p.value && shown(p.status) && isFigureShown(p));
+  const p = rent.find((x) => x.highlight && x.status === "verified") ?? rent.find((x) => x.status === "verified") ?? rent[0];
+  return p ? { kind: "point", point: p } : { kind: "none" };
+}
+/** Market rent statistics are directly comparable only when it is the very same statistic: same metric, currency, reference period and every figure verified. Different publishers' statistics (ONS vs CMHC) never are. */
+export function rentCmp(keys: Key[]): Cmp {
+  const pts = keys.flatMap((k) => (k.kind === "point" ? [k.point] : []));
+  if (pts.length < 2) return "missing";
+  if (pts.some((p) => p.status !== "verified")) return "unverified";
+  const same = (f: (p: DataPoint) => string) => new Set(pts.map(f)).size === 1;
+  return same((p) => p.metric) && same((p) => p.sourceId) && same((p) => p.value!.currency) && same((p) => p.value!.per) && same((p) => p.validFor) ? "same" : "differ";
+}
+
+/**
+ * What a topic can offer on the comparison page, in the user's words:
+ *  comparable – every city has a verified figure on the same basis;  reference – figures are shown but must not be compared as the same thing;
+ *  partial – only some cities have a figure (shown as reference);  linkOnly – the data exists but the publisher's terms allow only a link;
+ *  notYet – nothing obtained.
+ */
+export type Availability = "comparable" | "reference" | "partial" | "linkOnly" | "notYet";
+export function availability(keys: Key[], cmp: Cmp): Availability {
+  if (cmp === "same") return "comparable";
+  if (cmp !== "missing") return "reference";
+  const figures = keys.filter((k) => k.kind !== "none" && k.kind !== "link").length, links = keys.filter((k) => k.kind === "link").length;
+  if (figures > 0) return "partial";
+  return links > 0 ? "linkOnly" : "notYet";
+}

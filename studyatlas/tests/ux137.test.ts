@@ -19,7 +19,9 @@ t("city comparison: an at-a-glance strip lists every key topic, each with a one-
     assert.ok(html.includes(`data-testid="glance-${topic}"`) && html.includes(`id="cmp-${topic}"`) && html.includes(`data-testid="why-${topic}"`), topic);
     const kind = /data-testid="glance-[a-z]+" data-kind="(\w+)"/.exec(html.slice(html.indexOf(`data-testid="glance-${topic}"`) - 5))?.[1];
     const cmp = new RegExp(`data-testid="cmp-${topic}" data-cmp="([^"]+)"`).exec(html)?.[1]!;
-    assert.equal(kind, cmp === "same" ? "ok" : cmp === "missing" ? "none" : "ref", `${topic}: glance agrees with the row verdict (${cmp})`);
+    const av = new RegExp(`data-testid="cmp-${topic}" data-cmp="[^"]+" data-av="([^"]+)"`).exec(html)?.[1]!;
+    assert.equal(kind, { comparable: "ok", reference: "ref", partial: "ref", linkOnly: "link", notYet: "none" }[av], `${topic}: glance agrees with the row (${cmp}/${av})`);
+    assert.equal(av === "comparable", cmp === "same", `${topic}: only a same-basis row is called comparable`);
   }
   assert.ok(!/Same unit, period and audience|単位・期間・対象が同じ/.test(text(html)) || /data-cmp="same"/.test(html), "the 'comparable' reason only appears for a same-basis row");
   assert.ok(!/おすすめ|最安|best|cheapest/i.test(text(html)), "no ranking words");
