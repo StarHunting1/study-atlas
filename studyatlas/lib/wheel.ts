@@ -26,3 +26,19 @@ export function classifyWheel(e: WheelLike, state: WheelState, now: number, mac 
 }
 /** Pixels to pan for a trackpad swipe: the scroll deltas as they arrive (the system's natural-scrolling setting is already in their sign). */
 export const panDelta = (e: Pick<WheelLike, "deltaX" | "deltaY">): [number, number] => [e.deltaX, e.deltaY];
+
+/** Zoom levels per pixel of a pinch (ctrl+wheel). Same rate as MapLibre's own trackpad zoom (1/100), but each event is clamped so a ctrl+mouse-wheel notch (±100) or a burst cannot jump the map. */
+export const PINCH_RATE = 0.01;
+export const PINCH_MAX_STEP = 0.5;
+const LINE_PX = 16, PAGE_PX = 400;
+/** Zoom change for one pinch wheel event: pinch-out (deltaY < 0) zooms in, pinch-in zooms out. Line/page deltas are converted to pixels first. */
+export function pinchZoomDelta(e: Pick<WheelLike, "deltaY" | "deltaMode">): number {
+  const px = e.deltaMode === 1 ? e.deltaY * LINE_PX : e.deltaMode === 2 ? e.deltaY * PAGE_PX : e.deltaY;
+  if (!Number.isFinite(px)) return 0;
+  return Math.max(-PINCH_MAX_STEP, Math.min(PINCH_MAX_STEP, -px * PINCH_RATE));
+}
+/** Safari's gesture `scale` (1 at gesturestart, cumulative) → absolute zoom: doubling the distance between the fingers is +1 zoom level. Bad values keep the start zoom. */
+export function gestureZoom(startZoom: number, scale: number, min = -Infinity, max = Infinity): number {
+  if (!Number.isFinite(scale) || scale <= 0) return startZoom;
+  return Math.max(min, Math.min(max, startZoom + Math.log2(scale)));
+}

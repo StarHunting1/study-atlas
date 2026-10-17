@@ -6,7 +6,7 @@ import { cities, countries } from "@/data/cities";
 import { boundsOf, COUNTRY_SHAPES } from "@/data/countryShapes";
 import { useI18n } from "@/lib/i18n";
 import { countryName, cityName } from "@/lib/names";
-import { classifyWheel, isMacLike, newWheelState, panDelta } from "@/lib/wheel";
+import { classifyWheel, gestureZoom, isMacLike, newWheelState, panDelta, pinchZoomDelta } from "@/lib/wheel";
 import { activeCountry, countryFitBounds, fitPadding, isLabelLayer, labelExpression, paintOverrides, PALETTE, type StyleLayer } from "@/lib/mapStyle";
 
 /**
@@ -54,22 +54,29 @@ export default function InteractiveMap({ country, selectedCity, onCity, onCountr
     map.current = m; const host = el.current!; host.dataset.mapState = "loading";
     if (process.env.NEXT_PUBLIC_MAP_DEBUG) (window as unknown as { __saMap?: maplibregl.Map }).__saMap = m;   // browser checks in CI only (build-time flag)
     m.addControl(new maplibregl.NavigationControl({ showCompass: false }), "top-right");
-    // Trackpad (Ver.1.3.7c/d): a two-finger swipe pans the map; pinch (ctrl+wheel, or Safari's gesture events) and a real mouse wheel keep zooming; touch screens are left alone.
-    // Our listener runs first (capture phase on the map's host); for a swipe it stops the event before MapLibre's own wheel zoom sees it.
+    // Trackpad (Ver.1.3.7c/d/e): a two-finger swipe pans the map; a pinch zooms around the fingers; a real mouse wheel keeps zooming; touch screens are left alone.
+    // Our listener runs first (capture phase on the map's host) and stops the event before MapLibre's own wheel zoom sees it, so nothing is handled twice.
+    // Chrome/Edge/Firefox send a pinch as ctrl+wheel; Safari sends gesturestart/gesturechange/gestureend (no wheel events while a gesture is active).
     const cleanups: (() => void)[] = [];
     {   // always installed: wheel events only ever come from a wheel or trackpad (never from touch), so this cannot affect touch screens
       const ws = newWheelState(); const mac = isMacLike(navigator.userAgent);
+      const at = (cx: number, cy: number) => { const r = host.getBoundingClientRect(); return m.unproject([cx - r.left, cy - r.top]); };
+      let gesturing = false;
       const onWheel = (e: WheelEvent) => {
         const kind = classifyWheel({ deltaX: e.deltaX, deltaY: e.deltaY, deltaMode: e.deltaMode, ctrlKey: e.ctrlKey, metaKey: e.metaKey, altKey: e.altKey, wheelDeltaY: (e as WheelEvent & { wheelDeltaY?: number }).wheelDeltaY }, ws, performance.now(), mac);
-        host.dataset.wheel = kind; if (kind !== "trackpad") return;
-        e.preventDefault(); e.stopPropagation(); const [dx, dy] = panDelta(e); m.panBy([dx, dy], { animate: false });
+        host.dataset.wheel = kind; if (kind === "wheel") return;
+        e.preventDefault(); e.stopPropagation();
+        if (kind === "pinch") { if (gesturing) return; m.easeTo({ zoom: m.getZoom() + pinchZoomDelta(e), around: at(e.clientX, e.clientY), duration: 0 }); return; }
+        const [dx, dy] = panDelta(e); m.panBy([dx, dy], { animate: false });
       };
       host.addEventListener("wheel", onWheel, { capture: true, passive: false }); cleanups.push(() => host.removeEventListener("wheel", onWheel, { capture: true } as EventListenerOptions));
-      // Safari sends a trackpad pinch as gesture events instead of ctrl+wheel
       if ("GestureEvent" in window) {
-        let startZoom = 0; type G = Event & { scale: number; clientX: number; clientY: number };
-        const gs = (e: Event) => { e.preventDefault(); startZoom = m.getZoom(); }, gc = (e: Event) => { e.preventDefault(); const g = e as G; const r = host.getBoundingClientRect(); m.easeTo({ zoom: startZoom + Math.log2(g.scale || 1), around: m.unproject([g.clientX - r.left, g.clientY - r.top]), duration: 0 }); };
-        host.addEventListener("gesturestart", gs); host.addEventListener("gesturechange", gc); cleanups.push(() => { host.removeEventListener("gesturestart", gs); host.removeEventListener("gesturechange", gc); });
+        let startZoom = 0, anchor: maplibregl.LngLat | null = null; type G = Event & { scale: number; clientX: number; clientY: number };
+        const gs = (e: Event) => { e.preventDefault(); const g = e as G; gesturing = true; startZoom = m.getZoom(); anchor = at(g.clientX, g.clientY); };
+        const gc = (e: Event) => { e.preventDefault(); const g = e as G; if (!anchor) return; m.easeTo({ zoom: gestureZoom(startZoom, g.scale, m.getMinZoom(), m.getMaxZoom()), around: anchor, duration: 0 }); };
+        const ge = (e: Event) => { e.preventDefault(); gesturing = false; anchor = null; };
+        host.addEventListener("gesturestart", gs); host.addEventListener("gesturechange", gc); host.addEventListener("gestureend", ge);
+        cleanups.push(() => { host.removeEventListener("gesturestart", gs); host.removeEventListener("gesturechange", gc); host.removeEventListener("gestureend", ge); });
       }
     }
     let loaded = false;

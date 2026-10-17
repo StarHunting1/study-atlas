@@ -28,6 +28,28 @@ PC のトラックパッド（MacBook など）で、**2本指スワイプ＝地
 
 # 地図の見た目の改善（Ver.1.3.7b）
 
+## トラックパッドのピンチズーム改善（Ver.1.3.7e）
+
+### ブラウザごとのピンチの届き方
+| ブラウザ | ピンチ | 2本指スワイプ |
+|---|---|---|
+| Chrome / Edge / Firefox（macOS） | `wheel` イベント + `ctrlKey=true`（deltaY<0 = ピンチアウト = 拡大） | `wheel`（deltaX/deltaY、離した後も慣性で続く） |
+| Safari（macOS） | `gesturestart` / `gesturechange` / `gestureend`（`scale` は開始時1の累積値、`clientX/Y` に指の位置）。この間 `wheel` は来ない | `wheel` |
+
+### 改善前の問題（コード調査）
+- Chrome系: ピンチは MapLibre 標準の `ScrollZoomHandler` に任せていた。1イベントごとの拡大量に上限がなく、`ctrl`+マウスホイールの1ノッチ（±100）で一気に拡大した。MapLibre 内部のイージングとこちらの処理が別々に動くため、連続ピンチの感触が一定しない。
+- Safari: `gesturechange` で `around` をイベントごとの現在位置から再計算していたため、指の位置が少しずれるたびに中心がずれ、地図が滑って見えた。
+
+### 変更
+- ピンチ（`ctrl`+wheel）は自前で処理し、`preventDefault`/`stopPropagation` で MapLibre 標準のホイールズームには渡さない（二重処理の防止）。
+- `m.easeTo({ zoom, around, duration: 0 })`（MapLibre 標準 API）でカーソル位置を中心にズーム。拡大量は `-deltaY × 0.01`（MapLibre のトラックパッド標準と同じ比率）、1イベントあたり ±0.5 に制限（`lib/wheel.ts` の `pinchZoomDelta`）。`deltaMode` が行/ページの場合はピクセルに換算。
+- Safari: `gesturestart` で中心の座標を固定し、`gesturechange` では `開始ズーム + log2(scale)`（`gestureZoom`、最小/最大ズームで制限）を適用。`gestureend` で解除。ジェスチャー中に届いた `ctrl`+wheel は無視（二重処理の防止）。
+- 変更なし: macOS の通常スクロール = 移動、⌘/Option+スクロール = ズーム、右上の＋/−ボタン、ドラッグ、スマホ/iPad（`cooperativeGestures`）、都市ピン、国選択、デザイン。
+
+### 確認できたこと / できていないこと
+- 確認済み（ヘッドレス Chromium・実ビルド、合成イベント）: ピンチアウトで拡大/ピンチインで縮小、拡大量が入力に比例、カーソル下の地点が動かない、連続ピンチが一定刻みで滑らかに積み上がる、ピンチ直後のスワイプ・スワイプ直後のピンチ、`ctrl`+ホイール1ノッチが +0.5 止まり、地図外ではページが通常スクロール、タッチ端末エミュレーションで挙動不変。Safari 用のジェスチャー処理は `GestureEvent` を擬似的に定義した合成イベントで確認（scale 2 で +1、0.5 で −1、中心固定、ジェスチャー中の wheel 無視）。
+- **未確認**: 実機 MacBook のトラックパッド、実機 Safari、実機 Chrome。本物の `gesturechange` の値の出方、慣性の体感、「Apple マップのような」滑らかさの主観的な評価は実機での確認が必要。
+
 ## 色が乏しくなった原因
 1. **スタイルの選択**: Ver.1.3.7 で使った OpenFreeMap の `positron` は、もともと白〜灰色の**モノトーン**のスタイル（背景用の落ち着いた地図）で、海・陸・国境の色の差が小さい。色が乏しく見えたのは CSS ではなく、このスタイルの設計による。
 2. **国の強調がなくなった**: Ver.1.3.5 の SVG 地図は対応国を青く塗っていたが、タイル地図には国ポリゴンがなく（タイルは国境の「線」のみ）、選択国・対応国の塗り分けが無くなった。

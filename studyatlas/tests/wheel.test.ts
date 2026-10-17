@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
-import { classifyWheel, HOLD_MS, isMacLike, newWheelState, panDelta, type WheelLike } from "@/lib/wheel";
+import { classifyWheel, gestureZoom, HOLD_MS, PINCH_MAX_STEP, isMacLike, newWheelState, panDelta, pinchZoomDelta, type WheelLike } from "@/lib/wheel";
 let n = 0; const t = (name: string, f: () => void) => { f(); n++; console.log("ok", name); };
 const ev = (o: Partial<WheelLike>): WheelLike => ({ deltaX: 0, deltaY: 0, deltaMode: 0, ctrlKey: false, ...o });
 
@@ -38,7 +38,23 @@ t("regression (Ver.1.3.7d): a laptop whose browser reports a coarse pointer must
 });
 t("map wiring: the wheel listener is on the map host in the capture phase and stops the event only for a swipe; mac detection is passed in; cleanup removes the listeners; Safari pinch uses gesture events", () => {
   const m = readFileSync("components/InteractiveMap.tsx", "utf8");
-  assert.ok(/capture: true, passive: false/.test(m) && /if \(kind !== "trackpad"\) return;/.test(m) && /e\.preventDefault\(\); e\.stopPropagation\(\)/.test(m) && /m\.panBy\(\[dx, dy\], \{ animate: false \}\)/.test(m) && /isMacLike\(navigator\.userAgent\)/.test(m));
+  assert.ok(/capture: true, passive: false/.test(m) && /if \(kind === "wheel"\) return;/.test(m) && /e\.preventDefault\(\); e\.stopPropagation\(\)/.test(m) && /m\.panBy\(\[dx, dy\], \{ animate: false \}\)/.test(m) && /isMacLike\(navigator\.userAgent\)/.test(m));
   assert.ok(/cleanups\.forEach/.test(m) && /GestureEvent/.test(m) && /gesturechange/.test(m) && /host\.addEventListener\("wheel"/.test(m), "attached to the map host only, so the page scrolls as usual outside the map");
+});
+t("pinch zoom (Ver.1.3.7e): pinch-out (deltaY<0) zooms in, pinch-in zooms out, proportional, clamped per event, line/page modes and bad values are safe", () => {
+  assert.ok(pinchZoomDelta({ deltaY: -10, deltaMode: 0 }) > 0 && pinchZoomDelta({ deltaY: 10, deltaMode: 0 }) < 0);
+  assert.ok(Math.abs(pinchZoomDelta({ deltaY: -2, deltaMode: 0 }) * 2 - pinchZoomDelta({ deltaY: -4, deltaMode: 0 })) < 1e-9, "proportional below the clamp");
+  assert.equal(pinchZoomDelta({ deltaY: -100, deltaMode: 0 }), PINCH_MAX_STEP, "a ctrl+mouse-wheel notch cannot jump the map"); assert.equal(pinchZoomDelta({ deltaY: 100, deltaMode: 0 }), -PINCH_MAX_STEP);
+  assert.equal(pinchZoomDelta({ deltaY: -10, deltaMode: 1 }), PINCH_MAX_STEP); assert.equal(pinchZoomDelta({ deltaY: NaN, deltaMode: 0 }), 0);
+});
+t("Safari gesture scale → zoom: doubling = +1, halving = -1, scale 1 = unchanged, clamped to the map limits, bad values keep the start zoom", () => {
+  assert.equal(gestureZoom(5, 2), 6); assert.equal(gestureZoom(5, 0.5), 4); assert.equal(gestureZoom(5, 1), 5);
+  assert.equal(gestureZoom(5, 1000, -1, 14), 14); assert.equal(gestureZoom(5, 1e-9, -1, 14), -1);
+  assert.equal(gestureZoom(5, 0), 5); assert.equal(gestureZoom(5, NaN), 5); assert.equal(gestureZoom(5, -2), 5);
+});
+t("map wiring (pinch): ctrl+wheel is handled by us (stopped before MapLibre, anchored at the cursor); Safari anchors at gesturestart, ignores wheel while gesturing, and releases at gestureend", () => {
+  const m = readFileSync("components/InteractiveMap.tsx", "utf8");
+  assert.ok(/pinchZoomDelta\(e\)/.test(m) && /around: at\(e\.clientX, e\.clientY\)/.test(m) && /duration: 0/.test(m));
+  assert.ok(/gestureZoom\(startZoom, g\.scale/.test(m) && /around: anchor/.test(m) && /"gestureend"/.test(m) && /if \(gesturing\) return;/.test(m));
 });
 console.log(n, "wheel tests passed");
