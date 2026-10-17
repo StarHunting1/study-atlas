@@ -46,7 +46,7 @@ t("every unverified or sample fact is labelled, and a verified fact always has a
   for (const c of cities) for (const s of sections) for (const f of s.fields) {
     const x = f.get(c); if (x.status === "pending") continue;
     if (x.status === "verified") assert.ok(x.sources?.length && x.period && x.checkedAt, `${c.id} ${f.id}`);
-    if (x.status === "unverified") { const out = text(wrap(h(FactView, { fact: x, kind: f.kind }))); assert.ok(out.includes("未確認"), `${c.id} ${f.id} is not marked unverified`); assert.ok(!out.includes("確認済み"), `${c.id} ${f.id}`); }
+    if (x.status === "unverified") { const out = text(wrap(h(FactView, { fact: x, kind: f.kind }))); assert.ok(out.includes("未確認"), `${c.id} ${f.id} is not marked unverified`); const claimLevel = (x as { claims?: { status: string }[] }).claims?.some((k) => k.status === "verified"); assert.ok(claimLevel || !out.includes("確認済み"), `${c.id} ${f.id}`); /* a Fact with some approved claims lists each claim with its own status (Ver.1.4.0) */ }
   }
 });
 t("source links are https and no example/placeholder host appears in real data", () => {
@@ -57,17 +57,18 @@ t("source links are https and no example/placeholder host appears in real data",
   assert.ok(urls.length > 40); for (const u of urls) { assert.ok(/^https:\/\//.test(u), u); assert.ok(!/example\.(com|org)|localhost|\.test\//.test(u), u); }
   assert.equal(new Set(urls.filter((u) => /\s/.test(u))).size, 0);
 });
-t("visa and health outlines: unverified, sourced, dated, never say which route applies to a person, and point to the official page", () => {
+t("visa and health outlines: status derived from the claims, sourced, dated, never say which route applies to a person, and point to the official page", () => {
   for (const code of ["GBR", "CAN"]) {
     const v = countries.find((c) => c.code === code)!.profile.visa;
-    for (const f of [v.official, v.notes]) { assert.equal(f.status, "unverified"); assert.ok(f.sources!.length >= 1 && f.checkedAt && f.period); assert.ok(f.note!.ja.includes("公式ページで確認") && f.note!.en.includes("confirm")); }
+    for (const f of [v.official, v.notes]) { assert.equal(f.status, f.claims!.every((c) => c.status === "verified") ? "verified" : "unverified", "a Fact is verified only when every one of its claims is"); assert.ok(f.sources!.length >= 1 && f.checkedAt && f.period); assert.ok(f.note!.ja.includes("公式ページで確認") && f.note!.en.includes("confirm")); }
     const body = JSON.stringify(v.official.value); assert.ok(body.includes("国籍") && !/あなたは|必ず(必要|不要)|you must apply for/i.test(body), "no individual verdict");
   }
   for (const id of ["manchester", "vancouver"]) { const hc = cities.find((c) => c.id === id)!.profile.living.healthcare; assert.equal(hc.status, "unverified"); assert.ok(hc.sources?.[0].url.startsWith("https://") && hc.checkedAt); }
 });
 t("the audit report is generated from the data and counts demo samples as 'no data'", () => {
   const md = auditMarkdown(); assert.ok(md.includes("RELEASE_DATA_AUDIT") && md.includes("sample（非公開）"));
-  for (const id of ["Toronto", "London", "Sydney", "Melbourne"]) assert.ok(new RegExp(`\\| ${id} \\| 25 \\| 0 \\| \\d+ \\| 3 \\| \\d+ \\| \\d+% \\| 0% \\|`).test(md), `${id}: 3 demo samples, no verified field`);
+  // London shows the UK "points to note" Fact, which is verified since Ver.1.4.0 (its only claim, U3, was approved): 1 verified field; the others have none
+  for (const [id, v, pct] of [["Toronto", 0, "0%"], ["London", 1, "4%"], ["Sydney", 0, "0%"], ["Melbourne", 0, "0%"]] as const) assert.ok(new RegExp(`\\| ${id} \\| 25 \\| ${v} \\| \\d+ \\| 3 \\| \\d+ \\| \\d+% \\| ${pct} \\|`).test(md), `${id}: 3 demo samples, ${v} verified field(s)`);
 });
 t("saved data stays readable: older planner drafts and profiles load unchanged", () => {
   const e = cleanEasy({ ...defaultEasy(), assume: { tuitionWeek: 120, visa: null, insurance: null, flight: { round: null, oneway: null } } })!; assert.equal(e.assume.tuitionWeek, 120);

@@ -11,8 +11,8 @@
 |---|---|---|---|---|---|---|---|
 | Vancouver | 25 | 2 | 9 | 0 | 14 | 44% | 8% |
 | Toronto | 25 | 0 | 7 | 3 | 15 | 28% | 0% |
-| Manchester | 25 | 5 | 9 | 0 | 11 | 56% | 20% |
-| London | 25 | 0 | 7 | 3 | 15 | 28% | 0% |
+| Manchester | 25 | 6 | 8 | 0 | 11 | 56% | 24% |
+| London | 25 | 1 | 6 | 3 | 15 | 28% | 4% |
 | Sydney | 25 | 0 | 5 | 3 | 17 | 20% | 0% |
 | Melbourne | 25 | 0 | 5 | 3 | 17 | 20% | 0% |
 
@@ -26,7 +26,7 @@
 | Safety | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
 | Education | 0 / 2 / 0 / 1 | 0 / 1 / 0 / 2 | 0 / 2 / 0 / 1 | 0 / 1 / 0 / 2 | 0 / 1 / 0 / 2 | 0 / 1 / 0 / 2 |
 | Transport | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 1 / 1 / 0 / 0 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 |
-| Visa | 0 / 2 / 0 / 0 | 0 / 2 / 0 / 0 | 0 / 2 / 0 / 0 | 0 / 2 / 0 / 0 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
+| Visa | 0 / 2 / 0 / 0 | 0 / 2 / 0 / 0 | 1 / 1 / 0 / 0 | 1 / 1 / 0 / 0 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
 | Daily life | 0 / 2 / 0 / 3 | 0 / 1 / 0 / 4 | 0 / 2 / 0 / 3 | 0 / 1 / 0 / 4 | 0 / 1 / 0 / 4 | 0 / 1 / 0 / 4 |
 
 ## 2. 公式データポイント（data/official）
@@ -152,7 +152,6 @@
 - pending: Education / Tuition fees
 - unverified: Transport / Main transport（確認日なし）
 - unverified: Visa / Official information（確認日 2026-10-15）
-- unverified: Visa / Points to note（確認日 2026-10-15）
 - unverified: Daily life / Student life（確認日なし）
 - unverified: Daily life / Healthcare（確認日 2026-10-15）
 - pending: Daily life / SIM / mobile
@@ -180,7 +179,6 @@
 - unverified: Transport / Main transport（確認日なし）
 - pending: Transport / Student discounts
 - unverified: Visa / Official information（確認日 2026-10-15）
-- unverified: Visa / Points to note（確認日 2026-10-15）
 - unverified: Daily life / Student life（確認日なし）
 - pending: Daily life / Healthcare
 - pending: Daily life / SIM / mobile
@@ -282,8 +280,9 @@
 28. **Vancouver 気候 1991–2020 の承認準備**: 月別48値・観測所ID（1108447＋1108395）・単位・期間・ライセンス・出典表示を承認用にまとめ、機械的な整合性チェック6項目（12か月そろい・日最低≤日平均≤日最高・現実的な範囲・月降水量の合計1159.7 mm が年値1159.5 mm と±1.0 mm 以内・季節性・記録の有無）が全て成立。ただし**出典との照合は人が行う**。年平均気温など気温の年値は未記録。承認までは 1981–2010 の verified 値を置き換えません。
 29. **再利用条件の未解決**: Canada.ca（C1〜C3）と BC州（C4a〜C4c）は、言い換え＋リンクで足りるかの判断（または書面確認）が必要。確認先の公式ページを承認シートに記載。許可が無い限り引用・転載はしません。
 30. **Ver.1.3.10 英国 claim の修正**: U4 を「Student visa はコース期間だけで決まらない（licensed student sponsor・資金・英語力・年齢）」に、U5a を「IHS の要否と NHS 利用の範囲はビザの種類・期間・申請場所・個々の事情で異なる（年£776／£1,035 は維持）」に修正（条件つき・承認者が出典と再照合）。U5-visa は U5a・U5b と重複するため承認候補から除外。政府 claim は 14 件（推奨5／条件つき8／保留1）。verified への変更は 0 件。
+31. **Ver.1.4.0 英国の政府 claim 5件を正式承認**: 人（StarHunting1）の明示的な承認指示（2026-10-17）に基づき、U1・U2・U3・U5b・U6 の5件だけを `verified` に変更（記録は `data/approvals.ts`、承認時の文言・条件・出典も保存。承認後に変更するとビルド失敗）。U4・U5a・Canada.ca の C1〜C3・BC州の C4a〜C4c・C4-ref は未承認（unverified）のまま、Vancouver 気候 1991–2020 も未承認。Fact は全 claim が verified のときだけ verified（英国「注意点」＝U3 のみ → verified、英国「公式情報」・Manchester 医療 → 未確認のまま、claim ごとに表示）。ビザ・IHS は Planner に自動計上しない。
 
-### 承認待ちの確認結果（verified にはしていません）
+### 承認待ちの確認結果（承認済みの5件を除き verified にはしていません）
 2026-10-15 の Actions ページ確認（run 38787463398）で、言い換えた記述が公式ページの記載と一致することを確認した項目。人が承認するまで unverified のまま。
 - GOV.UK: 学生のIHSは年£776（その他の申請は年£1,035）、英国外から申請する6か月以内はIHS不要 / 英語コースは6か月超〜11か月が短期学習ビザ（6か月以内は訪問者、11か月超は Student visa）、短期学習ビザの申請料£228 / 訪問者として6か月までの学習が可能（認定機関）
 - BC州: 国際学生ヘルスフィーは月$75、有効な就学許可を持ち年間で少なくとも6か月は州内にいる学生が対象（旧文言「6か月以上有効な就学許可」は不正確で Ver.1.3.4 で修正済み）、加入前に待機期間（居住開始月の残り＋2か月）があり民間保険が必要
