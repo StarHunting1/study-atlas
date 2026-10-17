@@ -41,21 +41,20 @@ async function ons() {
   for (const s of ["Cover sheet", "Notes"]) if (wb.sheets[s]) { const t: string[] = []; for await (const r of sheetRows(wb, s)) for (const v of Object.values(r.cells)) if (typeof v === "string") t.push(v); log(`SHEET ${s}:`, t.join(" ¦ ").slice(0, 3500)); }
 }
 const PAGES = [
-  "https://www.kaplaninternational.com/language-schools/canada/toronto", "https://www.kaplaninternational.com/language-schools/united-kingdom/london",
-  "https://www.ilac.com/", "https://www.ilac.com/contact-us/", "https://www.ilac.com/toronto/",
-  "https://www.languagescanada.ca/sitemap.xml",
-  "https://www.stgiles-international.com/", "https://www.wimbledonschoolofenglish.com/", "https://www.francesking.com/", "https://www.englishuk.com/en/students/where-in-the-uk/london",
-  "https://www.ef.com/uk/ilsd/schools/london/", "https://www.ef.com/wwen/ilsd/schools/london/",
+  "https://www.kaplaninternational.com/language-schools/canada/toronto", "https://www.kaplaninternational.com/language-schools/united-kingdom/london", "https://www.kaplaninternational.com/contact-us/form",
+  "https://www.stgiles-international.com/english-language-schools/london-central/", "https://www.stgiles-international.com/english-language-schools/london-central/fees/",
+  "https://francesking.com/school-of-english-london/", "https://francesking.com/school-of-english-london/course-prices/", "https://francesking.com/contact/",
+  "https://www.languagescanada.ca/sitemap.xml", "https://www.languagescanada.ca/en/listing-directory/students/kaplan-international-languages-toronto-1",
 ];
 async function pages() {
   for (const u of PAGES) {
     try { const rb = await robotsFor(u); if (!rb.allowed) { log("PAGE", u, "robots disallow"); continue; }
       const r = await fetchText(u); const title = /<title[^>]*>([^<]*)/i.exec(r.body)?.[1]?.trim();
       const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, "\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
-      const hit = [...new Set(text.filter((l) => l.length < 260 && (/[A-Z]\d[A-Z] ?\d[A-Z]\d|\b[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|accredit|Street|Road|Place|Avenue|Square|Languages Canada|British Council|English UK|\bage[ds]?\b|years? old|\b1[68]\+|\b[0-9]+ (?:Yonge|Bloor|King|Adelaide|Wellington|Bay|Charles|Oxford|Regent|Southampton)/i.test(l))))].slice(0, 26);
-      const locs = u.endsWith("sitemap.xml") ? [...r.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).filter((x) => /kaplan|ilac|toronto|london|ef-/i.test(x)).slice(0, 40) : [];
-      const nav = [...new Set([...r.body.matchAll(/href="([^"#]+)"/gi)].map((m) => m[1]).filter((h) => /contact|campus|location|school|accredit/i.test(h)))].slice(0, 12);
-      log("PAGE", u, r.status, r.url, "|", title, "\n   " + hit.join("\n   "), locs.length ? "\n   LOCS " + locs.join("\n   ") : "", "\n   NAV " + nav.join(" "));
+      const idx = text.map((l, k) => (/M5E ?1Z4|WC1A|WC1B|WC2|[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|Wellington|Yonge|Front St|British Council|English UK|Languages Canada|accredit|per week|£|fee/i.test(l) && l.length < 300 ? k : -1)).filter((k) => k >= 0).slice(0, 18);
+      const lines = [...new Set(idx.flatMap((k) => [text[k - 1], text[k], text[k + 1]].filter(Boolean)))].slice(0, 40);
+      const locs = u.endsWith("sitemap.xml") ? r.body.slice(0, 400) + "\n" + [...r.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).filter((x) => /kaplan|ilac|toronto|london/i.test(x)).slice(0, 30).join("\n   ") : "";
+      log("PAGE", u, r.status, "|", title, "\n   " + lines.join("\n   "), locs ? "\n   LOCS " + locs : "");
     } catch (e) { log("PAGE", u, "ERR", String(e)); }
     await sleep(1200);
   }
