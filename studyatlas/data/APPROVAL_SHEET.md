@@ -2,7 +2,7 @@
 
 _`npm run approvals` が `data/approvalSheet.ts` と各データから生成します。手で編集しないでください。_
 
-**承認の状況（Ver.1.4.0）**: 人が明示的に承認した英国の5件（U1・U2・U3・U5b・U6）だけが `verified`（承認記録は `data/approvals.ts`、承認者 StarHunting1、2026-10-17）。それ以外の主張と Vancouver の 1991–2020 気候データは `unverified` のままで、画面にも「未確認」と表示されます。自動のページ確認（GitHub Actions）だけで `verified` にすることはありません。`verified` にできるのは、人が承認の記録（承認者・日付・比較した内容）を `data/approvals.ts` に書いた主張だけです（`approve()` と `data/validate.ts` が検査し、承認後に文言・条件・出典を変えるとビルドが失敗します）。
+**承認の状況（Ver.1.4.0）**: 人が明示的に承認した英国の5件（U1・U2・U3・U5b・U6）だけが `verified`（承認記録は `data/approvals.ts`、承認者 StarHunting1、2026-10-17）。それ以外の主張は `unverified` のままで（Vancouver の 1991–2020 気候データは Ver.1.4.3 で承認・反映済み。§5）、画面にも「未確認」と表示されます。自動のページ確認（GitHub Actions）だけで `verified` にすることはありません。`verified` にできるのは、人が承認の記録（承認者・日付・比較した内容）を `data/approvals.ts` に書いた主張だけです（`approve()` と `data/validate.ts` が検査し、承認後に文言・条件・出典を変えるとビルドが失敗します）。
 
 | 承認済み（verified） | 承認者・日付 | 承認の根拠 |
 |---|---|---|
@@ -492,17 +492,19 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 - [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
 - [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
-## 5. Vancouver の気候データ（K1）: 1981–2010（画面の確認済み値）と 1991–2020（承認待ち候補）
+## 5. Vancouver の気候データ（K1）: 承認済み・本番反映（Ver.1.4.3）— 画面は 1991–2020、1981–2010 は履歴
 
-| 項目 | 現在（画面・verified） | 候補（未表示・unverified） |
+| 項目 | 旧（履歴・画面には表示しない） | 現在（画面・verified・承認済み） |
 |---|---|---|
+| 承認 | — | StarHunting1・2026-10-17 |
+| 年間降水量 | （月の合計 1189.0 mm） | ECCC の年値 1159.5 mm（画面に表示） |
 | 基準期間 | 1981–2010 | 1991–2020 |
 | 観測地点 | VANCOUVER INT'L A（気候ID 1108447） | VANCOUVER INTERNATIONAL (AIRPORT) – composite of 1108447 and 1108395 |
-| 状態 | verified | unverified |
+| 状態 | verified | verified |
 | 単位 | 気温 ℃（日平均・日最高・日最低の月平均）、降水量 mm（月合計） | 同じ（ECCC の行: Daily Average / Daily Maximum / Daily Minimum (°C)、Precipitation (mm)） |
 | 取得日・方法 | 2026-10-13・ECCC GeoMet API（2012-10-10 計算） | 2026-10-16・ECCC 一括CSV（BC州）を1回取得（Actions run 38904919856） |
 | 出典URL | https://climate.weather.gc.ca/climate_normals/ | https://climate.weather.gc.ca/climate_normals/index_e.html（一括ダウンロード: `/climate_normals/download/1991_e.html?area=province&province[]=BC&product[]=data&product[]=station_inventory`） |
-| 利用許諾 | Environment and Climate Change Canada Data Services End-use Licence v2.1（商用利用可・出典表示が必要） | 同じ |
+| 利用許諾 | Environment and Climate Change Canada Data Services End-use Licence v2.1.1 (August 2026)（商用利用可・出典表示が必要） | 同じ |
 | 出典表示（画面に表示する文言） | Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada. | 同じ |
 
 **観測地点・合成観測所の条件**: 1991–2020 の値は ECCC の「合成観測所」（normals code C）VANCOUVER INTERNATIONAL (AIRPORT) のもので、気候ID **1108447（VANCOUVER INT'L A）と 1108395（VANCOUVER INTL A、WMO 71892、YVR）** を組み合わせています（北緯49.20・西経123.18・標高4.3 m）。観測所IDは2013年前後で切り替わるため、30年分は2つのIDの観測をつないだものです。1981–2010 は旧ID 1108447 のみです。品質コード: 気温 B、降水量 C（ECCC の凡例による）。承認者は、この合成が「バンクーバー国際空港の平年値」として適切かを判断してください。
@@ -524,12 +526,12 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 
 年間降水量（月の合計）: 1189.0 mm → 1159.7 mm（-29.3）。ECCC の年値（1991–2020）は 1159.5 mm。
 
-**画面を切り替えたときの影響**（承認するまで切り替えません）:
+**画面を切り替えた影響**（2026-10-17 の承認を受けて Ver.1.4.3 で反映済み）:
 - 都市ページの「気候」と都市比較の月別表の値が、上表の「新」に変わる（気温は最大 ±0.4 ℃、降水量は月により最大 ±14 mm 程度の増減）。
 - 「最新の標準期間（1991–2020）ではありません」という注意書きは、期間の終わりが 2020 になるため表示されなくなる（Manchester は 1971–2000 のまま注意書きが残る）。
-- 画面の確認状況は、承認して `status: "verified"` にした時点でだけ「確認済み」になる。観測所の表記は合成観測所の名称と気候IDに変わる。
+- 画面の確認状況は「確認済み」（承認記録つき）。観測所の表記は合成観測所の名称と気候IDに変わった。
 - 出典表示（ECCC の文言）と出典URL（上表）が表示される。
-- 切り替え手順: `data/official/vancouver.ts` で `climateAlt` を `climate` に入れ替え（旧 1981–2010 は `climateAlt` へ）、`status`・`note`（承認者・日付）を更新。それまでは本番の確認済み値（1981–2010）を変更しません。
+- 切り替え内容: `data/official/vancouver.ts` で 1991–2020 を `climate`（承認記録は `data/approvals.ts`）、旧 1981–2010 を `climateAlt`（履歴、非表示）に入れ替えた。1981–2010 と 1991–2020 の値は混在させない。
 
 **整合性の機械チェック**（入力ミスの検出用。出典との照合は人が行います）:
 
@@ -568,8 +570,8 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 - [ ] ECCC の公式ページ／一括CSVを開き、観測所（合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)、気候ID 1108447・1108395）が一致している
 - [ ] 月別の日平均・日最高・日最低（℃）と降水量（mm）の48個の値が上表の「新」と一致している（年値も照合）— Actions の機械照合では全一致（上の結果）。人の最終確認はここ
 - [ ] 単位・基準期間（1991–2020）・品質コード（気温 B、降水量 C）を確認した
-- [ ] ライセンス（ECCC Data Services End-use Licence v2.1）と出典表示の文言が画面に出る設定になっている
-- [ ] 画面を切り替えたときの影響（上記）を読み、1981–2010 を `climateAlt` に残す手順に同意した
-- [ ] 承認の記録を書いた：`status: "verified"`、`note` に承認者・日付、`checkedAt`
+- [ ] ライセンス（ECCC Data Services End-use Licence v2.1.1）と出典表示の文言が画面に出る設定になっている
+- [ ] 画面を切り替えたときの影響（上記）を読み、1981–2010 を履歴（`climateAlt`）に残す手順に同意した
+- [x] 承認の記録を書いた（2026-10-17、StarHunting1。`data/approvals.ts`）
 
 **Manchester**: 1991–2020 は取り込めていません（旧 1971–2000 のまま）。理由は `data/APPROVAL_CANDIDATES.md` の「気候データの承認候補」を参照。

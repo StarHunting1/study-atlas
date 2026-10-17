@@ -84,6 +84,7 @@ export const ot = {
   climatePrecip: { en: "Average precipitation (mm)", ja: "平均降水量（mm）" },
   climateMean: { en: "Mean", ja: "平均" }, climateRange: { en: "Daily max–min", ja: "日最高〜日最低" },
   climateMax: { en: "Max", ja: "最高" }, climateMin: { en: "Min", ja: "最低" },
+  climateAnnual: { en: "Annual precipitation (annual value published by ECCC)", ja: "年間降水量（ECCCが公表する年値）" },
   climatePeriod: { en: "Averaging period", ja: "統計期間" }, climateStation: { en: "Station", ja: "観測地点" },
   showTable: { en: "Show as table", ja: "表で表示" }, hideTable: { en: "Hide table", ja: "表を閉じる" },
   climateDerived: { en: "Averages calculated by StudyAtlas from the Met Office's published monthly station values (calendar-month means over the period). They are not official Met Office climate averages.", ja: "Met Officeが公開する月別観測値から、StudyAtlasが統計期間の暦月平均を計算した値です。Met Office公式の気候平年値ではありません。" },
@@ -115,8 +116,8 @@ export const ot = {
   cmpMissing: { en: "No official figure", ja: "公式データなし" },
   cmpTmax: { en: "Mean daily max temperature (coolest–warmest month)", ja: "日最高気温の平均（月別の最低〜最高）" },
   cmpTmin: { en: "Mean daily min temperature (coolest–warmest month)", ja: "日最低気温の平均（月別の最低〜最高）" },
-  cmpPrecip: { en: "Annual precipitation (sum of the 12 monthly averages)", ja: "年間降水量（月別平均12か月の合計）" },
-  cmpPrecipNote: { en: "Definitions differ slightly: Met Office “rainfall” vs ECCC “total precipitation” (rain plus snow water equivalent).", ja: "定義が少し異なります：Met Officeは「降雨量」、ECCCは「降水量（雨＋雪の水換算）」です。" },
+  cmpPrecip: { en: "Annual precipitation", ja: "年間降水量" },
+  cmpPrecipNote: { en: "Definitions differ slightly: Met Office “rainfall” vs ECCC “total precipitation” (rain plus snow water equivalent). The yearly figure is ECCC's published annual value but, for Met Office, the sum of the monthly values (calculated by StudyAtlas).", ja: "定義が少し異なります：Met Officeは「降雨量」、ECCCは「降水量（雨＋雪の水換算）」です。年間の値は、ECCCは公表されている年値、Met Officeは月別値の合計（StudyAtlas計算）です。" },
   cmpDerived: { en: "calculated by StudyAtlas", ja: "StudyAtlas算出" },
   cmpClimatePeriods: { en: "Averaging periods differ", ja: "統計期間が異なります" },
 } as const;

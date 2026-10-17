@@ -78,6 +78,10 @@ export type ClimateNormals = {
   collectedIds?: string[];
   /** true when StudyAtlas calculated the values from published source values (not an official published average) */
   derived?: boolean;
+  /** Annual values as published by the source (never calculated from the months): shown instead of a sum of the monthly values */
+  annual?: { precipMm?: number };
+  /** Human approval of this record (who, when, on what basis); the approved numbers are kept in data/approvals.ts */
+  approval?: { by: string; at: string; compared: string };
 };
 
 /** A topic where data was reviewed but is NOT shown (e.g. terms of use not satisfied), with the official pages to check instead. */

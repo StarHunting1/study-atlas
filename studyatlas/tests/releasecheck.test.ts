@@ -103,12 +103,13 @@ t("the home-page map is production-safe: OpenFreeMap tiles (no key, no demo tile
   for (const c of countries) assert.ok(html.includes(`data-testid="country-${c.code}"`), c.code); for (const c of cities) assert.ok(html.includes(`data-testid="city-${c.id}"`), c.id);
   assert.ok(html.includes('aria-pressed="true"'), "the selected country is marked"); assert.ok(!/<img|<script|href=/.test(html));
 });
-t("Vancouver 1991–2020 normals are an approval candidate only: unverified, complete, sourced, with the station and licence stated; the verified 1981–2010 values stay the ones shown; Manchester stays as it was", () => {
+t("Vancouver 1991–2020 normals (approved 2026-10-17): verified with an approval record, complete, sourced, with the station and licence stated; the 1981–2010 record is history only; Manchester stays as it was", () => {
   const { officialData } = require("@/data/official") as typeof import("@/data/official"); const v = officialData("vancouver")!, m = officialData("manchester")!;
-  const a = v.climateAlt!; assert.ok(a); assert.equal(a.status, "unverified"); assert.equal(a.period, "1991–2020"); assert.equal(a.months.length, 12);
+  const a = v.climate!; assert.ok(a); assert.equal(a.status, "verified"); assert.equal(a.period, "1991–2020"); assert.equal(a.months.length, 12); assert.equal(a.approval?.by, "StarHunting1"); assert.equal(a.approval?.at, "2026-10-17");
   assert.ok(a.months.every((x) => x.meanC! >= x.minC! && x.meanC! <= x.maxC! && x.precipMm! > 0 && x.precipMm! < 400), "values are plausible and ordered (min ≤ mean ≤ max)");
   assert.ok(/1108447/.test(a.stationId!) && /1108395/.test(a.stationId!), "the composite station's two climate IDs are recorded"); assert.ok(/End-use Licence/.test(a.note!.en) && /End-use Licence/.test(a.note!.ja));
   assert.ok(a.evidence.length && a.evidence.every((e) => e.url.startsWith("https://climate.weather.gc.ca/")), "evidence is the official ECCC page");
-  assert.equal(v.climate!.period, "1981–2010"); assert.equal(v.climate!.status, "verified"); assert.ok(!/1991/.test(m.climate!.period), "Manchester keeps its earlier period: no 1991–2020 data was available to reuse");
+  assert.equal(v.climateAlt!.period, "1981–2010"); assert.ok(!/1991/.test(m.climate!.period), "Manchester keeps its earlier period: no 1991–2020 data was available to reuse");
 });
+
 console.log(n, "release check tests passed");

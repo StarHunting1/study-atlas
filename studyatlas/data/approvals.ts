@@ -1,5 +1,6 @@
 import type { Claim } from "./schema";
 import type { Localized } from "@/lib/i18n";
+import type { ClimateNormals } from "./official/types";
 /*
  * Human approvals of single claims (Ver.1.4.0). This file is the record: who approved which claim, when, on what basis, and the exact wording,
  * conditions and sources that were approved. A claim is verified only if it has an entry here AND its text, conditions and sources still equal
@@ -76,5 +77,31 @@ export function approve(c: Claim): Claim {
   const same = c.text.en === r.text.en && c.text.ja === r.text.ja && c.conditions.en === r.conditions.en && c.conditions.ja === r.conditions.ja && JSON.stringify(c.sources.map((s) => s.url)) === JSON.stringify(r.sources);
   if (!same) throw new Error(`Claim ${c.id} was changed after its approval (${r.approval.at}): approve the new wording again or restore the approved text`);
   if (c.review.verdict === "hold") throw new Error(`Claim ${c.id} is on hold and cannot be approved`);
+  return { ...c, status: "verified", approval: r.approval };
+}
+
+/*
+ * Approval of a climate record (Ver.1.4.3). Same rule as for claims: the record is verified only with an entry here, and the approved numbers,
+ * station, period, annual value and sources must still be what was approved (otherwise the build fails until a person approves the new values).
+ */
+export type ClimateApproval = { approval: NonNullable<ClimateNormals["approval"]>; station: string; stationId: string; period: string; meanC: number[]; maxC: number[]; minC: number[]; precipMm: number[]; annualPrecipMm: number; sources: string[] };
+export const CLIMATE_APPROVALS: Record<string, ClimateApproval> = {
+  "van-climate-eccc-1991-2020": {
+    approval: { by: "StarHunting1", at: "2026-10-17", compared: "2026-10-17 StarHunting1 による Vancouver 1991–2020 気候平年値（日平均・日最高・日最低・降水量の月別48値）の明示的な公開承認。照合：PR #46（GitHub Actions run 39051554489）で ECCC の一括CSV（Canadian Climate Normals 1991–2020、BC州）の合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)（Normal）の48値と全件一致を確認。ライセンス：ECCC Data Services End-use Licence v2.1.1（2026年8月）" },
+    station: "VANCOUVER INTERNATIONAL (AIRPORT) – composite of 1108447 and 1108395", stationId: "1108447+1108395", period: "1991–2020",
+    meanC: [4.1, 4.7, 6.7, 9.4, 13.0, 15.8, 18.2, 18.2, 15.2, 10.3, 6.4, 3.9],
+    maxC: [6.8, 7.9, 10.1, 13.1, 16.9, 19.6, 22.4, 22.4, 19.1, 13.5, 9.3, 6.6],
+    minC: [1.4, 1.5, 3.3, 5.7, 9.0, 11.9, 13.9, 14.0, 11.2, 7.0, 3.6, 1.2],
+    precipMm: [174.0, 90.8, 106.4, 85.5, 59.1, 51.1, 34.1, 36.1, 51.9, 123.9, 174.6, 172.2],
+    annualPrecipMm: 1159.5,
+    sources: ["https://climate.weather.gc.ca/climate_normals/index_e.html"],
+  },
+};
+export function approveClimate(c: ClimateNormals): ClimateNormals {
+  const r = CLIMATE_APPROVALS[c.id]; if (!r) return c;
+  const col = (k: "meanC" | "maxC" | "minC" | "precipMm") => JSON.stringify(c.months.map((m) => m[k]));
+  const same = c.station === r.station && c.stationId === r.stationId && c.period === r.period && col("meanC") === JSON.stringify(r.meanC) && col("maxC") === JSON.stringify(r.maxC) && col("minC") === JSON.stringify(r.minC) && col("precipMm") === JSON.stringify(r.precipMm)
+    && c.annual?.precipMm === r.annualPrecipMm && JSON.stringify(c.evidence.map((e) => e.url)) === JSON.stringify(r.sources);
+  if (!same) throw new Error(`Climate record ${c.id} was changed after its approval (${r.approval.at}): approve the new values again or restore the approved ones`);
   return { ...c, status: "verified", approval: r.approval };
 }

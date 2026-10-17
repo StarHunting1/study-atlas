@@ -58,7 +58,7 @@ export const RIGHTS: Record<string, Rights> = {
   },
   "eccc-climate-normals": {
     sourceName: "Environment and Climate Change Canada – climate normals (MSC GeoMet API)", sourceUrl: "https://api.weather.gc.ca/collections/climate-normals", licenseUrl: "https://eccc-msc.github.io/open-data/licence/readme_en/",
-    licence: "Environment and Climate Change Canada Data Services End-use Licence v2.1",
+    licence: "Environment and Climate Change Canada Data Services End-use Licence v2.1.1 (August 2026)",
     reuseStatus: "permitted", accessMethod: "open-api", automation: "allowed", lastReviewedAt: D, expertReview: false, restrictions: ["attribution-required", "robots-disallows-api-path"],
     attribution: "Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada.",
     robotsException: { urlPrefix: "https://api.weather.gc.ca/collections/climate-normals/", policyUrl: "https://eccc-msc.github.io/open-data/usage-policy/readme_en", reason: "The MSC Open Data Services Usage Policy documents programmatic use of the GeoMet API (limit: about 1 request per second); robots.txt disallows /collections/*/items for crawlers and points to that policy." },

@@ -42,5 +42,7 @@ export function checkClimate(c: ClimateNormals, sources: OfficialSource[]): stri
   if (!c.evidence.length) e.push(`${at}: evidence required`);
   if (!isDate(c.retrievedAt)) e.push(`${at}: retrievedAt must be YYYY-MM-DD`);
   if (c.status === "verified" && !isDate(c.checkedAt)) e.push(`${at}: verified data needs checkedAt`);
+  if (c.status === "verified" && !c.collectedIds?.length && !(c.approval?.by && isDate(c.approval?.at) && c.approval?.compared)) e.push(`${at}: verified data needs an API record (collectedIds) or a person's approval (who, when, what was compared)`);
+  if (c.approval && c.status !== "verified") e.push(`${at}: a record that is not verified must not carry an approval`);
   return e;
 }

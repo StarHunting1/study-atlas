@@ -58,7 +58,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.equal(pt("man-bus-28day-adult").value!.amount, 80); assert.equal(pt("man-anybus-28day-student").value!.amount, 63.3);
     assert.equal(pt("man-uom-ug-total").value!.amount, 1484); assert.equal(pt("van-monthly-adult-z1").value!.amount, 117.2);
     assert.equal(pt("van-upass").value!.amount, 47.85); assert.equal(pt("van-cmhc-rent-1br").value!.amount, 1807);
-    assert.deepEqual(van.climate!.months.map((m) => m.meanC).slice(0, 3), [4.13, 4.9, 6.88]); assert.equal(van.climate!.period, "1981–2010");
+    assert.deepEqual(van.climate!.months.map((m) => m.meanC).slice(0, 3), [4.1, 4.7, 6.7]); assert.equal(van.climate!.period, "1991–2020"); assert.deepEqual(van.climateAlt!.months.map((m) => m.meanC).slice(0, 3), [4.13, 4.9, 6.88]); assert.equal(van.climateAlt!.period, "1981–2010");
   });
 
   await t("profile facts bridged from official data validate and replace the demo numbers", () => {
@@ -83,7 +83,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     assert.deepEqual(compareIssues([pt("man-bus-single-adult"), pt("man-anybus-28day-student")]).sort(), ["audience", "period"]);
     assert.ok(compareIssues([pt("man-bus-single-adult"), { ...pt("van-fare-stored-adult-z1"), status: "unverified" }]).includes("notVerified"));
     const v = climateCompare("vancouver")!, mc = climateCompare("manchester")!;
-    assert.equal(v.period, "1981–2010"); assert.equal(mc.period, "1971–2000"); assert.ok(mc.derived && !v.derived);
+    assert.equal(v.period, "1991–2020"); assert.equal(mc.period, "1971–2000"); assert.equal(v.precipTotal, 1159.5, "the published annual value, not the 1159.7 sum"); assert.equal(v.status, "verified"); assert.ok(mc.derived && !v.derived);
     assert.deepEqual(climateIssues([mc, v]), ["period"]); // different averaging periods are not compared as the same metric
     assert.deepEqual(climateIssues([mc, { ...mc }]), []); assert.deepEqual(climateIssues([mc, undefined]), ["missing"]);
     assert.equal(mc.mean, undefined); assert.ok(mc.tmax && mc.tmin && mc.precipTotal === 806); // no mean temperature is invented for Manchester
