@@ -87,16 +87,18 @@ t("fee pages of the schools are recorded as link-only in the rights record; no f
   const { RIGHTS } = require("@/data/official/rights.data") as typeof import("@/data/official/rights.data"); const r = RIGHTS["language-school-fees"];
   assert.equal(r.display, "link-only"); assert.notEqual(r.reuseStatus, "permitted"); assert.ok(r.reviewed.length >= 4);
 });
-t("the home-page map is production-safe: bundled SVG, no tile/style request, no key, every country of the data has a clickable path, cities are buttons", () => {
+t("the home-page map is production-safe: OpenFreeMap tiles (no key, no demo tiles), a bundled SVG fallback with a clickable path for every country and a button for every city", () => {
   const fs = require("node:fs") as typeof import("node:fs");
-  const src = fs.readFileSync("components/WorldMap.tsx", "utf8"), data = fs.readFileSync("data/worldMap.ts", "utf8"), pkg = fs.readFileSync("package.json", "utf8");
-  assert.ok(!/https?:\/\/|NEXT_PUBLIC|maplibre|demotiles|fetch\(/i.test(src), "WorldMap makes no external request"); assert.ok(!/maplibre/i.test(pkg), "no tile-map library left");
+  const inter = fs.readFileSync("components/InteractiveMap.tsx", "utf8"), wrap = fs.readFileSync("components/WorldMap.tsx", "utf8"), stat = fs.readFileSync("components/StaticWorldMap.tsx", "utf8"), data = fs.readFileSync("data/worldMap.ts", "utf8");
+  assert.ok(/tiles\.openfreemap\.org\/styles\/liberty/.test(inter) && !/demotiles|maplibre\.org\/style/.test(inter + wrap + stat + fs.readFileSync("package.json", "utf8")), "no MapLibre demo tiles");
+  assert.ok(!/api[_-]?key|access_token/i.test(inter), "no key in the map code"); assert.ok(/StaticWorldMap/.test(wrap) && /failed/.test(wrap), "falls back to the static map when the tile service fails");
+  assert.ok(!/https?:\/\/|fetch\(|maplibre/i.test(stat), "the fallback makes no external request");
   assert.ok(!/demotiles/.test(fs.readFileSync("locales/en.ts", "utf8") + fs.readFileSync("locales/ja.ts", "utf8")), "no demo-tile credit left");
   const { COUNTRY_PATHS } = require("@/data/worldMap") as typeof import("@/data/worldMap"); const { countries, cities } = require("@/data/cities") as typeof import("@/data/cities");
   for (const c of countries) assert.ok(COUNTRY_PATHS[c.code]?.d.length > 50, `map path for ${c.code}`); assert.ok(/Natural Earth/.test(data) && /public domain/i.test(data), "source and licence recorded");
   const React = require("react") as typeof import("react"); const { renderToStaticMarkup } = require("react-dom/server") as typeof import("react-dom/server");
-  const { I18nProvider } = require("@/lib/i18n") as typeof import("@/lib/i18n"); const WorldMap = (require("@/components/WorldMap") as typeof import("@/components/WorldMap")).default;
-  const html = renderToStaticMarkup(React.createElement(I18nProvider, null, React.createElement(WorldMap, { country: "GBR", onCountry() {}, onCity() {}, onUnsupported() {} })));
+  const { I18nProvider } = require("@/lib/i18n") as typeof import("@/lib/i18n"); const Static = (require("@/components/StaticWorldMap") as typeof import("@/components/StaticWorldMap")).default;
+  const html = renderToStaticMarkup(React.createElement(I18nProvider, null, React.createElement(Static, { country: "GBR", selectedCity: null, onCountry() {}, onCity() {}, onUnsupported() {} })));
   for (const c of countries) assert.ok(html.includes(`data-testid="country-${c.code}"`), c.code); for (const c of cities) assert.ok(html.includes(`data-testid="city-${c.id}"`), c.id);
   assert.ok(html.includes('aria-pressed="true"'), "the selected country is marked"); assert.ok(!/<img|<script|href=/.test(html));
 });

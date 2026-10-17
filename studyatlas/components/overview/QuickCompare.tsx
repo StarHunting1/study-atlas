@@ -13,6 +13,7 @@ import { panel } from "@/lib/ui";
 import { dataText as d } from "@/locales/data";
 import { ot } from "@/locales/official";
 import { ux } from "@/locales/ux";
+import { cu } from "@/locales/compareUi";
 import { validForShort } from "@/data/official/validFor";
 import Disclosure from "@/components/Disclosure";
 import FactView, { StatusBadge } from "@/components/FactView";
@@ -96,8 +97,9 @@ function FactDetail({ cities, sectionIds, fieldIds }: { cities: City[]; sectionI
 function Row({ id, title, cities, keys, cmp, children }: { id: string; title: string; cities: City[]; keys: Key[]; cmp: Cmp; children: React.ReactNode }) {
   const { L } = useI18n(); const c = cmp === "n/a" ? null : chip[cmp];
   return (
-    <section data-testid={`cmp-${id}`} data-cmp={cmp} className={`${panel} space-y-3 p-4 sm:p-5`}>
+    <section id={`cmp-${id}`} data-testid={`cmp-${id}`} data-cmp={cmp} className={`${panel} space-y-3 p-4 sm:p-5`}>
       <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold text-[#0b2a5b]">{title}</h2>{c && <span data-testid={`chip-${id}`} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ${c.cls}`}>{L(ux[c.key] as never)}</span>}</div>
+      <p data-testid={`why-${id}`} className="-mt-1 text-xs leading-snug text-slate-500">{L(cu.why[cmp])}</p>
       <Cells cities={cities} keys={keys} />
       <Disclosure level="more" testid={`more-${id}`}><div className="space-y-4">{children}</div></Disclosure>
     </section>
@@ -112,6 +114,11 @@ export default function QuickCompare({ ids }: { ids: string[] }) {
   return (
     <div className="space-y-4" data-testid="quick-compare">
       <p className="text-xs text-slate-500">{L(ux.cmpIntro)}</p>
+      <nav aria-label={L(cu.glanceTitle)} data-testid="glance" className={`${panel} p-4`}>
+        <h2 className="text-sm font-semibold text-[#0b2a5b]">{L(cu.glanceTitle)}</h2><p className="mb-2 text-[11px] text-slate-500">{L(cu.glanceNote)}</p>
+        <ul className="flex flex-wrap gap-2">{TOPICS.map((t) => { const cmp = compareKeys(cities.map((c) => keyFigure(c, t))); const kind = cmp === "same" ? "ok" : cmp === "missing" ? "none" : "ref";
+          return <li key={t}><a href={`#cmp-${t}`} data-testid={`glance-${t}`} data-kind={kind} className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium ring-1 ${kind === "ok" ? "bg-emerald-50 text-emerald-800 ring-emerald-100" : kind === "none" ? "bg-slate-100 text-slate-500 ring-slate-200" : "bg-amber-50 text-amber-800 ring-amber-200"}`}>{L(ux.topics[t])}<span className="font-normal">· {L(kind === "ok" ? cu.comparable : kind === "none" ? cu.notYet : cu.reference)}</span></a></li>; })}</ul>
+      </nav>
       {TOPICS.map((t) => { const keys = cities.map((c) => keyFigure(c, t));
         return <Row key={t} id={t} title={L(ux.topics[t])} cities={cities} keys={keys} cmp={compareKeys(keys)}>
           {anyOfficial && <OfficialDetail cities={cities} topic={t} />}<FactDetail cities={cities} sectionIds={[SECTION_OF[t]]} />

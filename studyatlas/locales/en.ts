@@ -1,6 +1,6 @@
 const en = {
   heroTitle: "Explore the world. Find your place.", heroSub: "Study-abroad info, all in one place.",
-  search: "Search country, city, keyword", noResults: "No results found", searchHint: "Try “Manchester”, “UK”, “university”",
+  search: "Search country, city, keyword", noResults: "No results found", searchHint: "Try “Manchester”, “United Kingdom”, “university”",
   explore: "Explore", compare: "Compare", about: "About", popular: "Popular destinations",
   pickCountry: "Click a highlighted country on the map, or choose below.", noData: "No data for this country yet.",
   cities: "Cities", back: "Back", home: "Home", addCompare: "Add to compare", remove: "Remove from compare", goCompare: "Go to compare",
@@ -9,7 +9,7 @@ const en = {
   transport: "Transport", climate: "Climate", student: "Student life", areas: "Popular areas", schools: "Universities",
   official: "Official information", updated: "Last updated", sample: "Demo sample – not verified", pending: "Data coming soon",
   mapFail: "Map failed to load. Use the search bar or country buttons to browse cities.",
-  details: "View details", mapNote: "Map: Natural Earth (public domain)", dataNote: "Every figure shows whether it is verified; unverified information is labelled.",
+  details: "View details", mapNote: "Map: OpenFreeMap", dataNote: "Every figure shows whether it is verified; unverified information is labelled.",
   notFoundTitle: "Page not found", notFoundBody: "The page or city you requested does not exist.",
   mapFailed: "The map could not be loaded. Choose a country or city from the list or search instead.",
   photoCredits: "Photo credits", photoNote: "Photos from Wikimedia Commons, resized for this site. Each photo is available under the license shown.", photo: "Photo",

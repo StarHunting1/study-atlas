@@ -18,14 +18,19 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
   const row = (key: keyof typeof sc.rows, cell: (s: CompareSchool) => ReactNode) => (
     <section key={key} className="space-y-1.5" data-testid={`row-${key}`}>
       <h3 className="text-xs font-semibold text-slate-500">{L(sc.rows[key])}</h3>
-      <div className="grid grid-cols-2 gap-3 text-sm text-slate-700">{pair.map((s) => <div key={s.id} className="min-w-0 break-words rounded-xl bg-slate-50 p-3">{cell(s)}</div>)}</div>
+      <div className="grid gap-2 text-sm text-slate-700 sm:grid-cols-2 sm:gap-3">{pair.map((s) => <div key={s.id} className="min-w-0 break-words rounded-xl bg-slate-50 p-3"><p className="mb-1 text-[11px] font-medium text-slate-400 sm:hidden">{s.inst.name}</p>{cell(s)}</div>)}</div>
     </section>);
   return (
     <div className="space-y-4" data-testid="school-compare" data-cross-city={a.cityId !== b.cityId}>
       <div className="grid grid-cols-2 gap-3">{pair.map((s) => (
         <div key={s.id} className="min-w-0 rounded-xl bg-white p-3 ring-1 ring-slate-200" data-testid="school-head">
           <p className="text-[11px] text-slate-500">{cityName(s.cityId)}</p>
-          <h2 className="break-words text-base font-semibold text-[#0b2a5b]">{s.inst.url ? <a href={s.inst.url} target="_blank" rel="noopener noreferrer" className="underline">{s.inst.name}</a> : s.inst.name}</h2>
+          <h2 className="break-words text-base font-semibold text-[#0b2a5b]">{s.inst.name}</h2>
+          <div className="mt-1"><StatusBadge status={s.status} /></div>
+          <div className="mt-2 flex flex-wrap gap-x-3">
+            {s.inst.url && <a href={s.inst.url} target="_blank" rel="noopener noreferrer" data-testid="school-site" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(sc.website)} ↗</a>}
+            {s.inst.feesUrl && <a href={s.inst.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="fees-link-head" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(sc.feesLink)}</a>}
+          </div>
         </div>))}</div>
       {a.cityId !== b.cityId && <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900" data-testid="cross-city">{L(sc.crossCity)}</p>}
       {row("where", (s) => (s.inst.where ? L(s.inst.where) : miss))}

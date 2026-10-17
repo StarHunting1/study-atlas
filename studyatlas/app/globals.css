@@ -1,6 +1,9 @@
 @tailwind base;@tailwind components;@tailwind utilities;
 body{font-family:system-ui,-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;background:#f8fafc;color:#0f172a}
-html{scroll-padding-top:6.5rem}
+html{scroll-padding-top:6.5rem;-webkit-text-size-adjust:100%}
+body{line-height:1.6;-webkit-font-smoothing:antialiased}
+/* one visible keyboard focus ring everywhere */
+a:focus-visible,button:focus-visible,summary:focus-visible,select:focus-visible,input:focus-visible,[role="button"]:focus-visible{outline:2px solid #0ea5e9;outline-offset:2px}
 
 /* Planner sliders: big, touch friendly track and thumb (filled part follows --p) */
 .sa-range{-webkit-appearance:none;appearance:none;flex:1;min-width:0;height:44px;background:transparent;cursor:pointer;touch-action:pan-y}
@@ -24,3 +27,20 @@ html{scroll-padding-top:6.5rem}
 @keyframes sa-fade{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
 .sa-fade{animation:sa-fade .18s ease-out}
 @media (prefers-reduced-motion:reduce){.sa-fade{animation:none}}
+
+/* Interactive map pins (components/InteractiveMap.tsx): a 44px tap target around a dot with a white ring, so pins stand out on the beige/green/blue map.
+   Pins of the selected country are larger and teal-ringed, the selected city is navy and always labelled; the others stay visible but quieter. */
+.sa-pin{position:relative;display:flex;flex-direction:column;align-items:center;width:44px;height:44px;padding:0;background:transparent;border:0;cursor:pointer;justify-content:flex-end}
+.sa-pin-dot{display:block;width:18px;height:18px;margin-bottom:13px;border-radius:9999px;background:#0b2a5b;border:3px solid #fff;box-shadow:0 0 0 1.5px rgba(11,42,91,.55),0 2px 6px rgba(11,42,91,.4);transition:transform .15s}
+.sa-pin:hover .sa-pin-dot{transform:scale(1.15)}
+.sa-pin[data-active="true"] .sa-pin-dot{width:22px;height:22px;margin-bottom:11px;background:#1f7a6e;box-shadow:0 0 0 2px #fff,0 0 0 4px rgba(31,122,110,.55),0 2px 8px rgba(11,42,91,.4)}
+.sa-pin[data-selected="true"] .sa-pin-dot{width:26px;height:26px;margin-bottom:9px;background:#0b2a5b;box-shadow:0 0 0 2px #fff,0 0 0 5px rgba(11,42,91,.55),0 3px 10px rgba(11,42,91,.5)}
+.sa-pin:focus-visible{outline:none}.sa-pin:focus-visible .sa-pin-dot{box-shadow:0 0 0 3px #fff,0 0 0 6px #0ea5e9}
+.sa-pin-label{position:absolute;left:50%;top:-8px;transform:translateX(-50%);padding:1px 8px;border-radius:9999px;background:#fff;color:#0b2a5b;font-size:11px;font-weight:600;line-height:18px;white-space:nowrap;display:none;box-shadow:0 1px 4px rgba(15,23,42,.3)}
+.sa-zoomed .sa-pin-label,.sa-pin[data-active="true"] .sa-pin-label,.sa-pin[data-selected="true"] .sa-pin-label{display:block}
+.sa-pin[data-selected="true"]{z-index:2}
+.sa-map .maplibregl-ctrl-group{border-radius:12px;box-shadow:0 1px 6px rgba(15,23,42,.25)}
+.sa-map .maplibregl-ctrl-group button{width:40px;height:40px}
+.sa-cluster-dot{display:flex;align-items:center;justify-content:center;width:32px;height:32px;margin-bottom:6px;background:#0b2a5b;color:#fff;font-size:13px;font-weight:700}
+.sa-cluster[data-active="true"] .sa-cluster-dot{background:#1f7a6e}
+.sa-pin[hidden]{display:none}

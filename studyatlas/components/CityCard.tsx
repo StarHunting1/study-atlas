@@ -15,7 +15,7 @@ export default function CityCard({ city, active }: { city: City; active?: boolea
       </Link>
       <PhotoCredit photo={photo} className="-mt-2 truncate px-4 pb-2 text-[10px] text-slate-400" />
       <div className="mt-auto flex gap-2 px-4 pb-4">
-        <button disabled={!on && full} onClick={() => toggle(city.id)} aria-pressed={on} className={`flex-1 rounded-full px-3 py-2 text-sm font-medium disabled:opacity-40 ${on ? "bg-[#0b2a5b] text-white" : "bg-slate-100 hover:bg-slate-200"}`}>{on ? `✓ ${t("remove")}` : `+ ${t("addCompare")}`}</button>
+        <button disabled={!on && full} onClick={() => toggle(city.id)} aria-pressed={on} className={`min-h-[44px] flex-1 rounded-full px-3 py-2 text-sm font-medium disabled:opacity-40 ${on ? "bg-[#0b2a5b] text-white" : "bg-slate-100 hover:bg-slate-200"}`}>{on ? `✓ ${t("remove")}` : `+ ${t("addCompare")}`}</button>
       </div>
       {!on && full && <p className="-mt-2 px-4 pb-3 text-center text-[11px] text-slate-400">{t("compareFull")}</p>}
     </article>
