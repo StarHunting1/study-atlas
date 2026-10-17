@@ -23,7 +23,7 @@ export const ux = {
   // city page
   moreInfo: { en: "Visa, healthcare, safety and more", ja: "ビザ・医療・治安などの重要情報" }, moreInfoLead: { en: "Important information that is not shown in the five cards above.", ja: "上の5項目に入らない、大切な情報です。" },
   rows: { visa: { en: "Visa & healthcare", ja: "ビザ・医療" }, safety: { en: "Safety", ja: "治安" }, daily: { en: "Daily life", ja: "生活（SIM・銀行など）" }, data: { en: "Data status & sources", ja: "データの状態と出典" } },
-  rowHint: { visa: { en: "Official pages to check", ja: "確認すべき公式ページ" }, safety: { en: "Statistics and advice", ja: "統計と防犯情報" }, daily: { en: "Student life, SIM, banking", ja: "学生生活・SIM・銀行" }, data: { en: "What is verified and where it comes from", ja: "確認済みの範囲と出典" } },
+  rowHint: { visa: { en: "Entry routes, healthcare and official pages", ja: "入国区分・医療の目安と公式情報" }, safety: { en: "Statistics and advice", ja: "統計と防犯情報" }, daily: { en: "Student life, SIM, banking", ja: "学生生活・SIM・銀行" }, data: { en: "What is verified and where it comes from", ja: "確認済みの範囲と出典" } },
   // compare
   cmpIntro: { en: "Five key points side by side. Figures are shown in each city's own currency and are never converted or filled in.", ja: "重要な5項目を並べています。数値は各都市の通貨のままで、換算や推測での補完は行いません。" },
   moreCompare: { en: "Compare more", ja: "さらに比較する" }, lessCompare: { en: "Show fewer", ja: "項目を減らす" },

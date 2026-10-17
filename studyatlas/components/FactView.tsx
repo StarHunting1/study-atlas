@@ -10,14 +10,16 @@ import { sc } from "@/locales/schoolCompare";
 import { compareHref } from "@/data/languageSchools";
 import Link from "next/link";
 import { publicFact } from "@/data/publicFacts";
+import { displayStatus, type DisplayStatus } from "@/data/factStatus";
 
-const badgeStyle: Record<Status, string> = {
+const badgeStyle: Record<DisplayStatus, string> = {
+  partial: "bg-sky-50 text-amber-800 ring-1 ring-sky-100",
   verified: "bg-sky-50 text-sky-700 ring-1 ring-sky-100",
   unverified: "bg-amber-50 text-amber-800 ring-1 ring-amber-100",
   sample: "bg-amber-100 text-amber-800",
   pending: "bg-slate-100 text-slate-500",
 };
-export function StatusBadge({ status }: { status: Status }) {
+export function StatusBadge({ status }: { status: DisplayStatus }) {
   const { L } = useI18n();
   return <span className={`inline-block whitespace-nowrap rounded-full px-2 py-0.5 align-middle text-[11px] font-medium ${badgeStyle[status]}`}>{L(d[status])}</span>;
 }
@@ -43,7 +45,7 @@ function ClimateTable({ c }: { c: MonthlyClimate }) {
 export default function FactView({ fact: rawFact, kind, compact, lean }: { fact: Fact<unknown>; kind: FieldKind; compact?: boolean; /** period, check date and sources go behind "Sources & conditions" */ lean?: boolean }) {
   const { L } = useI18n(); const fact = publicFact(rawFact);   // demo "sample" numbers are never shown (Ver.1.3.1)
   if (fact.status === "pending" || fact.value === undefined) return <span className="text-sm text-slate-400">{L(d.pending)}</span>;
-  const v = fact.value;
+  const v = fact.value; const shownStatus = displayStatus(fact);   // display only: "partial" when some statements are verified (the stored status is unchanged)
   const body =
     kind === "money" ? <MoneyText m={v as Money} /> :
     kind === "climate" ? <ClimateTable c={v as MonthlyClimate} /> :
@@ -56,7 +58,8 @@ export default function FactView({ fact: rawFact, kind, compact, lean }: { fact:
         {i.source && <div className="text-[11px] text-slate-400">{L(d.source)}: <a href={i.source.url} target="_blank" rel="noopener noreferrer" className="underline">{i.source.publisher}</a></div>}</dl>}</li>)}</ul> :
     fact.claims?.some((c) => c.status === "verified")
       // Ver.1.3.6: once some statements are approved and others are not, each statement shows its own status (never one badge for a mixed Fact)
-      ? <ul className="space-y-1.5" data-testid="claims">{fact.claims.map((c) => <li key={c.id} data-testid="claim" data-claim={c.id} data-status={c.status}>{L(c.text)} <StatusBadge status={c.status} /></li>)}</ul>
+      // (only the statements that are still unverified carry a badge; the heading badge says "partly verified")
+      ? <ul className="space-y-1.5" data-testid="claims">{fact.claims.map((c) => <li key={c.id} data-testid="claim" data-claim={c.id} data-status={c.status}>{L(c.text)} {c.status !== "verified" && <StatusBadge status={c.status} />}</li>)}</ul>
       : <span>{L(v as Localized)}</span>;
   const includes = kind === "money" ? (v as Money).includes : undefined;
   const meta = (fact.period || fact.checkedAt || fact.sources?.length) ? (
@@ -68,7 +71,7 @@ export default function FactView({ fact: rawFact, kind, compact, lean }: { fact:
   ) : null;
   return (
     <div className="space-y-1">
-      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">{body}{!(lean && fact.status === "verified") && <StatusBadge status={fact.status} />}</div>
+      <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">{body}{!(lean && shownStatus === "verified") && <StatusBadge status={shownStatus} />}</div>
       {includes && <p className="text-xs text-slate-500">{L(d.includes)}: {L(includes)}</p>}
       {lean ? (meta && <Disclosure level="sources">{meta}</Disclosure>) : meta}
       {!compact && fact.note && <p className="text-[11px] leading-relaxed text-slate-400">{L(fact.note)}</p>}

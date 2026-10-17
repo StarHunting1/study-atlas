@@ -3,6 +3,8 @@ import type { Localized } from "@/lib/i18n";
 export const dataText = {
   verified: { en: "Verified", ja: "確認済み" },
   unverified: { en: "Unverified", ja: "未確認" },
+  partial: { en: "Partly verified", ja: "一部確認済み" },
+  checkedLine: { en: "Last checked", ja: "最終確認日" },
   sample: { en: "Demo sample – not verified", ja: "デモ用サンプル（未検証）" },
   pending: { en: "Data coming soon", ja: "データ準備中" },
   period: { en: "Period", ja: "対象期間" },
@@ -15,8 +17,8 @@ export const dataText = {
   per: { month: { en: "/ month", ja: "／月" }, week: { en: "/ week", ja: "／週" }, year: { en: "/ year", ja: "／年" }, once: { en: "one-off", ja: "（1回）" } },
   statusTitle: { en: "Data status", ja: "データの状態" },
   statusHelp: {
-    en: "Only “Verified” items have been checked against the cited source. “Unverified” and “Demo sample” items are shown for reference only, and “Data coming soon” items have not been researched yet.",
-    ja: "「確認済み」のみ出典と照合済みの情報です。「未確認」「デモ用サンプル」は参考表示で、「データ準備中」は未調査の項目です。",
+    en: "Only “Verified” items have been checked against the cited source. “Partly verified” means only some of the statements in an item are verified (each one is marked in the details). “Unverified” and “Demo sample” items are shown for reference only, and “Data coming soon” items have not been researched yet.",
+    ja: "「確認済み」のみ出典と照合済みの情報です。「一部確認済み」は、まとまりの一部の記述だけが確認済みという意味です（記述ごとの状況は詳細に表示）。「未確認」「デモ用サンプル」は参考表示で、「データ準備中」は未調査の項目です。",
   },
   cmpNotVerified: { en: "Not comparable: figures are not verified yet.", ja: "比較不可：確認済みの数値がまだありません。" },
   cmpCurrency: { en: "Different currencies – shown as-is, not converted or compared.", ja: "通貨が異なるため、換算・比較はしていません。" },
