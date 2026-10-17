@@ -1,5 +1,6 @@
 import { pending, type Claim, type Fact } from "./schema";
 import { claim, factFromClaims, source } from "./claims";
+import { approve } from "./approvals";
 import type { Localized } from "@/lib/i18n";
 import type { Country } from "./types";
 // Visa information is national. It stays "pending" until checked on the government's own page (see data/RESEARCH.md).
@@ -14,7 +15,7 @@ const U = { visitor: source("https://www.gov.uk/standard-visitor/visit-to-study"
 const C = { permit6: source("https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", IRCC), eta: source("https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", IRCC), permit: source("https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", IRCC) };
 const ukLicence = { en: "GOV.UK content is under the Open Government Licence v3.0 (commercial use allowed with attribution): facts are paraphrased and linked.", ja: "GOV.UKの内容は Open Government Licence v3.0（出典表示で商用利用可）。事実を言い換え、リンクを付けて表示。" };
 const caLicence = { en: "Canada.ca terms allow non-commercial reproduction; commercial reuse is not confirmed: facts are paraphrased and linked, nothing is copied.", ja: "Canada.ca の条件は非商用の複製を許可。商用の再利用は未確認：事実の言い換えとリンクのみ（転載なし）。" };
-const checkOfficial: Localized = { en: "Paraphrased from the government's public pages. On 2026-10-15 the wording was compared with the page text by a GitHub Actions page check (runs 38787463398, 38798253317); each statement below awaits a person's approval, so it is shown as unverified. Which route applies depends on your nationality and personal circumstances – confirm on the official page before you plan.", ja: "政府の公開ページの内容を言い換えたものです。2026-10-15 に GitHub Actions のページ確認（run 38787463398・38798253317）で記載との一致を確認しましたが、以下の各記述は人の承認待ちのため未確認として表示しています。どの区分が必要かは国籍・個別の事情で異なります。計画の前に必ず公式ページで確認してください。" };
+const checkOfficial: Localized = { en: "Paraphrased from the government's public pages. Each statement shows its own status: only statements a person has approved carry an approval record (data/approvals.ts); statements marked “Not verified” await a person's approval. Which route applies depends on your nationality and personal circumstances – confirm on the official page before you plan, and re-check amounts there (they change).", ja: "政府の公開ページの内容を言い換えたものです。確認状況は記述ごとに表示しています。人が承認した記述だけに承認の記録（data/approvals.ts）があり、「未確認」の記述は人の承認待ちです。どの区分が必要かは国籍・個別の事情で異なります。計画の前に必ず公式ページで確認し、金額は変わるため公式ページで最新額を確認してください。" };
 const where = (what: string) => `Country page → Visa → ${what}`;
 export const GBR_VISA_CLAIMS: Claim[] = [
   claim({ id: "U1", candidate: "U1", sources: [U.visitor], where: where("Official information"), verdict: "recommend",
@@ -33,13 +34,13 @@ export const GBR_VISA_CLAIMS: Claim[] = [
     text: { en: "Whether you need a visa or an electronic travel authorisation before travelling depends on your nationality.", ja: "渡航前にビザや電子渡航認証が必要かどうかは国籍によって異なります。" },
     conditions: { en: "Applies to every applicant: GOV.UK “Check if you need a UK visa” is the entry point.", ja: "すべての申請者が対象。入口は GOV.UK の「Check if you need a UK visa」。" },
     reason: { en: "The page says “Depending on your nationality, you may need to get an electronic travel authorisation (ETA)” and “You may need a visa” (page dated 2021-06-16).", ja: "ページに「Depending on your nationality, you may need to get an electronic travel authorisation (ETA)」「You may need a visa」とある（ページ日付 2021-06-16）。" } }),
-];
+].map(approve);
 export const GBR_NOTES_CLAIMS: Claim[] = [
   claim({ id: "U3", candidate: "U3", sources: [U.shortTerm], where: where("Points to note"), verdict: "recommend",
     text: { en: "GOV.UK lists the Short-term study visa fee as £228 (page read on 2026-10-15). Fees change – check the current amount on the official page.", ja: "GOV.UKでは短期学習ビザの申請料を£228と記載しています（2026-10-15に確認したページの記載）。金額は変更されるため、公式ページで最新額を確認してください。" },
     conditions: { en: "Only if you apply for the Short-term study visa; the healthcare surcharge and other costs are separate.", ja: "短期学習ビザを申請する場合のみ。医療付加金などは別。" },
     reason: { en: "Matches “It costs £228 for a Short-term study visa” (page updated 2025-02-06). The amount can change, hence the date.", ja: "「It costs £228 for a Short-term study visa」と一致（ページ更新 2025-02-06）。金額は変わりうるため確認日を併記。" } }),
-];
+].map(approve);
 export const CAN_VISA_CLAIMS: Claim[] = [
   claim({ id: "C1", candidate: "C1", sources: [C.permit6, C.eta], where: where("Official information"), verdict: "conditional",
     text: { en: "IRCC says a study permit is generally not needed for a programme of 6 months or less, but you still need a valid travel document to enter (an eTA or a visitor visa); which one depends on your nationality.", ja: "IRCCの案内では、6か月以内のプログラムなら一般に就学許可（study permit）は不要ですが、入国には有効な渡航書類（eTAまたは訪問者ビザ）が必要です。どちらが必要かは国籍によって異なります。" },

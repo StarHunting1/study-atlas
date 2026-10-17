@@ -37,12 +37,15 @@ export function climateChecks(c: ClimateNormals, annualPrecip?: number): Check[]
 export const CANDIDATES = ["U1", "U2", "U3", "U4", "U5", "U6", "C1", "C2", "C3", "C4"];
 export const allClaims = () => CLAIM_GROUPS.flatMap((g) => g.claims.map((c) => ({ ...c, group: g })));
 const esc = (t: string) => t.replace(/\|/g, "\\|").replace(/\n/g, " ");
+const mark = (c: { status: string }) => (c.status === "verified" ? "x" : " ");
 const VERDICT = { recommend: "推奨", conditional: "条件つき推奨", hold: "保留" } as const;
 
 export function approvalSheet(): string {
   const L: string[] = []; const all = allClaims();
   L.push("# 承認シート（Ver.1.3.6／1.3.9 チェックリスト追加）— 政府情報の主張ごとの承認と Vancouver 気候データ", "", "_`npm run approvals` が `data/approvalSheet.ts` と各データから生成します。手で編集しないでください。_", "",
-    "**これは承認ではありません。** 全ての主張・気候データは `unverified` のままで、画面にも「未確認」と表示されます。自動のページ確認（GitHub Actions）だけで `verified` にすることはありません。`verified` にできるのは、人が下の手順で承認の記録（承認者・日付・比較した内容）を書いた主張だけです（`data/validate.ts` が検査し、無いとビルドが失敗します）。", "",
+    "**承認の状況（Ver.1.4.0）**: 人が明示的に承認した英国の5件（U1・U2・U3・U5b・U6）だけが `verified`（承認記録は `data/approvals.ts`、承認者 StarHunting1、2026-10-17）。それ以外の主張と Vancouver の 1991–2020 気候データは `unverified` のままで、画面にも「未確認」と表示されます。自動のページ確認（GitHub Actions）だけで `verified` にすることはありません。`verified` にできるのは、人が承認の記録（承認者・日付・比較した内容）を `data/approvals.ts` に書いた主張だけです（`approve()` と `data/validate.ts` が検査し、承認後に文言・条件・出典を変えるとビルドが失敗します）。", "",
+    "| 承認済み（verified） | 承認者・日付 | 承認の根拠 |", "|---|---|---|",
+    ...all.filter((c) => c.status === "verified").map((c) => `| ${c.id} | ${c.approval!.by}・${c.approval!.at} | ${esc(c.approval!.compared)} |`), "",
     "## 1. 承認の単位と手順", "",
     "- 画面の1つの項目（Fact）は、複数の主張（claim）からできています。**主張ごと**に `status` と承認記録を持つので、1件ずつ承認できます。Fact 全体は「全ての主張が verified」のときだけ verified になり、一部だけ承認した場合は、画面で主張ごとに確認状況が表示されます。",
     "- 承認する手順: ①根拠のURLを開いて文言・数値が一致することを確認 → ②下の「編集する場所」の該当 claim で `status: \"verified\"` にし、`approval: { by: \"氏名\", at: \"YYYY-MM-DD\", compared: \"何と何を比べたか\" }`、`period`、`checkedAt` を設定 → ③`npm test` と `npm run approvals`。",
@@ -78,13 +81,13 @@ export function approvalSheet(): string {
       `| 対象（国籍） | ${esc(SCOPE[c.id].who)} |`, `| 対象（滞在期間・コース） | ${esc(SCOPE[c.id].stay)} |`, `| 対象（ビザ区分） | ${esc(SCOPE[c.id].visa)} |`,
       `| 既存表示との違い | ${esc(SCOPE[c.id].changed)} |`, `| 承認前に人が決めること | ${esc(SCOPE[c.id].decide)} |`,
       `| 編集する場所 | \`${g.file}\` の \`${g.name}\`（claim \`${c.id}\`） |`, "",
-      `**承認チェックリスト（${c.id}）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで \`verified\` にしません。**`, "",
-      "- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している",
-      "- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている",
-      `- [ ] 再利用条件を判断した（${c.candidate.startsWith("U") ? "OGL v3.0：出典表示で可" : "Canada.ca／BC州：言い換え＋リンクで足りると判断した、または書面確認を得た"}）`,
-      "- [ ] 金額・日付がある場合、確認日が文言に併記されている",
-      "- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した",
-      `- [ ] 承認の記録を書いた：\`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }\`、\`checkedAt\`、\`period\``, "");
+      `**承認チェックリスト（${c.id}）** — ${c.status === "verified" ? `✅ **承認済み**（${c.approval!.by}、${c.approval!.at}。記録: \`data/approvals.ts\`）。以下は承認時の確認項目` : "承認者が1件ずつ印を付けます。**全部に印が付くまで \`verified\` にしません。**"}`, "",
+      `- [${mark(c)}] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している`,
+      `- [${mark(c)}] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている`,
+      `- [${mark(c)}] 再利用条件を判断した（${c.candidate.startsWith("U") ? "OGL v3.0：出典表示で可" : "Canada.ca／BC州：言い換え＋リンクで足りると判断した、または書面確認を得た"}）`,
+      `- [${mark(c)}] 金額・日付がある場合、確認日が文言に併記されている`,
+      `- [${mark(c)}] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した`,
+      `- [${mark(c)}] 承認の記録を書いた：\`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }\`、\`checkedAt\`、\`period\``, "");
   }
   // ---- Vancouver climate
   const old = official.climate!, nw = official.climateAlt!; const r = RIGHTS["eccc-climate-normals"];

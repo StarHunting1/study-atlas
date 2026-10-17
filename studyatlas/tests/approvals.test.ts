@@ -13,6 +13,8 @@ import { getCity } from "@/data/cities";
 import official from "@/data/official/vancouver";
 import { climateChecks, ECCC_ANNUAL_PRECIP_1991_2020 } from "@/data/approvalSheet";
 import { SCOPE, TERMS_CHECK } from "@/data/approvalScope";
+import { APPROVALS, approve } from "@/data/approvals";
+const APPROVED = ["U1", "U2", "U3", "U5b", "U6"];
 import manchester from "@/data/official/manchester";
 let n = 0; const t = (name: string, f: () => void) => { f(); n++; console.log("ok", name); };
 const wrap = (el: unknown) => renderToStaticMarkup(h(I18nProvider, null, el as never));
@@ -23,11 +25,14 @@ t("every one of the ten candidates (U1–U6, C1–C4) is covered by claims, ids 
   assert.equal(new Set(claims.map((c) => c.id)).size, claims.length);
   for (const c of claims) { assert.ok(c.sources.length && c.sources.every((s) => s.url.startsWith("https://") && s.terms), `${c.id}: https source with a licence line`); assert.ok(c.conditions.ja && c.conditions.en && c.review.reason.ja && c.where, c.id); }
 });
-t("nothing is verified: all claims and all their Facts are unverified, and nothing carries an approval (an automated check never promotes)", () => {
-  assert.ok(claims.every((c) => c.status === "unverified" && !c.approval));
+t("only the five approved claims are verified (U1, U2, U3, U5b, U6), each with its approval record; every other claim is unverified without one; no verified claim lacks a record (an automated check never promotes)", () => {
+  assert.deepEqual(claims.filter((c) => c.status === "verified").map((c) => c.id).sort(), [...APPROVED].sort());
+  for (const c of claims) { if (APPROVED.includes(c.id)) { assert.ok(c.approval && c.approval.by === "StarHunting1" && c.approval.at === "2026-10-17" && /承認指示/.test(c.approval.compared) && c.sources.every((x) => c.approval!.compared.includes(x.url)), c.id); } else assert.ok(c.status === "unverified" && !c.approval, `${c.id} stays unverified`); }
+  for (const id of ["U4", "U5a", "C1", "C2", "C3", "C4a", "C4b", "C4c", "C4-ref"]) assert.equal(claims.find((c) => c.id === id)!.status, "unverified", id);
   for (const g of CLAIM_GROUPS) assert.ok(g.claims.length > 0);
   const gbr = countries.find((c) => c.code === "GBR")!.profile.visa, can = countries.find((c) => c.code === "CAN")!.profile.visa;
-  for (const f of [gbr.official, gbr.notes, can.official, can.notes, getCity("manchester")!.profile.living.healthcare, getCity("vancouver")!.profile.living.healthcare]) { assert.equal(f.status, "unverified"); assert.ok(f.claims?.length, "Fact is built from claims"); assert.deepEqual(checkFact("x", f), []); }
+  const want = [[gbr.official, "unverified"], [gbr.notes, "verified"], [can.official, "unverified"], [can.notes, "unverified"], [getCity("manchester")!.profile.living.healthcare, "unverified"], [getCity("vancouver")!.profile.living.healthcare, "unverified"]] as const;
+  for (const [f, st] of want) { assert.equal(f.status, st); assert.ok(f.claims?.length, "Fact is built from claims"); assert.deepEqual(checkFact("x", f), []); }
 });
 t("the displayed wording is the claims' text, and the licence conditions stay: Canada.ca / B.C. are paraphrase-and-link only", () => {
   const gbr = countries.find((c) => c.code === "GBR")!.profile.visa; assert.ok(gbr.notes.value!.en.includes("£228") && gbr.official.value!.ja.includes("Student visa"));
@@ -37,25 +42,25 @@ t("the displayed wording is the claims' text, and the licence conditions stay: C
   assert.ok(!claims.some((c) => /visitor stay of 6 months or less has no IHS|before you travel|degree study/.test(c.text.en)), "statements without a basis on the pages read are gone");
 });
 t("the validator refuses an unsafe approval: verified without a record, a held claim verified, a mixed Fact marked verified, an unverified claim with an approval", () => {
-  const base = claims.find((c) => c.id === "U1")!;
+  const base = { ...claims.find((c) => c.id === "U1")!, status: "unverified" as const, approval: undefined };
   const ok = { ...base, status: "verified" as const, approval: { by: "Reviewer", at: "2026-10-20", compared: "gov.uk page text" } };
   assert.deepEqual(checkFact("f", factFromClaims([ok])), [], "a verified claim with its approval record passes");
   assert.ok(checkFact("f", factFromClaims([{ ...ok, approval: undefined }])).some((p) => /needs an approval/.test(p)));
   const held = claims.find((c) => c.review.verdict === "hold")!;
   assert.ok(checkFact("f", factFromClaims([{ ...held, status: "verified", approval: ok.approval }])).some((p) => /on hold cannot be verified/.test(p)));
-  const mixed = factFromClaims([ok, claims.find((c) => c.id === "U2")!]); assert.equal(mixed.status, "unverified"); assert.ok(checkFact("f", { ...mixed, status: "verified" }).some((p) => /derived from its claims/.test(p)));
+  const mixed = factFromClaims([ok, claims.find((c) => c.id === "U4")!]); assert.equal(mixed.status, "unverified"); assert.ok(checkFact("f", { ...mixed, status: "verified" }).some((p) => /derived from its claims/.test(p)));
   assert.ok(checkFact("f", factFromClaims([{ ...base, approval: ok.approval }])).some((p) => /unverified claim must not carry an approval/.test(p)));
 });
 t("approving one claim shows that claim as verified and the others as unverified (never one badge for a mixed Fact); with none approved the page looks as before", () => {
   const u1 = claims.find((c) => c.id === "U1")!, u2 = claims.find((c) => c.id === "U2")!;
-  const partly = factFromClaims([{ ...u1, status: "verified", approval: { by: "R", at: "2026-10-20", compared: "x" } }, u2]);
+  const partly = factFromClaims([u1, { ...u2, status: "unverified" as const, approval: undefined }]);
   const html = wrap(h(FactView, { fact: partly, kind: "text" })); const items = html.match(/data-testid="claim"/g) ?? [];
   assert.equal(items.length, 2); assert.ok(/data-claim="U1"[^>]*data-status="verified"/.test(html) && /data-claim="U2"[^>]*data-status="unverified"/.test(html));
-  const none = wrap(h(FactView, { fact: factFromClaims([u1, u2]), kind: "text" })); assert.ok(!none.includes('data-testid="claim"'), "no per-claim list while nothing is approved"); assert.ok(none.includes("未確認"));
+  const un = (c: typeof u1) => ({ ...c, status: "unverified" as const, approval: undefined }); const none = wrap(h(FactView, { fact: factFromClaims([un(u1), un(u2)]), kind: "text" })); assert.ok(!none.includes('data-testid="claim"'), "no per-claim list while nothing is approved"); assert.ok(none.includes("未確認"));
 });
 t("the approval sheet is generated from the data and is up to date; it lists the hold items, the licence conditions and the Vancouver 1981–2010 vs 1991–2020 comparison", () => {
   const sheet = approvalSheet(); assert.equal(readFileSync("data/APPROVAL_SHEET.md", "utf8"), sheet, "run `npm run approvals`");
-  for (const w of ["保留すべき情報", "C4-ref", "合成観測所", "1108447", "1108395", "End-use Licence", "切り替えたときの影響", "承認ではありません"]) assert.ok(sheet.includes(w), w);
+  for (const w of ["保留すべき情報", "C4-ref", "合成観測所", "1108447", "1108395", "End-use Licence", "切り替えたときの影響", "承認の状況（Ver.1.4.0）"]) assert.ok(sheet.includes(w), w);
   for (const c of claims) assert.ok(sheet.includes(`### ${c.id}（候補 ${c.candidate}）`), c.id);
 });
 t("Vancouver climate: the verified 1981–2010 values are untouched and the 1991–2020 candidate is unverified and not displayed; Manchester is unchanged", () => {
@@ -82,8 +87,8 @@ t("Vancouver 1991–2020 climate: mechanical checks pass for the candidate (12 m
   const rb = climateChecks(bad, ECCC_ANNUAL_PRECIP_1991_2020); assert.ok(rb.filter((k) => !k.ok).length >= 2, "an inconsistent record is flagged");
   assert.equal(official.climate!.period, "1981–2010"); assert.equal(official.climate!.status, "verified");
 });
-t("verified count: still 0 claims verified and no approval records anywhere; Planner does not read visa or healthcare facts", () => {
-  assert.equal(claims.filter((c) => c.status === "verified" || c.approval).length, 0);
+t("verified count: exactly 5 claims verified, each with an approval record; Planner does not read visa or healthcare facts", () => {
+  assert.equal(claims.filter((c) => c.status === "verified").length, 5); assert.equal(claims.filter((c) => c.status === "verified" && !c.approval).length, 0);
   for (const f of ["lib/planner.ts", "lib/budget.ts", "lib/smart.ts"]) assert.ok(!/healthcare|visa\.|IHS|healthSurcharge/i.test(readFileSync(f, "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")), f);
 });
 t("UK corrections (Ver.1.3.10): U5-visa is no longer an approval candidate; U4 does not say the course length alone decides the Student visa; U5a keeps £776/£1,035 but does not promise NHS use; U1, U2, U3, U5b, U6 are unchanged; nothing is verified", () => {
@@ -100,6 +105,25 @@ t("UK corrections (Ver.1.3.10): U5-visa is no longer an approval candidate; U4 d
   assert.ok(/depends on the visa you apply for/.test(u5a.text.en) && /ビザの種類・期間・申請場所・個々の事情によって異なります/.test(u5a.text.ja) && /can give you access/.test(u5a.text.en) && /利用できる場合があります/.test(u5a.text.ja));
   assert.ok(/Standard Visitor/.test(claims.find((c) => c.id === "U1")!.text.en) && /国籍によってビザ|ETA/.test(claims.find((c) => c.id === "U1")!.conditions.ja) && /nationality/.test(claims.find((c) => c.id === "U6")!.text.en));
   assert.ok(claims.filter((c) => c.candidate.startsWith("U")).every((c) => c.sources.every((s) => /Open Government Licence v3\.0/.test(s.terms!) && s.url.startsWith("https://www.gov.uk/"))), "OGL v3.0 source lines kept");
-  assert.ok(claims.every((c) => c.status === "unverified" && !c.approval), "no claim verified, no approval record");
+  assert.ok(claims.filter((c) => c.status === "verified").every((c) => APPROVED.includes(c.id)), "only the approved five are verified");
+});
+t("Ver.1.4.0 approval record: data/approvals.ts holds exactly the five approvals with the approved wording; editing an approved claim, approving a held claim, or approving by an automated check is impossible", () => {
+  assert.deepEqual(Object.keys(APPROVALS).sort(), [...APPROVED].sort());
+  for (const id of APPROVED) { const c = claims.find((x) => x.id === id)!, r = APPROVALS[id]; assert.deepEqual([c.text, c.conditions, c.sources.map((x) => x.url)], [r.text, r.conditions, r.sources], `${id}: approved wording = displayed wording`); assert.ok(/Open Government Licence v3\.0/.test(c.sources[0].terms!), id); assert.ok(c.checkedAt === "2026-10-15" && c.period === "2026-10"); }
+  const u1 = claims.find((c) => c.id === "U1")!;
+  assert.throws(() => approve({ ...u1, text: { ...u1.text, en: u1.text.en + " (edited)" } }), /changed after its approval/);
+  assert.throws(() => approve({ ...u1, conditions: { ...u1.conditions, ja: "変更" } }), /changed after its approval/);
+  assert.equal(approve({ ...claims.find((c) => c.id === "U4")!, status: "unverified" }).status, "unverified", "no record = stays unverified");
+  assert.ok(claims.filter((c) => c.status === "verified").every((c) => c.review.verdict !== "hold"));
+});
+t("display: the country page lists each claim with its own status (U1/U2/U6 verified, U4 not verified), the single-claim notes Fact is verified, £228 keeps its date and the re-check advice, OGL v3.0 and the check date are shown, in ja and en", () => {
+  const g = countries.find((c) => c.code === "GBR")!.profile.visa;
+  const off = wrap(h(FactView, { fact: g.official, kind: "text" }));
+  for (const [id, st] of [["U1", "verified"], ["U2", "verified"], ["U6", "verified"], ["U4", "unverified"]]) assert.ok(new RegExp(`data-claim="${id}"[^>]*data-status="${st}"`).test(off), `${id} ${st}`);
+  assert.ok(off.includes("確認済み") && off.includes("未確認") && off.includes("Open Government Licence v3.0") && off.includes("2026-10-15"));
+  const notes = wrap(h(FactView, { fact: g.notes, kind: "text" })); assert.ok(notes.includes("£228") && notes.includes("2026-10-15") && notes.includes("公式ページで最新額を確認") && /data-claim="U3"[^>]*data-status="verified"/.test(notes) && notes.includes("Open Government Licence v3.0"));
+  assert.ok(g.notes.value!.en.includes("check the current amount on the official page") && g.notes.status === "verified" && g.official.status === "unverified");
+  const man = wrap(h(FactView, { fact: getCity("manchester")!.profile.living.healthcare, kind: "text" })); assert.ok(/data-claim="U5b"[^>]*data-status="verified"/.test(man) && /data-claim="U5a"[^>]*data-status="unverified"/.test(man));
+  for (const f of [g.official, g.notes]) { assert.ok(f.value!.ja && f.value!.en); }
 });
 console.log(n, "approval tests passed");

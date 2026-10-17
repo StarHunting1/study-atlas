@@ -2,7 +2,15 @@
 
 _`npm run approvals` が `data/approvalSheet.ts` と各データから生成します。手で編集しないでください。_
 
-**これは承認ではありません。** 全ての主張・気候データは `unverified` のままで、画面にも「未確認」と表示されます。自動のページ確認（GitHub Actions）だけで `verified` にすることはありません。`verified` にできるのは、人が下の手順で承認の記録（承認者・日付・比較した内容）を書いた主張だけです（`data/validate.ts` が検査し、無いとビルドが失敗します）。
+**承認の状況（Ver.1.4.0）**: 人が明示的に承認した英国の5件（U1・U2・U3・U5b・U6）だけが `verified`（承認記録は `data/approvals.ts`、承認者 StarHunting1、2026-10-17）。それ以外の主張と Vancouver の 1991–2020 気候データは `unverified` のままで、画面にも「未確認」と表示されます。自動のページ確認（GitHub Actions）だけで `verified` にすることはありません。`verified` にできるのは、人が承認の記録（承認者・日付・比較した内容）を `data/approvals.ts` に書いた主張だけです（`approve()` と `data/validate.ts` が検査し、承認後に文言・条件・出典を変えるとビルドが失敗します）。
+
+| 承認済み（verified） | 承認者・日付 | 承認の根拠 |
+|---|---|---|
+| U1 | StarHunting1・2026-10-17 | 2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/standard-visitor/visit-to-study |
+| U2 | StarHunting1・2026-10-17 | 2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/visa-to-study-english |
+| U6 | StarHunting1・2026-10-17 | 2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/check-uk-visa |
+| U3 | StarHunting1・2026-10-17 | 2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/visa-to-study-english |
+| U5b | StarHunting1・2026-10-17 | 2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/healthcare-immigration-application/how-much-pay |
 
 ## 1. 承認の単位と手順
 
@@ -15,18 +23,18 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 
 | 候補 | 主張 | 推奨 | 状態 |
 |---|---|---|---|
-| U1 | U1 | U1: 推奨 | U1: unverified |
-| U2 | U2 | U2: 推奨 | U2: unverified |
-| U3 | U3 | U3: 推奨 | U3: unverified |
+| U1 | U1 | U1: 推奨 | U1: verified |
+| U2 | U2 | U2: 推奨 | U2: verified |
+| U3 | U3 | U3: 推奨 | U3: verified |
 | U4 | U4 | U4: 条件つき推奨 | U4: unverified |
-| U5 | U5a, U5b | U5a: 条件つき推奨 / U5b: 推奨 | U5a: unverified, U5b: unverified |
-| U6 | U6 | U6: 推奨 | U6: unverified |
+| U5 | U5a, U5b | U5a: 条件つき推奨 / U5b: 推奨 | U5a: unverified, U5b: verified |
+| U6 | U6 | U6: 推奨 | U6: verified |
 | C1 | C1 | C1: 条件つき推奨 | C1: unverified |
 | C2 | C2 | C2: 条件つき推奨 | C2: unverified |
 | C3 | C3 | C3: 条件つき推奨 | C3: unverified |
 | C4 | C4-ref, C4a, C4b, C4c | C4-ref: 保留 / C4a: 条件つき推奨 / C4b: 条件つき推奨 / C4c: 条件つき推奨 | C4-ref: unverified, C4a: unverified, C4b: unverified, C4c: unverified |
 
-集計: 主張 14 件（推奨 5／条件つき推奨 8／保留 1）。verified は 0 件。
+集計: 主張 14 件（推奨 5／条件つき推奨 8／保留 1）。verified は 5 件。
 
 ## 3. 保留すべき情報
 
@@ -90,7 +98,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **推奨**：gov.uk/standard-visitor/visit-to-study（2026-10-15確認、ページ更新 2024-10-31）と一致。例外は文言に含めていない（簡略化であり誤りではない）。 |
 | 画面上の表示場所 | Country page → Visa → Official information（United Kingdom · visa.official） |
-| 現在の状態 | unverified（承認記録なし） |
+| 現在の状態 | verified（承認: StarHunting1、2026-10-17、2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/standard-visitor/visit-to-study） |
 | 対象（国籍） | 国籍を問わず（国籍によりビザ/ETAが別途必要） |
 | 対象（滞在期間・コース） | 6か月以内のコース |
 | 対象（ビザ区分） | 訪問者（Standard Visitor） |
@@ -98,14 +106,14 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 承認前に人が決めること | 例外を文言に入れなくてよいか（簡略化であり誤りではないと判断）。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | 編集する場所 | `data/countries.ts` の `GBR_VISA_CLAIMS`（claim `U1`） |
 
-**承認チェックリスト（U1）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
+**承認チェックリスト（U1）** — ✅ **承認済み**（StarHunting1、2026-10-17。記録: `data/approvals.ts`）。以下は承認時の確認項目
 
-- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
-- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
-- [ ] 再利用条件を判断した（OGL v3.0：出典表示で可）
-- [ ] 金額・日付がある場合、確認日が文言に併記されている
-- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
-- [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
+- [x] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
+- [x] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
+- [x] 再利用条件を判断した（OGL v3.0：出典表示で可）
+- [x] 金額・日付がある場合、確認日が文言に併記されている
+- [x] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
+- [x] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
 ### U2（候補 U2）— 推奨
 
@@ -119,7 +127,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **推奨**：gov.uk/visa-to-study-english（ページ更新 2025-02-06）と一致。 |
 | 画面上の表示場所 | Country page → Visa → Official information（United Kingdom · visa.official） |
-| 現在の状態 | unverified（承認記録なし） |
+| 現在の状態 | verified（承認: StarHunting1、2026-10-17、2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/visa-to-study-english） |
 | 対象（国籍） | 国籍を問わず（国籍別の渡航認証は別） |
 | 対象（滞在期間・コース） | 英語コースで6か月超〜11か月 |
 | 対象（ビザ区分） | 短期学習ビザ（Short-term study visa） |
@@ -127,14 +135,14 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 承認前に人が決めること | 18歳未満は別扱いである点を文言に入れなくてよいか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | 編集する場所 | `data/countries.ts` の `GBR_VISA_CLAIMS`（claim `U2`） |
 
-**承認チェックリスト（U2）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
+**承認チェックリスト（U2）** — ✅ **承認済み**（StarHunting1、2026-10-17。記録: `data/approvals.ts`）。以下は承認時の確認項目
 
-- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
-- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
-- [ ] 再利用条件を判断した（OGL v3.0：出典表示で可）
-- [ ] 金額・日付がある場合、確認日が文言に併記されている
-- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
-- [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
+- [x] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
+- [x] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
+- [x] 再利用条件を判断した（OGL v3.0：出典表示で可）
+- [x] 金額・日付がある場合、確認日が文言に併記されている
+- [x] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
+- [x] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
 ### U4（候補 U4）— 条件つき推奨
 
@@ -177,7 +185,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **推奨**：ページに「Depending on your nationality, you may need to get an electronic travel authorisation (ETA)」「You may need a visa」とある（ページ日付 2021-06-16）。 |
 | 画面上の表示場所 | Country page → Visa → Official information（United Kingdom · visa.official） |
-| 現在の状態 | unverified（承認記録なし） |
+| 現在の状態 | verified（承認: StarHunting1、2026-10-17、2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/check-uk-visa） |
 | 対象（国籍） | すべての申請者（国籍で要否が異なる） |
 | 対象（滞在期間・コース） | —（渡航前の確認） |
 | 対象（ビザ区分） | ビザ／電子渡航認証（ETA） |
@@ -185,14 +193,14 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 承認前に人が決めること | OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | 編集する場所 | `data/countries.ts` の `GBR_VISA_CLAIMS`（claim `U6`） |
 
-**承認チェックリスト（U6）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
+**承認チェックリスト（U6）** — ✅ **承認済み**（StarHunting1、2026-10-17。記録: `data/approvals.ts`）。以下は承認時の確認項目
 
-- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
-- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
-- [ ] 再利用条件を判断した（OGL v3.0：出典表示で可）
-- [ ] 金額・日付がある場合、確認日が文言に併記されている
-- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
-- [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
+- [x] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
+- [x] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
+- [x] 再利用条件を判断した（OGL v3.0：出典表示で可）
+- [x] 金額・日付がある場合、確認日が文言に併記されている
+- [x] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
+- [x] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
 ### U3（候補 U3）— 推奨
 
@@ -206,7 +214,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **推奨**：「It costs £228 for a Short-term study visa」と一致（ページ更新 2025-02-06）。金額は変わりうるため確認日を併記。 |
 | 画面上の表示場所 | Country page → Visa → Points to note（United Kingdom · visa.notes） |
-| 現在の状態 | unverified（承認記録なし） |
+| 現在の状態 | verified（承認: StarHunting1、2026-10-17、2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/visa-to-study-english） |
 | 対象（国籍） | 短期学習ビザの申請者 |
 | 対象（滞在期間・コース） | 6か月超〜11か月の英語コース |
 | 対象（ビザ区分） | 短期学習ビザ |
@@ -214,14 +222,14 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 承認前に人が決めること | 金額は変わりうる。確認日つきで掲載することでよいか（承認後も陳腐化するので、再確認の期限を決める）。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | 編集する場所 | `data/countries.ts` の `GBR_NOTES_CLAIMS`（claim `U3`） |
 
-**承認チェックリスト（U3）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
+**承認チェックリスト（U3）** — ✅ **承認済み**（StarHunting1、2026-10-17。記録: `data/approvals.ts`）。以下は承認時の確認項目
 
-- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
-- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
-- [ ] 再利用条件を判断した（OGL v3.0：出典表示で可）
-- [ ] 金額・日付がある場合、確認日が文言に併記されている
-- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
-- [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
+- [x] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
+- [x] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
+- [x] 再利用条件を判断した（OGL v3.0：出典表示で可）
+- [x] 金額・日付がある場合、確認日が文言に併記されている
+- [x] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
+- [x] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
 ### U5a（候補 U5）— 条件つき推奨
 
@@ -264,7 +272,7 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 利用条件（商用再利用） | Open Government Licence v3.0 – Contains public sector information licensed under the Open Government Licence v3.0 |
 | 推奨と理由 | **推奨**：同ページの「Cost for part of a year」の記載と一致。旧文言の「訪問者の滞在にはIHSがなく保険が必要」は読んだページにない推論のため削除。 |
 | 画面上の表示場所 | Manchester city page → Daily life → Healthcare（Manchester · living.healthcare） |
-| 現在の状態 | unverified（承認記録なし） |
+| 現在の状態 | verified（承認: StarHunting1、2026-10-17、2026-10-17 StarHunting1 によるこの5件（U1・U2・U3・U5b・U6）の明示的な承認指示。照合：GOV.UK の公式情報との照合結果（2026-10-15 の GitHub Actions ページ確認で記載との一致を確認済み、およびユーザーによる GOV.UK 公式情報の確認）。出典: https://www.gov.uk/healthcare-immigration-application/how-much-pay） |
 | 対象（国籍） | ビザ申請者（英国外／英国内で異なる） |
 | 対象（滞在期間・コース） | 6か月以内／6か月超〜1年未満 |
 | 対象（ビザ区分） | Student visa／短期学習ビザ |
@@ -272,14 +280,14 @@ _`npm run approvals` が `data/approvalSheet.ts` と各データから生成し�
 | 承認前に人が決めること | 同伴者・免除の規定に触れなくてよいか。OGL v3.0 の範囲で再利用可（出典表示）。追加の判断は不要。 |
 | 編集する場所 | `data/profiles/manchester.ts` の `UK_HEALTH_CLAIMS`（claim `U5b`） |
 
-**承認チェックリスト（U5b）** — 承認者が1件ずつ印を付けます。**全部に印が付くまで `verified` にしません。**
+**承認チェックリスト（U5b）** — ✅ **承認済み**（StarHunting1、2026-10-17。記録: `data/approvals.ts`）。以下は承認時の確認項目
 
-- [ ] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
-- [ ] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
-- [ ] 再利用条件を判断した（OGL v3.0：出典表示で可）
-- [ ] 金額・日付がある場合、確認日が文言に併記されている
-- [ ] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
-- [ ] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
+- [x] 公式出典のページを開き、公開予定の文言（日本語・English）の数値・語が一致している
+- [x] 対象（国籍・滞在期間・ビザ区分）と適用条件・例外が、文言と読み違えない形で書かれている
+- [x] 再利用条件を判断した（OGL v3.0：出典表示で可）
+- [x] 金額・日付がある場合、確認日が文言に併記されている
+- [x] 画面の表示場所と、Planner に自動計上されないこと（ビザ・保険）を確認した
+- [x] 承認の記録を書いた：`approval: { by: "承認者名", at: "YYYY-MM-DD", compared: "比べた内容" }`、`checkedAt`、`period`
 
 ### C1（候補 C1）— 条件つき推奨
 

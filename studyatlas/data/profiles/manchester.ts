@@ -1,5 +1,6 @@
 import { pending, type Claim, type CityProfile } from "../schema";
 import { claim, factFromClaims, source } from "../claims";
+import { approve } from "../approvals";
 import official from "../official/manchester";
 import { moneyFact, pointById, textFact } from "../official/toFact";
 // Ver.1.0 text below was written without a checked source, so it is kept as "unverified".
@@ -19,7 +20,7 @@ export const UK_HEALTH_CLAIMS: Claim[] = [
     text: { en: "It depends on the length of the visa and where you apply from: for 6 months or less you do not pay when applying from outside the UK (half the yearly cost when applying from inside the UK); for more than 6 months but less than a year you pay a full year.", ja: "金額はビザの期間と申請場所で変わります：6か月以内は英国外から申請する場合は不要（英国内から申請する場合は年額の半額）、6か月超〜1年未満は1年分です。" },
     conditions: { en: "Applies to the visa length actually granted; inside-UK applications at half rate (e.g. £388 for students); dependants and exemptions follow separate rules.", ja: "実際に付与されるビザの期間に対して適用。英国内からの申請は半額（学生は£388など）。同伴者・免除は別規定。" },
     reason: { en: "Matches the “Cost for part of a year” section of the same page. The earlier sentence that a visitor stay “has no IHS, so needs its own insurance” was removed: it was an inference, not a statement on the pages read.", ja: "同ページの「Cost for part of a year」の記載と一致。旧文言の「訪問者の滞在にはIHSがなく保険が必要」は読んだページにない推論のため削除。" } }),
-];
+].map(approve);
 const profile: CityProfile = {
   cost: {
     rent: pending({ en: "No official city-wide rent statistic yet (ONS source planned). See the Housing tab for University of Manchester hall prices.", ja: "市全体の公式家賃統計はまだありません（ONS を予定）。大学寮の料金は「住居」タブをご覧ください。" }),
@@ -45,6 +46,6 @@ const profile: CityProfile = {
     ] }, tuition: pending() },
   transport: { modes: { status: "unverified", note: carried, value: { en: "Metrolink tram, buses, rail.", ja: "メトロリンク（トラム）、バス、鉄道。" } },
     studentDiscount: textFact([P("man-anybus-28day-student")!, P("man-bus-allterms-student")!], { en: "Students aged 16–26: Bee AnyBus 28-day £63.30 (adult £87.40). Students at a Greater Manchester college/university: All Terms Bee Bus ticket £330 (1 Sep – 30 Jun).", ja: "16〜26歳の学生：Bee AnyBus 28日券 £63.30（大人 £87.40）。グレーター・マンチェスターの大学・カレッジの学生：All Terms Bee Bus 券 £330（9月1日〜6月30日）。" }) },
-  living: { studentLife: { status: "unverified", note: carried, value: { en: "Music, football and a large student population.", ja: "音楽やサッカー、学生が多い街。" } }, healthcare: factFromClaims(UK_HEALTH_CLAIMS, { en: "Paraphrased from the government page. On 2026-10-15 the amounts and periods below were compared with the page text by a GitHub Actions page check (runs 38787463398 and 38798253317); this is awaiting a person's approval, so the status stays unverified. Amounts change – check the official page. Not insurance advice.", ja: "政府ページの内容を言い換えたものです。2026-10-15に GitHub Actions のページ確認（run 38787463398・38798253317）で、下記の金額・期間がページの記載と一致することを確認しましたが、人の承認待ちのため未確認のままです。金額は変更されるため公式ページで確認してください。保険の助言ではありません。" }), sim: pending(), banking: pending(), studentFacilities: pending() },
+  living: { studentLife: { status: "unverified", note: carried, value: { en: "Music, football and a large student population.", ja: "音楽やサッカー、学生が多い街。" } }, healthcare: factFromClaims(UK_HEALTH_CLAIMS, { en: "Paraphrased from the government page. On 2026-10-15 the amounts and periods below were compared with the page text by a GitHub Actions page check (runs 38787463398 and 38798253317); each statement shows its own status: the statement on the amount by visa length and place of application was approved by a person (data/approvals.ts); the statement on the surcharge and NHS access awaits approval, so the section as a whole stays unverified. Amounts change – check the official page. Not insurance advice.", ja: "政府ページの内容を言い換えたものです。2026-10-15に GitHub Actions のページ確認（run 38787463398・38798253317）で、下記の金額・期間がページの記載と一致することを確認しましたが、記述ごとに確認状況を表示しています。ビザの期間・申請場所による金額の記述は人が承認済み（data/approvals.ts）、医療付加金とNHS利用の記述は承認待ちのため、この項目全体は未確認のままです。金額は変更されるため公式ページで確認してください。保険の助言ではありません。" }), sim: pending(), banking: pending(), studentFacilities: pending() },
 };
 export default profile;
