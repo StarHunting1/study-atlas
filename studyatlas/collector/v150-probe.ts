@@ -40,23 +40,22 @@ async function ons() {
   log("ONS_ROWS(last per area)", [...byKey.values()].join("\n"));
   for (const s of ["Cover sheet", "Notes"]) if (wb.sheets[s]) { const t: string[] = []; for await (const r of sheetRows(wb, s)) for (const v of Object.values(r.cells)) if (typeof v === "string") t.push(v); log(`SHEET ${s}:`, t.join(" ¦ ").slice(0, 3500)); }
 }
-const PAGES = [
-  "https://www.kaplaninternational.com/language-schools/canada/toronto", "https://www.kaplaninternational.com/language-schools/united-kingdom/london", "https://www.kaplaninternational.com/contact-us/form",
-  "https://www.stgiles-international.com/english-language-schools/london-central/", "https://www.stgiles-international.com/english-language-schools/london-central/fees/",
-  "https://francesking.com/school-of-english-london/", "https://francesking.com/school-of-english-london/course-prices/", "https://francesking.com/contact/",
-  "https://www.languagescanada.ca/sitemap.xml", "https://www.languagescanada.ca/en/listing-directory/students/kaplan-international-languages-toronto-1",
-];
+const PAGES = ["https://www.languagescanada.ca/sitemaps/page.xml"];
+const TEXT = ["https://www.kaplaninternational.com/language-schools/canada/toronto"];
 async function pages() {
   for (const u of PAGES) {
-    try { const rb = await robotsFor(u); if (!rb.allowed) { log("PAGE", u, "robots disallow"); continue; }
-      const r = await fetchText(u); const title = /<title[^>]*>([^<]*)/i.exec(r.body)?.[1]?.trim();
-      const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, "\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
-      const idx = text.map((l, k) => (/M5E ?1Z4|WC1A|WC1B|WC2|[A-Z]{1,2}\d{1,2}[A-Z]? ?\d[A-Z]{2}\b|Wellington|Yonge|Front St|British Council|English UK|Languages Canada|accredit|per week|£|fee/i.test(l) && l.length < 300 ? k : -1)).filter((k) => k >= 0).slice(0, 18);
-      const lines = [...new Set(idx.flatMap((k) => [text[k - 1], text[k], text[k + 1]].filter(Boolean)))].slice(0, 40);
-      const locs = u.endsWith("sitemap.xml") ? r.body.slice(0, 400) + "\n" + [...r.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]).filter((x) => /kaplan|ilac|toronto|london/i.test(x)).slice(0, 30).join("\n   ") : "";
-      log("PAGE", u, r.status, "|", title, "\n   " + lines.join("\n   "), locs ? "\n   LOCS " + locs : "");
-    } catch (e) { log("PAGE", u, "ERR", String(e)); }
-    await sleep(1200);
+    const rb = await robotsFor(u); if (!rb.allowed) { log("PAGE", u, "robots disallow"); continue; }
+    const r = await fetchText(u); const locs = [...r.body.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
+    log("SITEMAP", u, r.status, "locs", locs.length, "\n   " + locs.filter((x) => /listing-directory\/students\/.*(toronto|kaplan|ilac|ef-|english-in-canada|oxford|cic|ils|sprach)/i.test(x)).join("\n   "));
+    await sleep(1500);
+  }
+  for (const u of TEXT) {
+    const rb = await robotsFor(u); if (!rb.allowed) continue;
+    const r = await fetchText(u);
+    const text = r.body.replace(/<(script|style)[\s\S]*?<\/\1>/gi, " ").replace(/<[^>]+>/g, "\n").replace(/&amp;/g, "&").replace(/&nbsp;/g, " ").split("\n").map((l) => l.replace(/\s+/g, " ").trim()).filter(Boolean);
+    const k = text.findIndex((l) => /M5E ?1Z4/.test(l)); log("KAPLAN-TORONTO context:", JSON.stringify(text.slice(Math.max(0, k - 8), k + 3)));
+    const raw = r.body; const m = /"streetAddress"\s*:\s*"([^"]+)"|addressLocality[^}]{0,200}/i.exec(raw); log("JSONLD", m ? m[0].slice(0, 300) : "none");
+    const m2 = /M5E ?1Z4/.exec(raw); log("RAW", m2 ? raw.slice(Math.max(0, m2.index - 300), m2.index + 60).replace(/\s+/g, " ") : "none");
   }
 }
 (async () => { await pages().catch((e) => log("FAIL", String(e))); })();

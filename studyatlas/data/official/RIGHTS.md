@@ -15,6 +15,8 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 1 full |
 | Met Office – historical monthly station data (Ringway) (`metoffice-station-data`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | 1 full |
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |
+| Toronto Transit Commission (TTC) – fares and passes (`ttc-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
+| Transport for London (TfL) – fares and discounts (`tfl-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | GOV.UK (Content API) (`govuk-content`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
 | Open Government Canada (CKAN API) (`canada-open-gov`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
 | Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver) (`language-school-fees`) | **needs-review** | link-only | page-check-only | manual-link | 2026-10-15 | yes | — |
@@ -141,6 +143,26 @@ What each publisher's published terms permit, how the data may be accessed, and 
   - https://www.ubc.ca/site/legal.html (2026-10-14) — Terms of use: reserved rights, limited licence, robots clause
   - https://www.ubc.ca/robots.txt (2026-10-14) — crawl rules
   - https://vancouver.housing.ubc.ca/robots.txt (2026-10-14) — crawl rules (housing site)
+
+### Toronto Transit Commission (TTC) – fares and passes — `ttc-fares`
+
+- reuseStatus: **unknown** · collector: **blocked** · access: manual-link · last reviewed: never
+- source: https://www.ttc.ca/fares-and-passes
+- terms / licence: none published
+- restrictions: none recorded
+- review notes: Ver.1.5.0: the fares page was opened once by the GitHub Actions probe on 2026-10-17 (robots.txt allowed, HTTP 200) to confirm that the link works. The TTC's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read the page. Only a link and our own wording about who should check what are shown.
+- pages read:
+  - none yet
+
+### Transport for London (TfL) – fares and discounts — `tfl-fares`
+
+- reuseStatus: **unknown** · collector: **blocked** · access: manual-link · last reviewed: never
+- source: https://tfl.gov.uk/fares
+- terms / licence: none published
+- restrictions: none recorded
+- review notes: Ver.1.5.0: tfl.gov.uk answered the GitHub Actions probe's automated requests (2026-10-17, fares pages) with HTTP 403. The pages were therefore not read, not retried and no workaround was attempted. TfL's terms and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not request the site. Only a link and our own wording about who should check what are shown.
+- pages read:
+  - none yet
 
 ### GOV.UK (Content API) — `govuk-content`
 

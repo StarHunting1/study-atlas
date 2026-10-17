@@ -121,9 +121,9 @@ export function reconcileCollected(records: Record<string, CollectedRecord | und
       chk("same value", rec.value.number === cand.value!.amount, `${rec.value.number} vs ${cand.value!.amount}`),
       chk("same unit", rec.value.currency === cand.value!.currency && rec.value.unit === cand.value!.per, `${rec.value.currency}/${rec.value.unit}`),
       chk("same period", rec.period === period, `${rec.period} vs ${period}`),
-      chk("same city", rec.cityId === cand.cityId, rec.cityId),
+      chk("same city", rec.cityId === cand.cityId, String(rec.cityId)),
       chk("same licence as the rights record", rec.licence === rightsOfSource(cand.sourceId).licence, `${rec.licence}`),
-      chk("evidence quote matches", cand.sourceId === "ons-private-rents" ? rec.evidence.quote === cand.evidence[0].quote : rec.evidence.quote === cand.evidence[0].quote, rec.evidence.quote),
+      chk("evidence quote matches", rec.evidence.quote === cand.evidence[0].quote, String(rec.evidence.quote)),
       chk("the collector never verifies (record is unverified)", rec.status === "unverified", rec.status),
     ] };
   });

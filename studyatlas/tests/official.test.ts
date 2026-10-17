@@ -131,7 +131,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
   await t("collecting the same (fixture) responses twice: first run adds records, second run finds 0 changes", async () => {
     const first = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true });
     const ids = Object.keys(first.next.records);
-    assert.equal(ids.filter((i) => i.startsWith("page:")).length, 24); assert.ok(!ids.some((i) => i.startsWith("page:translink")), "no TransLink page is checked: the rights review blocks it"); assert.equal(ids.filter((i) => i.startsWith("statcan-cmhc-rents:")).length, 4); assert.equal(ids.filter((i) => i.startsWith("eccc-climate-normals:")).length, 4);
+    assert.equal(ids.filter((i) => i.startsWith("page:")).length, 24); assert.ok(!ids.some((i) => i.startsWith("page:translink")), "no TransLink page is checked: the rights review blocks it"); assert.equal(ids.filter((i) => i.startsWith("statcan-cmhc-rents:")).length, 8); assert.equal(ids.filter((i) => i.startsWith("eccc-climate-normals:")).length, 4);
     const second = await collect({ ai: false, fixtures: true, now: "2026-10-14T06:00:00.000Z", prev: first.next, force: true });
     assert.equal(second.changes.length, 0); assert.equal(JSON.stringify(second.next.records), JSON.stringify(first.next.records)); // retrieval times untouched
     assert.ok(Object.values(first.next.records).filter((r) => r.sourceId.startsWith("page:")).every((r) => r.value.text === "found"));

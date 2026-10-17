@@ -48,4 +48,10 @@ export const officialSources: OfficialSource[] = [
   { id: "ubc-housing-fees", publisher: "UBC Student Housing and Community Services", name: { en: "Residence fees 2026/27 (reviewed, not used)", ja: "寮料金 2026/27（調査済み・掲載せず）" }, country: "CAN", cityIds: ["vancouver"], topic: "housing", method: "page",
     pages: ["https://vancouver.housing.ubc.ca/applications/fees-payments/", "https://vancouver.housing.ubc.ca/applications/fees-payments/marine-drive/", "https://vancouver.housing.ubc.ca/applications/fees-payments/place-vanier/"], cadenceDays: 60,
   },
+  { id: "ttc-fares", publisher: "Toronto Transit Commission (TTC)", name: { en: "Fares and passes (link only)", ja: "運賃とパス（リンクのみ）" }, country: "CAN", cityIds: ["toronto"], topic: "transport", method: "page",
+    pages: ["https://www.ttc.ca/fares-and-passes"], cadenceDays: 60,
+  },
+  { id: "tfl-fares", publisher: "Transport for London (TfL)", name: { en: "Fares and discounts (link only)", ja: "運賃と割引（リンクのみ）" }, country: "GBR", cityIds: ["london"], topic: "transport", method: "page",
+    pages: ["https://tfl.gov.uk/fares"], cadenceDays: 60,
+  },
 ];

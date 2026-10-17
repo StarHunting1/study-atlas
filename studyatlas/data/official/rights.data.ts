@@ -121,6 +121,24 @@ export const RIGHTS: Record<string, Rights> = {
     },
     reviewed: [page("https://www.ons.gov.uk/help/terms-conditions", "ONS website terms: Crown copyright, OGL, exemptions (full)"), page("https://www.ons.gov.uk/help/fairusepolicy", "Fair use policy, last updated 30 April 2026 (full)"), page("https://developer.ons.gov.uk/bots/", "Guide to rate limiting and bot development (full)"), page("https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics", "dataset page: monthly xlsx editions"), page("https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003", "Manchester page: the figures the workbook was compared with (August 2026: £1,373)"), page("https://www.ons.gov.uk/robots.txt", "HTTP 404 (no crawl rules)")],
   },
+  "ttc-fares": {
+    sourceName: "Toronto Transit Commission (TTC) – fares and passes", sourceUrl: "https://www.ttc.ca/fares-and-passes", licenseUrl: null,
+    reuseStatus: "unknown", accessMethod: "manual-link", automation: "blocked", lastReviewedAt: null, expertReview: false, restrictions: [], display: "link-only",
+    reviewNotes: {
+      en: "Ver.1.5.0: the fares page was opened once by the GitHub Actions probe on 2026-10-17 (robots.txt allowed, HTTP 200) to confirm that the link works. The TTC's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read the page. Only a link and our own wording about who should check what are shown.",
+      ja: "Ver.1.5.0：リンクが有効かを確かめるため、2026-10-17にGitHub Actionsのプローブが運賃ページを1回だけ開きました（robots.txt許可、HTTP 200）。TTCの利用規約や運賃に関するオープンデータのライセンスは確認していないため、再利用の可否は不明です。金額・表・文章は転載せず、収集処理もこのページを読みません。リンクと、StudyAtlas自身による確認事項の説明だけを表示します。",
+    },
+    reviewed: [],
+  },
+  "tfl-fares": {
+    sourceName: "Transport for London (TfL) – fares and discounts", sourceUrl: "https://tfl.gov.uk/fares", licenseUrl: null,
+    reuseStatus: "unknown", accessMethod: "manual-link", automation: "blocked", lastReviewedAt: null, expertReview: false, restrictions: [],  display: "link-only",
+    reviewNotes: {
+      en: "Ver.1.5.0: tfl.gov.uk answered the GitHub Actions probe's automated requests (2026-10-17, fares pages) with HTTP 403. The pages were therefore not read, not retried and no workaround was attempted. TfL's terms and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not request the site. Only a link and our own wording about who should check what are shown.",
+      ja: "Ver.1.5.0：tfl.gov.uk は、GitHub Actionsのプローブによる自動アクセス（2026-10-17、運賃ページ）にHTTP 403を返しました。そのためページは読んでおらず、再試行も回避策も行っていません。TfLの利用規約や運賃に関するオープンデータのライセンスは確認していないため、再利用の可否は不明です。金額・表・文章は転載せず、収集処理もこのサイトにはアクセスしません。リンクと、StudyAtlas自身による確認事項の説明だけを表示します。",
+    },
+    reviewed: [],
+  },
   "language-school-fees": {
     sourceName: "Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver)", sourceUrl: "https://ihmanchester.com/prices-and-special-offers/", licenseUrl: null,
     reuseStatus: "needs-review", accessMethod: "manual-link", automation: "page-check-only", lastReviewedAt: "2026-10-15", expertReview: true, restrictions: ["no-reproduction-without-consent"], display: "link-only",
