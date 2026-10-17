@@ -5,6 +5,16 @@
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
 
+## 0m. Ver.1.5.1 の結果（Toronto・London 家賃の公式再照合と承認準備。承認・公開はまだ行っていません）
+
+| 項目 | 結果 |
+|---|---|
+| 公式データとの再照合 | Actions（run 39065320556、2026-10-17）で、Toronto の4値（C$1,491／1,761／2,045／2,294、2025、Toronto CMA 535）と London の1値（£2,332、2026年8月、London region E12000007）が**すべて公式データと一致**。対象年・地域区分・構造タイプ・単位も一致。 |
+| 出典・ライセンス | Toronto＝Statistics Canada 表34-10-0133-01（CMHC 賃貸市場調査）、CMHC ライセンス（商用利用可・取消可能・出典表示必須）。London＝ONS PIPR、OGL v3.0（商用利用可・出典表示）。`data/official/RIGHTS.md` に確認日 2026-10-17 を記録（検証状態とは別管理）。 |
+| 承認の仕組み | `RENT_APPROVALS`（`data/official/cityRents.ts`）に**数値ごと**の承認（承認者・日付・根拠・内容ダイジェスト）を書くと、その1値だけが verified で公開される。数値・出典・期間・定義を変更するとダイジェスト不一致でビルドが失敗。片方の都市・一部の数値の承認が他を公開することはない。承認記録は**空のまま**（未承認の金額は画面・比較に出ない）。手順は `data/APPROVAL_SHEET.md` §6。 |
+| 比較 | `rentBasis.ts` の全項目が一致したときだけ「同じ基準」。Toronto と Vancouver は承認後に一致、London（地域）と Manchester（自治体）は地域区分が違うため常に参考値のみ。順位付け・通貨換算なし。 |
+| 変更していないもの | Manchester / Vancouver の承認済みデータ・承認記録、Planner（Toronto・London に規則なし）、学校、交通、気候、地図、ビザ・医療 |
+
 ## 0l. Ver.1.5.0 の結果（Toronto・London のデータ拡充。家賃は承認待ちで数値は未掲載）
 
 | 項目 | 結果 |

@@ -35,8 +35,8 @@ t("student housing and the general rental market are separate rows: a university
 });
 t("the market-rent row never calls different statistics comparable (ONS vs CMHC: metric, source, currency, year all differ); only the very same statistic could be", () => {
   const keys = ["manchester", "vancouver"].map((i) => rentKey(city(i))); assert.equal(rentCmp(keys), "differ");
-  const m = (keys[0] as { point: import("@/data/official/types").DataPoint }).point; const same: Key[] = [{ kind: "point", point: m }, { kind: "point", point: { ...m, id: "x", cityId: "other" } }];
-  assert.equal(rentCmp(same), "same"); assert.equal(rentCmp([{ kind: "point", point: m }, { kind: "point", point: { ...m, id: "y", validFor: "2020" } }]), "differ");
+  const m = (keys[0] as { point: import("@/data/official/types").DataPoint }).point; const same: Key[] = [{ kind: "point", point: m }, { kind: "point", point: { ...m, id: "x" } }];
+  assert.equal(rentCmp(same), "same"); assert.equal(rentCmp([{ kind: "point", point: m }, { kind: "point", point: { ...m, id: "x2", cityId: "other" } }]), "differ", "a city whose rent basis is not recorded (rentBasis.ts) is never comparable (Ver.1.5.1)"); assert.equal(rentCmp([{ kind: "point", point: m }, { kind: "point", point: { ...m, id: "y", validFor: "2020" } }]), "differ");
   assert.equal(rentCmp([{ kind: "point", point: m }, { kind: "none" }]), "missing"); assert.equal(rentCmp([{ kind: "point", point: m }, { kind: "point", point: { ...m, id: "z", status: "unverified" } }]), "unverified");
   assert.notEqual(av(["manchester", "vancouver"], "climate"), "comparable");
 });

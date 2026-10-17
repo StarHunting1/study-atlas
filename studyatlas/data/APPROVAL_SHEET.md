@@ -575,3 +575,44 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 - [x] 承認の記録を書いた（2026-10-17、StarHunting1。`data/approvals.ts`）
 
 **Manchester**: 1991–2020 は取り込めていません（旧 1971–2000 のまま）。理由は `data/APPROVAL_CANDIDATES.md` の「気候データの承認候補」を参照。
+
+## 6. Toronto・London の家賃統計（Ver.1.5.1）: 照合済み・承認待ち（verified ではありません）
+
+公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。ここに書いてあるのは承認の**準備**だけです。承認記録（`RENT_APPROVALS`）が空の間、数値は画面にも比較にも出ず、どれも verified になりません。承認は**数値ごと**（Toronto 4件・London 1件）に別々にできます。
+
+| 項目 | 内容 |
+|---|---|
+| Toronto の出典 | Statistics Canada 表 34-10-0133-01（CMHC 賃貸市場調査）。地域メンバー125「Toronto, Ontario」＝国勢調査都市圏（CMA）コード535（geoLevel 503）。Toronto 市そのものではなく、より広い都市圏全体 |
+| Toronto の定義 | 構造タイプ3「Row and apartment structures of three units and over」の、間取り別の平均家賃（調査対象年2025、2025-12-17公表）。学生向け住居・語学学校の滞在先・留学生の平均ではない |
+| London の出典 | ONS Price Index of Private Rents（PIPR）月次価格統計、2026年9月16日版 Table 1。地域コード E12000007「London」＝イングランドの地域区分（グレーター・ロンドン）。区ごとの値ではなく地域全体の平均 |
+| London の定義 | 民間賃貸住宅すべて（新規契約と既存契約）の月額家賃の平均、2026年8月、1ポンド単位に丸め。ONSは「開発中の公式統計」としている |
+| ライセンス（Toronto） | CMHC Licence Agreement for the Use of Data：情報（および付加価値製品）の使用・複製・公表・配布・販売を許可（取消可能・世界的・無償）。**商用利用可**。情報は正確に複製し、出典表示（Source: CMHC, 製品名, 基準日。…as is basis with the permission of CMHC）が必須。Statistics Canada の表ページがこのCMHCライセンスを参照 |
+| ライセンス（London） | Open Government Licence v3.0：複製・公表・配布・改変・**商用利用可**。出典表示「Contains public sector information licensed under the Open Government Licence v3.0」。PIPRのデータセットページに「特に断りがない限りOGL v3.0」と明記 |
+| 再利用許諾の確認日 | 2026-10-17（`data/official/RIGHTS.md`。検証状態とは別の記録） |
+
+### 6.1 数値ごとの照合と承認の準備
+
+| 数値 | 公式（2026-10-17に取得） | サイトの候補 | 照合 | 比較の基準 | 承認の状態 | 承認で記録するダイジェスト |
+|---|---|---|---|---|---|---|
+| tor-cmhc-rent-bachelor | CMA 535 ・ 1,491 CAD/月 ・ 2025 | 1,491 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Bachelor units・2025 | **未承認**（非表示） | `4a79633baf6e7b89bdd7e14393229e1674567a418856ca355e824e5739eab8cf` |
+| tor-cmhc-rent-1br | CMA 535 ・ 1,761 CAD/月 ・ 2025 | 1,761 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・One bedroom units・2025 | **未承認**（非表示） | `abbbf002fa77176f0b4b2c9fc214de335c9faefd166c739b4fbf153f180185c1` |
+| tor-cmhc-rent-2br | CMA 535 ・ 2,045 CAD/月 ・ 2025 | 2,045 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Two bedroom units・2025 | **未承認**（非表示） | `5085d74860e41547259c36aeb9e6a911d5b64b6a444ba58427f0429c13f08381` |
+| tor-cmhc-rent-3br | CMA 535 ・ 2,294 CAD/月 ・ 2025 | 2,294 CAD/月 | 一致 | census metropolitan area・Row and apartment structures of three units and over・Three bedroom units・2025 | **未承認**（非表示） | `923365e8fe0775666ae8e0f82f996234670d48cdb7c8f912a37392859361fdb0` |
+| lon-ons-pipr-private-rent-region-month | E12000007 ・ 2,332 GBP/月 ・ 2026-08 | 2,332 GBP/月 | 一致 | region・all dwellings・all sizes・2026-08 | **未承認**（非表示） | `8122055734968c0c56c89125164f69d6ca1650924078dc93cb5710c026cdda09` |
+
+### 6.2 承認の手順（人が行う）
+
+1. 上の公式URL（Statistics Canada の表／ONS の PIPR データセットページ）を自分で開き、数値・地域・期間・単位が上表と一致することを確認する（Actions の機械照合は補助です）。
+2. CMHC ライセンスと OGL v3.0 の商用利用の許可、出典表示が画面に出る設定であることを確認する（再利用許諾が曖昧な場合は承認しないでください）。
+3. `data/official/cityRents.ts` の `RENT_APPROVALS` に、承認する数値だけを追加する（数値ごとに別のエントリ。他の都市・他の数値は公開されません）:
+   `"tor-cmhc-rent-1br": { approvedBy: "（名前）", approvedAt: "YYYY-MM-DD", basis: "（何を何と照合したか）", digest: "（上表のダイジェスト）" }`
+4. 数値・出典・期間・定義を後から変更すると、ダイジェストが一致せずビルドが失敗します（承認した内容と違うものは公開されません）。変更した場合は公式データと再照合して承認し直してください。
+5. 承認していない数値は、都市ページでは「承認待ち」の説明と公式リンクが残り、都市比較では「承認待ち（数値は未掲載）」と表示されます。Smart Planner には自動計上されません（Toronto・London には Planner の規則がありません）。
+
+### 6.3 承認チェックリスト
+
+- [ ] Toronto 4値（Bachelor 1,491／1BR 1,761／2BR 2,045／3BR 2,294 CAD/月、2025、CMA 535）を公式の表と照合した
+- [ ] London 1値（£2,332/月、2026年8月、London region E12000007、全住宅）を公式と照合した
+- [ ] CMHC ライセンス（商用利用可・出典表示必須・取消可能）と OGL v3.0 を確認した
+- [ ] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した
+- [ ] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）

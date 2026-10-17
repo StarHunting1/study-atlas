@@ -2,22 +2,28 @@ import type { CollectedRecord } from "../../collector/types";
 import { displayModeOf, rightsOfSource } from "./rights";
 import { officialSources } from "./sources";
 import type { DataPoint } from "./types";
-import type { RentApproval } from "./onsRent";
+import { sha256 } from "./rentDigest";
 /*
  * Public rent statistics for Toronto and London (Ver.1.5.0) – prepared, NOT published. Same rule as the Manchester ONS figure (onsRent.ts):
  *
  *   - The collector (collector/sources/statcan.ts, onsrent.ts) stores these as "unverified" candidates in data/collected/snapshot.json.
- *   - While TORONTO_RENT_APPROVAL / LONDON_RENT_APPROVAL is null the figures are NOT part of the official data: no card, no key figure, no number in
+ *   - A figure without its own entry in RENT_APPROVALS is NOT part of the official data: no card, no key figure, no number in
  *     the comparison. The city page and the comparison show the conditions and the official link instead.
- *   - A person who has compared the figures with the publisher's pages records the approval (name, date, what was compared) in a reviewed PR.
- *     Only then do the points exist, as "verified". The approval covers exactly this reference period and these values.
+ *   - A person who has compared a figure with the publisher's pages records the approval (name, date, what was compared, content digest) in a reviewed PR.
+ *     Only then does that point exist, as "verified". The approval covers exactly this reference period and these values; editing them breaks the digest and fails the build.
  *
  * What they are: whole-rental-market statistics. What they are not: student housing, language-school housing or an average for international students.
  * The two are NOT the same kind of statistic: Toronto is a CMHC survey average for a census metropolitan area (like Vancouver); London is the ONS
  * average for the whole London region (unlike Manchester, a single local authority). Reuse permission is recorded in rights.data.ts, apart from this approval.
  */
-export const TORONTO_RENT_APPROVAL: RentApproval | null = null;
-export const LONDON_RENT_APPROVAL: RentApproval | null = null;
+/**
+ * A person's approval of ONE rent figure. `digest` is the content digest (rentDigest) of the candidate the person compared: if the figure, unit, period,
+ * source, quote or definition is edited later, the approval no longer matches and loading the data fails. Approvals are per figure, so Toronto's four values and
+ * London's one value are approved (and can fail) independently, and approving one city never publishes the other.
+ * An empty record = nothing approved: nothing is shown and nothing is marked verified. (Print the digests with `npm run approvals`; they are listed in data/APPROVAL_SHEET.md.)
+ */
+export type RentApproval = { approvedBy: string; approvedAt: string; /** what the approver compared, e.g. "Statistics Canada table 34-10-0133-01 and the CMHC licence, 2026-10-20" */ basis: string; digest: string };
+export const RENT_APPROVALS: Record<string, RentApproval> = {};
 
 const TABLE = "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301";
 const PIPR = "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics";
@@ -36,7 +42,7 @@ export const CMHC_VALID_FOR = "2025 (latest reference year; released by Statisti
 
 export const TORONTO_RENT_CANDIDATES: Omit<DataPoint, "status" | "checkedAt">[] = TORONTO_RENTS.map((r): Omit<DataPoint, "status" | "checkedAt"> => ({
   id: torontoRentId(r.key), highlight: r.key === "1br", cityId: "toronto", topic: "housing", sourceId: "statcan-cmhc-rents", metric: `housing.marketRent.${r.key}`, collectedId: torontoCollectedId(r.key),
-  label: { en: `Average rent – ${r.en} (whole market)`, ja: `平均家賃 – ${r.ja}（市場全体）` }, value: { amount: r.amount, currency: "CAD", per: "month" }, audience: "renter",
+  label: { en: `Average rent – ${r.en} (whole market, Toronto metropolitan area)`, ja: `平均家賃 – ${r.ja}（市場全体・トロント都市圏）` }, value: { amount: r.amount, currency: "CAD", per: "month" }, audience: "renter",
   conditions: {
     en: "Average rent of all rented units of this size in row and apartment structures of three units and over, in the area named “Toronto, Ontario” in the Statistics Canada table (census metropolitan area, code 535: the whole Toronto metropolitan area, much wider than the City of Toronto). CMHC Rental Market Survey, reference year 2025 (the survey is taken in October). Whole rental market – not student housing, not language-school housing, not an average for international students, and not the asking rent of a newly listed unit.",
     ja: "Statistics Canadaの表で「Toronto, Ontario」とされる地域（国勢調査の都市圏、コード535：トロント市より大きく広いトロント都市圏全体）の、3戸以上の集合住宅・長屋における、この間取りの全賃貸住戸の平均家賃（CMHC 賃貸市場調査、調査対象年2025、調査は10月実施）。市場全体の値で、学生寮・語学学校の滞在先の料金・留学生の平均ではなく、新規募集物件の希望家賃でもありません。",
@@ -68,17 +74,33 @@ export const LONDON_RENT_CANDIDATE: Omit<DataPoint, "status" | "checkedAt"> = {
   note: { en: "Taken from the official ONS workbook. Rounded to the nearest £1; not seasonally adjusted. Manchester's figure is a single local authority, so the two are never put on the same footing.", ja: "ONS公式のワークブックから取得。1ポンド単位に丸め、季節調整なしです。マンチェスターの値は単一の自治体のもので、同じ基準としては扱いません。" },
 };
 
-function check(a: RentApproval) { if (!a.approvedBy.trim() || !/^\d{4}-\d{2}-\d{2}$/.test(a.approvedAt) || !a.basis.trim()) throw new Error("rent approval needs approvedBy, approvedAt (YYYY-MM-DD) and basis"); }
-export function torontoRentPoints(approval: RentApproval | null = TORONTO_RENT_APPROVAL): DataPoint[] {
-  if (!approval) return []; check(approval);
-  const failed = reconcileStatic().filter((c) => !c.ok); if (failed.length) throw new Error(`Toronto rent cannot be approved: ${failed.map((c) => c.name).join(", ")}`);
-  return TORONTO_RENT_CANDIDATES.map((c) => ({ ...c, status: "verified" as const, checkedAt: approval.approvedAt }));
+export type Candidate = Omit<DataPoint, "status" | "checkedAt">;
+/** Digest of what a person approves: the figure, its unit and period, the source and quote, the label and the statistical definition. Retrieval date and free notes are not part of it. */
+export function rentDigest(c: Candidate): string {
+  return sha256(JSON.stringify([c.id, c.cityId, c.topic, c.sourceId, c.metric, c.label, c.value, c.audience, c.conditions, c.validFor, c.evidence.map((e) => [e.url, e.publisher, e.section, e.quote, e.terms ?? null]), c.collectedId ?? null]));
 }
-export function londonRentPoints(approval: RentApproval | null = LONDON_RENT_APPROVAL): DataPoint[] {
-  if (!approval) return []; check(approval);
-  const failed = reconcileStatic().filter((c) => !c.ok); if (failed.length) throw new Error(`London rent cannot be approved: ${failed.map((c) => c.name).join(", ")}`);
-  return [{ ...LONDON_RENT_CANDIDATE, status: "verified", checkedAt: approval.approvedAt }];
+export const ALL_RENT_CANDIDATES: Candidate[] = [...TORONTO_RENT_CANDIDATES, LONDON_RENT_CANDIDATE];
+const ymd = /^\d{4}-\d{2}-\d{2}$/;
+/** Why an approval cannot be used for a candidate ("" = it can). */
+export function approvalProblem(c: Candidate, a: RentApproval | undefined): string {
+  if (!a) return "not approved";
+  if (!a.approvedBy?.trim() || !ymd.test(a.approvedAt) || !a.basis?.trim() || !a.digest?.trim()) return "an approval needs approvedBy, approvedAt (YYYY-MM-DD), basis and digest";
+  if (a.digest !== rentDigest(c)) return "the figure, unit, period, source or definition changed after it was approved (digest mismatch); compare it with the official source again and re-approve";
+  return "";
 }
+/** The points of the candidates a person has approved: each one individually, only when its own approval matches. Others stay out of the data. */
+export function approvedRentPoints(candidates: Candidate[], approvals: Record<string, RentApproval> = RENT_APPROVALS): DataPoint[] {
+  const known = new Set(ALL_RENT_CANDIDATES.map((c) => c.id)); const stray = Object.keys(approvals).filter((id) => !known.has(id));
+  if (stray.length) throw new Error(`rent approval for an unknown figure: ${stray.join(", ")}`);
+  const mine = candidates.filter((c) => approvals[c.id]); if (!mine.length) return [];
+  const bad = mine.map((c) => [c.id, approvalProblem(c, approvals[c.id])] as const).filter(([, p]) => p); if (bad.length) throw new Error(`rent approval rejected: ${bad.map(([id, p]) => `${id}: ${p}`).join("; ")}`);
+  const failed = reconcileStatic().filter((c) => !c.ok); if (failed.length) throw new Error(`rent cannot be approved: ${failed.map((c) => c.name).join(", ")}`);
+  return mine.map((c) => ({ ...c, status: "verified" as const, checkedAt: approvals[c.id].approvedAt }));
+}
+export const torontoRentPoints = (approvals: Record<string, RentApproval> = RENT_APPROVALS) => approvedRentPoints(TORONTO_RENT_CANDIDATES, approvals);
+export const londonRentPoints = (approvals: Record<string, RentApproval> = RENT_APPROVALS) => approvedRentPoints([LONDON_RENT_CANDIDATE], approvals);
+/** Candidates of a city that are still waiting for an approval (their numbers are not shown). */
+export const pendingRentIds = (cityId: "toronto" | "london", approvals: Record<string, RentApproval> = RENT_APPROVALS) => ALL_RENT_CANDIDATES.filter((c) => c.cityId === cityId && !approvals[c.id]).map((c) => c.id);
 
 export type Check = { name: string; ok: boolean; detail: string };
 const chk = (name: string, ok: boolean, detail: string): Check => ({ name, ok, detail });
