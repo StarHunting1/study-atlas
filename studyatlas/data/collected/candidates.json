@@ -1,66 +1,70 @@
 {
-  "generatedAt": "2026-10-14T15:27:40.929Z",
+  "generatedAt": "2026-10-19T17:50:48.564Z",
   "changes": [
     {
       "type": "added",
-      "id": "ons-private-rents:manchester:rental-price",
+      "id": "page:mel-abs-census-median-weekly-rent",
       "record": {
-        "id": "ons-private-rents:manchester:rental-price",
-        "sourceId": "ons-private-rents",
-        "country": "GBR",
-        "cityId": "manchester",
-        "field": "housing.privateRentAverage",
+        "id": "page:mel-abs-census-median-weekly-rent",
+        "sourceId": "page:abs-census-rent",
+        "country": "AUS",
+        "cityId": "melbourne",
+        "field": "official.mel-abs-census-median-weekly-rent",
         "label": {
-          "en": "Average monthly private rent, all dwellings (Manchester, ONS PIPR)",
-          "ja": "平均月額民間家賃・全住宅（Manchester、ONS PIPR）"
+          "en": "Median weekly rent – households that rent (2021 Census, Greater Melbourne) — still on the official page",
+          "ja": "週あたり家賃の中央値・賃貸世帯（2021年国勢調査・グレーター・メルボルン） — 公式ページに掲載あり"
         },
         "value": {
-          "number": 1373,
-          "currency": "GBP",
-          "unit": "month",
-          "text": "£1,373 per month, mean rent of all privately rented dwellings in Manchester local authority (E08000003), 2026-08; new and existing tenancies. Not university halls or student housing."
+          "text": "found",
+          "number": 390,
+          "currency": "AUD",
+          "unit": "week"
         },
-        "period": "2026-08",
-        "sourceUrl": "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics",
-        "apiUrl": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/16september2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
-        "retrievedAt": "2026-10-14T15:27:40.929Z",
-        "sourcePublishedAt": "2026-09-16",
-        "sourceUpdatedAt": "2026-09-16",
+        "period": "2021 (ABS 2021 Census; latest Census release shown on the QuickStats page)",
+        "sourceUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL",
+        "apiUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL",
+        "retrievedAt": "2026-10-19T17:50:48.564Z",
         "evidence": {
-          "path": "Table 1 row 34163, column H (Rental price)",
-          "quote": "Manchester E08000003 2026-08-01 Rental price 1373"
+          "path": "page text (value-found)",
+          "quote": "Greater Melbourne; Median weekly rent; 2021: 390"
         },
-        "contentHash": "20880743318b70db",
-        "licence": "Open Government Licence v3.0 (ONS website terms)",
+        "contentHash": "1ce9a9bb179f7e19",
+        "licence": "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
         "status": "unverified",
-        "review": "standard",
-        "meta": {
-          "areaCode": "E08000003",
-          "areaName": "Manchester",
-          "region": "North West",
-          "edition": "2026-09-16",
-          "workbook": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/16september2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
-          "attribution": "Source: Office for National Statistics licensed under the Open Government Licence v3.0.",
-          "scope": {
-            "en": "Mean monthly private rent of ALL privately rented dwellings in Manchester local authority (new and existing tenancies). Not university halls, not student housing, not an average for international students, not by bedroom or property type.",
-            "ja": "マンチェスター市（地方自治体）の民間賃貸住宅すべての月額家賃の平均（新規契約と既存契約）。大学寮・学生向け住居・留学生の平均ではなく、寝室数や物件タイプ別でもありません。"
-          },
-          "unit": "GBP per month, rounded to the nearest £1",
-          "statisticalStatus": "official statistics in development",
-          "manchesterMonthsInWorkbook": 140,
-          "checks": {
-            "valueIsWholePounds": true,
-            "monthIsFirstOfMonth": true,
-            "areaCodeMatchesName": true,
-            "publishedDateCrossChecked": true,
-            "unitConfirmedInNotes": true,
-            "definitionConfirmedInCover": true,
-            "indexBaseConfirmedInNotes": true,
-            "licenceRecorded": true
-          },
-          "unconfirmed": [],
-          "fairUse": "ONS fair use policy (last updated 30 April 2026): bots must follow the technical guidance and identify themselves with a contact in the User-Agent."
-        }
+        "review": "standard"
+      }
+    },
+    {
+      "type": "added",
+      "id": "page:syd-abs-census-median-weekly-rent",
+      "record": {
+        "id": "page:syd-abs-census-median-weekly-rent",
+        "sourceId": "page:abs-census-rent",
+        "country": "AUS",
+        "cityId": "sydney",
+        "field": "official.syd-abs-census-median-weekly-rent",
+        "label": {
+          "en": "Median weekly rent – households that rent (2021 Census, Greater Sydney) — still on the official page",
+          "ja": "週あたり家賃の中央値・賃貸世帯（2021年国勢調査・グレーター・シドニー） — 公式ページに掲載あり"
+        },
+        "value": {
+          "text": "found",
+          "number": 470,
+          "currency": "AUD",
+          "unit": "week"
+        },
+        "period": "2021 (ABS 2021 Census; latest Census release shown on the QuickStats page)",
+        "sourceUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD",
+        "apiUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD",
+        "retrievedAt": "2026-10-19T17:50:48.564Z",
+        "evidence": {
+          "path": "page text (value-found)",
+          "quote": "Greater Sydney; Median weekly rent; 2021: 470"
+        },
+        "contentHash": "c48e234bfa9bdb6c",
+        "licence": "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
+        "status": "unverified",
+        "review": "standard"
       }
     }
   ]
