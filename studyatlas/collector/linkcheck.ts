@@ -15,11 +15,14 @@ import { rightsOfSource } from "../data/official/rights";
 import { healthLinks, visaLinks } from "../data/visa";
 import { TRANSPORT_GUIDES } from "../data/official/transportGuides";
 import { makeRobots } from "./robots";
+import { blockedHostSet, decideAccess, guardedFetch, hostKey as guardHost } from "./guard";
 import { fetchText, htmlToText, sleep, USER_AGENT } from "./util";
 
-export type LinkTarget = { url: string; where: string[]; expect?: string; skip?: string };
-export type Verdict = "ok" | "redirected" | "access-denied" | "broken" | "client-error" | "server-error" | "unreachable" | "robots-disallowed" | "skipped";
-export type LinkResult = { url: string; where: string[]; verdict: Verdict; status: number | null; finalUrl?: string; title?: string; contentOk: boolean | null; note?: string };
+/** mode: how the link may be checked, decided from the rights records BEFORE any request: html (page body, words checked) · status-only (HTTP status, body not read) · skip (forbidden or unconfirmed: no request at all) */
+export type LinkMode = "html" | "status-only" | "skip";
+export type LinkTarget = { url: string; where: string[]; expect?: string; skip?: string; mode: LinkMode; skipVerdict?: "skipped" | "unconfirmed" };
+export type Verdict = "ok" | "redirected" | "access-denied" | "broken" | "client-error" | "server-error" | "unreachable" | "robots-disallowed" | "skipped" | "unconfirmed";
+export type LinkResult = { url: string; where: string[]; verdict: Verdict; status: number | null; finalUrl?: string; title?: string; contentOk: boolean | null; note?: string; mode?: LinkMode; checkedAt?: string };
 
 const CITY_IDS = ["manchester", "vancouver", "toronto", "london", "sydney", "melbourne"] as const;
 /** Words the page must contain for the link to count as "the right page". Matched case-insensitively against the page text. */
@@ -47,22 +50,23 @@ const EXPECT: [RegExp, string][] = [
 ];
 export const expectFor = (url: string): string | undefined => EXPECT.find(([re]) => re.test(url))?.[1];
 
-/** Hosts we never request automatically: the rights record blocks automation, or the publisher's terms restrict it. */
-export function blockedHosts(): Set<string> {
-  const h = new Set<string>(["ubc.ca", "translink.ca"]);
-  // the publisher's own site (rights.sourceUrl) is off limits; a third-party catalogue that merely lists the dataset (data.gov.uk) is not
-  for (const s of officialSources) { const r = rightsOfSource(s.id); if (r.automation === "blocked") h.add(new URL(r.sourceUrl).hostname.replace(/^www\d?\./, "")); }
-  return h;
+/** Hosts we never request: a rights record blocks automation (see guard.ts; the publisher's own site only). */
+export function blockedHosts(): Set<string> { return blockedHostSet(); }
+const hostKey = guardHost;
+
+/** Decided from the rights records, before any request. Forbidden or unconfirmed links are listed with the reason and never requested. */
+export function modeOf(url: string): { mode: LinkMode; skip?: string; skipVerdict?: "skipped" | "unconfirmed" } {
+  if (decideAccess(url, "html").allow) return { mode: "html" };
+  const s = decideAccess(url, "status-only"); if (s.allow) return { mode: "status-only" };
+  return { mode: "skip", skip: `rights: ${s.reason}`, skipVerdict: s.state === "unconfirmed" ? "unconfirmed" : "skipped" };
 }
-const hostKey = (u: string) => new URL(u).hostname.replace(/^www\d?\./, "");
 
 export function linkTargets(): LinkTarget[] {
-  const map = new Map<string, LinkTarget>(); const blocked = blockedHosts();
+  const map = new Map<string, LinkTarget>();
   const add = (url: string | undefined, where: string) => {
     if (!url || !/^https:\/\//.test(url)) return; const key = url.replace(/#.*$/, "");
     const cur = map.get(key); if (cur) { if (!cur.where.includes(where)) cur.where.push(where); return; }
-    const skip = [...blocked].some((b) => hostKey(key) === b || hostKey(key).endsWith("." + b)) ? "rights/terms: automated requests not allowed" : undefined;
-    map.set(key, { url: key, where: [where], expect: expectFor(key), skip });
+    map.set(key, { url: key, where: [where], expect: expectFor(key), ...modeOf(key) });
   };
   for (const code of ["GBR", "CAN", "AUS"]) { for (const l of visaLinks[code] ?? []) add(l.link.value, `visa:${code}`); for (const l of healthLinks[code] ?? []) add(l.link.value, `health:${code}`); }
   for (const g of TRANSPORT_GUIDES) for (const l of g.links) add(l.url, `guide:${g.cityId}`);
@@ -98,21 +102,24 @@ export function classify(status: number, requestedUrl: string, finalUrl: string)
 export const isVerifiedLink = (r: LinkResult) => r.verdict === "ok" && r.contentOk === true;
 const titleOf = (html: string) => htmlToText(/<title[^>]*>([\s\S]*?)<\/title>/i.exec(html)?.[1] ?? "").slice(0, 120);
 
-export async function checkLinks(targets = linkTargets(), pauseMs = 1500): Promise<LinkResult[]> {
-  const robots = makeRobots((u) => fetchText(u, { accept: "text/plain", retries: 0 }), USER_AGENT); const out: LinkResult[] = [];
+export async function checkLinks(targets = linkTargets(), pauseMs = 1500, io: { transport?: (u: string, init?: RequestInit) => Promise<Response>; robotsFetch?: (u: string) => Promise<{ status: number; body: string }> } = {}): Promise<LinkResult[]> {
+  const robots = makeRobots(io.robotsFetch ?? ((u) => fetchText(u, { accept: "text/plain", retries: 0 })), USER_AGENT); const out: LinkResult[] = []; const checkedAt = new Date().toISOString().slice(0, 10);
   for (const t of targets) {
-    if (t.skip) { out.push({ url: t.url, where: t.where, verdict: "skipped", status: null, contentOk: null, note: t.skip }); continue; }
+    // re-decided here as well: a stale or hand-built target can never reach the network if the rights records say no
+    const m = t.mode === "skip" ? t : { ...t, ...modeOf(t.url) };
+    if (m.mode === "skip") { out.push({ url: t.url, where: t.where, verdict: m.skipVerdict ?? "skipped", status: null, contentOk: null, note: m.skip ?? "rights: not requested", mode: "skip", checkedAt }); continue; }
     try {
-      const rb = await robots(t.url); if (!rb.allowed) { out.push({ url: t.url, where: t.where, verdict: "robots-disallowed", status: null, contentOk: null, note: rb.reason }); continue; }
+      const rb = await robots(t.url); if (!rb.allowed) { out.push({ url: t.url, where: t.where, verdict: "robots-disallowed", status: null, contentOk: null, note: rb.reason, mode: m.mode, checkedAt }); continue; }
       await sleep(Math.max(pauseMs, (rb.crawlDelay ?? 0) * 1000));
       const ctrl = new AbortController(); const timer = setTimeout(() => ctrl.abort(), 20000);
       try {
-        const res = await fetch(t.url, { headers: { "User-Agent": USER_AGENT, Accept: "text/html,*/*;q=0.8", "Accept-Language": "en" }, signal: ctrl.signal, redirect: "follow" });
-        const body = res.status >= 200 && res.status < 300 ? (await res.text()).slice(0, 600_000) : ""; const { verdict, note } = classify(res.status, t.url, res.url);
-        const text = htmlToText(body).toLowerCase(); const want = t.expect?.split("|"); const contentOk = verdict === "ok" ? (want ? want.some((w) => text.includes(w)) : null) : null;
-        out.push({ url: t.url, where: t.where, verdict, status: res.status, finalUrl: res.url !== t.url ? res.url : undefined, title: titleOf(body) || undefined, contentOk, note: contentOk === false ? `expected words not found: ${t.expect}` : note });
+        const res = await guardedFetch(t.url, m.mode === "html" ? "html" : "status-only", { headers: { "User-Agent": USER_AGENT, Accept: "text/html,*/*;q=0.8", "Accept-Language": "en" }, signal: ctrl.signal, redirect: "follow" }, { transport: io.transport, paceMs: pauseMs ? undefined : 0 });
+        const readBody = m.mode === "html" && res.status >= 200 && res.status < 300; const body = readBody ? (await res.text()).slice(0, 600_000) : ""; if (!readBody) await res.body?.cancel().catch(() => undefined);
+        const { verdict, note } = classify(res.status, t.url, res.url);
+        const text = htmlToText(body).toLowerCase(); const want = t.expect?.split("|"); const contentOk = verdict === "ok" && readBody ? (want ? want.some((w) => text.includes(w)) : null) : null;
+        out.push({ url: t.url, where: t.where, verdict, status: res.status, finalUrl: res.url !== t.url ? res.url : undefined, title: titleOf(body) || undefined, contentOk, note: contentOk === false ? `expected words not found: ${t.expect}` : m.mode === "status-only" && verdict === "ok" ? "status only: page body not read (rights)" : note, mode: m.mode, checkedAt });
       } finally { clearTimeout(timer); }
-    } catch (e) { const err = e as Error & { cause?: Error }; out.push({ url: t.url, where: t.where, verdict: "unreachable", status: null, contentOk: null, note: `${err.name}: ${err.cause?.message ?? err.message}`.slice(0, 160) }); }
+    } catch (e) { const err = e as Error & { cause?: Error }; out.push({ url: t.url, where: t.where, verdict: "unreachable", status: null, contentOk: null, note: `${err.name}: ${err.cause?.message ?? err.message}`.slice(0, 160), mode: m.mode, checkedAt }); }
   }
   return out;
 }
@@ -120,7 +127,7 @@ export async function checkLinks(targets = linkTargets(), pauseMs = 1500): Promi
 export function linkReport(rs: LinkResult[]): string {
   const n = (v: Verdict) => rs.filter((r) => r.verdict === v).length;
   const L = [`## Link check (${new Date().toISOString().slice(0, 10)})`, "",
-    `links ${rs.length} · verified (2xx + expected words found) ${rs.filter(isVerifiedLink).length} · reachable, content not matched/unchecked ${rs.filter((r) => r.verdict === "ok" && r.contentOk !== true).length} · access denied ${n("access-denied")} · broken ${n("broken")} · other client error ${n("client-error")} · server error ${n("server-error")} · unreachable ${n("unreachable")} · redirected to home ${n("redirected")} · robots ${n("robots-disallowed")} · skipped ${n("skipped")}`, "",
+    `links ${rs.length} · verified (2xx + expected words found) ${rs.filter(isVerifiedLink).length} · reachable, content not matched/unchecked ${rs.filter((r) => r.verdict === "ok" && r.contentOk !== true).length} · access denied ${n("access-denied")} · broken ${n("broken")} · other client error ${n("client-error")} · server error ${n("server-error")} · unreachable ${n("unreachable")} · redirected to home ${n("redirected")} · robots ${n("robots-disallowed")} · rights unconfirmed ${n("unconfirmed")} · skipped (rights forbid) ${n("skipped")} · rights unconfirmed ${n("unconfirmed")}`, "",
     "| verdict | status | content | url | note |", "|---|---|---|---|---|"];
   for (const r of rs) L.push(`| ${r.verdict} | ${r.status ?? "–"} | ${r.contentOk === null ? "n/a" : r.contentOk ? "match" : "NO MATCH"} | ${r.url} | ${(r.note ?? "").replace(/\|/g, "/")}${r.title ? ` · “${r.title.replace(/\|/g, "/")}”` : ""} |`);
   return L.join("\n");
@@ -129,6 +136,6 @@ export function linkReport(rs: LinkResult[]): string {
 if (require.main === module) {
   checkLinks().then((rs) => {
     console.log(linkReport(rs));
-    console.log("LINKCHECK_JSON_BEGIN"); console.log(JSON.stringify(rs.map((r) => ({ u: r.url, v: r.verdict, s: r.status, c: r.contentOk, f: r.finalUrl, w: r.where.length })))); console.log("LINKCHECK_JSON_END");
+    console.log("LINKCHECK_JSON_BEGIN"); console.log(JSON.stringify(rs.map((r) => ({ u: r.url, v: r.verdict, s: r.status, c: r.contentOk, f: r.finalUrl, w: r.where.length, m: r.mode, d: r.checkedAt })))); console.log("LINKCHECK_JSON_END");
   });
 }
