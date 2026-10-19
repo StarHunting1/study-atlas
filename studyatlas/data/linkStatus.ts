@@ -1,6 +1,6 @@
 /*
  * Result of the link check of the Manchester / Vancouver / Toronto / London / Sydney / Melbourne source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-19
- * (https://github.com/StarHunting1/study-atlas/actions/runs/39315686081 (interim: rights decisions recomputed offline; refreshed by the PR job below): the PR job "Collect official data" ran `npx tsx collector/linkcheck.ts`). Written by collector/linkstatus-write.ts from the job log; one request per link, no retries.
+ * (https://github.com/StarHunting1/study-atlas/actions/runs/39339592795: the PR job "Collect official data" ran `npx tsx collector/linkcheck.ts`). Written by collector/linkstatus-write.ts from the job log; one request per link, no retries.
  * Which links may be requested, and how, is decided from the rights records BEFORE any request (collector/guard.ts); the recorded result must agree with that decision (tests/guard166.test.ts).
  *   verdict: ok | access-denied (HTTP 401/403/429: the page may exist) | broken | skipped (a rights record forbids automated requests: not requested) | unconfirmed (no rights record covers the host, or its terms were never reviewed: not requested)
  *            | robots-disallowed (robots.txt disallows the path, or could not be fetched: then no request is made)
@@ -11,7 +11,7 @@
 export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped" | "unconfirmed" | "robots-disallowed";
 export type LinkMode = "html" | "status-only" | "skip";
 export const LINK_CHECKED_AT = "2026-10-19";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39315686081 (interim: rights decisions recomputed offline; refreshed by the PR job below)";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39339592795";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null, mode: LinkMode, checkedAt: string][] = [
   ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null, "html", "2026-10-19"],
   ["https://cityenglish.edu.au/", "unconfirmed", null, null, "skip", "2026-10-19"],

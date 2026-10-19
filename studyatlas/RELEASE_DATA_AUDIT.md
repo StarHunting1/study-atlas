@@ -73,7 +73,7 @@
 
 ## 4b. 出典リンクの検査（Manchester / Vancouver）
 
-実行: GitHub Actions（2026-10-19、https://github.com/StarHunting1/study-atlas/actions/runs/39315686081 (interim: rights decisions recomputed offline; refreshed by the PR job below)）。1リンク1回の確認（再試行なし・robots.txt遵守。要求してよいかは、通信の前に権利記録（collector/guard.ts）で判定し、禁止・未確認のリンクは通信せずに記録する）。
+実行: GitHub Actions（2026-10-19、https://github.com/StarHunting1/study-atlas/actions/runs/39339592795）。1リンク1回の確認（再試行なし・robots.txt遵守。要求してよいかは、通信の前に権利記録（collector/guard.ts）で判定し、禁止・未確認のリンクは通信せずに記録する）。
 
 | 対象 | 検証済み（2xx＋期待語を確認） | 到達（語は未確認/不一致） | アクセス拒否 | リンク切れ | 要求せず |
 |---|---|---|---|---|---|
