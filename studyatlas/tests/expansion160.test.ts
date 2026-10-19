@@ -8,6 +8,7 @@ import { countries, getCity } from "@/data/cities";
 import { officialData, officialSources } from "@/data/official";
 import CityOverview from "@/components/overview/CityOverview";
 import { keyFigure, rentCheckingKey, rentCmp, transportLinkKey, type Key } from "@/lib/overview";
+import { ux } from "@/locales/ux";
 import { getCompareSchool, listCompareSchools } from "@/data/languageSchools";
 import { ALL_RENT_CANDIDATES, AU_RENT_CANDIDATES_FOR_TEST, RENT_APPROVALS, approvalProblem, melbourneRentPoints, pendingRentIds, rentDigest, sydneyRentPoints, reconcileStatic, type RentApproval } from "../data/official/cityRents";
 import { MELBOURNE_RENT_CANDIDATE, SYDNEY_RENT_CANDIDATE } from "../data/official/auRents";
@@ -32,23 +33,28 @@ const ap = (c: { id: string }): RentApproval => ({ approvedBy: "Test Reviewer", 
 const both = { "syd-abs-census-median-weekly-rent": ap(SYDNEY_RENT_CANDIDATE), "mel-abs-census-median-weekly-rent": ap(MELBOURNE_RENT_CANDIDATE) };
 const key = (p: ReturnType<typeof sydneyRentPoints>[number]): Key => ({ kind: "point", point: p });
 
-t("no Sydney/Melbourne rent number is published: the real approvals contain neither figure, the data has no points, and no page or notice shows 470 / 390", () => {
-  assert.ok(!("syd-abs-census-median-weekly-rent" in RENT_APPROVALS) && !("mel-abs-census-median-weekly-rent" in RENT_APPROVALS));
-  for (const id of ["sydney", "melbourne"]) { assert.equal(officialData(id)!.points.length, 0); assert.deepEqual(pendingRentIds(id as never).length, 1);
-    const html = page(id); const tx = text(html); assert.ok(!/\b470\b|\b390\b/.test(tx), `${id}: no rent amount on the page`); assert.ok(!/A\$\s?\d|AUD\s?\d/.test(tx), "no AUD amount at all"); }
-  assert.deepEqual(Object.keys(RENT_APPROVALS).sort(), ["lon-ons-pipr-private-rent-region-month", "tor-cmhc-rent-1br", "tor-cmhc-rent-2br", "tor-cmhc-rent-3br", "tor-cmhc-rent-bachelor"], "the five 1.5.2 approvals are unchanged");
+t("approved (Ver.1.6.1): exactly the two ABS figures are verified, with StarHunting1's records and digests; the unapproved state still hides the number (builders with no approvals)", () => {
+  for (const [id, amount, aid] of [["sydney", 470, "syd-abs-census-median-weekly-rent"], ["melbourne", 390, "mel-abs-census-median-weekly-rent"]] as const) {
+    const a = RENT_APPROVALS[aid]; assert.equal(a.approvedBy, "StarHunting1"); assert.equal(a.approvedAt, "2026-10-19"); assert.match(a.basis, /明示的な公開承認/); assert.match(a.basis, /39292612214/); assert.match(a.basis, /Greater Capital City Statistical Area/);
+    assert.equal(a.digest, rentDigest(ALL_RENT_CANDIDATES.find((c) => c.id === aid)!));
+    const pts = officialData(id)!.points; assert.equal(pts.length, 1); const p = pts[0]; assert.deepEqual([p.id, p.value!.amount, p.value!.currency, p.value!.per, p.status, p.checkedAt, p.audience, p.topic], [aid, amount, "AUD", "week", "verified", "2026-10-19", "renter", "housing"]);
+    assert.ok(!p.housing && displayModeOf(p) === "full"); assert.equal(pendingRentIds(id as never).length, 0); assert.ok(!(officialData(id)!.notices ?? []).some((n) => n.why === "awaiting-approval"));
+    // the same data with no approval: the number disappears and the 'awaiting approval' notice returns
+    const none = id === "sydney" ? sydneyData({}) : melbourneData({}); assert.equal(none.points.length, 0); assert.ok(none.notices!.some((n) => n.why === "awaiting-approval"));
+  }
+  assert.deepEqual(Object.keys(RENT_APPROVALS).sort(), ["lon-ons-pipr-private-rent-region-month", "mel-abs-census-median-weekly-rent", "syd-abs-census-median-weekly-rent", "tor-cmhc-rent-1br", "tor-cmhc-rent-2br", "tor-cmhc-rent-3br", "tor-cmhc-rent-bachelor"].sort(), "exactly seven approvals");
+  assert.equal(RENT_APPROVALS["tor-cmhc-rent-1br"].digest, "abbbf002fa77176f0b4b2c9fc214de335c9faefd166c739b4fbf153f180185c1", "the 1.5.2 approvals are untouched");
 });
-
-t("housing headline while unapproved: 'being checked' (確認中) plus the official statistic link; never 'reference price in preparation' alone, never a number", () => {
-  for (const [id, abs] of [["sydney", "1GSYD"], ["melbourne", "2GMEL"]] as const) {
-    const k = keyOf(page(id), "housing"); const tx = text(k);
-    assert.match(k, /data-testid="key-rent-checking"/); assert.ok(tx.includes("公的な家賃統計：確認中") && tx.includes("公式の統計を開く"), tx);
-    assert.match(k, new RegExp(`href="https://www\\.abs\\.gov\\.au/census/find-census-data/quickstats/2021/${abs}"`)); assert.ok(!/\d{3}/.test(tx), "no number");
-    assert.equal(rentCheckingKey(city(id))!.url.includes(abs), true);
+t("housing headline now: the approved median with its area, year, unit and the two explicit disclaimers (not today's asking rent, not an international student's own housing cost); no 'being checked' placeholder", () => {
+  for (const [id, amount, area] of [["sydney", "470", "グレーター・シドニー"], ["melbourne", "390", "グレーター・メルボルン"]] as const) {
+    const html = page(id); const k = keyOf(html, "housing"); const tx = text(k);
+    assert.match(k, /data-testid="key-market-rent"/); assert.ok(tx.includes(amount) && tx.includes("AUD") && tx.includes("週") && tx.includes("2021") && tx.includes("中央値") && tx.includes(area), tx);
+    assert.ok(tx.includes("現在の募集家賃ではなく") && tx.includes("留学生個人の住居費でもありません") && tx.includes("学生向けの料金ではありません"), tx); assert.match(k, /data-testid="key-market-old"/);
+    assert.ok(!k.includes('data-testid="key-rent-checking"') && !k.includes('data-testid="key-prep"')); assert.equal(rentCheckingKey(city(id)), undefined);
+    assert.ok(ux.marketKeyOld.en.includes("not today's (2026) advertised rents") && ux.marketKeyOld.en.includes("not an international student's own housing cost") && ux.marketKeyTitleMedian.en.startsWith("Median weekly rent"));
   }
   assert.equal(rentCheckingKey(city("toronto")), undefined); assert.equal(rentCheckingKey(city("manchester")), undefined);
 });
-
 t("rights: ABS is CC BY 4.0 (permitted, shown in full, attribution); Transport for NSW and Transport Victoria are link-only and never requested; nothing is 'permitted' by assumption", () => {
   const abs = RIGHTS["abs-census-rent"]; assert.equal(abs.reuseStatus, "permitted"); assert.match(abs.licence!, /Creative Commons Attribution 4\.0/); assert.ok(abs.attribution!.includes("Australian Bureau of Statistics")); assert.equal(abs.lastReviewedAt, "2026-10-19");
   assert.equal(displayModeOf({ sourceId: "abs-census-rent", value: SYDNEY_RENT_CANDIDATE.value }), "full");
@@ -59,7 +65,7 @@ t("rights: ABS is CC BY 4.0 (permitted, shown in full, attribution); Transport f
 
 t("the candidates pass every static check (source, evidence page, quote, AUD per week, licence, student-housing disclaimer, area named) and each digest is stable", () => {
   const bad = reconcileStatic().filter((c) => !c.ok); assert.deepEqual(bad, []);
-  for (const c of [SYDNEY_RENT_CANDIDATE, MELBOURNE_RENT_CANDIDATE]) { assert.equal(c.value!.currency, "AUD"); assert.equal(c.value!.per, "week"); assert.equal(rentDigest(c), rentDigest({ ...c })); assert.match(c.conditions.en, /not student housing/i); assert.match(c.conditions.en, /median/i); assert.match(c.conditions.en, /2021/); assert.match(c.conditions.ja, /中央値/); assert.match(c.conditions.ja, /学生向け住居/); assert.match(c.conditions.en, /not an advertised|Actual rent paid, not an advertised/i); }
+  for (const c of [SYDNEY_RENT_CANDIDATE, MELBOURNE_RENT_CANDIDATE]) { assert.equal(c.value!.currency, "AUD"); assert.equal(c.value!.per, "week"); assert.equal(rentDigest(c), rentDigest({ ...c })); assert.match(c.conditions.en, /not student housing/i); assert.match(c.conditions.en, /median/i); assert.match(c.conditions.en, /2021/); assert.match(c.conditions.ja, /中央値/); assert.match(c.conditions.ja, /学生向け住居/); assert.match(c.conditions.en, /NOT today.s \(2026\) advertised asking rents/); assert.match(c.conditions.en, /Greater Capital City Statistical Area/); assert.match(c.conditions.en, /NOT an international student.s own housing cost/); assert.match(c.conditions.ja, /募集家賃ではありません/); assert.match(c.conditions.ja, /留学生個人の住居費ではなく/); }
   assert.equal(SYDNEY_RENT_CANDIDATE.value!.amount, 470); assert.equal(MELBOURNE_RENT_CANDIDATE.value!.amount, 390);
   assert.notEqual(rentDigest(SYDNEY_RENT_CANDIDATE), rentDigest(MELBOURNE_RENT_CANDIDATE));
   assert.ok(ALL_RENT_CANDIDATES.length === 7 && AU_RENT_CANDIDATES_FOR_TEST === 2);
@@ -74,24 +80,20 @@ t("a person's approval makes ONLY that figure appear (test input): Sydney alone,
   assert.throws(() => sydneyRentPoints({ "syd-xxx": ap(SYDNEY_RENT_CANDIDATE) }), /unknown figure/);
 });
 
-t("comparison: Sydney vs Melbourne is 'same basis' only when both are approved and every part of the statistic matches; against any other city it is 'differ' (reference only); unapproved = not compared", () => {
-  const s = sydneyRentPoints(both)[0], m = melbourneRentPoints(both)[0];
-  assert.ok(sameRentBasis([s, m])); assert.deepEqual(rentBasisDiff(rentBasisOf(s)!, rentBasisOf(m)!), []); assert.equal(rentCmp([key(s), key(m)]), "same");
+t("comparison: Sydney vs Melbourne is 'same basis' because every part of the statistic matches; against any other city it is never 'same' (reference only); a changed definition or unit breaks it", () => {
+  const s = officialData("sydney")!.points[0], m = officialData("melbourne")!.points[0];
+  assert.ok(sameRentBasis([s, m])); assert.deepEqual(rentBasisDiff(rentBasisOf(s)!, rentBasisOf(m)!), []); assert.equal(rentCmp([key(s), key(m)]), "same"); assert.equal(rentBasisOf(s)!.area, "ABS Greater Capital City Statistical Area");
   const tor = officialData("toronto")!.points.find((p) => p.highlight)!, lon = officialData("london")!.points[0], man = officialData("manchester")!.points.find((p) => p.metric === "housing.privateRent.average")!;
   for (const o of [tor, lon, man]) { assert.equal(rentCmp([key(s), key(o)]), "differ"); assert.ok(rentBasisDiff(rentBasisOf(s)!, rentBasisOf(o)!).length > 0); }
   const row = compareRows.find((r) => r.id === "marketRent")!; assert.ok(row.metrics.includes(s.metric));
-  assert.equal(rowVerdict(row, [s, m]).verdict, "sameBasis"); assert.notEqual(rowVerdict(row, [s, tor]).verdict, "sameBasis"); assert.ok(["notDirect", "issues"].includes(rowVerdict(row, [s, tor]).verdict));
-  // real data: no figure is picked, the reason is 'awaiting approval' and there is nothing to compare
-  assert.equal(pickPoint("sydney", row), undefined); assert.equal(pickPoint("melbourne", row), undefined); { const r = missingReason("sydney", row); assert.ok(r && r.kind === "notice" && r.why === "awaiting-approval"); } assert.equal(rowVerdict(row, [undefined, undefined]).verdict, "missing");
-  // a changed definition is never 'same'
-  const m2 = { ...m, validFor: "2016 (Census)" }; assert.ok(!sameRentBasis([s, m2]));
-  const m3 = { ...m, value: { ...m.value!, per: "month" as const } }; assert.ok(!sameRentBasis([s, m3]));
+  assert.equal(pickPoint("sydney", row)!.id, s.id); assert.equal(pickPoint("melbourne", row)!.id, m.id); assert.equal(rowVerdict(row, [s, m]).verdict, "sameBasis"); assert.ok(["notDirect", "issues"].includes(rowVerdict(row, [s, tor]).verdict));
+  const m2 = { ...m, validFor: "2016 (Census)" }; assert.ok(!sameRentBasis([s, m2])); const m3 = { ...m, value: { ...m.value!, per: "month" as const } }; assert.ok(!sameRentBasis([s, m3]));
+  const m4 = { ...m, value: { ...m.value!, currency: "NZD" } }; assert.ok(!sameRentBasis([s, m4]) || rentCmp([key(s), key(m4)]) !== "same");
 });
-
 t("transport: the official fares link is on the first screen, no fare amount or concession is stated, and no concession is promised to international students", () => {
   for (const [id, host, other] of [["sydney", "transportnsw.info/tickets-fares/fares", "eligibility-concessions"], ["melbourne", "transport.vic.gov.au/tickets-and-myki/fares", "myki"]] as const) {
     const html = page(id); const k = keyOf(html, "transport"); assert.match(k, new RegExp(`href="https://${host.replace(/\./g, "\\.")}"`)); assert.ok(text(k).includes("運賃の金額は転載していません"), id);
-    assert.ok(!/A\$\s?\d|AUD\s?\d|\$\s?\d/.test(text(html)), `${id}: no fare amount`); assert.ok(transportLinkKey(city(id))); assert.ok(officialData(id)!.notices!.find((x) => x.topic === "transport")!.links.some((l) => l.url.includes(other)));
+    assert.ok(!/A\$\s?\d|AUD\s?\d|\$\s?\d/.test(text(k)), `${id}: no fare amount in the transport card`); assert.ok(transportLinkKey(city(id))); assert.ok(officialData(id)!.notices!.find((x) => x.topic === "transport")!.links.some((l) => l.url.includes(other)));
     const tr = officialData(id)!.notices!.find((x) => x.topic === "transport")!; assert.ok(/Do not assume|not assume|limited/i.test(tr.text.en) || /do not assume/i.test(tr.text.en)); assert.ok(/とは限りません|思い込まず/.test(tr.text.ja));
     assert.ok(!/international students? (get|receive|are eligible)/i.test(tr.text.en.replace(/do not assume[^.]*\./i, "")), "no promise");
   }
@@ -146,14 +148,14 @@ t("link check covers Sydney and Melbourne (rent pages, schools, fee pages, visa/
   for (const x of by(/transportnsw\.info|transport\.vic\.gov\.au/)) assert.ok(x.skip, x.url);
 });
 
-t("comparison page: Sydney vs Melbourne says 'being checked' (not 'not obtained') for rent while unapproved, shows no amount, never 'comparable'; Sydney vs Toronto shows Toronto's approved rent only as reference", () => {
+t("comparison page: Sydney vs Melbourne is 'comparable' for rent with both A$ figures and the same-basis note; Sydney vs Toronto is 'reference only' (never compared, no conversion); existing pairs are unchanged", () => {
   const wrap = (el: ReturnType<typeof h>) => renderToStaticMarkup(h(I18nProvider, null, el));
   const sm = wrap(h(QuickCompare, { ids: ["sydney", "melbourne"] })); const tx = text(sm);
-  const rentChip = /data-testid="chip-rent"[^>]*>([^<]*)</.exec(sm)?.[1]; assert.equal(rentChip, "確認中", "rent chip"); assert.match(sm, /data-testid="glance-rent"[^>]*>[^]*?確認中/);
-  assert.ok(!/(^|\D)(470|390)(\D|$)/.test(tx) && !/A\$|AUD/.test(tx), "no Australian rent number in the comparison"); assert.ok(tx.includes("承認が済むまでStudyAtlasでは数値を表示しません"));
-  assert.ok(!/data-testid="chip-rent"[^>]*>[^<]*(比較可能|参考値のみ)/.test(sm), "not comparable, not even reference, while neither figure is shown");
-  const st = wrap(h(QuickCompare, { ids: ["sydney", "toronto"] })); assert.ok(!/(^|\D)(470|390)(\D|$)/.test(text(st))); assert.match(st, /data-testid="chip-rent"[^>]*>[^<]*参考値のみ|data-testid="chip-rent"[^>]*>[^<]*確認中|data-testid="chip-rent"[^>]*>[^<]*未取得/);
+  assert.equal(/data-testid="chip-rent"[^>]*>([^<]*)</.exec(sm)?.[1], "比較可能", "rent chip"); assert.match(sm, /data-testid="cmp-rent"[^>]*data-cmp="same"/);
+  assert.ok(tx.includes("470") && tx.includes("390") && tx.includes("同じ統計・同じ期間・同じ通貨です"), "both figures and the same-basis reason");
+  assert.ok(!/data-testid="chip-rent"[^>]*>[^<]*確認中/.test(sm));
+  const st = wrap(h(QuickCompare, { ids: ["sydney", "toronto"] })); assert.equal(/data-testid="chip-rent"[^>]*>([^<]*)</.exec(st)?.[1], "参考値のみ"); assert.match(st, /data-testid="cmp-rent"[^>]*data-cmp="differ"/); assert.ok(!/cheaper|安い/.test(text(st).replace(/どちらが安いかは判定しません/g, "")), "no verdict on which is cheaper");
+  const sl = wrap(h(QuickCompare, { ids: ["sydney", "london"] })); assert.equal(/data-testid="chip-rent"[^>]*>([^<]*)</.exec(sl)?.[1], "参考値のみ");
   const man = wrap(h(QuickCompare, { ids: ["manchester", "vancouver"] })); assert.ok(!/data-testid="chip-rent"[^>]*>[^<]*確認中/.test(man), "existing pairs are not relabelled");
 });
-
 console.log(n, "Ver.1.6.0 tests passed");

@@ -21,7 +21,7 @@ import { AU_RENT_CANDIDATES, SYDNEY_RENT_CANDIDATE, MELBOURNE_RENT_CANDIDATE } f
  * A person's approval of ONE rent figure. `digest` is the content digest (rentDigest) of the candidate the person compared: if the figure, unit, period,
  * source, quote or definition is edited later, the approval no longer matches and loading the data fails. Approvals are per figure, so Toronto's four values and
  * London's one value are approved (and can fail) independently, and approving one city never publishes the other.
- * A figure without an entry = not approved: nothing is shown and nothing is marked verified. Approved 2026-10-17 by StarHunting1 (Ver.1.5.2): the four Toronto values and the one London value, and only those. (Print the digests with `npm run approvals`; they are listed in data/APPROVAL_SHEET.md.)
+ * A figure without an entry = not approved: nothing is shown and nothing is marked verified. Approved 2026-10-17 by StarHunting1 (Ver.1.5.2): the four Toronto values and the one London value; approved 2026-10-19 by StarHunting1 (Ver.1.6.1): the Sydney and Melbourne ABS Census medians, and only those. (Print the digests with `npm run approvals`; they are listed in data/APPROVAL_SHEET.md.)
  */
 export type RentApproval = { approvedBy: string; approvedAt: string; /** what the approver compared, e.g. "Statistics Canada table 34-10-0133-01 and the CMHC licence, 2026-10-20" */ basis: string; digest: string };
 export const RENT_APPROVALS: Record<string, RentApproval> = {
@@ -30,6 +30,8 @@ export const RENT_APPROVALS: Record<string, RentApproval> = {
   "tor-cmhc-rent-2br": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるTorontoの家賃4件（CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA 535、2025年、CAD/月）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと全値の一致を確認済み。", digest: "5085d74860e41547259c36aeb9e6a911d5b64b6a444ba58427f0429c13f08381" },
   "tor-cmhc-rent-3br": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるTorontoの家賃4件（CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA 535、2025年、CAD/月）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと全値の一致を確認済み。", digest: "923365e8fe0775666ae8e0f82f996234670d48cdb7c8f912a37392859361fdb0" },
   "lon-ons-pipr-private-rent-region-month": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるLondon家賃1件（ONS PIPR、London region E12000007、2026年8月、GBP/月、全住宅）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと一致を確認済み。", digest: "8122055734968c0c56c89125164f69d6ca1650924078dc93cb5710c026cdda09" },
+  "syd-abs-census-median-weekly-rent": { approvedBy: "StarHunting1", approvedAt: "2026-10-19", basis: "StarHunting1によるSydney・Melbourneの家賃2件（ABS 2021年国勢調査 QuickStats、Greater Capital City Statistical Area、家賃中央値 A$470／A$390 per week、家賃なしの住戸を除く、CC BY 4.0）の明示的な公開承認（2026-10-19、PR #53マージ後）。数値・出典・地理区分・定義はPR #53の候補と一致することをActions run 39292612214（QuickStatsの再読）で確認済み。2021年の実際の家賃であり、現在の募集家賃・留学生個人の住居費ではないと明示する条件付き。", digest: "506c97aa71ea3e2cdbea993353f47c6f3f099459bfdec41c6241aa2cac1c73f2" },
+  "mel-abs-census-median-weekly-rent": { approvedBy: "StarHunting1", approvedAt: "2026-10-19", basis: "StarHunting1によるSydney・Melbourneの家賃2件（ABS 2021年国勢調査 QuickStats、Greater Capital City Statistical Area、家賃中央値 A$470／A$390 per week、家賃なしの住戸を除く、CC BY 4.0）の明示的な公開承認（2026-10-19、PR #53マージ後）。数値・出典・地理区分・定義はPR #53の候補と一致することをActions run 39292612214（QuickStatsの再読）で確認済み。2021年の実際の家賃であり、現在の募集家賃・留学生個人の住居費ではないと明示する条件付き。", digest: "ed4c547df54b47f95701207d8f22bd2a1c01b3e89f96d022713ef353b87a7a91" },
 };
 
 const TABLE = "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301";
@@ -122,7 +124,7 @@ const notStudent = (c: Omit<DataPoint, "status" | "checkedAt">) => c.audience ==
 const UNIT: Record<string, [string, string]> = { toronto: ["CAD", "month"], london: ["GBP", "month"], sydney: ["AUD", "week"], melbourne: ["AUD", "week"] };
 const AREA_NAMED: Record<string, (en: string) => boolean> = {
   toronto: (en) => /census metropolitan area/.test(en) && /535/.test(en), london: (en) => /E12000007/.test(en) && /region/.test(en),
-  sydney: (en) => /Greater Sydney/.test(en) && /2021 Census/.test(en) && /median/i.test(en), melbourne: (en) => /Greater Melbourne/.test(en) && /2021 Census/.test(en) && /median/i.test(en),
+  sydney: (en) => /Greater Sydney/.test(en) && /Greater Capital City Statistical Area/.test(en) && /2021 Census/.test(en) && /median/i.test(en) && /NOT today/.test(en) && /international student's own housing cost/.test(en), melbourne: (en) => /Greater Melbourne/.test(en) && /Greater Capital City Statistical Area/.test(en) && /2021 Census/.test(en) && /median/i.test(en) && /NOT today/.test(en) && /international student's own housing cost/.test(en),
 };
 export function reconcileStatic(): Check[] {
   const out: Check[] = [];

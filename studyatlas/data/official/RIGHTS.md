@@ -17,7 +17,7 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |
 | Toronto Transit Commission (TTC) – fares and passes (`ttc-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | Transport for London (TfL) – fares and discounts (`tfl-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
-| Australian Bureau of Statistics – 2021 Census QuickStats (median weekly rent) (`abs-census-rent`) | **permitted** | full | page-check-only | page-check | 2026-10-19 | no | — |
+| Australian Bureau of Statistics – 2021 Census QuickStats (median weekly rent) (`abs-census-rent`) | **permitted** | full | page-check-only | page-check | 2026-10-19 | no | 2 full |
 | Transport for NSW – tickets and fares (`tfnsw-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | Transport Victoria – myki and fares (`ptv-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | GOV.UK (Content API) (`govuk-content`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |

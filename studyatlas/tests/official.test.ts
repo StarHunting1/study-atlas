@@ -131,7 +131,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
   await t("collecting the same (fixture) responses twice: first run adds records, second run finds 0 changes", async () => {
     const first = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true });
     const ids = Object.keys(first.next.records);
-    assert.equal(ids.filter((i) => i.startsWith("page:")).length, 24); assert.ok(!ids.some((i) => i.startsWith("page:translink")), "no TransLink page is checked: the rights review blocks it"); assert.equal(ids.filter((i) => i.startsWith("statcan-cmhc-rents:")).length, 8); assert.equal(ids.filter((i) => i.startsWith("eccc-climate-normals:")).length, 4);
+    assert.equal(ids.filter((i) => i.startsWith("page:")).length, 26); assert.ok(!ids.some((i) => i.startsWith("page:translink")), "no TransLink page is checked: the rights review blocks it"); assert.equal(ids.filter((i) => i.startsWith("statcan-cmhc-rents:")).length, 8); assert.equal(ids.filter((i) => i.startsWith("eccc-climate-normals:")).length, 4);
     const second = await collect({ ai: false, fixtures: true, now: "2026-10-14T06:00:00.000Z", prev: first.next, force: true });
     assert.equal(second.changes.length, 0); assert.equal(JSON.stringify(second.next.records), JSON.stringify(first.next.records)); // retrieval times untouched
     assert.ok(Object.values(first.next.records).filter((r) => r.sourceId.startsWith("page:")).every((r) => r.value.text === "found"));
@@ -152,7 +152,7 @@ const pt = (id: string) => [...man.points, ...van.points].find((p) => p.id === i
     const first = await collect({ ai: false, fixtures: true, now: T1, prev: emptySnapshot(), force: true });
     const down = async (url: string) => { if (/robots\.txt$/.test(url)) return { status: 200, url, body: "User-agent: *\nAllow: /\n" }; throw new Error("fetch failed"); };
     const run = await collect({ ai: false, fixtures: true, now: "2026-11-01T00:00:00.000Z", prev: first.next, force: true, fetchers: { fetchText: down } });
-    assert.equal(run.changes.length, 0); assert.equal(Object.keys(run.next.records).filter((i) => i.startsWith("page:")).length, 24);
+    assert.equal(run.changes.length, 0); assert.equal(Object.keys(run.next.records).filter((i) => i.startsWith("page:")).length, 26);
     const pageRuns = run.runs.filter((r) => r.sourceId.startsWith("page:"));
     // sources blocked by the rights review are skipped (never requested); the others were requested and failed
     assert.ok(pageRuns.filter((r) => automationFor(r.sourceId).automation !== "blocked").every((r) => !r.ok));
