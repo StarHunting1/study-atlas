@@ -66,7 +66,7 @@ t("licence and attribution: ECCC Data Services End-use Licence v2.1.1 (August 20
 });
 t("nothing else was promoted: still exactly five verified claims, no other climate record carries an approval, Planner untouched", () => {
   assert.deepEqual(allClaims().filter((c) => c.status === "verified").map((c) => c.id).sort(), ["U1", "U2", "U3", "U5b", "U6"]);
-  assert.equal(man.climate!.approval, undefined); assert.equal(van.climateAlt!.approval, undefined); assert.deepEqual(Object.keys(CLIMATE_APPROVALS), ["van-climate-eccc-1991-2020"]);
+  assert.equal(man.climate!.approval, undefined); assert.equal(van.climateAlt!.approval, undefined); assert.deepEqual(Object.keys(CLIMATE_APPROVALS), ["van-climate-eccc-1991-2020", "tor-climate-eccc-1991-2020"]);
   assert.ok(!/climate|ECCC/i.test(readFileSync("lib/planner.ts", "utf8").replace(/\/\*[\s\S]*?\*\/|\/\/.*$/gm, "")));
 });
 console.log(n, "Vancouver climate release tests passed");

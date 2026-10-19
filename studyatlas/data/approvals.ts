@@ -84,7 +84,9 @@ export function approve(c: Claim): Claim {
  * Approval of a climate record (Ver.1.4.3). Same rule as for claims: the record is verified only with an entry here, and the approved numbers,
  * station, period, annual value and sources must still be what was approved (otherwise the build fails until a person approves the new values).
  */
-export type ClimateApproval = { approval: NonNullable<ClimateNormals["approval"]>; station: string; stationId: string; period: string; meanC: number[]; maxC: number[]; minC: number[]; precipMm: number[]; annualPrecipMm: number; sources: string[] };
+export type ClimateApproval = { approval: NonNullable<ClimateNormals["approval"]>; station: string; stationId: string; period: string; meanC: number[]; maxC: number[]; minC: number[]; precipMm: number[]; annualPrecipMm: number; sources: string[];
+  /** optional extra bound values (Ver.1.6.4): annual mean / max / min temperature and the ECCC quality codes; when present they must still match the record */
+  annualMeanC?: number; annualMaxC?: number; annualMinC?: number; quality?: string };
 export const CLIMATE_APPROVALS: Record<string, ClimateApproval> = {
   "van-climate-eccc-1991-2020": {
     approval: { by: "StarHunting1", at: "2026-10-17", compared: "2026-10-17 StarHunting1 による Vancouver 1991–2020 気候平年値（日平均・日最高・日最低・降水量の月別48値）の明示的な公開承認。照合：PR #46（GitHub Actions run 39051554489）で ECCC の一括CSV（Canadian Climate Normals 1991–2020、BC州）の合成観測所 VANCOUVER INTERNATIONAL (AIRPORT)（Normal）の48値と全件一致を確認。ライセンス：ECCC Data Services End-use Licence v2.1.1（2026年8月）" },
@@ -96,12 +98,22 @@ export const CLIMATE_APPROVALS: Record<string, ClimateApproval> = {
     annualPrecipMm: 1159.5,
     sources: ["https://climate.weather.gc.ca/climate_normals/index_e.html"],
   },
+  "tor-climate-eccc-1991-2020": {
+    approval: { by: "StarHunting1", at: "2026-10-19", compared: "2026-10-19 StarHunting1 による Toronto 1991–2020 気候平年値の明示的な公開承認（Ver.1.6.4）。対象：複合観測地点 TORONTO (CITY)（気候ID 6158350・6158355、北緯43.67度・西経79.40度、標高112.5 m）の月別48値（日平均・日最高・日最低気温、降水量）、年値4件（平均気温9.7 °C・平均最高13.4 °C・平均最低6.0 °C・降水量822.7 mm）、観測地点、統計期間、品質コード（気温A・降水量C）、公式出典、ライセンス。照合：GitHub Actions run 39308503517（読み取り専用）で ECCC の公式CSV（Canadian Climate Normals 1991–2020、オンタリオ州）と、48値と年値の全件一致を確認。ライセンス：ECCC Data Services End-use Licence v2.1.1（2026年8月）" },
+    station: "TORONTO (CITY) – composite of 6158350 and 6158355", stationId: "6158350+6158355", period: "1991–2020",
+    meanC: [-3.5, -2.7, 1.7, 7.8, 14.5, 19.8, 22.5, 21.9, 17.9, 11.2, 5.2, -0.1],
+    maxC: [-0.3, 0.6, 5.1, 11.7, 18.8, 24.2, 27.0, 26.1, 22.0, 14.6, 8.1, 2.6],
+    minC: [-6.7, -6.0, -1.8, 3.9, 10.0, 15.3, 18.1, 17.7, 13.8, 7.7, 2.3, -2.7],
+    precipMm: [64.6, 53.9, 52.8, 78.0, 76.4, 81.6, 76.5, 71.9, 69.4, 69.1, 70.8, 57.8],
+    annualPrecipMm: 822.7, annualMeanC: 9.7, annualMaxC: 13.4, annualMinC: 6.0, quality: "A (temperature) · C (precipitation)",
+    sources: ["https://climate.weather.gc.ca/climate_normals/index_e.html"],
+  },
 };
 export function approveClimate(c: ClimateNormals): ClimateNormals {
   const r = CLIMATE_APPROVALS[c.id]; if (!r) return c;
   const col = (k: "meanC" | "maxC" | "minC" | "precipMm") => JSON.stringify(c.months.map((m) => m[k]));
   const same = c.station === r.station && c.stationId === r.stationId && c.period === r.period && col("meanC") === JSON.stringify(r.meanC) && col("maxC") === JSON.stringify(r.maxC) && col("minC") === JSON.stringify(r.minC) && col("precipMm") === JSON.stringify(r.precipMm)
-    && c.annual?.precipMm === r.annualPrecipMm && JSON.stringify(c.evidence.map((e) => e.url)) === JSON.stringify(r.sources);
+    && c.annual?.precipMm === r.annualPrecipMm && (r.annualMeanC === undefined || c.annual?.meanC === r.annualMeanC) && (r.annualMaxC === undefined || c.annual?.maxC === r.annualMaxC) && (r.annualMinC === undefined || c.annual?.minC === r.annualMinC) && (r.quality === undefined || c.stationInfo?.quality === r.quality) && JSON.stringify(c.evidence.map((e) => e.url)) === JSON.stringify(r.sources);
   if (!same) throw new Error(`Climate record ${c.id} was changed after its approval (${r.approval.at}): approve the new values again or restore the approved ones`);
   return { ...c, status: "verified", approval: r.approval };
 }
