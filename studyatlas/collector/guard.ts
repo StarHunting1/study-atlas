@@ -37,14 +37,14 @@ export function blockedHostSet(ctx: Ctx = DEFAULT): Set<string> {
 }
 
 function evidence(url: string, ctx: Ctx) {
-  const host = hostKey(url), u = noHash(url); const out: { id: string; r: Rights; listed: boolean; licence: boolean; apiHost: boolean }[] = [];
+  const host = hostKey(url), u = noHash(url); const out: { id: string; r: Rights; listed: boolean; licence: boolean; licenceHost: boolean; apiHost: boolean; hostMatch: boolean }[] = [];
   for (const [id, r] of Object.entries(ctx.rights)) {
     if (r.automation === "blocked") continue;
     const src = ctx.sources.find((s) => s.id === id); const pages = [r.sourceUrl, ...(src?.pages ?? [])].filter(Boolean).map(noHash);
     const hosts = new Set(pages.map((p) => { try { return hostKey(p); } catch { return ""; } }));
     const apiHost = (r.apiHosts ?? []).some((a) => host === a.replace(/^www\d?\./, "")); const listed = pages.includes(u);
-    const licence = !!r.licenseUrl && noHash(r.licenseUrl) === u; const hostMatch = hosts.has(host); // exact host only: gov.uk does not cover data.gov.uk (no public-suffix guessing)
-    if (hostMatch || apiHost || licence) out.push({ id, r, listed, licence, apiHost });
+    const licence = !!r.licenseUrl && noHash(r.licenseUrl) === u; const licenceHost = !!r.licenseUrl && host === hostKey(r.licenseUrl); const hostMatch = hosts.has(host); // exact host only: gov.uk does not cover data.gov.uk (no public-suffix guessing)
+    if (hostMatch || apiHost || licence || licenceHost) out.push({ id, r, listed, licence, licenceHost, apiHost, hostMatch });
   }
   return out;
 }
@@ -63,6 +63,7 @@ export function decideAccess(url: string, kind: AccessKind, ctx: Ctx = DEFAULT):
   const ok = (state: AccessState, why: string) => d(true, state, why, reviewed.map((e) => e.id));
   const no = (why: string) => d(false, "forbidden", why, ids);
   const byKind = (k: AccessKind): AccessDecision => {
+    if (k === "status-only" && !reviewed.some((e) => e.hostMatch || e.apiHost)) return no("only the record's own licence page is covered on this host");
     if (k === "status-only") return ok("allowed", "status-only check: the record does not block automation");
     if (k === "api") return reviewed.some((e) => e.r.accessMethod === "open-api") ? ok("conditional", "documented API of an open-api record") : no("the record allows no API access");
     if (k === "dataset") return reviewed.some((e) => e.r.accessMethod === "open-api" || e.r.accessMethod === "open-data-file") ? ok("conditional", "published dataset file of an open record") : no("the record allows no dataset download");
@@ -73,7 +74,7 @@ export function decideAccess(url: string, kind: AccessKind, ctx: Ctx = DEFAULT):
     }
     return no("unknown way of access");
   };
-  if (kind === "robots") { const any = (["status-only", "api", "dataset", "html"] as AccessKind[]).some((k) => byKind(k).allow); return any ? ok("allowed", "robots.txt of a host that may be requested") : no("no way of access to this host is allowed, so its robots.txt is not requested either"); }
+  if (kind === "robots") { if (reviewed.some((e) => e.licenceHost)) return ok("allowed", "robots.txt of the host that serves the record's licence page"); const any = (["status-only", "api", "dataset", "html"] as AccessKind[]).some((k) => byKind(k).allow); return any ? ok("allowed", "robots.txt of a host that may be requested") : no("no way of access to this host is allowed, so its robots.txt is not requested either"); }
   return byKind(kind);
 }
 
