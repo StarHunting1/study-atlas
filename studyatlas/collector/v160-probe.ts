@@ -25,13 +25,10 @@ const links = async (url: string, re: RegExp, max = 25) => {
   console.log("  links:", hs.slice(0, max).join("\n         ") || "none");
 };
 (async () => {
-  const CR = /CRICOS[^.]{0,70}/i, WH = /Where to Find Us[^+]{0,120}/i, AD = /\b(Level|Suite|Floor)\s?\d+[^.]{0,80}(NSW|VIC|Victoria)[, ]+\d{4}/i, ST = /\d+[A-Za-z]?\s[A-Z][a-z]+ (Street|St|Road|Rd|Lane|Avenue)[^.]{0,60}/;
-  console.log("## K. schools round 4");
-  await links("https://www.kaplaninternational.com/language-schools/australia", /sydney|melbourne|australia\//i);
-  for (const u of ["https://www.kaplaninternational.com/learn-english-australia/melbourne", "https://www.kaplaninternational.com/learn-english-australia/sydney", "https://www.ilsc.com/language-schools/destinations/australia/city/melbourne", "https://www.ef-australia.com.au/campaign/ilsd/australia/sydney/"]) await page(u, [WH, AD, ST, CR, /NEAS|English Australia|accredit[^.]{0,80}/i, /minimum age|16 years|aged 1\d/i, /closed|closure|no longer/i], 110);
-  await links("https://www.ilsc.com/language-schools/destinations/australia/city/melbourne", /fee|price|visa|insurance|admission|australia\/city|campus/i, 20);
-  await links("https://www.kaplaninternational.com/learn-english-australia/melbourne", /fee|price|faq|course|visa|accommodation|cricos/i, 20);
-  console.log("\n## L. ILSC / Kaplan terms for CRICOS provider");
-  await page("https://www.ilsc.com/greystone-college/australia/policies", [CR], 120);
-  await page("https://www.kaplaninternational.com/faq/prices-and-payment", [/AUD|A\$|\$\d+[^.]{0,60}/i], 80);
+  const CR = /CRICOS[^.]{0,70}/i, ST = /\d+[A-Za-z]?\s[A-Z][a-z]+ (Street|St|Road|Rd|Lane|Avenue)[^.]{0,60}/, LV = /(Level|Suite)\s?\d+[^.]{0,70}(VIC|Victoria)[, ]+\d{4}/i;
+  console.log("## M. Melbourne candidates, official sites and government course directories");
+  for (const u of ["https://discoverenglish.com.au/", "https://www.discoverenglish.com.au/contact/", "https://cityenglish.edu.au/", "https://cityenglish.edu.au/contact/", "https://impactenglish.edu.au/", "https://langports.edu.au/", "https://search.studyaustralia.gov.au/provider/discover-english/6023706c67eb0679bbb72cc5e3987757", "https://search.studyaustralia.gov.au/provider/city-language-institute/6445438342133f69f3f08e2ca705a750", "https://search.studyaustralia.gov.au/provider/ilsc-melbourne/", "https://coursesearch.studymelbourne.vic.gov.au/provider/city-language-institute/6445438342133f69f3f08e2ca705a750"]) await page(u, [CR, LV, ST, /NEAS|English Australia|accredit[^.]{0,80}/i, /closed|closure|no longer|ceased/i, /General English[^.]{0,80}/i], 100);
+  console.log("\n## N. Sydney: ILSC page age, Navitas Sydney age, Study Australia provider directory for the three Sydney schools");
+  await page("https://www.ilsc.com/language-schools/destinations/australia/city/sydney", [/Minimum age[^.]{0,60}/i, /Launched[^.]{0,40}/i], 80);
+  await page("https://www.navitasenglish.edu.au/school/tour-2/", [/campus[^.]{0,120}/i], 80);
 })();
