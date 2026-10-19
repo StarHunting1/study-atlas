@@ -118,7 +118,7 @@ t("Manchester and Vancouver approved data are untouched; the Planner has no rule
   assert.equal(van.points.filter((p) => p.sourceId === "statcan-cmhc-rents").length, 4); assert.equal(van.points.find((p) => p.id === "van-cmhc-rent-1br")!.value!.amount, 1807); assert.equal(van.points.find((p) => p.id === "van-cmhc-rent-1br")!.status, "verified");
   assert.equal(man.points.find((p) => p.id === "man-ons-pipr-private-rent-month")!.value!.amount, 1373);
   const planner = readFileSync(path.join(root, "data/official/planner.ts"), "utf8"); assert.ok(!/\btoronto\b|\blondon\b/.test(planner.split("const RULES")[1].split("const audienceOf")[0]), "no planner rules for the new cities");
-  assert.equal(officialData("toronto")!.climate, undefined); assert.equal(officialData("london")!.climate, undefined);
+  assert.equal(officialData("toronto")!.climate!.status, "verified"); assert.equal(officialData("london")!.climate, undefined);
 });
 
 console.log(n, "Ver.1.5.0 expansion tests passed");

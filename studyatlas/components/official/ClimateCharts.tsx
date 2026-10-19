@@ -1,4 +1,5 @@
 "use client";
+import { tpl } from "@/components/planner/format";
 import { useState } from "react";
 import type { ClimateNormals } from "@/data/official/types";
 import { useI18n } from "@/lib/i18n";
@@ -88,6 +89,8 @@ export default function ClimateCharts({ c }: { c: ClimateNormals }) {
         {band && hasMean && <><span className="ml-2 mr-1 inline-block h-2.5 w-4 rounded-sm bg-sky-200 align-middle" />{L(ot.climateRange)}</>}
         <span className="ml-3">{L(ot.climateStation)}: {c.station}{c.stationId ? ` (${c.stationId})` : ""} · {L(ot.climatePeriod)}: <strong>{c.period}</strong></span>
       </p>
+      {c.annual?.meanC !== undefined && <p className="text-sm text-slate-700" data-testid="climate-annual-temp">{tpl(L(ot.climateAnnualTemp), { mean: c.annual.meanC.toFixed(1), max: c.annual.maxC !== undefined ? c.annual.maxC.toFixed(1) : "—", min: c.annual.minC !== undefined ? c.annual.minC.toFixed(1) : "—" })}</p>}
+      {c.stationInfo && <p className="text-xs text-slate-600" data-testid="climate-site">{L(c.stationInfo.where)}</p>}
       {c.annual?.precipMm !== undefined && <p className="text-sm text-slate-700" data-testid="climate-annual">{L(ot.climateAnnual)}: <strong className="tabular-nums">{c.annual.precipMm.toFixed(1)} mm</strong></p>}
       <button onClick={() => setTable(!table)} className="text-xs text-sky-700 underline">{L(table ? ot.hideTable : ot.showTable)}</button>
       {table && (

@@ -87,7 +87,7 @@ t("nothing else changed: Vancouver and Manchester rents, the five UK government 
   const van = officialData("vancouver")!.points.filter((p) => p.audience === "renter"); assert.deepEqual(van.map((p) => [p.value!.amount, p.status]), [[1667, "verified"], [1807, "verified"], [2364, "verified"], [2820, "verified"]]);
   const man = officialData("manchester")!.points.find((p) => p.audience === "renter")!; assert.equal(man.value!.amount, 1373); assert.equal(man.status, "verified");
   assert.deepEqual(allClaims().filter((c) => c.status === "verified").map((c) => c.id).sort(), ["U1", "U2", "U3", "U5b", "U6"]);
-  assert.ok(Object.keys(CLIMATE_APPROVALS).length >= 1 && officialData("vancouver")!.climate!.status === "verified"); assert.equal(officialData("toronto")!.climate, undefined); assert.equal(officialData("london")!.climate, undefined);
+  assert.ok(Object.keys(CLIMATE_APPROVALS).length >= 1 && officialData("vancouver")!.climate!.status === "verified"); assert.equal(officialData("toronto")!.climate!.status, "verified"); assert.equal(officialData("london")!.climate, undefined);
   for (const c of ["toronto", "london"] as const) for (const item of ["housing", "food", "transport", "phone", "leisure"] as const) assert.deepEqual(cityCandidates(c as never, item as never, { studyType: "language", housingType: "other" } as never), [], `${c}/${item}: nothing is added to the Planner`);
   assert.equal(cities.length, 6);
 });

@@ -198,7 +198,7 @@ export function approvalSheet(): string {
     `- [${auDone ? "x" : " "}] 承認記録を \`RENT_APPROVALS\` に書いた（数値ごと）`);
   const tc = TORONTO_CLIMATE_CANDIDATE, tcDone = !!CLIMATE_APPROVALS[tc.id], mn = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
   L.push("", tcDone ? "## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 承認済み" : "## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 取得済み・承認待ち（verified ではありません・サイトには数値を出していません）", "",
-    "2026-10-19 に GitHub Actions（run 39303865202。読み取り専用・robots.txt 順守・1回の要求）で、ECCC の「カナダ気候平年値 1991–2020」オンタリオ州の一括CSVから取得しました。ライセンスは ECCC Data Services End-use Licence v2.1.1（2026年8月。商用利用可・出典表示必須。同日に全文を再読）。**ライセンスが確認できない数値は、unverified でも公開しません。** 承認記録（`data/approvals.ts` の `CLIMATE_APPROVALS`）に載せるまで、都市ページにもグラフにも比較にも数値は出ず、「公式の平年値は取得済み・確認中」と公式リンクだけが出ます。",
+    "2026-10-19 に GitHub Actions（run 39303865202。読み取り専用・robots.txt 順守・1回の要求）で、ECCC の「カナダ気候平年値 1991–2020」オンタリオ州の一括CSVから取得しました。ライセンスは ECCC Data Services End-use Licence v2.1.1（2026年8月。商用利用可・出典表示必須。同日に全文を再読）。**ライセンスが確認できない数値は、unverified でも公開しません。** " + (tcDone ? "2026-10-19 に StarHunting1 が公開を承認し（Ver.1.6.4、照合は GitHub Actions run 39308503517）、`CLIMATE_APPROVALS` に記録しました。都市ページのグラフ・月別表・年値・観測所情報・品質コードと、比較（Vancouver とは観測地点の種類が違うため「参考値のみ」）に表示されます。" : "承認記録（`data/approvals.ts` の `CLIMATE_APPROVALS`）に載せるまで、都市ページにもグラフにも比較にも数値は出ず、「公式の平年値は取得済み・確認中」と公式リンクだけが出ます。") + "",
     "", "| 項目 | 内容 |", "|---|---|",
     `| 観測地点 | ${tc.station}（気候ID ${tc.stationId}）。複合観測所（NORMALS_CODE C）。**市内中心部の観測所**（北緯${tc.stationInfo!.lat}・西経${Math.abs(tc.stationInfo!.lon!)}・標高${tc.stationInfo!.elevationM} m）で、トロント・ピアソン空港（TORONTO INTL A）ではない |`,
     `| 統計期間・種類 | ${tc.period} のカナダ気候平年値（Normal）。ECCC が公表した値をそのまま転記（StudyAtlas は計算も補完もしない） |`,

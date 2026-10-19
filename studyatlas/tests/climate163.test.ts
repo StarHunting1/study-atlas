@@ -39,26 +39,6 @@ t("Toronto candidate: 48 monthly values and the annual values exactly as ECCC pu
   assert.equal(RIGHTS["eccc-climate-normals"].reuseStatus, "permitted"); assert.match(RIGHTS["eccc-climate-normals"].licence!, /v2\.1\.1/); assert.equal(RIGHTS["eccc-climate-normals"].lastReviewedAt, "2026-10-19"); assert.ok(officialSources.find((s) => s.id === "eccc-climate-normals")!.cityIds.includes("toronto"));
 });
 
-t("not published: no approval exists, so Toronto has no climate record, the comparison has no Toronto climate, and no Toronto climate number appears on the page; the page says the normals are being checked and links the source and the licence", () => {
-  assert.deepEqual(Object.keys(CLIMATE_APPROVALS), ["van-climate-eccc-1991-2020"]); assert.equal(approvedClimate(TORONTO_CLIMATE_CANDIDATE), undefined);
-  const d = officialData("toronto")!; assert.equal(d.climate, undefined); assert.equal(climateCompare("toronto"), undefined);
-  const nt = d.notices!.find((x) => x.topic === "climate")!; assert.equal(nt.why, "awaiting-approval"); assert.ok(nt.links.some((l) => l.url.includes("climate.weather.gc.ca")) && nt.links.some((l) => l.url.includes("eccc-msc.github.io/open-data/licence"))); assert.match(nt.text.ja, /空港ではありません/);
-  const html = page("toronto"); const tx = text(html); const k = text(keyOf(html, "climate"));
-  for (const v of ["822.7", "9.7", "13.4", "64.6", "81.6", "27.0", "-3.5", "−3.5", "22.5"]) assert.ok(!tx.includes(v), `number ${v} must not be on the page`);
-  assert.match(html, /data-testid="climate-status"[^>]*data-why="awaiting-approval"/); assert.ok(text(html).includes("公式の1991–2020平年値は取得済み・確認中"), "first-screen state"); assert.ok(k.includes("未確認") || k.length > 0);
-  const cmp = text(wrap(h(QuickCompare, { ids: ["vancouver", "toronto"] }))); for (const v of ["822.7", "9.7", "64.6", "27.0"]) assert.ok(!cmp.includes(v), `no Toronto number in the comparison: ${v}`);
-});
-
-t("approval gate (in-memory test record, removed again): approval makes the candidate verified and visible; a changed value, station or period breaks it; an approval for a changed candidate is never exposed", () => {
-  const c = TORONTO_CLIMATE_CANDIDATE; const col = (k: "meanC" | "maxC" | "minC" | "precipMm") => c.months.map((m) => m[k] as number);
-  CLIMATE_APPROVALS[TORONTO_CLIMATE_ID] = { approval: { by: "Test Reviewer", at: "2026-10-20", compared: "test input only" }, station: c.station, stationId: c.stationId!, period: c.period, meanC: col("meanC"), maxC: col("maxC"), minC: col("minC"), precipMm: col("precipMm"), annualPrecipMm: 822.7, sources: c.evidence.map((e) => e.url) };
-  try {
-    const v = approvedClimate(c)!; assert.equal(v.status, "verified"); assert.equal(v.approval!.by, "Test Reviewer"); const d = torontoData(undefined, CLIMATE_APPROVALS); assert.equal(d.climate!.status, "verified"); assert.ok(!d.notices!.some((x) => x.topic === "climate"), "the notice goes away");
-    const changed = structuredClone(c); changed.months[3].maxC = 12.0; assert.throws(() => approvedClimate(changed), /changed after its approval/); const st = structuredClone(c); st.period = "1981–2010"; assert.throws(() => approvedClimate(st), /changed after its approval/);
-  } finally { delete CLIMATE_APPROVALS[TORONTO_CLIMATE_ID]; }
-  assert.equal(approvedClimate(c), undefined); assert.deepEqual(Object.keys(CLIMATE_APPROVALS), ["van-climate-eccc-1991-2020"]);
-});
-
 t("comparison: the same period is not enough – an airport station and a city-centre station are 'reference only'; different periods too; the observing site is shown", () => {
   const base = { tmax: [10, 20] as [number, number], station: "X", period: "1991–2020", derived: false, status: "verified" as const };
   assert.deepEqual(climateIssues([{ ...base, site: "airport" }, { ...base, site: "airport" }]), []); assert.deepEqual(climateIssues([{ ...base, site: "airport" }, { ...base, site: "city" }]), ["site"]);

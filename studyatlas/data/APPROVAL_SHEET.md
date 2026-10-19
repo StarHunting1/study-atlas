@@ -649,9 +649,9 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 - [x] 「2021年のデータ」「中央値」「週あたり」「Greater 全体」「学生向け住居ではない」の説明が画面に出ることを確認した
 - [x] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）
 
-## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 取得済み・承認待ち（verified ではありません・サイトには数値を出していません）
+## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 承認済み
 
-2026-10-19 に GitHub Actions（run 39303865202。読み取り専用・robots.txt 順守・1回の要求）で、ECCC の「カナダ気候平年値 1991–2020」オンタリオ州の一括CSVから取得しました。ライセンスは ECCC Data Services End-use Licence v2.1.1（2026年8月。商用利用可・出典表示必須。同日に全文を再読）。**ライセンスが確認できない数値は、unverified でも公開しません。** 承認記録（`data/approvals.ts` の `CLIMATE_APPROVALS`）に載せるまで、都市ページにもグラフにも比較にも数値は出ず、「公式の平年値は取得済み・確認中」と公式リンクだけが出ます。
+2026-10-19 に GitHub Actions（run 39303865202。読み取り専用・robots.txt 順守・1回の要求）で、ECCC の「カナダ気候平年値 1991–2020」オンタリオ州の一括CSVから取得しました。ライセンスは ECCC Data Services End-use Licence v2.1.1（2026年8月。商用利用可・出典表示必須。同日に全文を再読）。**ライセンスが確認できない数値は、unverified でも公開しません。** 2026-10-19 に StarHunting1 が公開を承認し（Ver.1.6.4、照合は GitHub Actions run 39308503517）、`CLIMATE_APPROVALS` に記録しました。都市ページのグラフ・月別表・年値・観測所情報・品質コードと、比較（Vancouver とは観測地点の種類が違うため「参考値のみ」）に表示されます。
 
 | 項目 | 内容 |
 |---|---|
@@ -704,7 +704,7 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 4. 承認後は `data/official/toronto.ts` が自動で `climate` を持ち（`approvedClimate`）、グラフ・月別表・比較に出る。値・観測所・期間・出典を後から変えるとビルドが失敗する。
 ### 8.4 承認チェックリスト
 
-- [ ] 月別48値と年値（年平均気温 9.7・年降水量 822.7 など）を ECCC の公式CSVと照合した
-- [ ] 観測所が市内中心部の TORONTO (CITY) で、空港ではないことを確認した
-- [ ] ECCC ライセンス v2.1.1（商用利用可・出典表示）を確認した
-- [ ] 承認記録を `CLIMATE_APPROVALS` に書いた
+- [x] 月別48値と年値（年平均気温 9.7・年降水量 822.7 など）を ECCC の公式CSVと照合した
+- [x] 観測所が市内中心部の TORONTO (CITY) で、空港ではないことを確認した
+- [x] ECCC ライセンス v2.1.1（商用利用可・出典表示）を確認した
+- [x] 承認記録を `CLIMATE_APPROVALS` に書いた
