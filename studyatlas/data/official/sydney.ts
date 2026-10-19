@@ -29,6 +29,9 @@ export const sydneyData = (approvals: Record<string, RentApproval> = RENT_APPROV
         { label: { en: "Transport for NSW – Fares and ways to pay", ja: "Transport for NSW – 運賃と支払い方法" }, url: "https://transportnsw.info/tickets-fares/fares" },
         { label: { en: "Transport for NSW – Eligibility and concessions", ja: "Transport for NSW – 対象者と割引" }, url: "https://transportnsw.info/tickets-fares/eligibility-concessions" },
       ] },
+    { topic: "climate", sourceId: "bom-climate", why: "unreviewed",
+      text: { en: "The Bureau of Meteorology publishes official climate statistics for Sydney, but StudyAtlas could not read them: the Bureau's pages answered the automated check with HTTP 403 (access denied), the request was not repeated and no workaround was attempted, and its terms of reuse were not reviewed. No climate numbers are shown or compared for this city; the climate text above is an unverified overview. Please check the official statistics (the link was not opened by StudyAtlas).", ja: "気象局（BoM）はシドニーの公式の気候統計を公開していますが、StudyAtlasでは読み取れませんでした。気象局のページが自動確認にHTTP 403（アクセス拒否）を返したため、再試行も回避策も行っていません。再利用の条件も確認していません。この都市の気候の数値は表示も比較もしておらず、上の気候の文章は未確認の概要です。公式の統計をご確認ください（リンク先はStudyAtlasでは開けていません）。" },
+      links: [{ label: { en: "Bureau of Meteorology – Climate statistics for Australian locations (Sydney)", ja: "気象局（BoM）– 豪州各地の気候統計（シドニー）" }, url: "https://www.bom.gov.au/climate/averages/tables/cw_066062.shtml" }] },
   ],
 });
 export default sydneyData();

@@ -39,7 +39,7 @@ export const officialSources: OfficialSource[] = [
   { id: "statcan-cmhc-rents", publisher: "Statistics Canada / CMHC", name: { en: "Average rents (CMHC Rental Market Survey), table 34-10-0133-01", ja: "平均家賃（CMHC 賃貸市場調査）表 34-10-0133-01" }, country: "CAN", cityIds: ["vancouver", "toronto"], topic: "housing", method: "api",
     pages: ["https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301"], cadenceDays: 30,
   },
-  { id: "eccc-climate-normals", publisher: "Environment and Climate Change Canada", name: { en: "Canadian Climate Normals 1981–2010 (GeoMet OGC API)", ja: "カナダ気候平年値 1981–2010（GeoMet OGC API）" }, country: "CAN", cityIds: ["vancouver"], topic: "climate", method: "api",
+  { id: "eccc-climate-normals", publisher: "Environment and Climate Change Canada", name: { en: "Canadian Climate Normals 1981–2010 (GeoMet OGC API)", ja: "カナダ気候平年値 1981–2010（GeoMet OGC API）" }, country: "CAN", cityIds: ["vancouver", "toronto"], topic: "climate", method: "api",
     pages: ["https://climate.weather.gc.ca/climate_normals/", "https://api.weather.gc.ca/collections/climate-normals"], cadenceDays: 180,
   },
   { id: "metoffice-station-data", publisher: "Met Office", name: { en: "Historical monthly data for meteorological stations (Ringway)", ja: "気象観測地点の月別履歴データ（リングウェイ）" }, country: "GBR", cityIds: ["manchester"], topic: "climate", method: "api",
@@ -62,5 +62,8 @@ export const officialSources: OfficialSource[] = [
   },
   { id: "ptv-fares", publisher: "Transport Victoria (formerly Public Transport Victoria)", name: { en: "myki and fares (link only)", ja: "myki と運賃（リンクのみ）" }, country: "AUS", cityIds: ["melbourne"], topic: "transport", method: "page",
     pages: ["https://transport.vic.gov.au/tickets-and-myki/myki", "https://transport.vic.gov.au/tickets-and-myki/fares"], cadenceDays: 60,
+  },
+  { id: "bom-climate", publisher: "Bureau of Meteorology (BoM)", name: { en: "Climate statistics for Australian locations (link only)", ja: "豪州各地の気候統計（リンクのみ）" }, country: "AUS", cityIds: ["sydney", "melbourne"], topic: "climate", method: "page",
+    pages: ["https://www.bom.gov.au/climate/averages/tables/cw_066062.shtml", "https://www.bom.gov.au/climate/averages/tables/cw_086071.shtml"], cadenceDays: 180,
   },
 ];

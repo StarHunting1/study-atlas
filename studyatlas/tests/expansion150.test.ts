@@ -107,7 +107,7 @@ t("schools: EF Toronto, Kaplan Toronto, Kaplan London and Frances King London ar
 });
 
 t("transport and fees: TTC and TfL are link-only with unknown reuse, blocked for automation, never requested by the link check; school fee pages stay link-only", () => {
-  for (const id of ["ttc-fares", "tfl-fares"]) { const r = rightsOfSource(id); assert.equal(r.reuseStatus, "unknown"); assert.equal(r.display, "link-only"); assert.equal(r.automation, "blocked"); assert.equal(r.lastReviewedAt, null); }
+  for (const id of ["ttc-fares", "tfl-fares"]) { const r = rightsOfSource(id); assert.equal(r.reuseStatus, id === "ttc-fares" ? "restricted" : "unknown", "TTC: terms read on 2026-10-19 (Ver.1.6.3) and found restricted; TfL: still not readable"); assert.equal(r.display, "link-only"); assert.equal(r.automation, "blocked"); assert.equal(r.lastReviewedAt, id === "ttc-fares" ? "2026-10-19" : null); }
   const hosts = blockedHosts(); assert.ok(hosts.has("ttc.ca") && hosts.has("tfl.gov.uk"));
   assert.equal(rightsOfSource("language-school-fees").display, "link-only");
   for (const id of ["statcan-cmhc-rents", "ons-private-rents"]) assert.equal(rightsOfSource(id).reuseStatus, "permitted");

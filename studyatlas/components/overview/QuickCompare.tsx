@@ -6,6 +6,8 @@ import { sections } from "@/data/fields";
 import { moneyComparability } from "@/data/comparability";
 import type { DataPoint } from "@/data/official/types";
 import { rentDiffFields } from "@/data/official/rentBasis";
+import { guideOf } from "@/data/official/transportGuides";
+import { TransportGuideCompare } from "./TransportGuide";
 import { rentExplain } from "@/data/official/rentExplain";
 import { climateCompare, climateIssues, compareRows, hasHeldNotice, hasRentPending, missingReason, pickPoint, rowVerdict, type ClimateCompare, type Issue } from "@/data/official/compare";
 import { officialData } from "@/data/official";
@@ -36,7 +38,7 @@ const cmpOf = (keys: Key[], t: CmpTopic): Cmp => (t === "rent" ? rentCmp(keys) :
 const titleOf = (t: CmpTopic, L: (x: Localized) => string) => (t === "rent" ? L(cu.rentTitle) : t === "housing" ? L(cu.studentHousingTitle) : L(ux.topics[t]));
 const SECTION_OF: Record<Topic, string> = { living: "cost", housing: "housing", transport: "transport", climate: "climate", education: "education" };
 const EXTRA_FIELDS: Record<ExtraTopic, string[]> = { safety: ["safety.crimeStats", "safety.advice"], visa: ["visa.official", "visa.notes"], medical: ["living.healthcare"], daily: ["living.studentLife", "living.sim", "living.banking", "living.studentFacilities"] };
-const issueText: Record<Issue, keyof typeof ot> = { missing: "cmpMissing", notVerified: "cmpUnverified", period: "cmpPer", audience: "cmpAudience" };
+const issueText: Record<Issue, keyof typeof ot> = { missing: "cmpMissing", notVerified: "cmpUnverified", period: "cmpPer", audience: "cmpAudience", site: "cmpClimateSite" };
 /** The three states the user sees (comparable / reference only / not obtained) plus "official link only" for figures the publisher's terms keep off the page. */
 const chip: Record<Availability, { label: keyof typeof cu; kind: "ok" | "ref" | "link" | "none"; cls: string }> = {
   comparable: { label: "comparable", kind: "ok", cls: "bg-emerald-50 text-emerald-800 ring-emerald-100" }, reference: { label: "reference", kind: "ref", cls: "bg-amber-50 text-amber-800 ring-amber-200" },
@@ -83,8 +85,12 @@ function DetailRow({ label, note, noteCls = "text-slate-400", extra, cities, cel
 function OfficialDetail({ cities, topic }: { cities: City[]; topic: CmpTopic }) {
   const { L, lang } = useI18n(); const rows = compareRows.filter((r) => (topic === "rent" ? ["marketRent"] : ROWS_OF[topic]).includes(r.id));
   const showClimate = topic === "climate" && cities.some((c) => climateCompare(c.id));
-  if (!rows.length && !showClimate) return null;
+  const showGuide = topic === "transport" && cities.some((c) => guideOf(c.id));
+  if (!rows.length && !showClimate && !showGuide) return null;
   const none = <span className="text-xs text-slate-400">{L(ot.cmpMissing)}</span>;
+  /** A city without a shown climate record: say why (official normals collected and awaiting approval / official link only) instead of a bare "not obtained". */
+  const climateGap = (cityId: string) => { const n = (officialData(cityId)?.notices ?? []).find((x) => x.topic === "climate"); if (!n) return none;
+    return <div className="space-y-1" data-testid="climate-gap" data-why={n.why}><p className="text-xs font-medium text-slate-600">{L(n.why === "awaiting-approval" ? cu.climatePendingHere : cu.climateOfficialHere)}</p><p className="text-[11px] leading-snug text-slate-500">{L(n.why === "awaiting-approval" ? cu.climatePendingDetail : cu.climateOfficialDetail)}</p></div>; };
   /** A city without a shown figure: say why (terms allow only a link / reviewed and held back) instead of a bare "no data". */
   const gap = (cityId: string, row: (typeof compareRows)[number]) => { const m = missingReason(cityId, row); if (!m) return none;
     return m.kind === "link"
@@ -99,10 +105,11 @@ function OfficialDetail({ cities, topic }: { cities: City[]; topic: CmpTopic }) 
             <p className="text-[11px] text-slate-500">{L(ot.audience[p.audience])} · {validForShort(p.validFor, lang)}</p><p className="text-[11px] leading-snug text-slate-500">{L(p.conditions)}</p>
             <Disclosure level="sources"><p className="text-[11px] text-slate-500">{L(ot.source)}: <a href={p.evidence[0].url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{p.evidence[0].publisher}</a> · {L(ot.retrieved)}: {p.retrievedAt}{p.checkedAt ? ` · ${L(ot.checked)}: ${p.checkedAt}` : ""}</p></Disclosure></div> : gap(cities[i].id, row))} />;
       })}
+      {showGuide && <TransportGuideCompare ids={cities.map((c) => c.id)} names={Object.fromEntries(cities.map((c) => [c.id, c.name]))} />}
       {showClimate && ([["tmax", ot.cmpTmax, (c: ClimateCompare) => c.tmax && `${c.tmax[0].toFixed(1)} – ${c.tmax[1].toFixed(1)} °C`], ["tmin", ot.cmpTmin, (c: ClimateCompare) => c.tmin && `${c.tmin[0].toFixed(1)} – ${c.tmin[1].toFixed(1)} °C`], ["precip", ot.cmpPrecip, (c: ClimateCompare) => c.precipTotal !== undefined && `${c.precipTotal} mm`]] as const).map(([key, label, fmtv]) => {
         const cs = cities.map((c) => climateCompare(c.id)); const issues = climateIssues(cs);
         return <DetailRow key={key} label={L(label)} note={issues.length ? issues.map((i) => L(i === "period" ? ot.cmpClimatePeriods : ot[issueText[i]] as never)).join(" / ") : L(ot.cmpOkSame)} noteCls={issues.length ? "text-amber-700" : "text-emerald-700"} extra={key === "precip" ? L(ot.cmpPrecipNote) : undefined} cities={cities}
-          cells={cs.map((c) => c && fmtv(c) ? <div className="space-y-1"><span className="font-semibold tabular-nums">{fmtv(c)}</span> {c.status !== "verified" && <StatusBadge status={c.status} />}<p className="text-[11px] text-slate-500">{L(ot.climateStation)}: {c.station}</p><p className="text-[11px] text-slate-500">{L(ot.climatePeriod)}: {c.period}{c.derived ? ` · ${L(ot.cmpDerived)}` : ""}</p></div> : none)} />;
+          cells={cs.map((c, ci) => c && fmtv(c) ? <div className="space-y-1"><span className="font-semibold tabular-nums">{fmtv(c)}</span> {c.status !== "verified" && <StatusBadge status={c.status} />}<p className="text-[11px] text-slate-500">{L(ot.climateStation)}: {c.station}</p>{c.where && <p className="text-[11px] leading-snug text-slate-500" data-testid="climate-where">{L(c.where)}</p>}<p className="text-[11px] text-slate-500">{L(ot.climatePeriod)}: {c.period}{c.derived ? ` · ${L(ot.cmpDerived)}` : ""}</p></div> : climateGap(cities[ci].id))} />;
       })}
     </div>
   );

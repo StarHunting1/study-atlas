@@ -648,3 +648,63 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 - [x] Sydney 470／Melbourne 390 AUD/週（2021年国勢調査・中央値・実際の家賃）を ABS のページと照合した
 - [x] 「2021年のデータ」「中央値」「週あたり」「Greater 全体」「学生向け住居ではない」の説明が画面に出ることを確認した
 - [x] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）
+
+## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 取得済み・承認待ち（verified ではありません・サイトには数値を出していません）
+
+2026-10-19 に GitHub Actions（run 39303865202。読み取り専用・robots.txt 順守・1回の要求）で、ECCC の「カナダ気候平年値 1991–2020」オンタリオ州の一括CSVから取得しました。ライセンスは ECCC Data Services End-use Licence v2.1.1（2026年8月。商用利用可・出典表示必須。同日に全文を再読）。**ライセンスが確認できない数値は、unverified でも公開しません。** 承認記録（`data/approvals.ts` の `CLIMATE_APPROVALS`）に載せるまで、都市ページにもグラフにも比較にも数値は出ず、「公式の平年値は取得済み・確認中」と公式リンクだけが出ます。
+
+| 項目 | 内容 |
+|---|---|
+| 観測地点 | TORONTO (CITY) – composite of 6158350 and 6158355（気候ID 6158350+6158355）。複合観測所（NORMALS_CODE C）。**市内中心部の観測所**（北緯43.67・西経79.4・標高112.5 m）で、トロント・ピアソン空港（TORONTO INTL A）ではない |
+| 統計期間・種類 | 1991–2020 のカナダ気候平年値（Normal）。ECCC が公表した値をそのまま転記（StudyAtlas は計算も補完もしない） |
+| 品質コード | A (temperature) · C (precipitation)（ECCC の Code 列：A〜D） |
+| 単位 | 気温 °C、降水量 mm（月別12値＋年値） |
+| 比較への影響 | 承認後は、Vancouver（空港観測所・1991–2020）とは**観測地点の種類が異なる**（市内中心部と空港）ため、比較は「参考値のみ」になる |
+
+### 8.1 月別48値と年値
+
+| 月 | 平均気温 °C | 平均最高 °C | 平均最低 °C | 降水量 mm |
+|---|---|---|---|---|
+| 1月 | -3.5 | -0.3 | -6.7 | 64.6 |
+| 2月 | -2.7 | 0.6 | -6 | 53.9 |
+| 3月 | 1.7 | 5.1 | -1.8 | 52.8 |
+| 4月 | 7.8 | 11.7 | 3.9 | 78 |
+| 5月 | 14.5 | 18.8 | 10 | 76.4 |
+| 6月 | 19.8 | 24.2 | 15.3 | 81.6 |
+| 7月 | 22.5 | 27 | 18.1 | 76.5 |
+| 8月 | 21.9 | 26.1 | 17.7 | 71.9 |
+| 9月 | 17.9 | 22 | 13.8 | 69.4 |
+| 10月 | 11.2 | 14.6 | 7.7 | 69.1 |
+| 11月 | 5.2 | 8.1 | 2.3 | 70.8 |
+| 12月 | -0.1 | 2.6 | -2.7 | 57.8 |
+| **年** | **9.7** | **13.4** | **6** | **822.7** |
+
+### 8.2 整合チェック（コードによる確認。公式ファイルとの突き合わせは人が行う）
+
+| 確認 | 結果 | 詳細 |
+|---|---|---|
+| 12 months × 4 elements = 48 values, none missing | OK | 12 months |
+| every month: minimum ≤ mean ≤ maximum | OK | temperatures |
+| precipitation values are non-negative | OK | mm |
+| annual mean temperature matches the monthly means (±0.2 °C) | OK | 9.7 |
+| annual precipitation matches the sum of the months (±0.5 mm: rounding) | OK | 822.7 |
+| annual maximum / minimum lie within the monthly range | OK | 13.4/6 |
+| source registered for the city | OK | Environment and Climate Change Canada |
+| evidence page belongs to the source | OK | https://climate.weather.gc.ca/climate_normals/index_e.html |
+| station name, id, period and a plain-language location are recorded | OK | TORONTO (CITY) – composite of 6158350 and 6158355 · 1991–2020 |
+| licence recorded and reuse permitted, shown in full | OK | permitted · Environment and Climate Change Canada Data Services End-use Licence v2.1.1 (August 2026) |
+| the quote contains every value | OK | quote |
+| still a candidate: status is unverified and there is no approval inside the record | OK | unverified |
+
+### 8.3 承認の手順（人が行う）
+
+1. ECCC の公式ページ（https://climate.weather.gc.ca/climate_normals/index_e.html のオンタリオ州一括CSV）を開き、観測所 TORONTO (CITY)（気候ID 6158350・6158355）の「Daily Average / Daily Maximum / Daily Minimum (°C)」「Precipitation (mm)」の月別48値と年値が上表と一致することを確認する。
+2. ECCC のライセンス（v2.1.1：商用利用可・出典表示必須）と、画面に出る出典表示を確認する。
+3. `data/approvals.ts` の `CLIMATE_APPROVALS` に `"tor-climate-eccc-1991-2020"` を追加する（`approval`＝承認者・日付・照合内容、`station`・`stationId`・`period`、`meanC`・`maxC`・`minC`・`precipMm` の12値、`annualPrecipMm`、`sources`）。**承認者名と承認記録は、人が承認するまで作成しません。**
+4. 承認後は `data/official/toronto.ts` が自動で `climate` を持ち（`approvedClimate`）、グラフ・月別表・比較に出る。値・観測所・期間・出典を後から変えるとビルドが失敗する。
+### 8.4 承認チェックリスト
+
+- [ ] 月別48値と年値（年平均気温 9.7・年降水量 822.7 など）を ECCC の公式CSVと照合した
+- [ ] 観測所が市内中心部の TORONTO (CITY) で、空港ではないことを確認した
+- [ ] ECCC ライセンス v2.1.1（商用利用可・出典表示）を確認した
+- [ ] 承認記録を `CLIMATE_APPROVALS` に書いた

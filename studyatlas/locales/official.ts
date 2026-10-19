@@ -120,5 +120,6 @@ export const ot = {
   cmpPrecip: { en: "Annual precipitation", ja: "年間降水量" },
   cmpPrecipNote: { en: "Definitions differ slightly: Met Office “rainfall” vs ECCC “total precipitation” (rain plus snow water equivalent). The yearly figure is ECCC's published annual value but, for Met Office, the sum of the monthly values (calculated by StudyAtlas).", ja: "定義が少し異なります：Met Officeは「降雨量」、ECCCは「降水量（雨＋雪の水換算）」です。年間の値は、ECCCは公表されている年値、Met Officeは月別値の合計（StudyAtlas計算）です。" },
   cmpDerived: { en: "calculated by StudyAtlas", ja: "StudyAtlas算出" },
+  cmpClimateSite: { en: "Observing sites differ (e.g. airport vs city centre)", ja: "観測地点の種類が異なります（空港と市内中心部など）" },
   cmpClimatePeriods: { en: "Averaging periods differ", ja: "統計期間が異なります" },
 } as const;

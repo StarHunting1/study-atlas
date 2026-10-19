@@ -12,14 +12,15 @@ What each publisher's published terms permit, how the data may be accessed, and 
 | The University of Manchester (accommodation) (`uom-accommodation`) | **needs-review** | figure-with-link | page-check-only | page-check | 2026-10-14 | yes | 5 figure-with-link |
 | Office for National Statistics – Price Index of Private Rents (Manchester) (`ons-private-rents`) | **permitted** | full | allowed | open-data-file | 2026-10-17 | no | 2 full |
 | Statistics Canada / CMHC – average rents (table 34-10-0133-01) (`statcan-cmhc-rents`) | **permitted** | full | allowed | open-api | 2026-10-17 | no | 8 full |
-| Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | 1 full |
+| Environment and Climate Change Canada – climate normals (MSC GeoMet API) (`eccc-climate-normals`) | **permitted** | full | allowed | open-api | 2026-10-19 | no | 1 full |
 | Met Office – historical monthly station data (Ringway) (`metoffice-station-data`) | **permitted** | full | blocked | open-data-file | 2026-10-14 | no | 1 full |
 | UBC Student Housing and Community Services (`ubc-housing-fees`) | **restricted** | link-only | blocked | manual-link | 2026-10-14 | yes | — |
-| Toronto Transit Commission (TTC) – fares and passes (`ttc-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
+| Toronto Transit Commission (TTC) – fares and passes (`ttc-fares`) | **restricted** | link-only | blocked | manual-link | 2026-10-19 | yes | — |
 | Transport for London (TfL) – fares and discounts (`tfl-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | Australian Bureau of Statistics – 2021 Census QuickStats (median weekly rent) (`abs-census-rent`) | **permitted** | full | page-check-only | page-check | 2026-10-19 | no | 2 full |
 | Transport for NSW – tickets and fares (`tfnsw-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | Transport Victoria – myki and fares (`ptv-fares`) | **unknown** | link-only | blocked | manual-link | never | no | — |
+| Bureau of Meteorology – climate statistics for Australian locations (`bom-climate`) | **unknown** | link-only | blocked | manual-link | never | no | — |
 | GOV.UK (Content API) (`govuk-content`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
 | Open Government Canada (CKAN API) (`canada-open-gov`) | **permitted** | full | allowed | open-api | 2026-10-14 | no | — |
 | Language schools' own fee pages (Express English College, IH Manchester, Kaplan Manchester, IH Vancouver, EF Vancouver, EF Toronto, Kaplan Toronto, Kaplan London, Frances King London, ILSC Sydney and Melbourne, Navitas English Sydney, City Language Centre Melbourne) (`language-school-fees`) | **needs-review** | link-only | page-check-only | manual-link | 2026-10-15 | yes | — |
@@ -110,19 +111,21 @@ What each publisher's published terms permit, how the data may be accessed, and 
 
 ### Environment and Climate Change Canada – climate normals (MSC GeoMet API) — `eccc-climate-normals`
 
-- reuseStatus: **permitted** · collector: **allowed** · access: open-api · last reviewed: 2026-10-14
+- reuseStatus: **permitted** · collector: **allowed** · access: open-api · last reviewed: 2026-10-19
 - source: https://api.weather.gc.ca/collections/climate-normals
 - terms / licence: https://eccc-msc.github.io/open-data/licence/readme_en/ (Environment and Climate Change Canada Data Services End-use Licence v2.1.1 (August 2026))
 - restrictions: attribution-required, robots-disallows-api-path
 - attribution required: “Contains information licenced under the Data Server End-use Licence of Environment and Climate Change Canada.”
 - robots.txt exception: `https://api.weather.gc.ca/collections/climate-normals/` — The MSC Open Data Services Usage Policy documents programmatic use of the GeoMet API (limit: about 1 request per second); robots.txt disallows /collections/*/items for crawlers and points to that policy. (https://eccc-msc.github.io/open-data/usage-policy/readme_en)
-- review notes: The End-use Licence grants “a worldwide, royalty-free, perpetual, non-exclusive licence to use the Information, including for commercial purposes”, with the attribution statement above. robots.txt of api.weather.gc.ca disallows /collections/*/items, yet the Service Usage Policy it points to documents programmatic API use (usage limit 86,400 requests/day; meaningful User-Agent; request only data you need). StudyAtlas makes 4 filtered requests every 180 days, identifies itself in the User-Agent and is therefore treated as within the policy; this is a judgement and can be switched off by setting automation to “blocked”. The data recorded is the 1981–2010 climate normals.
+- review notes: The End-use Licence grants “a worldwide, royalty-free, perpetual, non-exclusive licence to use the Information, including for commercial purposes”, with the attribution statement above. robots.txt of api.weather.gc.ca disallows /collections/*/items, yet the Service Usage Policy it points to documents programmatic API use (usage limit 86,400 requests/day; meaningful User-Agent; request only data you need). StudyAtlas makes 4 filtered requests every 180 days, identifies itself in the User-Agent and is therefore treated as within the policy; this is a judgement and can be switched off by setting automation to “blocked”. The data recorded is the 1981–2010 climate normals. Ver.1.6.3 (2026-10-19): the licence text was read again (Data Services End-use Licence Version 2.1.1 – August 2026: “worldwide, royalty-free, perpetual, non-exclusive licence to use the Information, including for commercial purposes”; copy, modify, publish, translate, adapt and distribute allowed; the source must be acknowledged with the attribution statement and a link to the licence where possible). The Ontario bulk file of the 1991–2020 normals (one request, robots.txt allowed) was read for Toronto under the same licence.
 - pages read:
   - https://climate.weather.gc.ca/climate_normals/index_e.html (2026-10-16) — 1991–2020 normals: bulk download form (one GET request for British Columbia, 2026-10-16); licence text re-read (version 2.1.1, August 2026)
   - https://eccc-msc.github.io/open-data/licence/readme_en/ (2026-10-14) — End-use Licence v2.1 (full)
   - https://eccc-msc.github.io/open-data/usage-policy/readme_en (2026-10-14) — Service usage policy (full)
   - https://api.weather.gc.ca/robots.txt (2026-10-14) — Disallow: /collections/*/items
   - https://api.weather.gc.ca/ (2026-10-14) — GeoMet-OGC-API home (links the licence)
+  - https://eccc-msc.github.io/open-data/licence/readme_en/ (2026-10-19) — Data Services End-use Licence v2.1.1 (full text re-read before and after collecting the Toronto normals)
+  - https://climate.weather.gc.ca/climate_normals/index_e.html (2026-10-19) — Ontario bulk download of the 1991–2020 normals (one request; Toronto rows)
 
 ### Met Office – historical monthly station data (Ringway) — `metoffice-station-data`
 
@@ -153,13 +156,15 @@ What each publisher's published terms permit, how the data may be accessed, and 
 
 ### Toronto Transit Commission (TTC) – fares and passes — `ttc-fares`
 
-- reuseStatus: **unknown** · collector: **blocked** · access: manual-link · last reviewed: never
+- reuseStatus: **restricted** · collector: **blocked** · access: manual-link · last reviewed: 2026-10-19
 - source: https://www.ttc.ca/fares-and-passes
-- terms / licence: none published
-- restrictions: none recorded
-- review notes: Ver.1.5.0: the fares page was opened once by the GitHub Actions probe on 2026-10-17 (robots.txt allowed, HTTP 200) to confirm that the link works. The TTC's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read the page. Only a link and our own wording about who should check what are shown.
+- terms / licence: https://www.ttc.ca/transparency-and-accountability/policies/web-site-terms-and-conditions-of-use
+- restrictions: no-reproduction-without-consent, personal-noncommercial-extracts-only
+- review notes: Ver.1.5.0: the fares page was opened once by the GitHub Actions probe on 2026-10-17 (robots.txt allowed, HTTP 200) to confirm that the link works. The TTC's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read the page. Only a link and our own wording about who should check what are shown. Ver.1.6.3 (2026-10-19): the TTC Web Site Terms and Conditions of Use were read. They say the material is protected by copyright, may be viewed and copied for personal non-commercial use only, and that you may not “republish, reproduce, display, publicly perform, distribute or otherwise use any substantial part of the Works” without the prior written permission of the TTC; an acknowledgement of the source is required when TTC material is copied or published. The fares page was read once (HTTP 200): StudyAtlas therefore keeps fares link-only, copies no amount or table, and describes only in its own words how fares can be paid and that a post-secondary student fare exists with its eligibility on the TTC's own page.
 - pages read:
-  - none yet
+  - https://www.ttc.ca/transparency-and-accountability/policies/web-site-terms-and-conditions-of-use (2026-10-19) — Web Site Terms and Conditions of Use (use of the Web Site: copyright, personal non-commercial use, substantial part)
+  - https://www.ttc.ca/fares-and-passes (2026-10-19) — fares page (payment options and fare categories; no amount copied)
+  - https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts (2026-10-19) — fare types and discounts (post-secondary student category and its eligibility, read for the link only)
 
 ### Transport for London (TfL) – fares and discounts — `tfl-fares`
 
@@ -190,9 +195,11 @@ What each publisher's published terms permit, how the data may be accessed, and 
 - source: https://transportnsw.info/tickets-fares
 - terms / licence: none published
 - restrictions: none recorded
-- review notes: Ver.1.6.0: the GitHub Actions probe opened the tickets-and-fares, fares and eligibility-and-concessions pages once on 2026-10-19 (robots.txt allowed, HTTP 200) to confirm that the links work and what the pages are about. Transport for NSW's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read these pages. The eligibility page lists “Tertiary and TAFE students” among the groups that can get concession fares and says nothing there about international students, so StudyAtlas does not say that an international or language-school student gets a concession.
+- review notes: Ver.1.6.0: the GitHub Actions probe opened the tickets-and-fares, fares and eligibility-and-concessions pages once on 2026-10-19 (robots.txt allowed, HTTP 200) to confirm that the links work and what the pages are about. Transport for NSW's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read these pages. The eligibility page lists “Tertiary and TAFE students” among the groups that can get concession fares and says nothing there about international students, so StudyAtlas does not say that an international or language-school student gets a concession. Ver.1.6.3 (2026-10-19): the Tertiary and TAFE students page was read for the link only: it says concession fares are for students enrolled full-time and on-campus in an accredited course with a registered higher-education or vocational provider, and names international students only for certain scholarships (Endeavour, Australian Awards, Research Training Program); language-school courses are not mentioned. No site copyright or licence page could be found (the guessed copyright and terms pages answered 404, transport.nsw.gov.au answered 403); the Opal terms of use and the separate Transport Open Data portal licence were not reviewed, so reuse stays unknown and no fare amount is copied.
 - pages read:
-  - none yet
+  - https://transportnsw.info/tickets-fares/eligibility-concessions/tertiary-tafe-students (2026-10-19) — Tertiary and TAFE students: eligibility wording (link only)
+  - https://transportnsw.info/tickets-fares/fares (2026-10-19) — fares and ways to pay (payment options only; no amount copied)
+  - https://opendata.transport.nsw.gov.au/ (2026-10-19) — Transport Open Data portal (its own Data Licence; not applied to the website)
 
 ### Transport Victoria – myki and fares — `ptv-fares`
 
@@ -201,6 +208,16 @@ What each publisher's published terms permit, how the data may be accessed, and 
 - terms / licence: none published
 - restrictions: none recorded
 - review notes: Ver.1.6.0: ptv.vic.gov.au now redirects to transport.vic.gov.au, which answered the GitHub Actions probe's automated requests (2026-10-19, myki and fares pages) with HTTP 403 and a bot-check page (“Just a moment…”). The pages were therefore not read, not retried and no workaround was attempted; the links point to the pages the redirect leads to and their content is unconfirmed. The terms of use were not reviewed, so reuse is unknown: no amount, table or text is copied and no student-concession claim is made.
+- pages read:
+  - none yet
+
+### Bureau of Meteorology – climate statistics for Australian locations — `bom-climate`
+
+- reuseStatus: **unknown** · collector: **blocked** · access: manual-link · last reviewed: never
+- source: https://www.bom.gov.au/climate/averages/tables/cw_066062.shtml
+- terms / licence: none published
+- restrictions: none recorded
+- review notes: Ver.1.6.3: the GitHub Actions probe requested the BoM copyright page and four climate-statistics pages once each on 2026-10-19 (robots.txt did not forbid the paths); every request was answered with HTTP 403 (access denied). Nothing was read, nothing was retried and no workaround was attempted. BoM's terms of reuse were therefore NOT reviewed and reuse is unknown: no climate number is copied or shown, and the collector does not request these pages. Only a link to the official statistics and our own wording are shown; the link itself has not been opened by StudyAtlas.
 - pages read:
   - none yet
 

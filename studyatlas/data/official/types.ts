@@ -79,7 +79,9 @@ export type ClimateNormals = {
   /** true when StudyAtlas calculated the values from published source values (not an official published average) */
   derived?: boolean;
   /** Annual values as published by the source (never calculated from the months): shown instead of a sum of the monthly values */
-  annual?: { precipMm?: number };
+  annual?: { meanC?: number; maxC?: number; minC?: number; precipMm?: number };
+  /** The observing station in plain terms (Ver.1.6.3): where it is relative to the city centre, so an airport or suburban station is never read as the city centre itself */
+  stationInfo?: { kind: "city" | "airport" | "other"; lat?: number; lon?: number; elevationM?: number; where: Localized; /** quality code published with the normals (ECCC: A–D) */ quality?: string };
   /** Human approval of this record (who, when, on what basis); the approved numbers are kept in data/approvals.ts */
   approval?: { by: string; at: string; compared: string };
 };

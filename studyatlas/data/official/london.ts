@@ -24,6 +24,9 @@ export const londonData = (approvals: Record<string, RentApproval> = RENT_APPROV
         ja: "TfLの運賃（大人運賃・ゾーン・パス・割引・年齢や学生資格による対象）はここに転載していません。また、TfLのページは自動アクセスを拒否した（HTTP 403）ため読み取れておらず、再試行や回避もしていません。公式ページをブラウザでご確認ください。語学学校の学生が学生割引を受けられるとは限りません。1回ごとの運賃を、上限（キャップ）の規則を見ずに月額へ換算することもしないでください。プランナーはご自身の入力のままです。",
       },
       links: [{ label: { en: "TfL – Fares", ja: "TfL – 運賃" }, url: "https://tfl.gov.uk/fares" }] },
+    { topic: "climate", sourceId: "metoffice-station-data", why: "unreviewed",
+      text: { en: "The Met Office is the official source of UK climate averages, but StudyAtlas collected no London climate numbers: the Met Office website terms do not allow robots or page scraping other than its own APIs, and no API for London's averages was available. So no climate numbers are shown or compared for London; the climate text above is an unverified overview. Please check the Met Office's climate averages for a London station.", ja: "英国の気候平年値の公式な出典は英国気象庁（Met Office）ですが、StudyAtlasはロンドンの気候の数値を収集していません。Met Officeのサイト利用規約は、同庁が提供するAPI以外でのロボットやページのスクレイピングを認めておらず、ロンドンの平年値を取得できるAPIも使えなかったためです。ロンドンの気候の数値は表示も比較もしておらず、上の気候の文章は未確認の概要です。Met Officeの気候平年値（ロンドンの観測所）をご確認ください。" },
+      links: [] },
   ],
 });
 export default londonData();

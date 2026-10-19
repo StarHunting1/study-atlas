@@ -28,6 +28,9 @@ export const melbourneData = (approvals: Record<string, RentApproval> = RENT_APP
         { label: { en: "Transport Victoria – Fares", ja: "Transport Victoria – 運賃" }, url: "https://transport.vic.gov.au/tickets-and-myki/fares" },
         { label: { en: "Transport Victoria – myki", ja: "Transport Victoria – myki" }, url: "https://transport.vic.gov.au/tickets-and-myki/myki" },
       ] },
+    { topic: "climate", sourceId: "bom-climate", why: "unreviewed",
+      text: { en: "The Bureau of Meteorology publishes official climate statistics for Melbourne, but StudyAtlas could not read them: the Bureau's pages answered the automated check with HTTP 403 (access denied), the request was not repeated and no workaround was attempted, and its terms of reuse were not reviewed. No climate numbers are shown or compared for this city; the climate text above is an unverified overview. Please check the official statistics (the link was not opened by StudyAtlas).", ja: "気象局（BoM）はメルボルンの公式の気候統計を公開していますが、StudyAtlasでは読み取れませんでした。気象局のページが自動確認にHTTP 403（アクセス拒否）を返したため、再試行も回避策も行っていません。再利用の条件も確認していません。この都市の気候の数値は表示も比較もしておらず、上の気候の文章は未確認の概要です。公式の統計をご確認ください（リンク先はStudyAtlasでは開けていません）。" },
+      links: [{ label: { en: "Bureau of Meteorology – Climate statistics for Australian locations (Melbourne)", ja: "気象局（BoM）– 豪州各地の気候統計（メルボルン）" }, url: "https://www.bom.gov.au/climate/averages/tables/cw_086071.shtml" }] },
   ],
 });
 export default melbourneData();
