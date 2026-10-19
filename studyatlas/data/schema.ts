@@ -77,8 +77,12 @@ export type MonthlyClimate = {
 };
 
 /** `where`, `courses` and `stay` (accommodation arranged by the school) are short paraphrases, written only when a listing states them; `source` is the page the entry was read from. */
+/** What exactly was checked about a language school (Ver.1.6.2). Kinds are kept apart so that, for example, a provider's registration is never read as a confirmed course or campus.
+ *  state: confirmed = two independent sources agree · single = one source only · stated = only the school's own statement · notConfirmed = looked for, could not be confirmed · notChecked = not looked at */
+export type SchoolCheck = { kind: "provider" | "campus" | "course" | "accreditation"; state: "confirmed" | "single" | "stated" | "notConfirmed" | "notChecked"; detail?: Localized };
 export type Institution = { /** stable key; set for language schools that can be compared */ id?: string; name: string; url?: string; note?: Localized; where?: Localized; courses?: Localized; stay?: Localized; source?: SourceRef;
   /** the school's own fee-information page (a link only: no fee table or figure is copied) */ feesUrl?: string;
+  /** the name as the school or the register gives it (shown next to the display name when it differs) */ officialName?: string; /** item-by-item confirmation state (registration, campus, courses, accreditation) */ checks?: SchoolCheck[];
   /** true = kept as research data but not shown to visitors (e.g. identity or operating status could not be confirmed) */ hidden?: true };
 
 export type CityProfile = {

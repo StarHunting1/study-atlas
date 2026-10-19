@@ -22,6 +22,7 @@ export default function ComparePage() {
           <li key={id} className={`${panel} min-w-0 p-3`}><p className="truncate text-xs text-slate-500">{L(c.blurb)}</p><h2 className="truncate text-base font-semibold text-[#0b2a5b]">{L(c.name)}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-x-3"><Link href={`/city/${id}`} className="inline-flex min-h-[44px] items-center text-xs text-sky-700 underline">{L(cu.details)}</Link><button onClick={() => toggle(id)} className="min-h-[44px] text-xs text-slate-500 underline">{L(cu.remove)}</button></div></li>); })}</ul>}
       {ids.length >= 2 ? <QuickCompare ids={ids} /> : <p className="text-slate-500">{ids.length === 0 ? t("emptyCompare") + " " : ""}{t("maxCompare")}</p>}
+      {ids.length >= 2 && <section className={`${panel} space-y-1 p-4`} data-testid="compare-planner"><p className="text-xs leading-relaxed text-slate-600">{L(cu.toPlanner)}</p><Link href="/planner" data-testid="compare-planner-link" className="inline-flex min-h-[44px] items-center text-sm text-sky-700 underline">{L(cu.toPlannerLink)}</Link></section>}
     </div>
   );
 }

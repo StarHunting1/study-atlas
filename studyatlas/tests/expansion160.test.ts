@@ -152,7 +152,7 @@ t("comparison page: Sydney vs Melbourne is 'comparable' for rent with both A$ fi
   const wrap = (el: ReturnType<typeof h>) => renderToStaticMarkup(h(I18nProvider, null, el));
   const sm = wrap(h(QuickCompare, { ids: ["sydney", "melbourne"] })); const tx = text(sm);
   assert.equal(/data-testid="chip-rent"[^>]*>([^<]*)</.exec(sm)?.[1], "比較可能", "rent chip"); assert.match(sm, /data-testid="cmp-rent"[^>]*data-cmp="same"/);
-  assert.ok(tx.includes("470") && tx.includes("390") && tx.includes("同じ統計・同じ期間・同じ通貨です"), "both figures and the same-basis reason");
+  assert.ok(tx.includes("470") && tx.includes("390") && tx.includes("いずれも2021年の、大都市圏統計区域"), "both figures and the same-basis reason");
   assert.ok(!/data-testid="chip-rent"[^>]*>[^<]*確認中/.test(sm));
   const st = wrap(h(QuickCompare, { ids: ["sydney", "toronto"] })); assert.equal(/data-testid="chip-rent"[^>]*>([^<]*)</.exec(st)?.[1], "参考値のみ"); assert.match(st, /data-testid="cmp-rent"[^>]*data-cmp="differ"/); assert.ok(!/cheaper|安い/.test(text(st).replace(/どちらが安いかは判定しません/g, "")), "no verdict on which is cheaper");
   const sl = wrap(h(QuickCompare, { ids: ["sydney", "london"] })); assert.equal(/data-testid="chip-rent"[^>]*>([^<]*)</.exec(sl)?.[1], "参考値のみ");
