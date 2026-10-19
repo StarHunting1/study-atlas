@@ -14,12 +14,8 @@ export const TERMS_PAGES: { who: string; url: string }[] = [
   { who: "TfGM / Bee Network", url: "https://tfgm.com/disclaimer" },
   { who: "TfGM / Bee Network", url: "https://tfgm.com/" },
   { who: "TfGM / Bee Network", url: "https://developer.tfgm.com/" },
-  { who: "TransLink", url: "https://www.translink.ca/terms-and-conditions" },
-  { who: "TransLink (open API / GTFS)", url: "https://www.translink.ca/about-us/doing-business-with-translink/app-developer-resources/terms-of-use" },
-  { who: "TransLink (open API / GTFS)", url: "https://www.translink.ca/about-us/doing-business-with-translink/app-developer-resources/gtfs/gtfs-data" },
   { who: "University of Manchester", url: "https://www.manchester.ac.uk/copyright/" },
   { who: "University of Manchester", url: "https://www.manchester.ac.uk/" },
-  { who: "UBC", url: "https://www.ubc.ca/site/legal.html" },
   { who: "CMHC", url: "https://www.cmhc-schl.gc.ca/en/professionals/housing-markets-data-and-research/housing-data/cmhc-licence-agreement-use-of-data" },
   { who: "CMHC", url: "https://www.cmhc-schl.gc.ca/about-us/terms-conditions/hmip-terms-conditions" },
   { who: "CMHC / Statistics Canada", url: "https://www.statcan.gc.ca/en/reference/agreement_CMHC" },
@@ -29,7 +25,6 @@ export const TERMS_PAGES: { who: string; url: string }[] = [
   { who: "ECCC (MSC open data)", url: "https://eccc-msc.github.io/open-data/licence/readme_en/" },
   { who: "ECCC (MSC open data)", url: "https://eccc-msc.github.io/open-data/usage/readme_en/" },
   { who: "ECCC (GeoMet API)", url: "https://api.weather.gc.ca/" },
-  { who: "Met Office", url: "https://www.metoffice.gov.uk/policies/legal" },
   { who: "Met Office (station data on data.gov.uk)", url: "https://www.data.gov.uk/dataset/17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5" },
   { who: "GOV.UK", url: "https://www.gov.uk/help/terms-conditions" },
   { who: "GOV.UK Content API", url: "https://content-api.publishing.service.gov.uk/" },
@@ -39,7 +34,7 @@ export const TERMS_PAGES: { who: string; url: string }[] = [
   { who: "UK Open Government Licence v3.0", url: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/" },
 ];
 /** Origins whose robots.txt is printed verbatim (public crawl policy). */
-export const ROBOTS_ORIGINS = ["https://tfgm.com", "https://www.translink.ca", "https://www.manchester.ac.uk", "https://www.ubc.ca", "https://vancouver.housing.ubc.ca", "https://www.cmhc-schl.gc.ca", "https://www150.statcan.gc.ca", "https://api.weather.gc.ca", "https://climate.weather.gc.ca", "https://www.metoffice.gov.uk", "https://www.data.gov.uk", "https://www.gov.uk", "https://open.canada.ca"];
+export const ROBOTS_ORIGINS = ["https://tfgm.com", "https://www.manchester.ac.uk", "https://www.cmhc-schl.gc.ca", "https://www150.statcan.gc.ca", "https://api.weather.gc.ca", "https://climate.weather.gc.ca", "https://www.metoffice.gov.uk", "https://www.data.gov.uk", "https://www.gov.uk", "https://open.canada.ca"];
 
 const KEY = /copyright|reproduc|republish|redistribut|licen[cs]e|permission|written consent|personal use|non-commercial|commercial|robot|spider|crawl|scrap|automat|data mining|text and data|extract|database right|open government|attribution|\bapi\b|rate limit|requests per|trade ?mark|exclusive property|may not|must not|prohibit/i;
 const TERMS_LINK = /terms|copyright|legal|licen|disclaimer|conditions|open data|developer|privacy/i;
@@ -53,13 +48,10 @@ export function keyLines(text: string, max = 45): string[] {
 /** Pages read in full (or around the clauses that matter) so the exact wording can be quoted in the review. */
 export const DETAIL_PAGES: { who: string; url: string; full?: boolean; around?: RegExp; width?: number }[] = [
   { who: "TfGM / Bee Network", url: "https://tfgm.com/disclaimer", full: true },
-  { who: "TransLink website terms", url: "https://www.translink.ca/terms-and-conditions", around: /Copyright:|robot|spider|scrap|automat|personal use|non-commercial/i, width: 1500 },
   { who: "University of Manchester", url: "https://www.manchester.ac.uk/copyright/", full: true },
   { who: "University of Manchester", url: "https://www.manchester.ac.uk/disclaimer/", full: true },
-  { who: "UBC", url: "https://www.ubc.ca/site/legal.html", around: /limited license|robot, spider/i, width: 1400 },
   { who: "ECCC MSC Open Data usage policy", url: "https://eccc-msc.github.io/open-data/usage-policy/readme_en", full: true },
   { who: "Statistics Canada table 34-10-0133-01", url: "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301", full: true },
-  { who: "Met Office website terms of use", url: "https://www.metoffice.gov.uk/policies/tandc", around: /Open Government Licence|licen[cs]e|copyright|automat|robot|scrap/i, width: 900 },
 ];
 const JSON_PAGES = ["https://api.weather.gc.ca/collections/climate-normals?f=json", "https://www.data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5"];
 

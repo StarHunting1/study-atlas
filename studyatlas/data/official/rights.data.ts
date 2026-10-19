@@ -94,7 +94,7 @@ export const RIGHTS: Record<string, Rights> = {
   },
   "govuk-content": {
     sourceName: "GOV.UK (Content API)", sourceUrl: "https://www.gov.uk/", licenseUrl: "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
-    licence: "Open Government Licence v3.0 (except where otherwise stated on a page)",
+    licence: "Open Government Licence v3.0 (except where otherwise stated on a page)", apiHosts: ["content-api.publishing.service.gov.uk"],
     reuseStatus: "permitted", accessMethod: "open-api", automation: "allowed", lastReviewedAt: D, expertReview: false, restrictions: ["attribution-required"],
     attribution: "Contains public sector information licensed under the Open Government Licence v3.0.",
     reviewNotes: {

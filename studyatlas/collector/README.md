@@ -95,7 +95,6 @@ Open each source link, confirm value / who it applies to / period / licence, the
   ("not due" in the report); `--force` (used on pull-request dry runs) ignores it. Unchanged content never creates a PR.
 - **Consistency**: the report lists published figures that no longer match the latest API value.
 - `collector/probe.ts` (runs on pull requests): reviewer aid that prints robots verdict, HTTP status, money lines and links of pages to be added. Nothing is stored.
-- `collector/aia-chain.sh`: completes a TLS chain for a host that omits its intermediate certificate (verified against system roots; verification stays on).
 
 ## Ver.1.5.1 additions
 - `sources/metoffice.ts`: Met Office historical monthly station data (UK OGL v3.0). Derives calendar-month means for fixed 30-year periods
@@ -112,3 +111,9 @@ Open each source link, confirm value / who it applies to / period / licence, the
   edition/cover date mismatch stops the import; the earlier record is kept (the newest month is never replaced by an older one).
 - Rate and identification rules (developer.ons.gov.uk/bots, ons.gov.uk/help/fairusepolicy): two requests a month, one second apart, the User-Agent in
   `util.ts` (name/version/URL, no personal data), HTTP 429 → wait for `Retry-After` (at most 60 s) once, then give up for this run.
+
+## Ver.1.6.6: access guard (read before writing any script that talks to the network)
+- `collector/guard.ts` is the only file that sends requests (`guardedFetch`); `util.ts` (`fetchText`, `fetchJson`, `postJson`, `fetchBinary`) and `linkcheck.ts` call it. Before any request, `decideAccess(url, kind)` reads the rights records (`data/official/rights.data.ts`) and answers `allowed` / `conditional` / `forbidden` / `unconfirmed`. **Fail closed**: no record, a record never reviewed, or a way of access the record does not cover = no request.
+- Kinds are not interchangeable: `html` (page body, only for pages listed in the record) · `api` · `dataset` · `robots` · `status-only` (HTTP status, body not read). A record that blocks automation blocks every kind, robots.txt included; "robots.txt allows it" never overrides the rights record.
+- Temporary investigation scripts must use `fetchText` / `guardedFetch` from here (never `fetch`, `curl`, `https`). Every attempt is counted (`STUDYATLAS_MAX_REQUESTS`, default 400), hosts are paced 1 s apart, and `accessLedger()` lists what was requested and how. `tests/guard166.test.ts` fails if a direct network call or a leftover `*-probe` script/workflow is on the branch.
+- Limits: this cannot stop code that bypasses the module (a shell step with `curl`, a new import of `node:https`), a browser run by a person, or a workflow written outside `collector/`; the test scans for the common ones only.

@@ -24,7 +24,7 @@ t("targets: Manchester and Vancouver links only; sources whose rights block auto
   const ts = linkTargets(); assert.ok(ts.length >= 40 && new Set(ts.map((x) => x.url)).size === ts.length);
   assert.ok(ts.every((x) => x.url.startsWith("https://")));
   for (const x of ts) { const host = new URL(x.url).hostname; if (/translink\.ca$|ubc\.ca$|(^|\.)metoffice\.gov\.uk$/.test(host)) assert.ok(x.skip, `${x.url} must be skipped`); }
-  assert.ok(ts.find((x) => x.url.includes("data.gov.uk"))?.skip === undefined, "the catalogue page is checkable");
+  assert.ok(ts.find((x) => x.url.includes("data.gov.uk"))?.mode === "skip", "Ver.1.6.6: the data.gov.uk catalogue has no rights record of its own: held back as unconfirmed (fail closed)");
   assert.ok(blockedHosts().has("translink.ca") && blockedHosts().has("ubc.ca") && blockedHosts().has("metoffice.gov.uk"));
   assert.ok(ts.some((x) => /sydney/.test(x.where.join(" "))) && ts.some((x) => /melbourne/.test(x.where.join(" "))), "Sydney and Melbourne are checked since Ver.1.6.0");
   assert.ok(blockedHosts().has("transportnsw.info") && blockedHosts().has("transport.vic.gov.au"), "the fare pages are link-only and never requested again");
@@ -38,8 +38,8 @@ t("recorded Actions result: every link that is requested has a result, nothing r
   const ts = linkTargets(); const urls = new Set(ts.map((x) => x.url));
   for (const x of ts) assert.ok(linkStatusOf(x.url), `no recorded result for ${x.url}`);
   for (const [u] of LINK_STATUS) assert.ok(urls.has(u), `recorded result for a link that is no longer used: ${u}`);
-  for (const x of ts) { const r = linkStatusOf(x.url)!; assert.equal(r[1] === "skipped", !!x.skip, x.url); assert.notEqual(r[1], "broken", `broken link in the data: ${x.url}`); }
-  const verified = LINK_STATUS.filter((r) => r[1] === "ok" && r[3] === true).length; assert.ok(verified >= 20, "verified links: " + verified);
-  assert.ok(LINK_STATUS.every((r) => ["ok", "access-denied", "broken", "skipped", "robots-disallowed"].includes(r[1])), "every recorded verdict is a known kind (access denied / robots are never recorded as broken)");
+  for (const x of ts) { const r = linkStatusOf(x.url)!; assert.equal(r[1] === "skipped" || r[1] === "unconfirmed", !!x.skip, x.url); assert.equal(r[4] === "skip", !!x.skip, `${x.url}: recorded mode must match the rights decision`); assert.notEqual(r[1], "broken", `broken link in the data: ${x.url}`); }
+  const verified = LINK_STATUS.filter((r) => r[1] === "ok" && r[3] === true).length; assert.ok(verified >= 5, "verified links: " + verified);
+  assert.ok(LINK_STATUS.every((r) => ["ok", "access-denied", "broken", "skipped", "unconfirmed", "robots-disallowed"].includes(r[1])), "every recorded verdict is a known kind (access denied / robots are never recorded as broken)");
 });
 console.log(n, "link check tests passed");

@@ -23,7 +23,7 @@ export const HTML_HINTS: string[] = [
 /** Extra pages probed for links/money lines only. */
 export const LINK_PAGES: string[] = [];
 /** Raw text files: first lines printed as they are (data files). */
-export const RAW_FILES: string[] = ["https://www.metoffice.gov.uk/pub/data/weather/uk/climate/stationdata/ringwaydata.txt"];
+export const RAW_FILES: string[] = []; // the Met Office site is blocked by its rights record (collector/guard.ts refuses it)
 
 export const robotsFor = makeRobots((u) => fetchText(u, { accept: "text/plain" }), USER_AGENT);
 

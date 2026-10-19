@@ -50,6 +50,8 @@ export type Rights = {
   display?: DisplayMode;
   /** robots.txt disallows a path but the provider's own usage policy documents programmatic use of it (requests to URLs under `urlPrefix` are then allowed) */
   robotsException?: { urlPrefix: string; policyUrl: string; reason: string };
+  /** Hosts, besides the publisher's own site and the listed source pages, that serve the documented API of this record (e.g. content-api.publishing.service.gov.uk for GOV.UK). Never widens `automation`. */
+  apiHosts?: string[];
   /** A professional's opinion is recommended before relying on this reading of the terms */
   expertReview: boolean;
 };
