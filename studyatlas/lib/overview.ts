@@ -3,7 +3,7 @@ import type { City } from "@/data/cities";
 import type { Fact, Institution, Money, Status } from "@/data/types";
 import type { Localized } from "@/lib/i18n";
 import { climateCompare } from "@/data/official/compare";
-import { officialData } from "@/data/official";
+import { officialData, officialSources } from "@/data/official";
 import { sections } from "@/data/fields";
 import { isStudentHousing } from "@/data/official/housingKind";
 import type { DataPoint } from "@/data/official/types";
@@ -98,6 +98,23 @@ export function rentKey(c: City): Key {
   const p = rent.find((x) => x.highlight && x.status === "verified") ?? rent.find((x) => x.status === "verified") ?? rent[0];
   return p ? { kind: "point", point: p } : { kind: "none" };
 }
+/**
+ * City-page headline helpers (Ver.1.5.3). They only READ data that is already shown further down the page; the comparison keeps using keyFigure/rentKey unchanged,
+ * so a market rent never becomes a "student housing" figure in the comparison.
+ */
+/** The shown whole-market rent of a city (its representative figure and how many such figures there are), if any. */
+export function marketRentSummary(c: City): { point: DataPoint; count: number } | undefined {
+  const k = rentKey(c); if (k.kind !== "point") return undefined;
+  const count = (officialData(c.id)?.points ?? []).filter((p) => p.topic === "housing" && p.audience === "renter" && p.value && shown(p.status) && isFigureShown(p)).length;
+  return { point: k.point, count };
+}
+/** A link to the official fares page for a city whose fares are link-only (reviewed, not copied). Cities with their own fare figures keep their usual key. */
+export function transportLinkKey(c: City): Key | undefined {
+  const d = officialData(c.id); if (!d || d.points.some((p) => p.topic === "transport")) return undefined;
+  const n = (d.notices ?? []).find((x) => x.topic === "transport" && x.links.length); if (!n) return undefined;
+  return { kind: "link", url: n.links[0].url, publisher: officialSources.find((x) => x.id === n.sourceId)?.publisher ?? n.links[0].label.en };
+}
+
 /** Market rent statistics are directly comparable only when it is the very same statistic: same metric, currency, reference period and every figure verified. Different publishers' statistics (ONS vs CMHC) never are. */
 export function rentCmp(keys: Key[]): Cmp {
   const pts = keys.flatMap((k) => (k.kind === "point" ? [k.point] : []));

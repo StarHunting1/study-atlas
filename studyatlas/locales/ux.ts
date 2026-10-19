@@ -17,6 +17,12 @@ export const ux = {
     unconfirmedTitle: { en: "Eligibility not confirmed", ja: "対象かどうか未確認" }, notForTitle: { en: "University / college students only", ja: "大学・カレッジの学生のみ" },
     notFor: { en: "For university or college students only – not available to language-school students.", ja: "大学・カレッジの学生向けで、語学留学生は利用できません。" },
   },
+  /** City-page headlines (Ver.1.5.3): the market rent that is already on the page, and a link-only fare source */
+  marketKeyTitle: { en: "Average rent in the whole rental market", ja: "賃貸市場全体の平均家賃" },
+  marketKeyNotStudent: { en: "Not a student price: not university halls, homestay or a school's accommodation fee. A student-specific price is still in preparation.", ja: "学生向けの料金ではありません（大学寮・ホームステイ・学校の滞在費ではない）。学生向けの参考料金は準備中です。" },
+  marketKeyMore: { en: "{n} figures by size, with sources and conditions, are under “Show details”.", ja: "間取り別など{n}件の数値と、出典・適用条件は「詳しく見る」にあります。" },
+  transportLinkNote: { en: "Fare amounts are not copied here: check the official page.", ja: "運賃の金額は転載していません。公式ページでご確認ください。" },
+  jumpTo: { en: "Jump to a topic", ja: "項目へ移動" },
   noData: { en: "Data coming soon", ja: "データ準備中" }, pricePrep: { en: "Reference price in preparation", ja: "参考料金は準備中" }, unverifiedShort: { en: "Not verified", ja: "未確認" },
   schoolsU: { en: "{u} universities", ja: "大学 {u}校" }, schoolsL: { en: "{l} language schools", ja: "語学学校 {l}校" },
   seeSchools: { en: "Compare schools →", ja: "学校を比較する →" }, tempLabel: { en: "Monthly mean temperature over the year", ja: "月別平均気温の年間の幅" },
