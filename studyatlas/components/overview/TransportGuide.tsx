@@ -10,6 +10,8 @@ export function TransportGuideLinks({ cityId }: { cityId: string }) {
   const { L } = useI18n(); const g = guideOf(cityId); if (!g) return null;
   return (
     <div className="mt-2 space-y-1.5" data-testid="transport-guide-links">
+      {g.operator && <p className="text-xs font-medium text-slate-700" data-testid="guide-operator">{L(ux.guide.operator)}: {L(g.operator)}</p>}
+      {g.read && g.paymentShort && <p className="text-xs text-slate-600" data-testid="guide-payment-short">{L(ux.guide.payNow)}: {L(g.paymentShort)}</p>}
       <ul className="flex flex-wrap gap-2">{KINDS.map(({ kind, label }) => { const l = guideLink(g, kind);
         return <li key={kind}>{l
           ? <a href={l.url} target="_blank" rel="noopener noreferrer" data-testid={`guide-${kind}`} className="inline-flex min-h-[40px] items-center gap-1 rounded-full px-3 text-xs font-medium text-sky-800 ring-1 ring-sky-200 hover:bg-sky-50">{L(ux.guide[label])} ↗</a>
@@ -26,8 +28,8 @@ export function TransportGuideDetail({ cityId }: { cityId: string }) {
   return (
     <section className="space-y-2 rounded-xl bg-slate-50 p-3 ring-1 ring-slate-200" data-testid="transport-guide">
       <h4 className="text-xs font-semibold text-slate-700">{L(ux.guide.title)}</h4>
-      <dl className="space-y-2">{row("modes", g.modes)}{row("payment", g.payment)}{row("fareSystem", g.fareSystem)}{row("studentTitle", g.student)}</dl>
-      <ul className="space-y-1 text-xs">{g.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(l.label)} ↗</a>{!l.opened && <span className="ml-1 text-[11px] text-slate-500">({L(ux.guide.unopened)})</span>}</li>)}</ul>
+      <dl className="space-y-2">{row("modes", g.modes)}{row("payment", g.payment)}{row("fareSystem", g.fareSystem)}{row("zones", g.zones)}{row("passes", g.passes)}{row("studentTitle", g.student)}</dl>
+      <ul className="space-y-1 text-xs">{g.links.map((l) => <li key={l.url}><a href={l.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(l.label)} ↗</a><span className="ml-1 text-[11px] text-slate-500" data-testid="guide-link-status">({L(!l.opened ? ux.guide.unopened : l.read ? ux.guide.readOk : ux.guide.opened)})</span></li>)}</ul>
       <p className="text-[11px] leading-snug text-slate-500">{g.read ? L(ux.guide.paraphraseNote) : L(ux.guide.notRead)}</p>
     </section>
   );

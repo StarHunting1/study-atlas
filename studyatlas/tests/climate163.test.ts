@@ -59,7 +59,7 @@ t("Sydney, Melbourne and London: no climate numbers (BoM answered 403, the Met O
 });
 
 t("transport guides: Toronto and Sydney summarise what was read on 2026-10-19 (payment options, where student eligibility is decided); London and Melbourne are link-only and say the pages could not be read; no amounts anywhere", () => {
-  assert.equal(TRANSPORT_GUIDES.length, 4); for (const id of ["toronto", "sydney"]) { const g = guideOf(id)!; assert.ok(g.read && g.checkedAt === "2026-10-19" && g.payment && g.modes); }
+  assert.equal(TRANSPORT_GUIDES.length, 6); for (const id of ["toronto", "sydney"]) { const g = guideOf(id)!; assert.ok(g.read && g.checkedAt === "2026-10-19" && g.payment && g.modes); }
   for (const id of ["london", "melbourne"]) { const g = guideOf(id)!; assert.ok(!g.read && g.checkedAt === null && !g.payment && !g.modes); assert.ok(g.links.every((l) => !l.opened)); }
   assert.match(guideOf("toronto")!.payment!.en, /PRESTO/); assert.match(guideOf("sydney")!.payment!.en, /Opal/); assert.match(guideOf("sydney")!.payment!.en, /tap on/);
   for (const g of TRANSPORT_GUIDES) { const all = JSON.stringify([g.modes, g.payment, g.fareSystem, g.student]); assert.ok(!/[$£€]\s?\d|\d\s?(CAD|AUD|GBP)|\d+\.\d\d/.test(all), `${g.cityId}: no fare amount`); assert.ok(g.links.every((l) => l.url.startsWith("https://")));
@@ -76,7 +76,6 @@ t("transport card, first screen: official fares, route map and student-eligibili
     for (const kind of ["map", "student"] as const) { const u = e[kind]; if (u) assert.ok(k.includes(`href="${u}"`), `${id} ${kind}`); else assert.match(k, new RegExp(`data-testid="guide-${kind}-none"`), `${id} ${kind} none`); }
     assert.ok(text(k).includes("運賃の金額は転載していません"), `${id}: still no amount`); assert.ok(!/[$£]\s?\d/.test(text(k)), `${id}: no amount`); }
   assert.ok(text(keyOf(page("melbourne"), "transport")).includes("路線図：確認中")); assert.ok(text(keyOf(page("toronto"), "transport")).includes("確認日: 2026-10-19")); assert.ok(text(keyOf(page("london"), "transport")).includes("読み取れなかった"));
-  for (const id of ["manchester", "vancouver"]) assert.ok(!page(id).includes('data-testid="transport-guide-links"'), `${id} unchanged`);
 });
 
 t("transport comparison: the systems are shown side by side (payment, student-eligibility checkpoint, official pages) without amounts or a verdict; cities without guides are not invented (the block sits in the opened detail of the transport row)", () => {
@@ -84,8 +83,8 @@ t("transport comparison: the systems are shown side by side (payment, student-el
   const html = render(["toronto", "sydney"]); const ts = text(html);
   assert.match(html, /data-testid="guide-compare"/); for (const k of ["payment", "student", "links"]) assert.match(html, new RegExp(`data-testid="guide-row-${k}"`)); assert.ok(ts.includes("PRESTO")); assert.ok(ts.includes("Opal")); assert.ok(ts.includes("トロント") && ts.includes("シドニー"));
   assert.ok(ts.includes("金額の比較や優劣の判定はしていません")); assert.ok(!/最安|cheapest|おすすめ|best/i.test(ts)); assert.ok(!/[$£]\s?\d/.test(ts));
-  assert.equal(render(["manchester", "vancouver"]), "", "no guide for these pairs: nothing is rendered"); const lm = render(["london", "melbourne"]); assert.match(lm, /data-testid="guide-compare"/); assert.ok(text(lm).includes("確認中"));
-  const mix = text(render(["toronto", "manchester"])); assert.ok(mix.includes("要約はまだありません"), "a city without a guide says so");
+  assert.match(render(["manchester", "vancouver"]), /data-testid="guide-compare"/, "Ver.1.6.5: all six cities have a guide"); const lm = render(["london", "melbourne"]); assert.match(lm, /data-testid="guide-compare"/); assert.ok(text(lm).includes("確認中"));
+  const mix = text(render(["toronto", "manchester"])); assert.ok(mix.includes("PRESTO") && mix.includes("Bee Network"));
   assert.ok(/showGuide = topic === "transport"/.test(readFileSync("components/overview/QuickCompare.tsx", "utf8")), "wired into the transport detail");
 });
 

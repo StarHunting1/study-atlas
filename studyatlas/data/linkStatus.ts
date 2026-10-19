@@ -1,6 +1,6 @@
 /*
  * Result of the link check of the Manchester / Vancouver / Toronto / London / Sydney / Melbourne source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-19
- * (run 39305949403, commit d059848: a temporary push-triggered workflow ran the same `npx tsx collector/linkcheck.ts` as the PR job "Collect official data"). Pasted from the job log; one request per link, no retries.
+ * (run 39315686081, commit 81305eb: a temporary push-triggered workflow ran the same `npx tsx collector/linkcheck.ts` as the PR job "Collect official data"). Pasted from the job log; one request per link, no retries.
  *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests) | robots-disallowed (robots.txt disallows the path, or could not be fetched, e.g. a timeout: then no request is made)
  *   content: true = the page answered 2xx AND contains the words we expect (so it is the right page); false = answered but the words were
  *            not found; null = not checked for words (licence pages, catalogues) or not requested.
@@ -8,7 +8,7 @@
  */
 export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped" | "robots-disallowed";
 export const LINK_CHECKED_AT = "2026-10-19";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39305949403";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39315686081";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null][] = [
   ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null],
   ["https://cityenglish.edu.au/", "ok", 200, true],
@@ -36,8 +36,10 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=484&top=15", "ok", 200, true],
   ["https://search.studyaustralia.gov.au/provider/city-language-institute/6445438342133f69f3f08e2ca705a750", "ok", 200, true],
   ["https://search.studyaustralia.gov.au/provider/ilsc-greystone-college/8e18e884000b3ff1d42524a0acf3294b", "ok", 200, true],
+  ["https://tfgm.com/maps", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/bus-tickets", "ok", 200, true],
+  ["https://tfgm.com/tickets-and-passes/ways-to-pay/smart-card", "ok", 200, true],
   ["https://tfl.gov.uk/fares", "skipped", null, null],
   ["https://tfl.gov.uk/fares/free-and-discounted-travel", "skipped", null, null],
   ["https://tfl.gov.uk/maps", "skipped", null, null],
@@ -100,7 +102,9 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.studyaustralia.gov.au/en", "ok", 200, true],
   ["https://www.studyaustralia.gov.au/en/plan-your-move/overseas-student-health-cover-oshc", "ok", 200, true],
   ["https://www.studyaustralia.gov.au/en/plan-your-move/your-guide-to-visas", "ok", 200, true],
+  ["https://www.translink.ca/schedules-and-maps/transit-system-maps", "skipped", null, null],
   ["https://www.translink.ca/terms-and-conditions", "skipped", null, null],
+  ["https://www.translink.ca/transit-fares/compass-card", "skipped", null, null],
   ["https://www.translink.ca/transit-fares/pricing-and-fare-zones", "skipped", null, null],
   ["https://www.translink.ca/transit-fares/u-pass-bc", "skipped", null, null],
   ["https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", "skipped", null, null],
