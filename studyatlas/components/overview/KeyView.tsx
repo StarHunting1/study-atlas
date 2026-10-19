@@ -8,6 +8,9 @@ import { StatusBadge } from "@/components/FactView";
 import { tpl } from "@/components/planner/format";
 import { dataText as d } from "@/locales/data";
 import type { Money } from "@/data/types";
+import type { DataPoint } from "@/data/official/types";
+import { validForShort } from "@/data/official/validFor";
+import { cu } from "@/locales/compareUi";
 import type { Localized } from "@/lib/i18n";
 
 /** Level 1: one short figure. Who it applies to and any non-verified status stay visible, so the summary cannot mislead. */
@@ -24,4 +27,21 @@ export default function KeyView({ k, big, languageFirst, noneText }: { k: Key; b
     case "temp": return <div className="space-y-1"><p className="flex flex-wrap items-baseline gap-x-2"><span className={num}>{k.lo.toFixed(1)} – {k.hi.toFixed(1)} °C</span>{badge}</p><p className="text-xs text-slate-500">{L(ux.tempLabel)}</p></div>;
     case "schools": return <p className="flex flex-wrap items-baseline gap-x-2 text-sm font-medium text-slate-800">{(() => { const u = k.universities > 0 && tpl(L(ux.schoolsU), { u: k.universities }), l = k.languageSchools > 0 && tpl(L(ux.schoolsL), { l: k.languageSchools }); return (languageFirst ? [l, u] : [u, l]).filter(Boolean).join(" · "); })()}{badge}</p>;
   }
+}
+
+/**
+ * City-page housing headline when no student price exists yet but a verified whole-market rent does (Ver.1.5.3): the representative figure with its area,
+ * period and a plain "not a student price" line. The other figures, conditions and sources stay behind "詳しく見る".
+ */
+export function MarketRentKey({ point, count, big }: { point: DataPoint; count: number; big?: boolean }) {
+  const { L, lang } = useI18n(); const basis = cu.rentBasis[`${point.metric}@${point.cityId}`] ?? cu.rentBasis[point.metric]; const st = keyStatus({ kind: "point", point });
+  return (
+    <div className="space-y-1" data-testid="key-market-rent">
+      <p className="text-xs font-medium text-slate-600">{L(ux.marketKeyTitle)}</p>
+      <p className="flex flex-wrap items-baseline gap-x-2"><AmountText p={point} big={big} />{st && st !== "verified" ? <StatusBadge status={st} /> : null}</p>
+      <p className="text-xs leading-snug text-slate-500">{basis ? `${L(basis)} · ` : ""}{validForShort(point.validFor, lang)}</p>
+      <p className="text-[11px] leading-snug text-amber-800">{L(ux.marketKeyNotStudent)}</p>
+      {count > 1 && <p className="text-[11px] leading-snug text-slate-500" data-testid="key-market-more">{tpl(L(ux.marketKeyMore), { n: count })}</p>}
+    </div>
+  );
 }

@@ -10,7 +10,7 @@ import { RIGHTS } from "@/data/official/rights.data";
 import { healthLinks, visaLinks } from "@/data/visa";
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
-import { keyFigure, TOPICS, type Topic } from "@/lib/overview";
+import { keyFigure, marketRentSummary, TOPICS, transportLinkKey, type Topic } from "@/lib/overview";
 import { dataText as d } from "@/locales/data";
 import { ot } from "@/locales/official";
 import { ux } from "@/locales/ux";
@@ -20,7 +20,8 @@ import { CardGrid } from "@/components/official/DataCard";
 import { housingKindOf } from "@/data/official/housingKind";
 import ClimateCharts from "@/components/official/ClimateCharts";
 import { tpl } from "@/components/planner/format";
-import KeyView from "./KeyView";
+import KeyView, { MarketRentKey } from "./KeyView";
+import { pill, pillOff } from "@/lib/ui";
 import VisaGuide, { cardsFor, hasGuide } from "./VisaGuide";
 import { sc } from "@/locales/schoolCompare";
 import StudyModeSwitch from "./StudyModeSwitch";
@@ -97,12 +98,12 @@ const LANG_FIRST: Record<string, string[]> = { education: ["education.languageSc
 const UNI_FIRST: Record<string, string[]> = { education: ["education.universities", "education.tuition", "education.languageSchools"], housing: ["housing.dorm", "housing.shareHouse", "housing.homestay", "housing.overview"] };
 
 function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: City; data?: OfficialCityData; open: boolean; setOpen: (o: boolean) => void; mode: StudyMode }) {
-  const { L } = useI18n(); const k = keyFigure(city, topic, mode); const all = (t: DataPoint["topic"]) => (data?.points ?? []).filter((p) => p.topic === t);
+  const { L } = useI18n(); const k = keyFigure(city, topic, mode); const mr = topic === "housing" && k.kind === "none" ? marketRentSummary(city) : undefined; const tl = topic === "transport" ? transportLinkKey(city) : undefined; const all = (t: DataPoint["topic"]) => (data?.points ?? []).filter((p) => p.topic === t);
   const by = (t: DataPoint["topic"]) => all(t).filter((p) => fitOf(p, mode) === "applies"); const order = (mode === "language" ? LANG_FIRST : UNI_FIRST)[topic];
   let body: ReactNode = null;
   if (topic === "living") body = <>{by("living").length > 0 && <><p className="rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">{L(ot.livingIntro)}</p><CardGrid points={by("living")} /></>}{all("living").length > 0 && by("living").length === 0 && <p className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-200" data-testid="prep-living">{L(ot.pricePrep)}</p>}<Profile city={city} id="cost" /></>;
   if (topic === "housing") body = <><HousingStudentFirst city={city} data={data} points={by("housing")} mode={mode} />
-    <Disclosure level="more" label={L(ot.housingMarketMore)} testid="market-more"><div className="space-y-3"><p className="text-xs leading-relaxed text-slate-500">{L(ot.housingMarketMoreNote)}</p>
+    <Disclosure level="more" label={L(ot.housingMarketMore)} testid="market-more" defaultOpen={by("housing").every((p) => housingKindOf(p) === "market") && by("housing").length > 0}><div className="space-y-3"><p className="text-xs leading-relaxed text-slate-500">{L(ot.housingMarketMoreNote)}</p>
       <Group title={L(ot.housingMarket)} points={by("housing").filter((p) => housingKindOf(p) === "market")} /></div></Disclosure><Profile city={city} id="housing" order={order} /></>;
   if (topic === "transport") body = <><Group title={L(ot.transportAdult)} points={by("transport").filter((p) => p.audience === "adult")} /><Group title={L(ot.transportStudent)} points={by("transport").filter((p) => p.audience !== "adult")} /><Notices data={data} topic="transport" /><Profile city={city} id="transport" /></>;
   if (topic === "climate") body = <>{data?.climate && showsFigure(displayModeOfClimate(data.climate)) && <><div className="flex flex-wrap items-center gap-2"><StatusBadge status={data.climate.status} /><span className="text-xs text-slate-500">{L(ot.retrieved)}: {data.climate.retrievedAt}{data.climate.checkedAt ? ` · ${L(d.checked)}: ${data.climate.checkedAt}` : ""}</span></div><ClimateCharts c={data.climate} />
@@ -118,7 +119,7 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
     <article id={topic} data-testid={`card-${topic}`} className={`${panel} min-w-0 scroll-mt-24 self-start p-4 sm:p-5 ${open ? "md:col-span-2" : ""}`}>
       <h2 className="text-base font-semibold text-[#0b2a5b]">{L(ux.topics[topic])}</h2>
       <p className="mb-2 text-xs text-slate-500">{L(ux.blurb[topic])}</p>
-      <div data-testid={`key-${topic}`}><KeyView k={k} big languageFirst={mode === "language"} /></div>
+      <div data-testid={`key-${topic}`}>{mr ? <MarketRentKey point={mr.point} count={mr.count} big /> : tl ? <div className="space-y-1"><KeyView k={tl} big /><p className="text-[11px] leading-snug text-slate-500">{L(ux.transportLinkNote)}</p></div> : <KeyView k={k} big languageFirst={mode === "language"} />}</div>
       <Disclosure level="more" open={open} onOpenChange={setOpen} testid={`more-${topic}`} className="mt-3"><div className="space-y-4">{body}</div></Disclosure>
     </article>
   );
@@ -126,9 +127,10 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
 
 export default function CityOverview({ city, country, data }: { city: City; country: Country; data?: OfficialCityData }) {
   const { L } = useI18n(); const { mode, setMode } = useStudyMode(); const [openT, setOpenT] = useState<Partial<Record<Topic, boolean>>>({}); const [openR, setOpenR] = useState<Partial<Record<Row, boolean>>>({});
-  useEffect(() => { // deep link
-    const h = window.location.hash.slice(1); if ((TOPICS as readonly string[]).includes(h)) setOpenT({ [h]: true }); else if ((ROWS as readonly string[]).includes(h)) setOpenR({ [h]: true });
-    if (h) setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50);
+  useEffect(() => { // deep link (also when a jump link below changes only the #hash)
+    const go = () => { const h = window.location.hash.slice(1); if ((TOPICS as readonly string[]).includes(h)) setOpenT({ [h]: true }); else if ((ROWS as readonly string[]).includes(h)) setOpenR({ [h]: true });
+      if (h) setTimeout(() => document.getElementById(h)?.scrollIntoView({ block: "start" }), 50); };
+    go(); window.addEventListener("hashchange", go); return () => window.removeEventListener("hashchange", go);
   }, []);
   const counts = [...(data?.points ?? []).map((p) => p.status), ...(data?.climate ? [data.climate.status] : [])].reduce<Record<string, number>>((a, s) => ({ ...a, [s]: (a[s] ?? 0) + 1 }), {});
   const used = officialSources.filter((s) => s.cityIds.includes(city.id));
@@ -136,6 +138,7 @@ export default function CityOverview({ city, country, data }: { city: City; coun
   return (
     <div className="space-y-6">
       <StudyModeSwitch mode={mode} onChange={setMode} />
+      <nav aria-label={L(ux.jumpTo)} data-testid="topic-jump" className="flex flex-wrap gap-2">{cardOrder(mode).map((t) => <a key={t} href={`#${t}`} data-testid={`jump-${t}`} className={`${pill} ${pillOff} min-h-[44px]`}>{L(ux.topics[t])}</a>)}</nav>
       <div className="grid items-start gap-4 md:grid-cols-2" data-testid="cards" data-mode={mode}>
         {cardOrder(mode).map((t) => <Card key={t} topic={t} mode={mode} city={city} data={data} open={!!openT[t]} setOpen={(o) => setOpenT((x) => ({ ...x, [t]: o }))} />)}
       </div>
