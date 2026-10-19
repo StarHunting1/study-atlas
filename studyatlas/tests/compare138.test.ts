@@ -60,7 +60,7 @@ t("page: two housing rows with their conditions, chips use the states, no rankin
   assert.ok(html.includes('id="cmp-housing"') && html.includes('id="cmp-rent"') && html.indexOf('id="cmp-housing"') < html.indexOf('id="cmp-rent"') && html.indexOf('id="cmp-rent"') < html.indexOf('id="cmp-transport"'));
   assert.ok(tx.includes("学生向け住居費（1人あたり）") && tx.includes("一般賃貸市場の家賃"));
   const rent = html.slice(html.indexOf('id="cmp-rent"'), html.indexOf('id="cmp-transport"')), hous = html.slice(html.indexOf('id="cmp-housing"'), html.indexOf('id="cmp-rent"'));
-  assert.ok(/data-av="reference"/.test(rent) && !/data-av="comparable"/.test(rent) && /参考として並べるだけで、直接は比較しません/.test(text(rent)));
+  assert.ok(/data-av="reference"/.test(rent) && !/data-av="comparable"/.test(rent) && /同じ統計ではないため参考比較です/.test(text(rent)));
   assert.ok(text(rent).includes("ONS") && text(rent).includes("CMHC") && /GBP/.test(rent) && /CAD/.test(rent) && text(rent).includes("2026年8月"), "ONS Aug 2026, CMHC 2025, each currency");
   assert.ok(text(rent).includes("2025年") && text(rent).includes("民間賃貸住宅すべて") && text(rent).includes("バンクーバー都市圏") && text(rent).includes("賃貸世帯全体"), "area, dwelling type, year, audience are shown");
   assert.ok(/£555/.test(hous) && !/1,807/.test(hous) && !/£1,373/.test(hous), "student row: Manchester hall price only, no market rent");

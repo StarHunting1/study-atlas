@@ -6,6 +6,7 @@ import { sections } from "@/data/fields";
 import { moneyComparability } from "@/data/comparability";
 import type { DataPoint } from "@/data/official/types";
 import { rentDiffFields } from "@/data/official/rentBasis";
+import { rentExplain } from "@/data/official/rentExplain";
 import { climateCompare, climateIssues, compareRows, hasHeldNotice, hasRentPending, missingReason, pickPoint, rowVerdict, type ClimateCompare, type Issue } from "@/data/official/compare";
 import { officialData } from "@/data/official";
 import type { Fact, Money } from "@/data/types";
@@ -46,8 +47,11 @@ const chip: Record<Availability, { label: keyof typeof cu; kind: "ok" | "ref" | 
 /** Rent chip label: when the only reason there is nothing to compare is that every city's statistic waits for a person's approval, say "being checked", not "not obtained". */
 const chipLabel = (cities: City[], topic: string, av: Availability): keyof typeof cu => (topic === "rent" && av === "notYet" && cities.length > 0 && cities.every((c) => hasRentPending(c.id)) ? "checking" : chip[av].label);
 const withFields = (tpl: Localized, fields: string[]): Localized => Object.fromEntries(["en", "ja"].map((l) => [l, tpl[l].replace("{fields}", fields.map((f) => cu.rentDiff.fields[f][l]).join(l === "ja" ? "、" : "; "))]));
-const rentWhyDiffer = (keys: Key[]): Localized => { const f = rentDiffFields(keys.flatMap((k) => (k.kind === "point" ? [k.point] : []))); return f?.length ? withFields(cu.rentDiff.why, f) : cu.rentWhy.differ; };
-const rentNoteDiffer = (pts: (DataPoint | undefined)[], fallback: Localized): Localized => { const f = rentDiffFields(pts.filter((p): p is DataPoint => !!p)); return f?.length ? withFields(cu.rentDiff.note, f) : fallback; };
+/** Reason for the rent verdict, built from the recorded definitions (rentExplain.ts); the older generic wording is only the fallback for a figure without a recorded definition. */
+const rentReason = (pts: (DataPoint | undefined)[], nameOf: (id: string) => Localized): Localized | undefined => { const have = pts.filter((p): p is DataPoint => !!p); const e = rentExplain(have, have.map((p) => nameOf(p.cityId))); return e ? { en: e.en, ja: e.ja } : undefined; };
+const rentWhyDiffer = (keys: Key[], nameOf: (id: string) => Localized): Localized => { const pts = keys.flatMap((k) => (k.kind === "point" ? [k.point] : [])); const r = rentReason(pts, nameOf); if (r) return r; const f = rentDiffFields(pts); return f?.length ? withFields(cu.rentDiff.why, f) : cu.rentWhy.differ; };
+const rentWhySame = (keys: Key[], nameOf: (id: string) => Localized): Localized => rentReason(keys.flatMap((k) => (k.kind === "point" ? [k.point] : [])), nameOf) ?? cu.rentWhy.same;
+const rentNoteDiffer = (pts: (DataPoint | undefined)[], fallback: Localized, nameOf: (id: string) => Localized): Localized => { const r = rentReason(pts, nameOf); if (r) return r; const f = rentDiffFields(pts.filter((p): p is DataPoint => !!p)); return f?.length ? withFields(cu.rentDiff.note, f) : fallback; };
 const whyKey = (av: Availability, cmp: Cmp): keyof typeof cu.why => (av === "partial" || av === "linkOnly" ? av : cmp);
 
 /** What exactly the number is, in one line: the statistic and area for market rents, the university for student housing. */
@@ -90,7 +94,7 @@ function OfficialDetail({ cities, topic }: { cities: City[]; topic: CmpTopic }) 
     <div className="space-y-3">
       {rows.map((row) => {
         const pts = cities.map((c) => pickPoint(c.id, row)); if (!pts.some(Boolean) && !cities.some((c) => { const m = missingReason(c.id, row); return m?.kind === "link" || (m?.kind === "notice" && m.why !== "restricted"); })) return null; const { verdict, issues, currenciesDiffer } = rowVerdict(row, pts);
-        return <DetailRow key={row.id} label={L(row.label)} note={verdict === "notDirect" ? L(row.id === "marketRent" ? rentNoteDiffer(pts, row.basis!) : row.basis!) : verdict === "missing" && cities.some((c) => missingReason(c.id, row)?.kind === "link") ? L(cu.why.linkOnly) : cities.some((c) => missingReason(c.id, row)?.kind === "notice") && (verdict === "missing" || verdict === "issues") ? undefined : issues.length ? issues.map((i) => L(ot[issueText[i]] as never)).join(" / ") : L(currenciesDiffer ? ot.cmpOk : ot.cmpOkSameCur)} noteCls={issues.length || verdict === "notDirect" ? "text-amber-700" : "text-emerald-700"} extra={row.hint ? L(row.hint) : undefined} cities={cities}
+        return <DetailRow key={row.id} label={L(row.label)} note={verdict === "notDirect" ? L(row.id === "marketRent" ? rentNoteDiffer(pts, row.basis!, (id) => cities.find((c) => c.id === id)!.name) : row.basis!) : verdict === "missing" && cities.some((c) => missingReason(c.id, row)?.kind === "link") ? L(cu.why.linkOnly) : cities.some((c) => missingReason(c.id, row)?.kind === "notice") && (verdict === "missing" || verdict === "issues") ? undefined : issues.length ? issues.map((i) => L(ot[issueText[i]] as never)).join(" / ") : L(currenciesDiffer ? ot.cmpOk : ot.cmpOkSameCur)} noteCls={issues.length || verdict === "notDirect" ? "text-amber-700" : "text-emerald-700"} extra={row.hint ? L(row.hint) : undefined} cities={cities}
           cells={pts.map((p, i) => p ? <div className="space-y-1"><AmountText p={p} /> {p.status !== "verified" && <StatusBadge status={p.status} />}
             <p className="text-[11px] text-slate-500">{L(ot.audience[p.audience])} · {validForShort(p.validFor, lang)}</p><p className="text-[11px] leading-snug text-slate-500">{L(p.conditions)}</p>
             <Disclosure level="sources"><p className="text-[11px] text-slate-500">{L(ot.source)}: <a href={p.evidence[0].url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{p.evidence[0].publisher}</a> · {L(ot.retrieved)}: {p.retrievedAt}{p.checkedAt ? ` · ${L(ot.checked)}: ${p.checkedAt}` : ""}</p></Disclosure></div> : gap(cities[i].id, row))} />;
@@ -146,7 +150,7 @@ export default function QuickCompare({ ids }: { ids: string[] }) {
           return <li key={t}><a href={`#cmp-${t}`} data-testid={`glance-${t}`} data-kind={kind} className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium ring-1 ${chip[av].cls}`}>{titleOf(t, L)}<span className="font-normal">· {L(cu[chipLabel(cities, t, av)] as never)}</span></a></li>; })}</ul>
       </nav>
       {CMP_TOPICS.map((t) => { const keys = keysOf(cities, t); const cmp = cmpOf(keys, t); const av = availability(keys, cmp);
-        return <Row key={t} id={t} title={titleOf(t, L)} cities={cities} keys={keys} cmp={cmp} topic={t} note={t === "housing" ? cu.studentHousingNote : undefined} why={t === "rent" && av !== "partial" && av !== "notYet" ? (cmp === "same" ? cu.rentWhy.same : rentWhyDiffer(keys)) : t === "rent" && av === "notYet" && cities.every((c) => hasRentPending(c.id)) ? cu.rentPendingDetail : undefined}>
+        return <Row key={t} id={t} title={titleOf(t, L)} cities={cities} keys={keys} cmp={cmp} topic={t} note={t === "housing" ? cu.studentHousingNote : undefined} why={t === "rent" && av !== "partial" && av !== "notYet" ? (cmp === "same" ? rentWhySame(keys, (id) => cities.find((c) => c.id === id)!.name) : rentWhyDiffer(keys, (id) => cities.find((c) => c.id === id)!.name)) : t === "rent" && av === "notYet" && cities.every((c) => hasRentPending(c.id)) ? cu.rentPendingDetail : undefined}>
           {anyOfficial && <OfficialDetail cities={cities} topic={t} />}{t !== "rent" && <FactDetail cities={cities} sectionIds={[SECTION_OF[t]]} />}
           {t === "education" && <Link href="/schools" className="inline-block text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link>}
         </Row>; })}

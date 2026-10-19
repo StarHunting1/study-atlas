@@ -45,5 +45,7 @@ export const cu = {
     why: t("Not the same statistic. It differs in: {fields}. Shown side by side as reference, never as a direct comparison. Currencies are not converted.", "同じ統計ではありません（違い：{fields}）。参考として並べるだけで、直接は比較しません。通貨は換算しません。"),
     note: t("Not directly comparable. It differs in: {fields}. No “cheaper” verdict is given and currencies are not converted.", "直接は比較できません（違い：{fields}）。どちらが安いかは判定せず、通貨は換算しません。"),
   },
+  toPlanner: t("The figures on this page are for comparing places and are not entered into your budget. In the cost planner you enter your own rent, transport and other costs; rents, visa and insurance fees are never added automatically.", "この比較の数値は、都市を見比べるためのもので、あなたの予算には入りません。費用プランナーでは、家賃・交通費などをご自身で入力します（家賃の統計値やビザ・保険の費用が自動で入ることはありません）。"),
+  toPlannerLink: t("Open the cost planner to try a budget →", "費用プランナーで試算する →"),
   remove: t("Remove from comparison", "比較から外す"), details: t("City details", "都市の詳細"),
 };

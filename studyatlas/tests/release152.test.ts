@@ -99,8 +99,8 @@ t("the comparison page names what really differs (area kind for London/Mancheste
   for (const k of Object.keys(rentBasisOf(P("toronto"))!)) { assert.ok(cu.rentDiff.fields[k].en && cu.rentDiff.fields[k].ja, k); }
   assert.ok(cu.rentDiff.why.en.includes("{fields}") && cu.rentDiff.why.ja.includes("{fields}") && cu.rentDiff.note.en.includes("{fields}") && cu.rentDiff.note.ja.includes("{fields}"));
   const render = (ids: string[]) => renderToStaticMarkup(h(I18nProvider, null, h(QuickCompare, { ids }))).replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
-  const lm = render(["london", "manchester"]); assert.ok(lm.includes("同じ統計ではありません（違い：地域区分（地域全体・都市圏・1つの自治体））"), "London/Manchester: the area kind is named"); assert.ok(!lm.includes("統計の種類（発表元・地域・住居タイプ・年・通貨）が異なる"), "no generic claim of a year or currency difference");
-  const tv = render(["toronto", "vancouver"]); assert.ok(tv.includes("同じ統計・同じ期間・同じ通貨です。")); assert.ok(tv.includes("比較可能"));
+  const lm = render(["london", "manchester"]); assert.ok(lm.includes("同じ統計ではないため参考比較です：対象地域の単位が違います（ロンドン：地域全体、マンチェスター：1つの地方自治体）"), "London/Manchester: the area kind is named, with each city's value (Ver.1.6.2 wording)"); assert.ok(!lm.includes("統計の種類（発表元・地域・住居タイプ・年・通貨）が異なる"), "no generic claim of a year or currency difference");
+  const tv = render(["toronto", "vancouver"]); assert.ok(tv.includes("いずれも2025年の、都市圏")); assert.ok(tv.includes("比較可能"));
 });
 
 console.log(n, "Ver.1.5.2 release tests passed");

@@ -25,7 +25,7 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
       <div className="grid grid-cols-2 gap-3">{pair.map((s) => (
         <div key={s.id} className="min-w-0 rounded-xl bg-white p-3 ring-1 ring-slate-200" data-testid="school-head">
           <p className="text-[11px] text-slate-500">{cityName(s.cityId)}</p>
-          <h2 className="break-words text-base font-semibold text-[#0b2a5b]">{s.inst.name}</h2>
+          <h2 className="break-words text-base font-semibold text-[#0b2a5b]">{s.inst.name}</h2>{s.inst.officialName && s.inst.officialName !== s.inst.name && <p className="mt-0.5 break-words text-[11px] text-slate-500" data-testid="official-name">{L(sc.officialName)}: {s.inst.officialName}</p>}
           <div className="mt-1"><StatusBadge status={s.status} /></div>
           <div className="mt-2 flex flex-wrap gap-x-3">
             {s.inst.url && <a href={s.inst.url} target="_blank" rel="noopener noreferrer" data-testid="school-site" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(sc.website)} ↗</a>}
@@ -38,6 +38,8 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
       {row("stay", (s) => (s.inst.stay ? L(s.inst.stay) : miss))}
       {row("tuition", (s) => <>{miss}<span className="mt-1 block text-[11px] text-slate-500">{L(sc.tuitionNote)}</span>{s.inst.feesUrl && <a href={s.inst.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="fees-link" className="mt-1 inline-block py-1 text-xs text-sky-700 underline">{L(sc.feesLink)}</a>}</>)}
       <section className="rounded-xl bg-amber-50 p-3 text-xs text-amber-900" data-testid="fee-conditions"><h3 className="font-semibold">{L(sc.feeCondTitle)}</h3><ul className="mt-1 list-disc space-y-0.5 pl-4">{sc.feeConds.map((x) => <li key={x.en}>{L(x)}</li>)}</ul></section>
+      {row("checks", (s) => (s.inst.checks?.length ? <ul className="space-y-1.5" data-testid="school-checks">{s.inst.checks.map((c) => <li key={c.kind} data-kind={c.kind} data-state={c.state}><span className="block text-[11px] font-medium text-slate-500">{L(sc.checkKinds[c.kind])}</span><span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${c.state === "confirmed" ? "bg-emerald-50 text-emerald-800 ring-emerald-100" : c.state === "notConfirmed" || c.state === "notChecked" ? "bg-slate-100 text-slate-600 ring-slate-200" : "bg-amber-50 text-amber-800 ring-amber-200"}`}>{L(sc.checkStates[c.state])}</span>{c.detail && <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">{L(c.detail)}</span>}</li>)}</ul> : <span className="text-[11px] leading-snug text-slate-500" data-testid="school-checks-none">{L(sc.checksNone)}</span>))}
+      <p className="-mt-2 text-[11px] text-slate-500">{L(sc.checksNote)}</p>
       {row("status", (s) => (<div className="space-y-1"><StatusBadge status={s.status} />{s.checkedAt && <span className="block text-[11px] text-slate-500">{L(sc.checked)}: {s.checkedAt}</span>}{s.status !== "verified" && <span className="block text-[11px] text-slate-500">{L(sc.statusNote)}</span>}</div>))}
       <Disclosure level="more" testid="compare-more"><div className="space-y-3">
         <section className="space-y-1.5"><h3 className="text-xs font-semibold text-slate-500">{L(sc.details)}</h3>
