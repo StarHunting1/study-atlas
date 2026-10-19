@@ -20,10 +20,16 @@ import { sha256 } from "./rentDigest";
  * A person's approval of ONE rent figure. `digest` is the content digest (rentDigest) of the candidate the person compared: if the figure, unit, period,
  * source, quote or definition is edited later, the approval no longer matches and loading the data fails. Approvals are per figure, so Toronto's four values and
  * London's one value are approved (and can fail) independently, and approving one city never publishes the other.
- * An empty record = nothing approved: nothing is shown and nothing is marked verified. (Print the digests with `npm run approvals`; they are listed in data/APPROVAL_SHEET.md.)
+ * A figure without an entry = not approved: nothing is shown and nothing is marked verified. Approved 2026-10-17 by StarHunting1 (Ver.1.5.2): the four Toronto values and the one London value, and only those. (Print the digests with `npm run approvals`; they are listed in data/APPROVAL_SHEET.md.)
  */
 export type RentApproval = { approvedBy: string; approvedAt: string; /** what the approver compared, e.g. "Statistics Canada table 34-10-0133-01 and the CMHC licence, 2026-10-20" */ basis: string; digest: string };
-export const RENT_APPROVALS: Record<string, RentApproval> = {};
+export const RENT_APPROVALS: Record<string, RentApproval> = {
+  "tor-cmhc-rent-bachelor": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるTorontoの家賃4件（CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA 535、2025年、CAD/月）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと全値の一致を確認済み。", digest: "4a79633baf6e7b89bdd7e14393229e1674567a418856ca355e824e5739eab8cf" },
+  "tor-cmhc-rent-1br": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるTorontoの家賃4件（CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA 535、2025年、CAD/月）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと全値の一致を確認済み。", digest: "abbbf002fa77176f0b4b2c9fc214de335c9faefd166c739b4fbf153f180185c1" },
+  "tor-cmhc-rent-2br": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるTorontoの家賃4件（CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA 535、2025年、CAD/月）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと全値の一致を確認済み。", digest: "5085d74860e41547259c36aeb9e6a911d5b64b6a444ba58427f0429c13f08381" },
+  "tor-cmhc-rent-3br": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるTorontoの家賃4件（CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA 535、2025年、CAD/月）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと全値の一致を確認済み。", digest: "923365e8fe0775666ae8e0f82f996234670d48cdb7c8f912a37392859361fdb0" },
+  "lon-ons-pipr-private-rent-region-month": { approvedBy: "StarHunting1", approvedAt: "2026-10-17", basis: "StarHunting1によるLondon家賃1件（ONS PIPR、London region E12000007、2026年8月、GBP/月、全住宅）の明示的な公開承認（2026-10-17）。PR #50でActions run 39065320556により公式データと一致を確認済み。", digest: "8122055734968c0c56c89125164f69d6ca1650924078dc93cb5710c026cdda09" },
+};
 
 const TABLE = "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301";
 const PIPR = "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics";

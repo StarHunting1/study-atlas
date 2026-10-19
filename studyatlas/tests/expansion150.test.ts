@@ -5,6 +5,8 @@ import path from "node:path";
 import { getCity } from "../data/cities";
 import { listCompareSchools, getCompareSchool } from "../data/languageSchools";
 import { officialData, officialSources } from "../data/official";
+import { torontoData } from "../data/official/toronto";
+import { londonData } from "../data/official/london";
 import { ALL_RENT_CANDIDATES, LONDON_RENT_CANDIDATE, RENT_APPROVALS, TORONTO_RENTS, TORONTO_RENT_CANDIDATES, londonRentPoints, rentDigest, reconcileCollected, reconcileStatic, torontoRentPoints } from "../data/official/cityRents";
 import { compareRows, compareIssues, hasHeldNotice, hasRentPending, missingReason, pickPoint, rowVerdict } from "../data/official/compare";
 import { isFigureShown, rightsOfSource } from "../data/official/rights";
@@ -26,10 +28,9 @@ t("reconciliation: every Toronto/London candidate agrees with the source registr
   assert.deepEqual(TORONTO_RENTS.map((r) => r.amount), [1491, 1761, 2045, 2294]); assert.equal(LONDON_RENT_CANDIDATE.value!.amount, 2332);
 });
 
-t("before approval nothing is published: no rent points for Toronto or London, no verified claim, and the pages carry conditions and official links instead", () => {
-  assert.deepEqual(RENT_APPROVALS, {}, "no approval has been recorded");
+t("unapproved state (data built with an empty approval map): no rent points for Toronto or London, no verified claim, and the pages carry conditions and official links instead", () => {
   for (const id of ["toronto", "london"]) {
-    const d = officialData(id)!; assert.ok(d, id); assert.equal(d.points.length, 0, `${id}: no numbers before approval`);
+    const d = id === "toronto" ? torontoData({}) : londonData({}); assert.ok(d, id); assert.equal(d.points.length, 0, `${id}: no numbers before approval`);
     const housing = d.notices!.find((x) => x.topic === "housing")!; const transport = d.notices!.find((x) => x.topic === "transport")!;
     for (const x of [housing, transport]) { assert.ok(x.text.en && x.text.ja && x.links.length >= 1 && x.links.every((l) => l.url.startsWith("https://") && l.label.en && l.label.ja)); }
     assert.match(housing.text.en, /not student housing|not language-school housing/i); assert.match(housing.text.ja, /学生向け住居/);
@@ -37,7 +38,7 @@ t("before approval nothing is published: no rent points for Toronto or London, n
   }
   const toronto = getCity("toronto")!.profile, london = getCity("london")!.profile;
   for (const p of [toronto, london]) { const verified: string[] = []; const walk = (o: unknown, path: string) => { if (!o || typeof o !== "object") return; if ("status" in (o as object)) { if ((o as { status: string }).status === "verified") verified.push(path); return; } for (const [k, v] of Object.entries(o)) walk(v, `${path}.${k}`); }; walk(p, "p"); assert.deepEqual(verified, []); }
-  assert.ok(torontoRentPoints().length === 0 && londonRentPoints().length === 0);
+  assert.ok(torontoRentPoints({}).length === 0 && londonRentPoints({}).length === 0);
 });
 
 t("an approval needs a name, a date and what was compared; only then do the points exist, as verified, in the existing housing group (renter audience)", () => {
@@ -71,16 +72,20 @@ t("rent definitions are kept apart: Toronto and Vancouver share one CMHC definit
   assert.match(tor.conditions.en, /census metropolitan area/); assert.match(tor.conditions.en, /much wider than the City of Toronto/);
 });
 
-t("held rent: while unapproved, the comparison names the topic as held with official links (not as 'no data') and shows no number", () => {
+t("held rent (empty approval map): the comparison names the topic as held with official links (not as 'no data'); with the real approvals the pending notice is gone and the transport notice stays", () => {
+  for (const id of ["toronto", "london"]) {
+    const d = id === "toronto" ? torontoData({}) : londonData({}); const n = d.notices!.find((x) => x.topic === "housing")!; assert.equal(n.why, "awaiting-approval"); assert.ok(n.links.length >= 1);
+    assert.equal(d.notices!.find((x) => x.topic === "transport")!.why, "unreviewed");
+  }
+  assert.ok(cu.rentPendingHere.ja.includes("承認待ち") && cu.rentPendingHere.en.includes("Awaiting approval") && cu.unreviewedDetail.ja && cu.unreviewedDetail.en);
+  // the real data (Ver.1.5.2: approved)
   const row = compareRows.find((r) => r.id === "marketRent")!;
   for (const id of ["toronto", "london"]) {
-    assert.equal(pickPoint(id, row), undefined); const r = missingReason(id, row)!; assert.equal(r.kind, "notice"); assert.ok(r.kind === "notice" && r.why === "awaiting-approval" && r.links.length >= 1);
-    assert.ok(hasRentPending(id)); assert.equal(hasHeldNotice(id, "housing"), false, "the rent notice is not the student-housing 'fees held back' notice");
-    assert.equal(missingReason(id, compareRows.find((x) => x.id === "uniHalls")!), undefined, "the student-housing row never borrows the rent notice");
+    assert.ok(pickPoint(id, row), `${id}: the approved figure is shown`); assert.equal(hasRentPending(id), false); assert.equal(hasHeldNotice(id, "housing"), false);
+    assert.equal(missingReason(id, compareRows.find((x) => x.id === "uniHalls")!), undefined, "the student-housing row never borrows a rent notice");
     const tr = missingReason(id, compareRows.find((x) => x.id === "single")!)!; assert.ok(tr.kind === "notice" && tr.why === "unreviewed", "transport: link only, terms not reviewed");
   }
   assert.ok(!hasRentPending("manchester") && !hasRentPending("vancouver"));
-  assert.ok(cu.rentPendingHere.ja.includes("承認待ち") && cu.rentPendingHere.en.includes("Awaiting approval") && cu.unreviewedDetail.ja && cu.unreviewedDetail.en);
 });
 
 t("collected records: a missing record is reported, never assumed; matching records reconcile; a disagreeing one fails", () => {

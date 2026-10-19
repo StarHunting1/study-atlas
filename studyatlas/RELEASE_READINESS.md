@@ -5,6 +5,17 @@
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
 
+## 0n. Ver.1.5.2 の結果（Toronto・London の家賃5件を正式承認・本番反映）
+
+| 項目 | 結果 |
+|---|---|
+| verified にした家賃（5件のみ） | Toronto＝CMHC／Statistics Canada 表34-10-0133-01、Toronto CMA（コード535）、2025年、CAD/月：Bachelor C$1,491／1 Bedroom C$1,761／2 Bedrooms C$2,045／3 Bedrooms C$2,294。London＝ONS Price Index of Private Rents、London region（E12000007）、2026年8月、全住宅タイプ、GBP/月：£2,332。 |
+| 承認記録 | `RENT_APPROVALS`（`data/official/cityRents.ts`）に数値ごとに登録：承認者 StarHunting1、承認日 2026-10-17、根拠＝ユーザーの明示的な5件の公開承認と PR #50 の公式データ照合（Actions run 39065320556）。内容ダイジェストは PR #50 で準備したものと同一。後から数値・出典・期間・定義を変えるとビルドが失敗する。 |
+| 画面 | 都市ページ（住居カードの「市場全体の家賃」）に、Toronto は都市圏全体・2025年・CAD/月・間取り別4件、London は London region 全体・2026年8月・GBP/月・全住宅の平均＋ONS「開発中の公式統計」を、出典・確認日・ライセンス表示付きで表示。学生向け住居・語学学校の滞在先の料金ではないことを明記。Planner には自動計上しない。 |
+| 比較 | Toronto と Vancouver は同じ基準（発表元・表・構造・間取り・地域区分・年・通貨・期間がすべて一致）。London（地域）と Manchester（自治体）は地域区分が異なり「参考値のみ」。順位付け・通貨換算なし。 |
+| 出典・ライセンス | Toronto＝CMHC ライセンス（商用利用可・取消可能・出典表示必須）。London＝OGL v3.0。再利用許諾（RIGHTS.md）と検証状態は別管理。 |
+| 変更していないもの | Vancouver・Manchester の家賃、英国政府 claim 5件、Vancouver 気候48値、Planner の計算・保存形式、地図、学校比較、ビザ・医療の承認ロジック、TTC・TfL（リンクのみ） |
+
 ## 0m. Ver.1.5.1 の結果（Toronto・London 家賃の公式再照合と承認準備。承認・公開はまだ行っていません）
 
 | 項目 | 結果 |

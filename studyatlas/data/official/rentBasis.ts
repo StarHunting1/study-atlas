@@ -33,3 +33,9 @@ export const rentBasisKey = (p: DataPoint): string | undefined => { const b = re
 export function rentBasisDiff(a: RentBasis, b: RentBasis): (keyof RentBasis)[] { return (Object.keys(a) as (keyof RentBasis)[]).filter((k) => a[k] !== b[k]); }
 /** True only when every point has a recorded basis and all bases are identical. */
 export const sameRentBasis = (points: DataPoint[]) => { const ks = points.map(rentBasisKey); return ks.length > 1 && ks.every((k) => !!k) && new Set(ks).size === 1; };
+
+/** The parts in which any of the points differs from the first one (undefined when some point has no recorded basis). Empty = same footing. */
+export function rentDiffFields(points: DataPoint[]): (keyof RentBasis)[] | undefined {
+  const bs = points.map(rentBasisOf); if (bs.length < 2 || bs.some((b) => !b)) return undefined;
+  const first = bs[0]!; return (Object.keys(first) as (keyof RentBasis)[]).filter((k) => bs.some((b) => b![k] !== first[k]));
+}
