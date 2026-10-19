@@ -10,7 +10,8 @@ import { RIGHTS } from "@/data/official/rights.data";
 import { healthLinks, visaLinks } from "@/data/visa";
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
-import { keyFigure, marketRentSummary, TOPICS, transportLinkKey, type Topic } from "@/lib/overview";
+import { keyFigure, marketRentSummary, rentCheckingKey, TOPICS, transportLinkKey, type Topic } from "@/lib/overview";
+import { compareHref, listCompareSchools } from "@/data/languageSchools";
 import { dataText as d } from "@/locales/data";
 import { ot } from "@/locales/official";
 import { ux } from "@/locales/ux";
@@ -98,7 +99,7 @@ const LANG_FIRST: Record<string, string[]> = { education: ["education.languageSc
 const UNI_FIRST: Record<string, string[]> = { education: ["education.universities", "education.tuition", "education.languageSchools"], housing: ["housing.dorm", "housing.shareHouse", "housing.homestay", "housing.overview"] };
 
 function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: City; data?: OfficialCityData; open: boolean; setOpen: (o: boolean) => void; mode: StudyMode }) {
-  const { L } = useI18n(); const k = keyFigure(city, topic, mode); const mr = topic === "housing" && k.kind === "none" ? marketRentSummary(city) : undefined; const tl = topic === "transport" ? transportLinkKey(city) : undefined; const all = (t: DataPoint["topic"]) => (data?.points ?? []).filter((p) => p.topic === t);
+  const { L } = useI18n(); const k = keyFigure(city, topic, mode); const mr = topic === "housing" && k.kind === "none" ? marketRentSummary(city) : undefined; const tl = topic === "transport" ? transportLinkKey(city) : undefined; const rc = topic === "housing" && !mr ? rentCheckingKey(city) : undefined; const cs = topic === "education" ? listCompareSchools().filter((x) => x.cityId === city.id) : []; const all = (t: DataPoint["topic"]) => (data?.points ?? []).filter((p) => p.topic === t);
   const by = (t: DataPoint["topic"]) => all(t).filter((p) => fitOf(p, mode) === "applies"); const order = (mode === "language" ? LANG_FIRST : UNI_FIRST)[topic];
   let body: ReactNode = null;
   if (topic === "living") body = <>{by("living").length > 0 && <><p className="rounded-xl bg-amber-50 px-3 py-2 text-xs leading-relaxed text-amber-900">{L(ot.livingIntro)}</p><CardGrid points={by("living")} /></>}{all("living").length > 0 && by("living").length === 0 && <p className="rounded-xl bg-slate-50 px-3 py-2 text-xs text-slate-500 ring-1 ring-slate-200" data-testid="prep-living">{L(ot.pricePrep)}</p>}<Profile city={city} id="cost" /></>;
@@ -119,7 +120,7 @@ function Card({ topic, city, data, open, setOpen, mode }: { topic: Topic; city: 
     <article id={topic} data-testid={`card-${topic}`} className={`${panel} min-w-0 scroll-mt-24 self-start p-4 sm:p-5 ${open ? "md:col-span-2" : ""}`}>
       <h2 className="text-base font-semibold text-[#0b2a5b]">{L(ux.topics[topic])}</h2>
       <p className="mb-2 text-xs text-slate-500">{L(ux.blurb[topic])}</p>
-      <div data-testid={`key-${topic}`}>{mr ? <MarketRentKey point={mr.point} count={mr.count} big /> : tl ? <div className="space-y-1"><KeyView k={tl} big /><p className="text-[11px] leading-snug text-slate-500">{L(ux.transportLinkNote)}</p></div> : <KeyView k={k} big languageFirst={mode === "language"} />}</div>
+      <div data-testid={`key-${topic}`}>{mr ? <MarketRentKey point={mr.point} count={mr.count} big /> : rc ? <div className="space-y-1" data-testid="key-rent-checking"><p className="text-sm font-semibold text-slate-800">{L(ux.rentChecking)}</p><p className="text-[11px] leading-snug text-slate-500">{L(ux.rentCheckingNote)}</p><a href={rc.url} target="_blank" rel="noopener noreferrer" data-testid="key-rent-checking-link" className="inline-flex min-h-[40px] items-center gap-1 rounded-full px-3 text-sm font-medium text-sky-800 ring-1 ring-sky-200 hover:bg-sky-50">{L(ux.rentCheckingLink)} ↗</a><p className="text-xs text-slate-500">{rc.publisher}</p></div> : tl ? <div className="space-y-1"><KeyView k={tl} big /><p className="text-[11px] leading-snug text-slate-500">{L(ux.transportLinkNote)}</p></div> : <KeyView k={k} big languageFirst={mode === "language"} />}{cs.length > 0 && <Link href={compareHref(cs[0].id, cs[1]?.id)} data-testid="key-school-list" className="mt-1 inline-flex min-h-[40px] items-center text-sm text-sky-700 underline">{tpl(L(ux.schoolsListLink), { n: cs.length })}</Link>}</div>
       <Disclosure level="more" open={open} onOpenChange={setOpen} testid={`more-${topic}`} className="mt-3"><div className="space-y-4">{body}</div></Disclosure>
     </article>
   );
@@ -134,15 +135,18 @@ export default function CityOverview({ city, country, data }: { city: City; coun
   }, []);
   const counts = [...(data?.points ?? []).map((p) => p.status), ...(data?.climate ? [data.climate.status] : [])].reduce<Record<string, number>>((a, s) => ({ ...a, [s]: (a[s] ?? 0) + 1 }), {});
   const used = officialSources.filter((s) => s.cityIds.includes(city.id));
+  const quickLinks = hasGuide(country) ? [] : [...(visaLinks[country.code] ?? []), ...(healthLinks[country.code] ?? [])]; // countries without a visa guide (Australia): the official pages stay one tap away
   const rowProps = (r: Row) => ({ level: "row" as const, id: r, testid: `row-${r}`, open: !!openR[r], onOpenChange: (o: boolean) => setOpenR((x) => ({ ...x, [r]: o })), title: L(ux.rows[r]), summary: L(ux.rowHint[r]) });
   return (
     <div className="space-y-6">
       <StudyModeSwitch mode={mode} onChange={setMode} />
-      <nav aria-label={L(ux.jumpTo)} data-testid="topic-jump" className="flex flex-wrap gap-2">{cardOrder(mode).map((t) => <a key={t} href={`#${t}`} data-testid={`jump-${t}`} className={`${pill} ${pillOff} min-h-[44px]`}>{L(ux.topics[t])}</a>)}</nav>
+      <nav aria-label={L(ux.jumpTo)} data-testid="topic-jump" className="flex flex-wrap gap-2">{cardOrder(mode).map((t) => <a key={t} href={`#${t}`} data-testid={`jump-${t}`} className={`${pill} ${pillOff} min-h-[44px]`}>{L(ux.topics[t])}</a>)}{quickLinks.length > 0 && <a href="#visa-links" data-testid="jump-visa-links" className={`${pill} ${pillOff} min-h-[44px]`}>{L(ux.visaQuickJump)}</a>}</nav>
       <div className="grid items-start gap-4 md:grid-cols-2" data-testid="cards" data-mode={mode}>
         {cardOrder(mode).map((t) => <Card key={t} topic={t} mode={mode} city={city} data={data} open={!!openT[t]} setOpen={(o) => setOpenT((x) => ({ ...x, [t]: o }))} />)}
       </div>
 
+      {quickLinks.length > 0 && <section id="visa-links" data-testid="visa-links" className={`${panel} scroll-mt-24 p-4 sm:p-5`} aria-labelledby="visa-links-h"><h2 id="visa-links-h" className="text-base font-semibold text-[#0b2a5b]">{L(ux.visaQuick)}</h2><p className="mb-2 text-xs leading-relaxed text-slate-500">{L(ux.visaQuickLead)}</p>
+        <ul className="space-y-1 text-sm">{quickLinks.map((l) => <li key={l.link.value}><a href={l.link.value} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[40px] items-center text-sky-700 underline">{L(l.label)} ↗</a></li>)}</ul></section>}
       <section className={`${panel} p-4 sm:p-5`} aria-labelledby="more-info">
         <h2 id="more-info" className="text-base font-semibold text-[#0b2a5b]">{L(ux.moreInfo)}</h2><p className="mb-2 text-xs text-slate-500">{L(ux.moreInfoLead)}</p>
         <div className="divide-y divide-slate-100">

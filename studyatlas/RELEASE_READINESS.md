@@ -5,6 +5,18 @@
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
 
+## 0p. Ver.1.6.0 の結果（Sydney・Melbourne のデータ拡充。家賃は未承認で非公開）
+
+| 項目 | 結果 |
+|---|---|
+| 家賃（取得のみ） | ABS 2021年国勢調査 QuickStats の週あたり家賃**中央値**（実際の家賃・家賃なし住戸を除く）：Greater Sydney 470／Greater Melbourne 390 AUD/週。ライセンスは CC BY 4.0（商用利用可）。`RENT_APPROVALS` に記録がないため**画面・比較には数値を出していない**（「確認中」＋公式リンク）。承認は人が行う（`data/APPROVAL_SHEET.md` §7） |
+| 比較の扱い | 承認後、Sydney と Melbourne は同じ統計・定義・年・通貨・期間単位なので互いに「比較可能」。他都市とは「参考値のみ」。承認前は数値を比較表に出さない。NSW の賃貸保証金データ・ビクトリア州の賃貸レポートは定義が異なる／読めなかったため不使用 |
+| 語学学校 | 4校（ILSC Sydney・Navitas English Sydney Hyde Park・ILSC Melbourne・City Language Centre Melbourne）。全て「未確認」。ILSC・City Language Centre は Study Australia（豪州政府）の提供機関ディレクトリで CRICOS 機関コードと住所を突き合わせ済み。Navitas は登録簿との照合ができておらず学校自身の記載のみ（明記）。CRICOS の課程検索は robots.txt が禁じるため未使用。NEAS 認定はどの学校も確認できず、認定校とは書いていない。EF Sydney・Kaplan Melbourne・Discover English は確認できず掲載せず。料金は転載せず学校ページへのリンクのみ |
+| 交通 | Transport for NSW（運賃・対象者のページ）と Transport Victoria（運賃・myki）の公式リンクを交通カードの最初の画面に表示。金額・割引条件は転載しない（利用規約未確認／Transport Victoria は bot 確認で読めず）。留学生が割引を受けられるとは書かない |
+| ビザ・保険 | 内務省の Student visa（500）・Visitor visa（600）・ETA（601）、Study Australia のビザ案内・OSHC の公式リンクのみ（都市ページに常時表示）。料金・規則・claim は転載せず、英国・カナダの claim は流用せず、Planner へ自動計上しない |
+| 変更していないもの | Manchester・Vancouver・Toronto・London の承認済み家賃と表示、英国政府 claim 5件、Vancouver 気候、Planner の計算と保存、地図、既存の学校比較、既存のライセンス・承認記録 |
+| 未実施・残り | 家賃2件の人による承認／Navitas の登録簿照合／EF・Kaplan・他校の追加調査／NEAS 認定の確認／Transport Victoria の運賃ページ（bot 確認で未読）／気候・生活費は容量外で未着手 |
+
 ## 0o. Ver.1.5.3 の結果（Toronto・London の表示を見つけやすく。データ・承認の変更なし）
 
 | 項目 | 結果 |

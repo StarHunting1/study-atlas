@@ -82,6 +82,8 @@ export const LONDON_RENT_CANDIDATE: Omit<DataPoint, "status" | "checkedAt"> = {
 };
 
 export type Candidate = Omit<DataPoint, "status" | "checkedAt">;
+/** (test helper) number of Sydney/Melbourne candidates */
+export const AU_RENT_CANDIDATES_FOR_TEST = AU_RENT_CANDIDATES.length;
 /** Digest of what a person approves: the figure, its unit and period, the source and quote, the label and the statistical definition. Retrieval date and free notes are not part of it. */
 export function rentDigest(c: Candidate): string {
   return sha256(JSON.stringify([c.id, c.cityId, c.topic, c.sourceId, c.metric, c.label, c.value, c.audience, c.conditions, c.validFor, c.evidence.map((e) => [e.url, e.publisher, e.section, e.quote, e.terms ?? null]), c.collectedId ?? null]));

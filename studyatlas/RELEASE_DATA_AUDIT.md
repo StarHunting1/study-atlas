@@ -13,8 +13,8 @@
 | Toronto | 25 | 0 | 8 | 3 | 14 | 32% | 0% |
 | Manchester | 25 | 6 | 8 | 0 | 11 | 56% | 24% |
 | London | 25 | 1 | 7 | 3 | 14 | 32% | 4% |
-| Sydney | 25 | 0 | 5 | 3 | 17 | 20% | 0% |
-| Melbourne | 25 | 0 | 5 | 3 | 17 | 20% | 0% |
+| Sydney | 25 | 0 | 6 | 3 | 16 | 24% | 0% |
+| Melbourne | 25 | 0 | 6 | 3 | 16 | 24% | 0% |
 
 ### 分野別（verified / unverified / sample / pending）
 
@@ -24,7 +24,7 @@
 | Housing | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 | 0 / 1 / 0 / 3 |
 | Climate | 1 / 1 / 0 / 0 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 |
 | Safety | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
-| Education | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 1 / 0 / 2 | 0 / 1 / 0 / 2 |
+| Education | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 | 0 / 2 / 0 / 1 |
 | Transport | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 1 / 1 / 0 / 0 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 | 0 / 1 / 0 / 1 |
 | Visa | 0 / 2 / 0 / 0 | 0 / 2 / 0 / 0 | 1 / 1 / 0 / 0 | 1 / 1 / 0 / 0 | 0 / 0 / 0 / 2 | 0 / 0 / 0 / 2 |
 | Daily life | 0 / 2 / 0 / 3 | 0 / 1 / 0 / 4 | 0 / 2 / 0 / 3 | 0 / 1 / 0 / 4 | 0 / 1 / 0 / 4 | 0 / 1 / 0 / 4 |
@@ -37,8 +37,8 @@
 | Toronto | 4 | 4 | 0 | 4 | 0 | なし | 0 |
 | Manchester | 25 | 25 | 0 | 25 | 0 | verified（1971–2000） | 0 |
 | London | 1 | 1 | 0 | 1 | 0 | なし | 0 |
-| Sydney | 0 | – | – | – | – | なし | – |
-| Melbourne | 0 | – | – | – | – | なし | – |
+| Sydney | 0 | 0 | 0 | 0 | 0 | なし | 0 |
+| Melbourne | 0 | 0 | 0 | 0 | 0 | なし | 0 |
 
 ## 3. 語学学校・大学
 
@@ -48,8 +48,8 @@
 | Toronto | 2 | 0 | unverified | 2（unverified） |
 | Manchester | 3 | 3 | unverified | 2（unverified） |
 | London | 2 | 1 | unverified | 3（unverified） |
-| Sydney | 0 | 0 | pending | 2（unverified） |
-| Melbourne | 0 | 0 | pending | 2（unverified） |
+| Sydney | 2 | 0 | unverified | 2（unverified） |
+| Melbourne | 2 | 0 | unverified | 2（unverified） |
 
 ## 4. 出典の利用条件（権利管理）
 
@@ -66,6 +66,9 @@
 | UBC Student Housing and Community Services | vancouver | restricted | （区分から導出） | blocked |
 | Toronto Transit Commission (TTC) – fares and passes | toronto | unknown | link-only | blocked |
 | Transport for London (TfL) – fares and discounts | london | unknown | link-only | blocked |
+| Australian Bureau of Statistics – 2021 Census QuickStats (median weekly rent) | sydney, melbourne | permitted | （区分から導出） | page-check-only |
+| Transport for NSW – tickets and fares | sydney | unknown | link-only | blocked |
+| Transport Victoria – myki and fares | melbourne | unknown | link-only | blocked |
 
 ## 4b. 出典リンクの検査（Manchester / Vancouver）
 
@@ -203,7 +206,7 @@
 - pending: Safety / Official crime statistics
 - pending: Safety / Safety advice
 - unverified: Education / Universities（確認日なし）
-- pending: Education / Language schools
+- unverified: Education / Language schools（確認日 2026-10-19）
 - pending: Education / Tuition fees
 - unverified: Transport / Main transport（確認日なし）
 - pending: Transport / Student discounts
@@ -231,7 +234,7 @@
 - pending: Safety / Official crime statistics
 - pending: Safety / Safety advice
 - unverified: Education / Universities（確認日なし）
-- pending: Education / Language schools
+- unverified: Education / Language schools（確認日 2026-10-19）
 - pending: Education / Tuition fees
 - unverified: Transport / Main transport（確認日なし）
 - pending: Transport / Student discounts
@@ -289,6 +292,7 @@
 35. **Ver.1.5.1 Toronto・London の家賃統計を公式データと再照合（承認準備のみ。verified への変更・公開はなし）**: Actions（run 39065320556、2026-10-17、読み取り専用・robots順守・再試行なし）で、Toronto の4値（Bachelor 1,491／1BR 1,761／2BR 2,045／3BR 2,294 CAD/月、2025、CMA 535、StatCan WDS ベクトル v3822835・v3822969・v3823103・v3823237）と London の1値（£2,332/月、2026年8月、E12000007、ONS PIPR 2026-09-16版）が**すべて公式と一致**。CMHC ライセンス（商用利用可・取消可能・出典表示必須）と OGL v3.0（商用利用可・出典表示）の文言も再読。承認は**数値ごと**の記録（`RENT_APPROVALS`、承認者・日付・根拠・内容ダイジェスト）で、数値・出典・期間・定義を変えるとダイジェスト不一致でビルドが失敗する。比較は `rentBasis.ts` の全項目（発表元・表・指標・構造・間取り・地域区分・年・通貨・期間）が一致する場合だけ「同じ基準」とし、Toronto と Vancouver は承認後に一致、London（地域）と Manchester（自治体）は地域区分が異なり常に参考値のみ。**承認記録は空のまま**（捏造なし）。
 36. **Ver.1.5.2 Toronto・London の家賃5件を正式承認・本番反映**: 人（StarHunting1）の明示的な公開承認（2026-10-17）と、PR #50 の Actions 照合（run 39065320556）に基づき、`RENT_APPROVALS` に数値ごとの承認記録を登録し、Toronto 4件（CMA 535、2025、Bachelor C$1,491／1BR 1,761／2BR 2,045／3BR 2,294）と London 1件（London region E12000007、2026年8月、£2,332）だけを verified に変更。ダイジェストは PR #50 で準備した内容と同一（差異なし）。数値・出典・期間・定義を変えるとビルドが失敗する。比較は Toronto／Vancouver が同じ基準（承認後に全項目一致）、London／Manchester は地域区分が異なり参考値のみ。ほかのデータ（英国政府 claim 5件、Vancouver 気候48値、Vancouver・Manchester の家賃）、Planner、地図、学校比較、ビザ・医療は変更なし。TTC・TfL は引き続きリンクのみ。
 37. **Ver.1.5.3 表示の見つけやすさ（データ・承認記録の変更なし）**: Toronto・London の承認済み家賃・学校4校・TTC/TfL リンクはビルドに入っていたが、都市ページの最初の画面では住居カードが「参考料金は準備中」、交通カードが未確認の説明文だけで、家賃は「詳しく見る」→「市場全体の家賃を見る」の2段階奥にあった。住居カードの見出しに市場全体の平均家賃（代表値・地域・年・「学生向けの料金ではありません」）を出し、交通カードの見出しに公式運賃ページへのリンクを出し、学生向けの価格がない都市では市場全体の家賃を最初から開き、5項目へのジャンプリンクを追加した。比較ページの判定・承認記録・Planner は変更なし。
+38. **Ver.1.6.0 Sydney・Melbourne のデータ拡充（家賃は取得済み・未承認で非公開／学校・交通・ビザの公式リンクを追加）**: 2026-10-19 に GitHub Actions のプローブ（読み取り専用・robots.txt 順守・1件ずつ・再試行なし）で、ABS 2021年国勢調査 QuickStats の週あたり家賃中央値（Greater Sydney 470／Greater Melbourne 390 AUD/週）、ABS の著作権表示（CC BY 4.0・商用利用可）、語学学校の公式ページ、豪州政府 Study Australia の提供機関ディレクトリ（CRICOS コード・住所の突き合わせ）、Transport for NSW／Transport Victoria、内務省・Study Australia のビザ・OSHC ページを確認した。家賃2件は `RENT_APPROVALS` に載せていないため**都市ページにも比較にも数値は出ない**（「確認中」と公式リンクのみ）。承認すると同じ統計・同じ定義の Sydney–Melbourne だけが「同じ基準」、他都市とは常に参考値のみ。NSW 賃貸保証金データ・ビクトリア州の賃貸レポートは定義が違う、または読めなかった（DFFH の robots.txt に接続できず）ため使っていない。語学学校は4校（ILSC Sydney／Navitas English Sydney Hyde Park／ILSC Melbourne／City Language Centre Melbourne）で全て未確認扱い。CRICOS 登録簿の課程検索は robots.txt が禁じているため使えず、ILSC は機関コード02137Mと住所をディレクトリと照合、City Language Centre は機関コード03893Mを照合、Navitas は登録簿との照合ができていない（学校自身の記載のみ）と明記。EF Sydney はディレクトリにキャンパスが載っていない、Kaplan Melbourne は学校ページに住所がない、Discover English は公式サイトに接続できない（証明書不一致）ため掲載しなかった。NEAS の認定はどの学校でも確認できず、認定校とは書いていない。Transport for NSW は運賃ページを開けたが利用規約未確認のためリンクのみ（対象者ページは大学・TAFE の学生を挙げ、留学生は挙げていない）。Transport Victoria は bot 確認ページ（HTTP 403）で読めず、回避せずリンクのみ。ビザ（subclass 500／600／601）と OSHC は公式ページへのリンクだけで、英国・カナダの claim は流用していない。Planner への自動計上はなし。
 
 ### 承認待ちの確認結果（承認済みの5件を除き verified にはしていません）
 2026-10-15 の Actions ページ確認（run 38787463398）で、言い換えた記述が公式ページの記載と一致することを確認した項目。人が承認するまで unverified のまま。
