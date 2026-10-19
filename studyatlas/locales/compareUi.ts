@@ -13,7 +13,7 @@ export const cu = {
   },
   glanceTitle: t("What can be compared", "比較できる項目の状況"),
   glanceNote: t("Only items with the same basis on both sides count as comparable.", "どの都市も同じ基準で揃っている項目だけを「比較可能」としています。"),
-  comparable: t("Comparable", "比較可能"), reference: t("Reference only", "参考値のみ"), notYet: t("Not obtained", "未取得"), linkOnly: t("Official link only", "公式リンクのみ"),
+  comparable: t("Comparable", "比較可能"), reference: t("Reference only", "参考値のみ"), notYet: t("Not obtained", "未取得"), checking: t("Being checked", "確認中"), linkOnly: t("Official link only", "公式リンクのみ"),
   heldHere: t("Figure not shown (publisher's terms)", "規約により数値は非表示"), heldLink: t("See the official page", "公式ページで確認"), noticeHere: t("Fees not shown (held back)", "料金掲載見合わせ"),
   rentPendingHere: t("Awaiting approval (figure not shown)", "承認待ち（数値は未掲載）"),
   rentPendingDetail: t("A public statistic has been collected, but a person has not approved it yet, so StudyAtlas does not show the number. See the official page.", "公的統計は取得済みですが、人による承認が済むまでStudyAtlasでは数値を表示しません。公式ページをご確認ください。"),

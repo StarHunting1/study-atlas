@@ -21,6 +21,7 @@ import { cityCandidates } from "../data/official/planner";
 import { healthLinks, visaLinks } from "../data/visa";
 import { blockedHosts, expectFor, linkTargets } from "../collector/linkcheck";
 import { countries as countryList } from "../data/countries";
+import QuickCompare from "@/components/overview/QuickCompare";
 
 let n = 0; const t = (name: string, fn: () => void) => { fn(); n++; console.log("ok", name); };
 const city = (id: string) => getCity(id)!;
@@ -143,6 +144,16 @@ t("link check covers Sydney and Melbourne (rent pages, schools, fee pages, visa/
   const ts = linkTargets(); const by = (re: RegExp) => ts.filter((x) => re.test(x.url));
   assert.ok(by(/abs\.gov\.au\/census/).length === 2 && by(/ilsc\.com/).length >= 2 && by(/navitasenglish/).length >= 2 && by(/cityenglish/).length >= 1 && by(/homeaffairs/).length === 3 && by(/overseas-student-health-cover/).length === 1);
   for (const x of by(/transportnsw\.info|transport\.vic\.gov\.au/)) assert.ok(x.skip, x.url);
+});
+
+t("comparison page: Sydney vs Melbourne says 'being checked' (not 'not obtained') for rent while unapproved, shows no amount, never 'comparable'; Sydney vs Toronto shows Toronto's approved rent only as reference", () => {
+  const wrap = (el: ReturnType<typeof h>) => renderToStaticMarkup(h(I18nProvider, null, el));
+  const sm = wrap(h(QuickCompare, { ids: ["sydney", "melbourne"] })); const tx = text(sm);
+  const rentChip = /data-testid="chip-rent"[^>]*>([^<]*)</.exec(sm)?.[1]; assert.equal(rentChip, "確認中", "rent chip"); assert.match(sm, /data-testid="glance-rent"[^>]*>[^]*?確認中/);
+  assert.ok(!/(^|\D)(470|390)(\D|$)/.test(tx) && !/A\$|AUD/.test(tx), "no Australian rent number in the comparison"); assert.ok(tx.includes("承認が済むまでStudyAtlasでは数値を表示しません"));
+  assert.ok(!/data-testid="chip-rent"[^>]*>[^<]*(比較可能|参考値のみ)/.test(sm), "not comparable, not even reference, while neither figure is shown");
+  const st = wrap(h(QuickCompare, { ids: ["sydney", "toronto"] })); assert.ok(!/(^|\D)(470|390)(\D|$)/.test(text(st))); assert.match(st, /data-testid="chip-rent"[^>]*>[^<]*参考値のみ|data-testid="chip-rent"[^>]*>[^<]*確認中|data-testid="chip-rent"[^>]*>[^<]*未取得/);
+  const man = wrap(h(QuickCompare, { ids: ["manchester", "vancouver"] })); assert.ok(!/data-testid="chip-rent"[^>]*>[^<]*確認中/.test(man), "existing pairs are not relabelled");
 });
 
 console.log(n, "Ver.1.6.0 tests passed");
