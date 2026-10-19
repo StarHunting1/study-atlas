@@ -23,29 +23,10 @@ async function page(url: string, res: RegExp[], linkRe?: RegExp, w = 110) {
   if (linkRe) console.log("  links:\n    " + (links(r.body, r.url, linkRe).join("\n    ") || "none"));
 }
 (async () => {
-  console.log("## A2. ECCC 1991–2020, Ontario bulk file: composite station TORONTO (CITY), the four elements (one request)");
-  const url = "https://climate.weather.gc.ca/climate_normals/download/1991_e.html?area=province&province%5B%5D=ON&product%5B%5D=data&product%5B%5D=station_inventory";
-  const rb = await robots(url);
-  if (!rb.allowed) console.log(`robots: ${rb.reason} (not fetched)`); else {
-    await sleep(1500); const res = await fetch(url, { headers: { "user-agent": USER_AGENT } }); const buf = Buffer.from(await res.arrayBuffer());
-    console.log(`- ${res.status} ${res.headers.get("content-type")} ${buf.length} bytes`);
-    if (res.status === 200 && buf.subarray(0, 2).toString() === "PK") {
-      const dir = mkdtempSync(join(tmpdir(), "eccc-")); const f = join(dir, "on.zip"); writeFileSync(f, buf);
-      try {
-        const n = execFileSync("unzip", ["-Z1", f]).toString().split("\n").filter((x) => /Data\.csv$/.test(x))[0];
-        const lines = execFileSync("unzip", ["-p", f, n], { maxBuffer: 400 * 1024 * 1024 }).toString("latin1").split(/\r?\n/);
-        const city = lines.filter((l) => l.startsWith('"TORONTO (CITY)"'));
-        console.log(`TORONTO (CITY) rows: ${city.length}`);
-        for (const l of city) if (/"(Daily Average|Daily Maximum|Daily Minimum|Precipitation|Rainfall|Snowfall) \((.C|mm|cm)\)"/.test(l.replace("Â", ""))) console.log("  " + l);
-        console.log("elements present for the normal period: " + [...new Set(city.filter((l) => l.includes('"Normal"')).map((l) => l.split('","')[4]))].join(" ; ").slice(0, 900));
-        const pr = lines.filter((l) => l.startsWith('"TORONTO (CITY)"') && /Period|Year|Number of years/i.test(l)); console.log("period/records lines: " + pr.length);
-      } finally { rmSync(dir, { recursive: true, force: true }); }
-    } else console.log(short(buf.toString("utf8"), 300));
-  }
-  console.log("\n## B2. Transport for NSW: footer/legal links, tertiary students, concession eligibility wording");
-  await page("https://transportnsw.info/tickets-fares", [/Copyright[^.]{0,120}/i, /Creative Commons[^.]{0,160}/i], /copyright|terms|disclaimer|licen|privacy|open data|developer/i);
-  await page("https://transportnsw.info/tickets-fares/eligibility-concessions/tertiary-tafe-students", [/international[^.]{0,200}/i, /overseas[^.]{0,200}/i, /CRICOS[^.]{0,200}/i, /full.time[^.]{0,200}/i, /eligible[^.]{0,220}/i, /Student Concession[^.]{0,160}/i]);
-  console.log("\n## C2. TTC: legal/footer links, post-secondary student wording, maps");
-  await page("https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", [/Post-secondary[^.]{0,260}/i, /international[^.]{0,200}/i, /full.time[^.]{0,200}/i, /Youth[^.]{0,100}/i], /map|student|post-secondary|presto|discount/i);
-  await page("https://www.ttc.ca/", [/Copyright[^.]{0,120}/i, /Terms[^.]{0,120}/i], /terms|legal|copyright|privacy|open data|map|subway|route/i);
+  console.log("## E. terms re-read: ECCC data licence, TTC website terms, Transport for NSW legal pages");
+  await page("https://eccc-msc.github.io/open-data/licence/readme_en/", [/Licence[^.]{0,200}/i, /commercial[^.]{0,200}/i, /attribution|acknowledg[^.]{0,200}/i, /version[^.]{0,80}/i, /modif|adapt|derive[^.]{0,200}/i, /redistribut|sub-licen[^.]{0,200}/i], /licen|terms|end-use/i, 140);
+  await page("https://www.ttc.ca/transparency-and-accountability/policies/web-site-terms-and-conditions-of-use", [/copyright[^.]{0,260}/i, /reproduc[^.]{0,260}/i, /commercial[^.]{0,200}/i, /licen[cs]e[^.]{0,200}/i, /without[^.]{0,160}permission[^.]{0,120}/i], /licen|open data|copyright|terms/i, 140);
+  await page("https://transportnsw.info/", [/Copyright[^.]{0,120}/i, /Creative Commons[^.]{0,160}/i], /copyright|terms|disclaimer|licen|privacy|open data|developer|legal/i);
+  await page("https://www.transport.nsw.gov.au/", [/Copyright[^.]{0,120}/i, /Creative Commons[^.]{0,160}/i], /copyright|terms|disclaimer|licen|privacy|open data|developer|legal/i);
+  await page("https://opendata.transport.nsw.gov.au/", [/Creative Commons[^.]{0,200}/i, /licen[cs]e[^.]{0,200}/i, /commercial[^.]{0,160}/i], /licen|terms|copyright|fare|opal/i);
 })();
