@@ -23,7 +23,7 @@ async function page(url: string, res: RegExp[], linkRe?: RegExp, w = 110) {
   if (linkRe) console.log("  links:\n    " + (links(r.body, r.url, linkRe).join("\n    ") || "none"));
 }
 (async () => {
-  console.log("## A. ECCC 1991–2020 normals, bulk file for Ontario (one request)");
+  console.log("## A2. ECCC 1991–2020, Ontario bulk file: composite station TORONTO (CITY), the four elements (one request)");
   const url = "https://climate.weather.gc.ca/climate_normals/download/1991_e.html?area=province&province%5B%5D=ON&product%5B%5D=data&product%5B%5D=station_inventory";
   const rb = await robots(url);
   if (!rb.allowed) console.log(`robots: ${rb.reason} (not fetched)`); else {
@@ -32,26 +32,20 @@ async function page(url: string, res: RegExp[], linkRe?: RegExp, w = 110) {
     if (res.status === 200 && buf.subarray(0, 2).toString() === "PK") {
       const dir = mkdtempSync(join(tmpdir(), "eccc-")); const f = join(dir, "on.zip"); writeFileSync(f, buf);
       try {
-        for (const n of execFileSync("unzip", ["-Z1", f]).toString().split("\n").filter(Boolean)) {
-          const lines = execFileSync("unzip", ["-p", f, n], { maxBuffer: 400 * 1024 * 1024 }).toString("latin1").split(/\r?\n/);
-          console.log(`### ${n}: ${lines.length} lines; header: ${short(lines[0], 700)}`);
-          const hits = lines.filter((l) => /TORONTO/i.test(l)); const inv = /inventory/i.test(n);
-          console.log(`  TORONTO rows: ${hits.length}`);
-          if (inv) for (const l of hits.slice(0, 20)) console.log("  " + short(l, 400));
-          else { const names = [...new Set(hits.map((l) => l.split(",").slice(0, 4).join("|")))]; console.log("  stations in data file: " + names.slice(0, 12).join(" ;; ")); for (const l of hits.filter((x) => /TORONTO (CITY|INTL|PEARSON|CITY CENTRE)/i.test(x)).slice(0, 150)) console.log("  " + short(l, 330)); }
-        }
+        const n = execFileSync("unzip", ["-Z1", f]).toString().split("\n").filter((x) => /Data\.csv$/.test(x))[0];
+        const lines = execFileSync("unzip", ["-p", f, n], { maxBuffer: 400 * 1024 * 1024 }).toString("latin1").split(/\r?\n/);
+        const city = lines.filter((l) => l.startsWith('"TORONTO (CITY)"'));
+        console.log(`TORONTO (CITY) rows: ${city.length}`);
+        for (const l of city) if (/"(Daily Average|Daily Maximum|Daily Minimum|Precipitation|Rainfall|Snowfall) \((.C|mm|cm)\)"/.test(l.replace("Â", ""))) console.log("  " + l);
+        console.log("elements present for the normal period: " + [...new Set(city.filter((l) => l.includes('"Normal"')).map((l) => l.split('","')[4]))].join(" ; ").slice(0, 900));
+        const pr = lines.filter((l) => l.startsWith('"TORONTO (CITY)"') && /Period|Year|Number of years/i.test(l)); console.log("period/records lines: " + pr.length);
       } finally { rmSync(dir, { recursive: true, force: true }); }
     } else console.log(short(buf.toString("utf8"), 300));
   }
-  console.log("\n## B. Bureau of Meteorology: terms and climate-statistics pages");
-  await page("https://www.bom.gov.au/other/copyright.shtml", [/Creative Commons[^.]{0,200}/i, /commercial[^.]{0,150}/i, /automated|scrap|robot/i], /licen|creative|copyright|terms|data/i);
-  for (const u of ["https://www.bom.gov.au/climate/averages/tables/cw_066062.shtml", "https://www.bom.gov.au/climate/averages/tables/cw_086071.shtml", "https://www.bom.gov.au/climate/averages/tables/cw_066037.shtml", "https://www.bom.gov.au/climate/averages/tables/cw_086282.shtml"]) await page(u, [/Statistics[^.]{0,120}/i, /1991[^.]{0,80}/i, /Mean maximum temperature[^A-Za-z]{0,120}/i, /Mean rainfall[^A-Za-z]{0,120}/i], undefined, 90);
-  console.log("\n## C. TTC");
-  await page("https://www.ttc.ca/fares-and-passes", [/PRESTO[^.]{0,160}/i, /contactless[^.]{0,140}/i, /student[^.]{0,160}/i, /zone|flat fare/i, /\$\d+\.\d\d/], /map|fare|presto|concession|student|payment/i);
-  await page("https://www.ttc.ca/terms-of-use", [/copyright[^.]{0,200}/i, /reproduc[^.]{0,160}/i, /licen[cs]e[^.]{0,160}/i], /licen|terms|open data|copyright/i);
-  console.log("\n## D. Transport for NSW");
-  await page("https://transportnsw.info/tickets-fares/fares", [/Opal card[^.]{0,160}/i, /zone|distance|band/i, /Opal network map|map/i], /map|opal|concession|fare|student|payment/i);
-  await page("https://transportnsw.info/tickets-fares/eligibility-concessions", [/Tertiary[^.]{0,200}/i, /international[^.]{0,200}/i, /apply[^.]{0,160}/i], /student|tertiary|international|concession/i);
-  await page("https://transportnsw.info/copyright", [/Creative Commons[^.]{0,200}/i, /copyright[^.]{0,200}/i, /reproduc[^.]{0,160}/i], /licen|creative|copyright|terms|data/i);
-  await page("https://transportnsw.info/about-us/terms-of-use", [/Creative Commons[^.]{0,200}/i, /copyright[^.]{0,200}/i], /licen|creative|copyright|terms|data/i);
+  console.log("\n## B2. Transport for NSW: footer/legal links, tertiary students, concession eligibility wording");
+  await page("https://transportnsw.info/tickets-fares", [/Copyright[^.]{0,120}/i, /Creative Commons[^.]{0,160}/i], /copyright|terms|disclaimer|licen|privacy|open data|developer/i);
+  await page("https://transportnsw.info/tickets-fares/eligibility-concessions/tertiary-tafe-students", [/international[^.]{0,200}/i, /overseas[^.]{0,200}/i, /CRICOS[^.]{0,200}/i, /full.time[^.]{0,200}/i, /eligible[^.]{0,220}/i, /Student Concession[^.]{0,160}/i]);
+  console.log("\n## C2. TTC: legal/footer links, post-secondary student wording, maps");
+  await page("https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", [/Post-secondary[^.]{0,260}/i, /international[^.]{0,200}/i, /full.time[^.]{0,200}/i, /Youth[^.]{0,100}/i], /map|student|post-secondary|presto|discount/i);
+  await page("https://www.ttc.ca/", [/Copyright[^.]{0,120}/i, /Terms[^.]{0,120}/i], /terms|legal|copyright|privacy|open data|map|subway|route/i);
 })();
