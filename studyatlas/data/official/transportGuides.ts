@@ -20,7 +20,7 @@ export const TRANSPORT_GUIDES: TransportGuide[] = [
     links: [
       { kind: "fares", label: t("TTC – Fares and passes", "TTC – 運賃とパス"), url: "https://www.ttc.ca/fares-and-passes", opened: true },
       { kind: "student", label: t("TTC – Fare types and discounts (student eligibility)", "TTC – 運賃の種類と割引（学生の対象条件）"), url: "https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", opened: true },
-      { kind: "map", label: t("TTC – Routes and schedules (maps)", "TTC – 路線と時刻表（路線図）"), url: "https://www.ttc.ca/routes-and-schedules", opened: true },
+      { kind: "map", label: t("TTC – Routes and schedules (maps)", "TTC – 路線と時刻表（路線図）"), url: "https://www.ttc.ca/routes-and-schedules", opened: false },
     ] },
   { cityId: "sydney", sourceId: "tfnsw-fares", checkedAt: "2026-10-19", read: true,
     modes: t("Opal network: trains, buses, ferries and light rail in Sydney and the surrounding regions (Transport for NSW names the Blue Mountains, Central Coast, Hunter and Illawarra).", "Opalの対象：シドニーと周辺地域の電車・バス・フェリー・ライトレール（Transport for NSWは、ブルーマウンテンズ・セントラルコースト・ハンター・イラワラも挙げています）。"),

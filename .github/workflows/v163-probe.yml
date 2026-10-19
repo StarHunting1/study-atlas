@@ -13,3 +13,4 @@ jobs:
         with: { node-version: 20, cache: npm, cache-dependency-path: studyatlas/package-lock.json }
       - run: npm ci
       - run: npx tsx collector/linkcheck.ts
+# link-check rerun (Ver.1.6.3: transport guide links added to the checked set)

@@ -13,6 +13,7 @@ import { officialData } from "../data/official";
 import { officialSources } from "../data/official/sources";
 import { rightsOfSource } from "../data/official/rights";
 import { healthLinks, visaLinks } from "../data/visa";
+import { TRANSPORT_GUIDES } from "../data/official/transportGuides";
 import { makeRobots } from "./robots";
 import { fetchText, htmlToText, sleep, USER_AGENT } from "./util";
 
@@ -64,6 +65,7 @@ export function linkTargets(): LinkTarget[] {
     map.set(key, { url: key, where: [where], expect: expectFor(key), skip });
   };
   for (const code of ["GBR", "CAN", "AUS"]) { for (const l of visaLinks[code] ?? []) add(l.link.value, `visa:${code}`); for (const l of healthLinks[code] ?? []) add(l.link.value, `health:${code}`); }
+  for (const g of TRANSPORT_GUIDES) for (const l of g.links) add(l.url, `guide:${g.cityId}`);
   for (const id of CITY_IDS) {
     const c = cities.find((x) => x.id === id)!; const edu = c.profile.education;
     for (const i of edu.languageSchools.value ?? []) { add(i.url, `school:${id}:${i.name}`); add(i.source?.url, `school-source:${id}:${i.name}`); add(i.feesUrl, `school-fees:${id}:${i.name}`); }
