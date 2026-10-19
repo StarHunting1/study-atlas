@@ -37,10 +37,11 @@ export function MarketRentKey({ point, count, big }: { point: DataPoint; count: 
   const { L, lang } = useI18n(); const basis = cu.rentBasis[`${point.metric}@${point.cityId}`] ?? cu.rentBasis[point.metric]; const st = keyStatus({ kind: "point", point });
   return (
     <div className="space-y-1" data-testid="key-market-rent">
-      <p className="text-xs font-medium text-slate-600">{L(ux.marketKeyTitle)}</p>
+      <p className="text-xs font-medium text-slate-600">{L(point.metric === "housing.marketRent.censusMedianWeekly" ? ux.marketKeyTitleMedian : ux.marketKeyTitle)}</p>
       <p className="flex flex-wrap items-baseline gap-x-2"><AmountText p={point} big={big} />{st && st !== "verified" ? <StatusBadge status={st} /> : null}</p>
       <p className="text-xs leading-snug text-slate-500">{basis ? `${L(basis)} · ` : ""}{validForShort(point.validFor, lang)}</p>
       <p className="text-[11px] leading-snug text-amber-800">{L(ux.marketKeyNotStudent)}</p>
+      {point.metric === "housing.marketRent.censusMedianWeekly" && <p className="text-[11px] leading-snug text-amber-800" data-testid="key-market-old">{L(ux.marketKeyOld)}</p>}
       {count > 1 && <p className="text-[11px] leading-snug text-slate-500" data-testid="key-market-more">{tpl(L(ux.marketKeyMore), { n: count })}</p>}
     </div>
   );

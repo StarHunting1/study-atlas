@@ -59,7 +59,7 @@ export const ot = {
   housingTypesTitle: { en: "Housing types open to students", ja: "留学生が使える住居タイプ" },
   housingTypes: {
     dorm: { en: "Run by a university or school, usually for its own students. A language-course or other-school student may not be able to apply. Bills, meals and the contract length differ by hall.", ja: "大学や学校が運営する寮で、多くは在籍校の学生向けです。語学留学の方や他校の学生は申し込めないことがあります。光熱費・食事・契約期間は寮ごとに異なります。" },
-    market: { en: "You rent a flat or house on the open market, on your own or with others. Usually a long tenancy with a deposit; the average figures below describe this whole market, not student rooms.", ja: "一般の賃貸市場で、一人または共同でアパート・住宅を借ります。多くは長期契約でデポジットが必要です。下の平均家賃はこの市場全体の統計で、留学生の部屋の料金ではありません。" },
+    market: { en: "You rent a flat or house on the open market, on your own or with others. Usually a long tenancy with a deposit; the average figures below describe this whole market, not student rooms.", ja: "一般の賃貸市場で、一人または共同でアパート・住宅を借ります。多くは長期契約でデポジットが必要です。下の平均・中央値の家賃はこの市場全体の統計で、留学生の部屋の料金ではありません。" },
     homestay: { en: "You live with a host family. Meals, the unit of the price (week or month) and the minimum stay differ by school or agency.", ja: "現地の家庭に滞在します。食事の有無、料金の単位（週額・月額）、最低滞在期間は学校や手配会社ごとに異なります。" },
     share: { en: "You rent one room in a house or flat shared with other tenants. The price is for the room, not the whole home divided by the number of people. Bills may or may not be included.", ja: "他の入居者と共有する住宅の個室を借ります。料金は個室1人分で、住宅全体の家賃を人数で割った値ではありません。光熱費が含まれるかは物件によって異なります。" },
   },
@@ -72,7 +72,7 @@ export const ot = {
   },
   housingTypesCheck: { en: "Always check who can apply, the contract period and what is included on the official page.", ja: "入居資格・契約期間・含まれるものは、必ず公式ページでご確認ください。" },
   housingMarketMore: { en: "City reference: rental-market statistics (not student housing)", ja: "都市の参考情報：賃貸市場の統計（学生向けではありません）" },
-  housingMarketMoreNote: { en: "Averages for the whole rental market of the city or area. They are not the price of a student room and are not used as one.", ja: "都市や地域の賃貸市場全体の平均です。留学生の部屋の料金ではなく、そのようには扱いません。" },
+  housingMarketMoreNote: { en: "Averages or medians for the whole rental market of the city or area. They are not the price of a student room and are not used as one.", ja: "都市や地域の賃貸市場全体の平均または中央値です。留学生の部屋の料金ではなく、そのようには扱いません。" },
   housingNote: {
     en: "University hall prices and city-wide average rents describe different things (contract, bills, who can apply). They are shown separately and never combined.",
     ja: "大学寮の料金と都市全体の平均家賃は、契約内容・光熱費・入居資格が異なる別の情報です。分けて表示し、混ぜて扱いません。",

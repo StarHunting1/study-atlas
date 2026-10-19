@@ -33,7 +33,7 @@ t("exactly the five approved figures are verified: Toronto 4 (CAD/month, CMA 535
 });
 
 t("the approval records: StarHunting1, 2026-10-17, the explicit-approval basis, and the content digest of the figure that was verified in PR #50", () => {
-  assert.deepEqual(Object.keys(RENT_APPROVALS).sort(), ALL_RENT_CANDIDATES.filter((c) => c.cityId === "toronto" || c.cityId === "london").map((c) => c.id).sort(), "only the five Ver.1.5.2 figures are approved (Sydney and Melbourne are not)");
+  assert.deepEqual(Object.keys(RENT_APPROVALS).sort(), ALL_RENT_CANDIDATES.map((c) => c.id).sort(), "the five Ver.1.5.2 figures and the two Ver.1.6.1 figures are approved, nothing else");
   for (const c of ALL_RENT_CANDIDATES.filter((x) => x.cityId === "toronto" || x.cityId === "london")) { const a = RENT_APPROVALS[c.id]; assert.equal(a.approvedBy, "StarHunting1"); assert.equal(a.approvedAt, "2026-10-17"); assert.match(a.basis, /明示的な公開承認/); assert.match(a.basis, /run 39065320556/); assert.equal(a.digest, rentDigest(c)); }
   const PR50 = { "tor-cmhc-rent-bachelor": "4a79633baf6e7b89bdd7e14393229e1674567a418856ca355e824e5739eab8cf", "tor-cmhc-rent-1br": "abbbf002fa77176f0b4b2c9fc214de335c9faefd166c739b4fbf153f180185c1", "tor-cmhc-rent-2br": "5085d74860e41547259c36aeb9e6a911d5b64b6a444ba58427f0429c13f08381", "tor-cmhc-rent-3br": "923365e8fe0775666ae8e0f82f996234670d48cdb7c8f912a37392859361fdb0", "lon-ons-pipr-private-rent-region-month": "8122055734968c0c56c89125164f69d6ca1650924078dc93cb5710c026cdda09" };
   for (const [id, d] of Object.entries(PR50)) assert.equal(RENT_APPROVALS[id].digest, d, `${id}: identical to what PR #50 prepared`);

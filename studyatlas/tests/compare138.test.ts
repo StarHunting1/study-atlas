@@ -31,7 +31,7 @@ t("student housing and the general rental market are separate rows: a university
   const mr = rentKey(city("manchester")), vr = rentKey(city("vancouver"));
   assert.ok(mr.kind === "point" && mr.point.metric === "housing.privateRent.average" && mr.point.value!.currency === "GBP");
   assert.ok(vr.kind === "point" && vr.point.metric === "housing.marketRent.1br" && vr.point.value!.currency === "CAD" && vr.point.status === "verified");
-  assert.equal(rentKey(city("sydney")).kind, "none", "a city with no market statistic is not obtained");
+  { const sy = rentKey(city("sydney")); assert.ok(sy.kind === "point" && sy.point.metric === "housing.marketRent.censusMedianWeekly" && sy.point.value!.amount === 470 && sy.point.value!.currency === "AUD" && sy.point.value!.per === "week", "Sydney: approved ABS Census median (Ver.1.6.1)"); }
   const tr = rentKey(city("toronto")); assert.ok(tr.kind === "point" && tr.point.metric === "housing.marketRent.1br" && tr.point.value!.amount === 1761 && tr.point.status === "verified", "Toronto: approved 1-bedroom (Ver.1.5.2)");
 });
 t("the market-rent row never calls different statistics comparable (ONS vs CMHC: metric, source, currency, year all differ); only the very same statistic could be", () => {

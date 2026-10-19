@@ -86,7 +86,6 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.navitasenglish.edu.au/apply/fees/", "ok", 200, true],
   ["https://www.navitasenglish.edu.au/courses/general-english/", "ok", 200, true],
   ["https://www.navitasenglish.edu.au/school/tour-2/", "ok", 200, true],
-  ["https://www.nsw.gov.au/housing-and-construction/rental-forms-surveys-and-data/rental-bond-data", "ok", 200, true],
   ["https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics", "ok", 200, true],
   ["https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003", "ok", 200, true],
   ["https://www.sprachcaffe.com/en/uc/adults/canada/vancouver.htm", "ok", 200, true],

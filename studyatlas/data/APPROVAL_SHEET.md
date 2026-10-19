@@ -617,15 +617,15 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 - [x] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した
 - [x] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）
 
-## 7. Sydney・Melbourne の家賃統計（Ver.1.6.0）: 取得済み・承認待ち（verified ではありません・サイトには数値を出していません）
+## 7. Sydney・Melbourne の家賃統計（Ver.1.6.0）: 承認済み
 
-2026-10-19 に GitHub Actions（読み取り専用・robots.txt 順守・再試行なし）で ABS の QuickStats 2ページを開いて取得しました。この2件は**承認の準備だけ**です。承認記録（`RENT_APPROVALS`）に載せるまで、都市ページ・都市比較に数値は出ず、「確認中」と公式リンクだけが出ます。**ライセンスが不明な数値は、unverified でも公開しません**（ABS は CC BY 4.0 で、商用利用可）。
+2026-10-19 に GitHub Actions（読み取り専用・robots.txt 順守・再試行なし）で ABS の QuickStats 2ページを開いて取得し（Ver.1.6.0）、PR #53 のマージ後に StarHunting1 が2件を明示的に承認しました（2026-10-19、Ver.1.6.1）。承認前に Actions run 39292612214 で QuickStats を再読し、数値（470／390）・出典・地理区分（Greater Capital City Statistical Areas）・定義（家賃なしの住戸を除く）が候補と一致することを確認しています。承認記録は `RENT_APPROVALS` にあり、数値・出典・定義を変えるとダイジェストが一致せずビルドが失敗します。画面では「2021年の実際の家賃で、現在の募集家賃ではなく、留学生個人の住居費でもない」と明示します。
 
 | 項目 | 内容 |
 |---|---|
 | 出典 | Australian Bureau of Statistics（ABS）2021年国勢調査 All persons QuickStats：Greater Sydney／Greater Melbourne の「Median weekly rent」 |
 | 定義 | 住居を借りている世帯の**週あたり**家賃の**中央値**（豪ドル）。**実際に支払われている家賃**で、新規契約の募集家賃ではない。家賃なしで占有される住戸は除く（ABSの注記）。2021年の値で、現在の家賃とは異なる可能性が高い |
-| 範囲 | ABS の Greater Sydney／Greater Melbourne 全体（都心よりずっと広い）。学生寮・語学学校の滞在先・留学生の平均ではない |
+| 範囲 | ABS の Greater Sydney／Greater Melbourne（地理区分 Greater Capital City Statistical Areas＝大都市圏統計区域）全体で、都心よりずっと広い。学生寮・語学学校の滞在先・留学生個人の住居費ではない |
 | 比較 | シドニーとメルボルンは同じ統計・同じ定義・同じ年・同じ通貨と期間単位なので、承認後は互いに「比較可能」。他都市（月額・平均・別の統計）とは「参考値のみ」（換算しない） |
 | 対象外とした統計 | NSW州政府の賃貸保証金（ボンド）データ（新規契約が対象。数値は読んでいない）、ビクトリア州政府の賃貸レポート（robots.txt/アクセスの都合でページを読めなかった）。定義が違うため、仮に取得しても ABS の中央値と同じ統計としては比較しない |
 | ライセンス | Creative Commons Attribution 4.0 International（ABS サイトの著作権表示）。**商用利用可**。出典表示「Source: Australian Bureau of Statistics, 2021 Census QuickStats, licensed under CC BY 4.0」。確認日 2026-10-19（`data/official/RIGHTS.md`） |
@@ -634,8 +634,8 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 
 | 数値 | 公式（2026-10-19に取得） | サイトの候補 | 比較の基準 | 承認の状態 | 承認で記録するダイジェスト |
 |---|---|---|---|---|---|
-| syd-abs-census-median-weekly-rent | https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD ・ 470 AUD/週 ・ 2021 | 470 AUD/週 | ABS Greater Capital City area・all rented dwellings・2021 | **未承認**（非表示） | `37f57c35893d686067fa7be8673b0749692ec7d7191c6999b89d3518d36ea7b0` |
-| mel-abs-census-median-weekly-rent | https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL ・ 390 AUD/週 ・ 2021 | 390 AUD/週 | ABS Greater Capital City area・all rented dwellings・2021 | **未承認**（非表示） | `cfd34a176ee7e64c3e1f08bba07f825b509b34b4488b3e95b25e368532c4b4a8` |
+| syd-abs-census-median-weekly-rent | https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD ・ 470 AUD/週 ・ 2021 | 470 AUD/週 | ABS Greater Capital City Statistical Area・all rented dwellings・2021 | 承認済み（StarHunting1・2026-10-19） | `506c97aa71ea3e2cdbea993353f47c6f3f099459bfdec41c6241aa2cac1c73f2` |
+| mel-abs-census-median-weekly-rent | https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL ・ 390 AUD/週 ・ 2021 | 390 AUD/週 | ABS Greater Capital City Statistical Area・all rented dwellings・2021 | 承認済み（StarHunting1・2026-10-19） | `ed4c547df54b47f95701207d8f22bd2a1c01b3e89f96d022713ef353b87a7a91` |
 
 ### 7.2 承認の手順（人が行う）
 
@@ -645,6 +645,6 @@ ECCC の一括CSV（`1991-2020_Canadian_Climate_Normals_BC_Data.csv`、ブリテ
 4. 承認しない間は、都市ページに「公的な家賃統計：確認中」と公式リンクが出て、都市比較には数値が出ません。承認後に数値・出典・定義を変更するとダイジェストが一致せずビルドが失敗します。
 ### 7.3 承認チェックリスト
 
-- [ ] Sydney 470／Melbourne 390 AUD/週（2021年国勢調査・中央値・実際の家賃）を ABS のページと照合した
-- [ ] 「2021年のデータ」「中央値」「週あたり」「Greater 全体」「学生向け住居ではない」の説明が画面に出ることを確認した
-- [ ] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）
+- [x] Sydney 470／Melbourne 390 AUD/週（2021年国勢調査・中央値・実際の家賃）を ABS のページと照合した
+- [x] 「2021年のデータ」「中央値」「週あたり」「Greater 全体」「学生向け住居ではない」の説明が画面に出ることを確認した
+- [x] 承認記録を `RENT_APPROVALS` に書いた（数値ごと）

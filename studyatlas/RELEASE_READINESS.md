@@ -5,6 +5,16 @@
 > 公開するか、どの範囲で（例: 「ベータ・確認中」と明示した限定公開）は、人が判断してください。
 > 本書は `RELEASE_DATA_AUDIT.md`（`npm run audit` で再生成）と自動テスト（`tests/releasecheck.test.ts`）に基づきます。ローカル確認であり、GitHub Actions や法務の判断ではありません。
 
+## 0q. Ver.1.6.1 の結果（Sydney・Melbourne の家賃2件を正式承認・公開）
+
+| 項目 | 結果 |
+|---|---|
+| 承認 | StarHunting1、2026-10-19、PR #53 のマージ後。Greater Sydney 470／Greater Melbourne 390 AUD/週（ABS 2021年国勢調査、家賃中央値、実際の家賃、家賃なしの住戸を除く、Greater Capital City Statistical Areas） |
+| 照合 | Actions run 39292612214 で QuickStats を再読：数値・出典・地理区分・定義が候補と一致。地理区分の名称を説明文に明記（ダイジェスト更新後に承認を登録） |
+| 表示 | 住居カードの見出しに中央値・区域・2021年・「現在の募集家賃ではなく、留学生個人の住居費でもない」を表示。ライセンス CC BY 4.0 の出典表示は詳細に表示 |
+| 比較 | Sydney↔Melbourne は同じ統計・定義で「比較可能」。他都市（月額・平均・別の統計）とは「参考値のみ」で、換算・優劣判定なし |
+| 変更していないもの | Toronto・London の承認5件、Manchester・Vancouver、英国政府 claim、Vancouver 気候、学校4校、交通・ビザ・OSHC のリンク、Planner |
+
 ## 0p. Ver.1.6.0 の結果（Sydney・Melbourne のデータ拡充。家賃は未承認で非公開）
 
 | 項目 | 結果 |
