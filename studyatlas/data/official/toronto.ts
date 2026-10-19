@@ -26,8 +26,8 @@ export const torontoData = (approvals: Record<string, RentApproval> = RENT_APPRO
       ] }] as TopicNotice[]),
     { topic: "transport", sourceId: "ttc-fares", why: "unreviewed",
       text: {
-        en: "TTC fares (adult fare, passes, discounts, who qualifies by age or student status) are not copied here: StudyAtlas has not reviewed whether the TTC's terms allow reuse, so the official page is linked instead. Do not assume that language-school students get a student discount – check the eligibility rules on the TTC page. A monthly cost should be worked out by you from the current fares (the Planner keeps your own input).",
-        ja: "TTCの運賃（大人運賃・定期・割引・年齢や学生資格による対象）はここに転載していません。TTCの利用規約が再利用を認めているかを確認していないため、公式ページへのリンクのみとしています。語学学校の学生が学生割引を受けられるとは限りません。対象条件はTTCのページでご確認ください。月額の目安は、最新の運賃を見てご自身で計算してください（プランナーはご自身の入力のままです）。",
+        en: "TTC fares (adult fare, passes, discounts, who qualifies by age or student status) are not copied here: the TTC's terms of use require written permission to reproduce a substantial part of its website content (read on 2026-10-19), so the official page is linked instead. Do not assume that language-school students get a student discount – check the eligibility rules on the TTC page. A monthly cost should be worked out by you from the current fares (the Planner keeps your own input).",
+        ja: "TTCの運賃（大人運賃・定期・割引・年齢や学生資格による対象）はここに転載していません。TTCの利用規約は、サイトの内容の実質的な部分の複製に書面の許可を求めている（2026-10-19に確認）ため、公式ページへのリンクのみとしています。語学学校の学生が学生割引を受けられるとは限りません。対象条件はTTCのページでご確認ください。月額の目安は、最新の運賃を見てご自身で計算してください（プランナーはご自身の入力のままです）。",
       },
       links: [{ label: { en: "TTC – Fares and passes", ja: "TTC – 運賃とパス" }, url: "https://www.ttc.ca/fares-and-passes" }] },
     ...(approvedClimate(TORONTO_CLIMATE_CANDIDATE) ? [] : [{ topic: "climate", sourceId: "eccc-climate-normals", why: "awaiting-approval",
