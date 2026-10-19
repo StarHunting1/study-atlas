@@ -13,6 +13,7 @@ export const sc = {
   checksNone: t("The registration and accreditation of this school have not been checked item by item. Check the school's site and the official register.", "この学校の登録・認定は、項目ごとには確認していません。学校の公式サイトと公的な登録簿でご確認ください。"),
   checkKinds: { provider: t("Institution registration (e.g. CRICOS provider)", "機関の登録（CRICOS機関など）"), campus: t("Campus address", "キャンパスの所在地"), course: t("Courses (registered course codes)", "コース（登録されたコース番号）"), accreditation: t("Accreditation (e.g. NEAS)", "認定（NEASなど）") },
   checkStates: { confirmed: t("Confirmed by two sources", "2つの情報源で一致"), single: t("One source only", "情報源は1つだけ"), stated: t("School's own statement only", "学校自身の記載のみ"), notConfirmed: t("Could not be confirmed", "確認できていません"), notChecked: t("Not checked", "未確認") },
+  thirdParty: t("Register / directory record", "登録・加盟の記録（第三者）"), thirdPartyNone: t("No record by a register or directory has been found yet; the items above rest on the school’s own pages.", "登録簿・ディレクトリ側の記録はまだ見つかっておらず、上の項目は学校自身のページに基づきます。"),
   checksNote: t("“Confirmed” never means that the school is enrolling today or that its fees are right.", "「一致」は、現在募集中であることや料金が正しいことを意味しません。"),
 
   tuitionNote: t("No verified fee is held for this school. Check the school's site for current fees.", "この学校の確認済み料金はありません。最新の料金は学校の公式サイトでご確認ください。"),
