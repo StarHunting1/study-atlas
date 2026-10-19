@@ -262,6 +262,20 @@ What each publisher's published terms permit, how the data may be accessed, and 
   - https://www.ef.com/ca/legal/terms-and-conditions/ (2026-10-14) — Programme terms and footer copyright (2026-10-15)
   - https://ihvancouver.com/ (2026-10-14) — Bot check (403); not read, not retried (2026-10-15)
 
+## Human access reviews (new sources)
+
+A source that no rights record covers can be requested by the collector only after a person reviews its terms and records the result in `data/official/accessReviews.ts` (procedure: `collector/README.md`, "Source access review"). Access and republishing are recorded separately. A review never lifts a block above.
+
+No review record yet: every source below is still held back (fail closed).
+
+Waiting for a person's review (nothing is allowed meanwhile):
+
+- Study Australia (Australian Government) (studyaustralia.gov.au, search.studyaustralia.gov.au) — provider directory: institution name, CRICOS provider code, campus address
+- CRICOS (Commonwealth Register of Institutions and Courses for Overseas Students) (cricos.education.gov.au) — institution, campus and course registration (its robots.txt disallows automated access; robots.txt is not the terms)
+- Languages Canada (languagescanada.ca) — accredited programs directory
+- English UK (englishuk.com) — member directory
+- British Council (britishcouncil.org) — accreditation UK (English language centres)
+
 ## Not covered by this review
 
 - Ver.1.3 profile summaries and school data under `data/profiles` and `data/schools` (text written by StudyAtlas, mostly `unverified` or sample): their sources are not official figure sources; they are shown with their own status and sources.
