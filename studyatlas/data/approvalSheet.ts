@@ -7,6 +7,8 @@ import { RIGHTS } from "./official/rights.data";
 import { SCOPE, TERMS_CHECK } from "./approvalScope";
 import type { ClimateNormals } from "./official/types";
 import { ALL_RENT_CANDIDATES, RENT_APPROVALS, rentDigest } from "./official/cityRents";
+import { TORONTO_CLIMATE_CANDIDATE, climateCandidateChecks } from "./official/cityClimates";
+import { CLIMATE_APPROVALS } from "./approvals";
 import { rentBasisOf } from "./official/rentBasis";
 
 /** Where each list of claims lives in the code (what a reviewer edits to approve one claim). */
@@ -194,5 +196,28 @@ export function approvalSheet(): string {
     `- [${auDone ? "x" : " "}] Sydney 470／Melbourne 390 AUD/週（2021年国勢調査・中央値・実際の家賃）を ABS のページと照合した`,
     `- [${auDone ? "x" : " "}] 「2021年のデータ」「中央値」「週あたり」「Greater 全体」「学生向け住居ではない」の説明が画面に出ることを確認した`,
     `- [${auDone ? "x" : " "}] 承認記録を \`RENT_APPROVALS\` に書いた（数値ごと）`);
+  const tc = TORONTO_CLIMATE_CANDIDATE, tcDone = !!CLIMATE_APPROVALS[tc.id], mn = ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"];
+  L.push("", tcDone ? "## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 承認済み" : "## 8. Toronto の気候データ（Ver.1.6.3 で取得）: 取得済み・承認待ち（verified ではありません・サイトには数値を出していません）", "",
+    "2026-10-19 に GitHub Actions（run 39303865202。読み取り専用・robots.txt 順守・1回の要求）で、ECCC の「カナダ気候平年値 1991–2020」オンタリオ州の一括CSVから取得しました。ライセンスは ECCC Data Services End-use Licence v2.1.1（2026年8月。商用利用可・出典表示必須。同日に全文を再読）。**ライセンスが確認できない数値は、unverified でも公開しません。** 承認記録（`data/approvals.ts` の `CLIMATE_APPROVALS`）に載せるまで、都市ページにもグラフにも比較にも数値は出ず、「公式の平年値は取得済み・確認中」と公式リンクだけが出ます。",
+    "", "| 項目 | 内容 |", "|---|---|",
+    `| 観測地点 | ${tc.station}（気候ID ${tc.stationId}）。複合観測所（NORMALS_CODE C）。**市内中心部の観測所**（北緯${tc.stationInfo!.lat}・西経${Math.abs(tc.stationInfo!.lon!)}・標高${tc.stationInfo!.elevationM} m）で、トロント・ピアソン空港（TORONTO INTL A）ではない |`,
+    `| 統計期間・種類 | ${tc.period} のカナダ気候平年値（Normal）。ECCC が公表した値をそのまま転記（StudyAtlas は計算も補完もしない） |`,
+    `| 品質コード | ${tc.stationInfo!.quality}（ECCC の Code 列：A〜D） |`, "| 単位 | 気温 °C、降水量 mm（月別12値＋年値） |",
+    "| 比較への影響 | 承認後は、Vancouver（空港観測所・1991–2020）とは**観測地点の種類が異なる**（市内中心部と空港）ため、比較は「参考値のみ」になる |", "",
+    "### 8.1 月別48値と年値", "", "| 月 | 平均気温 °C | 平均最高 °C | 平均最低 °C | 降水量 mm |", "|---|---|---|---|---|",
+    ...tc.months.map((m, i) => `| ${mn[i]} | ${m.meanC} | ${m.maxC} | ${m.minC} | ${m.precipMm} |`),
+    `| **年** | **${tc.annual!.meanC}** | **${tc.annual!.maxC}** | **${tc.annual!.minC}** | **${tc.annual!.precipMm}** |`, "",
+    "### 8.2 整合チェック（コードによる確認。公式ファイルとの突き合わせは人が行う）", "", "| 確認 | 結果 | 詳細 |", "|---|---|---|",
+    ...climateCandidateChecks(tc).map((c) => `| ${c.name} | ${c.ok ? "OK" : "**NG**"} | ${c.detail} |`), "",
+    "### 8.3 承認の手順（人が行う）", "",
+    "1. ECCC の公式ページ（https://climate.weather.gc.ca/climate_normals/index_e.html のオンタリオ州一括CSV）を開き、観測所 TORONTO (CITY)（気候ID 6158350・6158355）の「Daily Average / Daily Maximum / Daily Minimum (°C)」「Precipitation (mm)」の月別48値と年値が上表と一致することを確認する。",
+    "2. ECCC のライセンス（v2.1.1：商用利用可・出典表示必須）と、画面に出る出典表示を確認する。",
+    "3. `data/approvals.ts` の `CLIMATE_APPROVALS` に `\"tor-climate-eccc-1991-2020\"` を追加する（`approval`＝承認者・日付・照合内容、`station`・`stationId`・`period`、`meanC`・`maxC`・`minC`・`precipMm` の12値、`annualPrecipMm`、`sources`）。**承認者名と承認記録は、人が承認するまで作成しません。**",
+    "4. 承認後は `data/official/toronto.ts` が自動で `climate` を持ち（`approvedClimate`）、グラフ・月別表・比較に出る。値・観測所・期間・出典を後から変えるとビルドが失敗する。",
+    "### 8.4 承認チェックリスト", "",
+    `- [${tcDone ? "x" : " "}] 月別48値と年値（年平均気温 9.7・年降水量 822.7 など）を ECCC の公式CSVと照合した`,
+    `- [${tcDone ? "x" : " "}] 観測所が市内中心部の TORONTO (CITY) で、空港ではないことを確認した`,
+    `- [${tcDone ? "x" : " "}] ECCC ライセンス v2.1.1（商用利用可・出典表示）を確認した`,
+    `- [${tcDone ? "x" : " "}] 承認記録を \`CLIMATE_APPROVALS\` に書いた`);
   return L.join("\n") + "\n";
 }

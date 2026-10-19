@@ -23,7 +23,7 @@ export type Key =
   | { kind: "point"; point: DataPoint }
   | { kind: "money"; fact: Fact<Money> }
   | { kind: "text"; fact: Fact<Localized> }
-  | { kind: "temp"; lo: number; hi: number; station: string; period: string; status: Status; derived: boolean }
+  | { kind: "temp"; lo: number; hi: number; station: string; period: string; status: Status; derived: boolean; site?: string }
   | { kind: "schools"; universities: number; languageSchools: number; status: Status }
   | { kind: "link"; url: string; publisher: string }  // the figure may not be shown (rights.ts): a link to the official page instead
   | { kind: "none"; /** housing: no verified per-person student price yet – "reference price in preparation", never an invented figure */ prep?: true };
@@ -46,7 +46,7 @@ export function keyFigure(c: City, topic: Topic, mode?: StudyMode): Key {
   if (topic === "climate") {
     const k = climateCompare(c.id);
     // (climateCompare already returns nothing for a climate record whose terms do not allow showing it)
-    if (k) { const r = k.mean ?? (k.tmin && k.tmax ? ([k.tmin[0], k.tmax[1]] as [number, number]) : undefined); if (r) return { kind: "temp", lo: r[0], hi: r[1], station: k.station, period: k.period, status: k.status, derived: k.derived }; }
+    if (k) { const r = k.mean ?? (k.tmin && k.tmax ? ([k.tmin[0], k.tmax[1]] as [number, number]) : undefined); if (r) return { kind: "temp", lo: r[0], hi: r[1], station: k.station, period: k.period, status: k.status, derived: k.derived, site: k.site }; }
     return has(pr.climate.overview) ? { kind: "text", fact: pr.climate.overview } : { kind: "none" };
   }
   if (topic === "education") {
@@ -78,7 +78,7 @@ export function compareKeys(keys: Key[]): Cmp {
   const kind = have[0].kind;
   if (kind === "point") { const p = have.map((k) => (k as { point: DataPoint }).point); return new Set(p.map((x) => x.value!.per)).size > 1 || new Set(p.map((x) => x.audience)).size > 1 ? "differ" : "same"; }
   if (kind === "money") { const f = have.map((k) => (k as { fact: Fact<Money> }).fact); return new Set(f.map((x) => `${x.value!.per}|${x.period ?? ""}`)).size > 1 ? "differ" : "same"; }
-  if (kind === "temp") return new Set(have.map((k) => (k as { period: string }).period)).size > 1 ? "differ" : "same";
+  if (kind === "temp") return new Set(have.map((k) => (k as { period: string }).period)).size > 1 || new Set(have.map((k) => (k as { site?: string }).site)).size > 1 ? "differ" : "same";
   return "n/a"; // free text and institution counts are shown side by side but never judged "the same basis"
 }
 

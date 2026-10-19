@@ -1,6 +1,6 @@
 /*
  * Result of the link check of the Manchester / Vancouver / Toronto / London / Sydney / Melbourne source links (collector/linkcheck.ts), run by GitHub Actions on 2026-10-19
- * (run 39289111658, commit 4801b38: a temporary push-triggered workflow ran the same `npx tsx collector/linkcheck.ts` as the PR job "Collect official data"). Pasted from the job log; one request per link, no retries.
+ * (run 39305949403, commit d059848: a temporary push-triggered workflow ran the same `npx tsx collector/linkcheck.ts` as the PR job "Collect official data"). Pasted from the job log; one request per link, no retries.
  *   verdict: ok | access-denied | broken | skipped (rights record / terms forbid automated requests) | robots-disallowed (robots.txt disallows the path, or could not be fetched, e.g. a timeout: then no request is made)
  *   content: true = the page answered 2xx AND contains the words we expect (so it is the right page); false = answered but the words were
  *            not found; null = not checked for words (licence pages, catalogues) or not requested.
@@ -8,7 +8,7 @@
  */
 export type LinkVerdict = "ok" | "access-denied" | "broken" | "skipped" | "robots-disallowed";
 export const LINK_CHECKED_AT = "2026-10-19";
-export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39289111658";
+export const LINK_CHECK_RUN = "https://github.com/StarHunting1/study-atlas/actions/runs/39305949403";
 export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | null, content: boolean | null][] = [
   ["https://api.weather.gc.ca/collections/climate-normals", "ok", 200, null],
   ["https://cityenglish.edu.au/", "ok", 200, true],
@@ -39,10 +39,15 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student", "ok", 200, true],
   ["https://tfgm.com/tickets-and-passes/bus-tickets", "ok", 200, true],
   ["https://tfl.gov.uk/fares", "skipped", null, null],
+  ["https://tfl.gov.uk/fares/free-and-discounted-travel", "skipped", null, null],
+  ["https://tfl.gov.uk/maps", "skipped", null, null],
   ["https://transport.vic.gov.au/tickets-and-myki/fares", "skipped", null, null],
   ["https://transport.vic.gov.au/tickets-and-myki/myki", "skipped", null, null],
+  ["https://transportnsw.info/document/6027/opal-network-map.pdf", "skipped", null, null],
   ["https://transportnsw.info/tickets-fares", "skipped", null, null],
+  ["https://transportnsw.info/tickets-fares/contactless-payments", "skipped", null, null],
   ["https://transportnsw.info/tickets-fares/eligibility-concessions", "skipped", null, null],
+  ["https://transportnsw.info/tickets-fares/eligibility-concessions/tertiary-tafe-students", "skipped", null, null],
   ["https://transportnsw.info/tickets-fares/fares", "skipped", null, null],
   ["https://vancouver.housing.ubc.ca/applications/eligibility/", "skipped", null, null],
   ["https://vancouver.housing.ubc.ca/applications/fees-payments/", "skipped", null, null],
@@ -51,6 +56,8 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD", "ok", 200, true],
   ["https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL", "ok", 200, true],
   ["https://www.abs.gov.au/website-privacy-copyright-and-disclaimer", "ok", 200, true],
+  ["https://www.bom.gov.au/climate/averages/tables/cw_066062.shtml", "skipped", null, null],
+  ["https://www.bom.gov.au/climate/averages/tables/cw_086071.shtml", "skipped", null, null],
   ["https://www.canada.ca/en/immigration-refugees-citizenship/services/study-canada/study-permit.html", "ok", 200, true],
   ["https://www.cmhc-schl.gc.ca/about-us/terms-conditions/hmip-terms-conditions", "ok", 200, null],
   ["https://www.data.gov.uk/api/action/package_show?id=17ba3bbe-0e98-4a8c-9937-bd1d50fdc3c5", "ok", 200, null],
@@ -89,14 +96,17 @@ export const LINK_STATUS: [url: string, verdict: LinkVerdict, status: number | n
   ["https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics", "ok", 200, true],
   ["https://www.ons.gov.uk/visualisations/housingpriceslocal/E08000003", "ok", 200, true],
   ["https://www.sprachcaffe.com/en/uc/adults/canada/vancouver.htm", "ok", 200, true],
-  ["https://www.stgiles-international.com/english-language-schools/london-central/", "ok", 200, true],
+  ["https://www.stgiles-international.com/english-language-schools/london-central/", "robots-disallowed", null, null],
   ["https://www.studyaustralia.gov.au/en", "ok", 200, true],
   ["https://www.studyaustralia.gov.au/en/plan-your-move/overseas-student-health-cover-oshc", "ok", 200, true],
   ["https://www.studyaustralia.gov.au/en/plan-your-move/your-guide-to-visas", "ok", 200, true],
   ["https://www.translink.ca/terms-and-conditions", "skipped", null, null],
   ["https://www.translink.ca/transit-fares/pricing-and-fare-zones", "skipped", null, null],
   ["https://www.translink.ca/transit-fares/u-pass-bc", "skipped", null, null],
+  ["https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", "skipped", null, null],
   ["https://www.ttc.ca/fares-and-passes", "skipped", null, null],
+  ["https://www.ttc.ca/routes-and-schedules", "skipped", null, null],
+  ["https://www.ttc.ca/transparency-and-accountability/policies/web-site-terms-and-conditions-of-use", "skipped", null, null],
   ["https://www.ubc.ca/site/legal.html", "skipped", null, null],
   ["https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301", "ok", 200, true],
   ["https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", "ok", 200, true],
