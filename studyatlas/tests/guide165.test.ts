@@ -24,16 +24,16 @@ t("every one of the six cities has a transport guide with an operator, a fares l
   for (const g of TRANSPORT_GUIDES) { assert.ok(g.operator, g.cityId); assert.ok(guideLink(g, "fares"), g.cityId); assert.ok(g.links.every((l) => l.url.startsWith("https://")));
     const all = JSON.stringify([g.modes, g.payment, g.paymentShort, g.zones, g.passes, g.student]); assert.ok(!/[$£€]\s?\d|\d\s?(CAD|AUD|GBP)|\d+\.\d\d/.test(all), `${g.cityId}: no fare amount`);
     assert.ok(!/(get|receive|are entitled to|qualify for) a student (discount|fare|pass)/i.test(g.student.en), `${g.cityId}: no promised discount`); assert.ok(/check|confirm|not mentioned|Not confirmed|eligib/i.test(g.student.en)); }
-  for (const id of ["manchester", "vancouver"]) { const g = guideOf(id)!; assert.ok(g.read && g.checkedAt === "2026-10-19" && g.payment && g.paymentShort && g.student); assert.ok(guideLink(g, "map") && guideLink(g, "student")); }
-  assert.match(guideOf("vancouver")!.student.en, /Language-school students are not mentioned/); assert.match(guideOf("vancouver")!.student.en, /each institution decides eligibility/); assert.match(guideOf("manchester")!.student.en, /does not say that every international or language-school student is eligible/);
-  assert.match(guideOf("vancouver")!.zones!.en, /three fare zones/); assert.match(guideOf("manchester")!.payment!.en, /contactless/);
+  { const g = guideOf("manchester")!; assert.ok(g.read && g.checkedAt === "2026-10-19" && g.payment && g.paymentShort && g.student); assert.ok(guideLink(g, "map") && guideLink(g, "student")); }
+  assert.match(guideOf("manchester")!.student.en, /does not say that every international or language-school student is eligible/); assert.match(guideOf("manchester")!.payment!.en, /contactless/);
+  { const g = guideOf("vancouver")!; assert.ok(!g.read && g.checkedAt === null && !g.payment && !g.zones && !g.passes, "TransLink's rights record blocks automated requests: link-only"); assert.ok(guideLink(g, "map") && guideLink(g, "student") && guideLink(g, "payment")); assert.match(g.student.en, /language-school students/); }
 });
 
-t("a link that answered is not described as read: only links whose page was read carry read:true; London and Melbourne (HTTP 403, not retried) have no read link and no summary", () => {
+t("a link that answered is not described as read: only links whose page was read carry read:true; London, Melbourne (HTTP 403, not retried) and Vancouver (rights record blocks automation) have no read link and no summary", () => {
   for (const g of TRANSPORT_GUIDES) for (const l of g.links) { if (l.read) assert.ok(l.opened, `${g.cityId} ${l.url}: read implies opened`); if (!g.read) assert.ok(!l.opened && !l.read, `${g.cityId}: nothing opened when the guide was not read`); }
-  assert.equal(guideLink(guideOf("manchester")!, "student")!.read, false); assert.equal(guideLink(guideOf("manchester")!, "student")!.opened, true); assert.equal(guideLink(guideOf("vancouver")!, "map")!.opened, false);
+  assert.equal(guideLink(guideOf("manchester")!, "student")!.read, false); assert.equal(guideLink(guideOf("manchester")!, "student")!.opened, true); assert.equal(guideLink(guideOf("vancouver")!, "map")!.opened, false); for (const id of ["vancouver", "toronto", "sydney"]) for (const l of guideOf(id)!.links.filter((x) => /routes-and-schedules|contactless|transit-system-maps/.test(x.url))) assert.ok(!l.opened && !l.read, `${id}: pages whose rights record blocks automation are not marked as read`);
   const man = text(wrap(h(TransportGuideDetail, { cityId: "manchester" }))); assert.ok(man.includes("リンクは確認済みで、内容を読みました") && man.includes("リンクは確認済み（内容は要約に含めていません）") && man.includes("リンク先の動作は未確認"));
-  for (const id of ["london", "melbourne"]) { const g = guideOf(id)!; assert.ok(!g.payment && !g.paymentShort && !g.passes); }
+  for (const id of ["london", "melbourne", "vancouver"]) { const g = guideOf(id)!; assert.ok(!g.payment && !g.paymentShort && !g.passes); }
 });
 
 t("transport card first screen (all six): operator and fares link visible without opening anything; payment line only when the page was read; Manchester's approved transport figure is still there", () => {
