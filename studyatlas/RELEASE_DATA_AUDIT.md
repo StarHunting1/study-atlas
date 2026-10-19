@@ -73,11 +73,11 @@
 
 ## 4b. 出典リンクの検査（Manchester / Vancouver）
 
-実行: GitHub Actions（2026-10-19、https://github.com/StarHunting1/study-atlas/actions/runs/39289111658）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
+実行: GitHub Actions（2026-10-19、https://github.com/StarHunting1/study-atlas/actions/runs/39305949403）。1リンク1回の確認（再試行なし・robots.txt遵守。権利記録で自動アクセスを禁じている TransLink / UBC / Met Office サイトは要求しない）。
 
 | 対象 | 検証済み（2xx＋期待語を確認） | 到達（語は未確認/不一致） | アクセス拒否 | リンク切れ | 要求せず |
 |---|---|---|---|---|---|
-| 91 | 64 | 10 | 0 | 0 | 16 |
+| 101 | 63 | 10 | 0 | 0 | 26 |
 
 - 「アクセス拒否」(401/403/429)は**リンク切れではありません**。ページは存在しうるが自動アクセスを拒むため、未検証のまま扱います。
 - 到達しても期待語が見つからないリンクは検証済みにしません（例: Express English College の公式サイトはタイトルに校名がなく、手動で English UK 掲載のサイトURLと一致を確認）。
