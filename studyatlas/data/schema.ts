@@ -82,7 +82,7 @@ export type MonthlyClimate = {
 export type SchoolCheck = { kind: "provider" | "campus" | "course" | "accreditation"; state: "confirmed" | "single" | "stated" | "notConfirmed" | "notChecked"; detail?: Localized };
 export type Institution = { /** stable key; set for language schools that can be compared */ id?: string; name: string; url?: string; note?: Localized; where?: Localized; courses?: Localized; stay?: Localized; source?: SourceRef;
   /** the school's own fee-information page (a link only: no fee table or figure is copied) */ feesUrl?: string;
-  /** the name as the school or the register gives it (shown next to the display name when it differs) */ officialName?: string; /** item-by-item confirmation state (registration, campus, courses, accreditation) */ checks?: SchoolCheck[];
+  /** the name as the school or the register gives it (shown next to the display name when it differs) */ officialName?: string; /** item-by-item confirmation state (registration, campus, courses, accreditation) */ checks?: SchoolCheck[]; /** the register / directory entry of a body other than the school, when `source` is the school's own page */ record?: SourceRef;
   /** true = kept as research data but not shown to visitors (e.g. identity or operating status could not be confirmed) */ hidden?: true };
 
 export type CityProfile = {

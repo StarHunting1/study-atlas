@@ -15,3 +15,7 @@ export function listCompareSchools(): CompareSchool[] {
 }
 export const getCompareSchool = (id: string | null | undefined) => (id ? listCompareSchools().find((s) => s.id === id) : undefined);
 export const compareHref = (a: string, b?: string) => `/schools/compare?a=${encodeURIComponent(a)}${b ? `&b=${encodeURIComponent(b)}` : ""}`;
+
+const hostOf = (u?: string) => { try { return new URL(u ?? "").hostname.replace(/^www\d?\./, ""); } catch { return ""; } };
+/** The record of a body other than the school (a register, a directory of an accrediting or membership body), or undefined when the only source is the school's own site. A school's own statement is never counted as a third-party record. */
+export const thirdPartyRecord = (inst: Institution): SourceRef | undefined => inst.record ?? (inst.source && hostOf(inst.source.url) && hostOf(inst.source.url) !== hostOf(inst.url) ? inst.source : undefined);

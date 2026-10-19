@@ -63,7 +63,7 @@ t("International House Vancouver keeps the New Westminster location in the compa
 });
 t("fewer than two schools: a prompt, no table; details and sources sit in disclosures (closed by default)", () => {
   assert.ok(view("van-ef").includes('data-testid="need-two"') && !view("van-ef").includes("school-compare"));
-  const out = view("man-express-english-college", "van-ef"); assert.ok(out.includes('data-testid="compare-more"') && !out.includes("englishuk.com"), "sources are not rendered while closed");
+  const out = view("man-express-english-college", "van-ef"); assert.ok(out.includes('data-testid="compare-more"') && !out.includes('data-testid="compare-sources"'), "the source list is not rendered while closed (Ver.1.6.7: the register/directory record link is on the first screen, apart from the sources)");
 });
 t("entry points: each visible school card links to the comparison; hidden or id-less entries do not", () => {
   const f = getCity("manchester")!.profile.education.languageSchools;

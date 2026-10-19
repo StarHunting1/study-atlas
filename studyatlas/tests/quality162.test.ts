@@ -78,7 +78,7 @@ t("school compare: registration is shown item by item (institution, campus, cour
 });
 
 t("schools without item-by-item checks say so instead of implying a registration was confirmed", () => {
-  const html = wrap(h(SchoolCompareView, { a: getCompareSchool("man-kaplan"), b: getCompareSchool("tor-ef") })); assert.equal((html.match(/data-testid="school-checks-none"/g) ?? []).length, 2); assert.ok(text(html).includes("項目ごとには確認していません"));
+  const strip = (id: string) => { const x = getCompareSchool(id)!; return { ...x, inst: { ...x.inst, checks: undefined } }; }; /* Ver.1.6.7: all shown schools now have checks, so the fallback is tested with the checks removed */ const html = wrap(h(SchoolCompareView, { a: strip("man-kaplan"), b: strip("tor-ef") })); assert.equal((html.match(/data-testid="school-checks-none"/g) ?? []).length, 2); assert.ok(text(html).includes("項目ごとには確認していません"));
 });
 
 t("protected data: the seven rent approvals keep their digests and records (nothing is re-approved or edited by this version)", () => {
