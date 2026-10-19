@@ -10,6 +10,8 @@ const D = "2026-10-14";
 const page = (url: string, scope: string) => ({ url, reviewedAt: D, scope });
 const D2 = "2026-10-17";
 const page2 = (url: string, scope: string) => ({ url, reviewedAt: D2, scope });
+const D3 = "2026-10-19";
+const page3 = (url: string, scope: string) => ({ url, reviewedAt: D3, scope });
 export const RIGHTS: Record<string, Rights> = {
   "tfgm-fares": {
     sourceName: "Transport for Greater Manchester (Bee Network)", sourceUrl: "https://tfgm.com/tickets-and-passes/bus-tickets", licenseUrl: null,
@@ -129,6 +131,35 @@ export const RIGHTS: Record<string, Rights> = {
     reviewNotes: {
       en: "Ver.1.5.0: the fares page was opened once by the GitHub Actions probe on 2026-10-17 (robots.txt allowed, HTTP 200) to confirm that the link works. The TTC's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read the page. Only a link and our own wording about who should check what are shown.",
       ja: "Ver.1.5.0：リンクが有効かを確かめるため、2026-10-17にGitHub Actionsのプローブが運賃ページを1回だけ開きました（robots.txt許可、HTTP 200）。TTCの利用規約や運賃に関するオープンデータのライセンスは確認していないため、再利用の可否は不明です。金額・表・文章は転載せず、収集処理もこのページを読みません。リンクと、StudyAtlas自身による確認事項の説明だけを表示します。",
+    },
+    reviewed: [],
+  },
+  "abs-census-rent": {
+    sourceName: "Australian Bureau of Statistics – 2021 Census QuickStats (median weekly rent)", sourceUrl: "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD", licenseUrl: "https://www.abs.gov.au/website-privacy-copyright-and-disclaimer",
+    licence: "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
+    reuseStatus: "permitted", accessMethod: "page-check", automation: "page-check-only", lastReviewedAt: D3, expertReview: false, restrictions: ["attribution-required"],
+    attribution: "Source: Australian Bureau of Statistics, 2021 Census QuickStats, licensed under Creative Commons Attribution 4.0 International (https://creativecommons.org/licenses/by/4.0/).",
+    reviewNotes: {
+      en: "Ver.1.6.0 (read on GitHub Actions, 2026-10-19; robots.txt allowed these paths): the ABS copyright notice says “All material presented on this website is provided under a Creative Commons Attribution 4.0 International licence, with the exception of” the Commonwealth Coat of Arms, the ABS logo, trade-marked material, unit record data, third-party content and sub-brands. A published Census statistic is none of those exceptions, so reproducing the figure with the attribution above is permitted, including commercially (CC BY 4.0). The pages were opened once each; nothing else was collected. The licence covers reuse only: StudyAtlas still does not publish the two figures until a person has compared them with the ABS page and approved them (data/official/auRents.ts).",
+      ja: "Ver.1.6.0（2026-10-19にGitHub Actionsで確認。robots.txtはこのパスを許可）：ABSの著作権表示は、「このサイトに掲載されるすべての資料は、次の例外を除きクリエイティブ・コモンズ表示4.0国際ライセンスで提供される」とし、例外はオーストラリア国章、ABSロゴ、商標が付いた資料、個票データ、第三者の内容、サブブランドです。公表された国勢調査の統計値はこれらの例外に当たらないため、上記の出典表示を付けて数値を掲載することは（商用を含め）許諾されています。ページは各1回だけ開き、それ以外は取得していません。ライセンスは再利用の許諾だけを示すものです。2つの数値は、人がABSのページと突き合わせて承認するまで、StudyAtlasでは公開しません（data/official/auRents.ts）。",
+    },
+    reviewed: [page3("https://www.abs.gov.au/website-privacy-copyright-and-disclaimer", "Copyright and Creative Commons notice (full)"), page3("https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD", "Greater Sydney QuickStats (median weekly rent, footnote on rent-free dwellings)"), page3("https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL", "Greater Melbourne QuickStats (median weekly rent)")],
+  },
+  "tfnsw-fares": {
+    sourceName: "Transport for NSW – tickets and fares", sourceUrl: "https://transportnsw.info/tickets-fares", licenseUrl: null,
+    reuseStatus: "unknown", accessMethod: "manual-link", automation: "blocked", lastReviewedAt: null, expertReview: false, restrictions: [], display: "link-only",
+    reviewNotes: {
+      en: "Ver.1.6.0: the GitHub Actions probe opened the tickets-and-fares, fares and eligibility-and-concessions pages once on 2026-10-19 (robots.txt allowed, HTTP 200) to confirm that the links work and what the pages are about. Transport for NSW's terms of use and any open-data licence for fares were NOT reviewed, so reuse is unknown: no amount, table or text is copied and the collector does not read these pages. The eligibility page lists “Tertiary and TAFE students” among the groups that can get concession fares and says nothing there about international students, so StudyAtlas does not say that an international or language-school student gets a concession.",
+      ja: "Ver.1.6.0：リンクが有効かと内容の種類を確かめるため、2026-10-19にGitHub Actionsのプローブが「乗車券と運賃」「運賃」「対象者と割引」のページを各1回だけ開きました（robots.txt許可、HTTP 200）。Transport for NSWの利用規約や運賃に関するオープンデータのライセンスは確認していないため、再利用の可否は不明です。金額・表・文章は転載せず、収集処理もこれらのページを読みません。対象者のページには割引運賃を受けられる人の区分として「Tertiary and TAFE students（大学・TAFEの学生）」が挙がっていますが、留学生や語学学校の学生についての記載はそこになく、StudyAtlasは留学生・語学学校の学生が割引を受けられるとは書きません。",
+    },
+    reviewed: [],
+  },
+  "ptv-fares": {
+    sourceName: "Transport Victoria – myki and fares", sourceUrl: "https://transport.vic.gov.au/tickets-and-myki/myki", licenseUrl: null,
+    reuseStatus: "unknown", accessMethod: "manual-link", automation: "blocked", lastReviewedAt: null, expertReview: false, restrictions: [], display: "link-only",
+    reviewNotes: {
+      en: "Ver.1.6.0: ptv.vic.gov.au now redirects to transport.vic.gov.au, which answered the GitHub Actions probe's automated requests (2026-10-19, myki and fares pages) with HTTP 403 and a bot-check page (“Just a moment…”). The pages were therefore not read, not retried and no workaround was attempted; the links point to the pages the redirect leads to and their content is unconfirmed. The terms of use were not reviewed, so reuse is unknown: no amount, table or text is copied and no student-concession claim is made.",
+      ja: "Ver.1.6.0：ptv.vic.gov.au は現在 transport.vic.gov.au に転送され、GitHub Actionsのプローブによる自動アクセス（2026-10-19、mykiと運賃のページ）にHTTP 403と確認用ページ（“Just a moment…”）を返しました。そのためページは読んでおらず、再試行も回避策も行っていません。リンク先は転送先のページで、内容は未確認です。利用規約は確認していないため再利用の可否は不明で、金額・表・文章は転載せず、学生割引についても何も述べません。",
     },
     reviewed: [],
   },

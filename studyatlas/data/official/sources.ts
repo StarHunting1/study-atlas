@@ -12,7 +12,7 @@ import type { Localized } from "@/lib/i18n";
  */
 export type Topic = "transport" | "housing" | "living" | "climate";
 export type OfficialSource = {
-  id: string; publisher: string; name: Localized; country: "GBR" | "CAN"; cityIds: string[]; topic: Topic;
+  id: string; publisher: string; name: Localized; country: "GBR" | "CAN" | "AUS"; cityIds: string[]; topic: Topic;
   method: "api" | "page";
   /** Pages a person (and the page check) reads. For api sources: the human-readable page for the data. */
   pages: string[];
@@ -53,5 +53,14 @@ export const officialSources: OfficialSource[] = [
   },
   { id: "tfl-fares", publisher: "Transport for London (TfL)", name: { en: "Fares and discounts (link only)", ja: "運賃と割引（リンクのみ）" }, country: "GBR", cityIds: ["london"], topic: "transport", method: "page",
     pages: ["https://tfl.gov.uk/fares"], cadenceDays: 60,
+  },
+  { id: "abs-census-rent", publisher: "Australian Bureau of Statistics (ABS)", name: { en: "2021 Census QuickStats: median weekly rent (Greater Sydney, Greater Melbourne)", ja: "2021年国勢調査クイックスタッツ：週あたり家賃の中央値（グレーター・シドニー／グレーター・メルボルン）" }, country: "AUS", cityIds: ["sydney", "melbourne"], topic: "housing", method: "page",
+    pages: ["https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD", "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL"], cadenceDays: 180,
+  },
+  { id: "tfnsw-fares", publisher: "Transport for NSW", name: { en: "Tickets and fares, Opal and concessions (link only)", ja: "乗車券と運賃・Opal・割引（リンクのみ）" }, country: "AUS", cityIds: ["sydney"], topic: "transport", method: "page",
+    pages: ["https://transportnsw.info/tickets-fares", "https://transportnsw.info/tickets-fares/fares", "https://transportnsw.info/tickets-fares/eligibility-concessions"], cadenceDays: 60,
+  },
+  { id: "ptv-fares", publisher: "Transport Victoria (formerly Public Transport Victoria)", name: { en: "myki and fares (link only)", ja: "myki と運賃（リンクのみ）" }, country: "AUS", cityIds: ["melbourne"], topic: "transport", method: "page",
+    pages: ["https://transport.vic.gov.au/tickets-and-myki/myki", "https://transport.vic.gov.au/tickets-and-myki/fares"], cadenceDays: 60,
   },
 ];

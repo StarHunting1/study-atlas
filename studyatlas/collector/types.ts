@@ -13,7 +13,7 @@ export type Access =
   | "needs-key"          // requires registration / API key (store it in GitHub Secrets)
   | "needs-terms-review" // no documented API, or terms not yet reviewed: do not scrape
 export type SourceInfo = {
-  id: string; name: string; country: "GBR" | "CAN"; access: Access;
+  id: string; name: string; country: "GBR" | "CAN" | "AUS"; access: Access;
   /** Minimum days between fetches (scheduled runs skip a source that is not due; --force ignores this) */
   cadenceDays?: number;
   /** Developer documentation / terms to read before enabling */
@@ -34,7 +34,7 @@ export type CollectedRecord = {
   /** Stable id: `${sourceId}:${key}` */
   id: string;
   sourceId: string;
-  country: "GBR" | "CAN";
+  country: "GBR" | "CAN" | "AUS";
   /** City the record is about; omitted for national information (e.g. visa rules) */
   cityId?: string;
   /** Ver.1.3 field path it would update (e.g. "visa.official", "living.healthcare") or a dataset topic ("dataset.housing") */
