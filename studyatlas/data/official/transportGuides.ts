@@ -6,41 +6,71 @@ import type { Localized } from "@/lib/i18n";
  * automated check with HTTP 403 / a bot check) has only links, and says so. Everything here is "unverified": a short paraphrase of a public page that no person has compared yet.
  */
 export type GuideLinkKind = "fares" | "payment" | "student" | "map";
-export type GuideLink = { kind: GuideLinkKind; label: Localized; url: string; /** the page was opened by StudyAtlas's own check (false = link only, not confirmed to work) */ opened: boolean };
+export type GuideLink = { kind: GuideLinkKind; label: Localized; url: string; /** the page was opened by StudyAtlas's own check (false = link only, not confirmed to work) */ opened: boolean;
+  /** Ver.1.6.5: the page's content was read (and is summarised in this guide). `opened` alone only says the link answered; a link that was opened but not read is never described as confirmed */ read?: boolean };
 export type TransportGuide = {
-  cityId: string; sourceId: string; /** date the pages were opened; null when they could not be read */ checkedAt: string | null; read: boolean;
+  cityId: string; sourceId: string; /** the operator(s), shown first */ operator?: Localized; /** one line on how to pay, for the first screen */ paymentShort?: Localized; passes?: Localized; zones?: Localized; /** date the pages were opened; null when they could not be read */ checkedAt: string | null; read: boolean;
   modes?: Localized; payment?: Localized; fareSystem?: Localized; student: Localized; links: GuideLink[];
 };
 const t = (en: string, ja: string): Localized => ({ en, ja });
 export const TRANSPORT_GUIDES: TransportGuide[] = [
   { cityId: "toronto", sourceId: "ttc-fares", checkedAt: "2026-10-19", read: true,
+    operator: t("Toronto Transit Commission (TTC)", "トロント交通局（TTC）"), paymentShort: t("PRESTO card, debit/credit card (incl. mobile wallet) or cash", "PRESTOカード、デビット／クレジットカード（モバイルウォレット含む）、現金"),
     modes: t("TTC subway, streetcars and buses (see the official routes and schedules).", "TTCの地下鉄・路面電車・バス（路線と時刻は公式ページで確認）。"),
     payment: t("According to the TTC fares page, a fare can be paid with a PRESTO card (physical or in a mobile wallet), a PRESTO ticket, an Interac debit or credit card (including a mobile wallet) or cash. The page also describes monthly fare capping for eligible fares paid by PRESTO, debit or credit card.", "TTCの運賃ページによると、PRESTOカード（物理カードまたはスマホのウォレット）、PRESTOチケット、Interacデビット／クレジットカード（スマホのウォレット含む）、現金で支払えます。PRESTO・デビット・クレジットカードで払う対象運賃には、月ごとの運賃上限（マンスリー・フェア・キャッピング）の説明もあります。"),
     student: t("The TTC lists a post-secondary student fare category. Its eligibility is set on the TTC's own page (it names full-time study at a recognized post-secondary institution or a registered private career college in Toronto). Language-school students are not mentioned there, so check the TTC before assuming a student fare.", "TTCには、ポストセカンダリー（大学・カレッジ等）の学生向けの運賃区分があります。対象はTTC自身のページで定められており（トロント市内の認定された高等教育機関、または登録された私立キャリアカレッジへのフルタイムの在籍と記載）、語学学校の学生には触れていません。学生運賃があると思い込まず、TTCで確認してください。"),
     links: [
-      { kind: "fares", label: t("TTC – Fares and passes", "TTC – 運賃とパス"), url: "https://www.ttc.ca/fares-and-passes", opened: true },
-      { kind: "student", label: t("TTC – Fare types and discounts (student eligibility)", "TTC – 運賃の種類と割引（学生の対象条件）"), url: "https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", opened: true },
-      { kind: "map", label: t("TTC – Routes and schedules (maps)", "TTC – 路線と時刻表（路線図）"), url: "https://www.ttc.ca/routes-and-schedules", opened: false },
+      { kind: "fares", label: t("TTC – Fares and passes", "TTC – 運賃とパス"), url: "https://www.ttc.ca/fares-and-passes", opened: true, read: true },
+      { kind: "student", label: t("TTC – Fare types and discounts (student eligibility)", "TTC – 運賃の種類と割引（学生の対象条件）"), url: "https://www.ttc.ca/Fares-and-passes/Fares-types-and-discounts", opened: true, read: true },
+      { kind: "map", label: t("TTC – Routes and schedules (maps)", "TTC – 路線と時刻表（路線図）"), url: "https://www.ttc.ca/routes-and-schedules", opened: true, read: true },
     ] },
   { cityId: "sydney", sourceId: "tfnsw-fares", checkedAt: "2026-10-19", read: true,
+    operator: t("Transport for NSW (Opal)", "Transport for NSW（Opal）"), paymentShort: t("Opal card, or a contactless card / digital wallet (tap on, tap off)", "Opalカード、またはコンタクトレスのカード／デジタルウォレット（乗車時と降車時にタッチ）"),
     modes: t("Opal network: trains, buses, ferries and light rail in Sydney and the surrounding regions (Transport for NSW names the Blue Mountains, Central Coast, Hunter and Illawarra).", "Opalの対象：シドニーと周辺地域の電車・バス・フェリー・ライトレール（Transport for NSWは、ブルーマウンテンズ・セントラルコースト・ハンター・イラワラも挙げています）。"),
     payment: t("According to Transport for NSW, you can pay with an Opal card, or with a credit/debit card or a digital wallet (Apple Pay, Google Pay, Samsung Pay) that has the contactless symbol; you tap on at the start and tap off at the end of the trip. Concession fares need a concession entitlement linked to the card.", "Transport for NSWによると、Opalカード、またはコンタクトレスのマークがあるクレジット／デビットカードやデジタルウォレット（Apple Pay・Google Pay・Samsung Pay）で支払えます。乗車時と降車時にタップします。割引運賃には、カードに紐づけた割引の資格（コンセッション）が必要です。"),
     fareSystem: t("The fare depends on where, when and how you travel and on any Opal benefits that apply (see the official fares pages for the amounts).", "運賃は、どこで・いつ・どのように乗るかと、適用されるOpalの特典で変わります（金額は公式の運賃ページで確認）。"),
     student: t("Concession fares exist for tertiary and TAFE students. Transport for NSW describes them for students enrolled full-time and on-campus in an accredited course with a registered higher-education or vocational provider, and names international students only for certain scholarships; language-school courses are not mentioned. Do not assume a student discount – check the official page.", "大学・TAFEの学生には割引運賃があります。Transport for NSWは、登録された高等教育機関または職業教育機関の認定コースにフルタイムで通学（オンキャンパス）する学生を対象とし、留学生が挙がるのは特定の奨学金の場合だけで、語学学校のコースには触れていません。学生割引があると思い込まず、公式ページで確認してください。"),
     links: [
-      { kind: "fares", label: t("Transport for NSW – Fares and ways to pay", "Transport for NSW – 運賃と支払い方法"), url: "https://transportnsw.info/tickets-fares/fares", opened: true },
-      { kind: "payment", label: t("Transport for NSW – Contactless payments", "Transport for NSW – コンタクトレス決済"), url: "https://transportnsw.info/tickets-fares/contactless-payments", opened: false },
-      { kind: "student", label: t("Transport for NSW – Tertiary and TAFE students (eligibility)", "Transport for NSW – 大学・TAFEの学生（対象条件）"), url: "https://transportnsw.info/tickets-fares/eligibility-concessions/tertiary-tafe-students", opened: true },
+      { kind: "fares", label: t("Transport for NSW – Fares and ways to pay", "Transport for NSW – 運賃と支払い方法"), url: "https://transportnsw.info/tickets-fares/fares", opened: true, read: true },
+      { kind: "payment", label: t("Transport for NSW – Contactless payments", "Transport for NSW – コンタクトレス決済"), url: "https://transportnsw.info/tickets-fares/contactless-payments", opened: true, read: true },
+      { kind: "student", label: t("Transport for NSW – Tertiary and TAFE students (eligibility)", "Transport for NSW – 大学・TAFEの学生（対象条件）"), url: "https://transportnsw.info/tickets-fares/eligibility-concessions/tertiary-tafe-students", opened: true, read: true },
       { kind: "map", label: t("Transport for NSW – Opal network map (PDF)", "Transport for NSW – Opal路線図（PDF）"), url: "https://transportnsw.info/document/6027/opal-network-map.pdf", opened: false },
     ] },
-  { cityId: "london", sourceId: "tfl-fares", checkedAt: null, read: false,
+  { cityId: "manchester", sourceId: "tfgm-fares", checkedAt: "2026-10-19", read: true,
+    operator: t("Bee Network / Transport for Greater Manchester (TfGM)", "Bee Network／グレーター・マンチェスター交通局（TfGM）"),
+    paymentShort: t("Contactless card or phone, Bee Network app, Bee Card or a paper ticket on the bus", "コンタクトレスのカード／スマートフォン、Bee Networkアプリ、Beeカード、バス車内の紙のチケット"),
+    modes: t("Bee Network buses and Metrolink trams across Greater Manchester (see the official maps).", "グレーター・マンチェスターのBee Networkバスとメトロリンク（トラム）（路線図は公式ページ）。"),
+    payment: t("According to the TfGM bus-tickets page, you can pay by contactless tap-and-go on the bus, with the Bee Network app, with a smart card (the Bee Card) or with a paper ticket bought on the bus. A single ‘hopper’ ticket lets you change to another Bee Network bus within a set time without paying again.", "TfGMのバス乗車券ページによると、支払いはバス車内でのコンタクトレス（タッチ決済）、Bee Networkアプリ、スマートカード（Beeカード）、またはバス車内で買う紙のチケットです。1回乗車の「ホッパー」チケットは、一定時間内なら別のBee Networkバスに追加料金なしで乗り換えられます。"),
+    passes: t("The page lists single ‘hopper’ tickets, 1-day and 7-day Bee Bus tickets, multi-journey tickets for bus and tram, annual tickets, family tickets and tickets for students. Bee AnyBus tickets cover a few non-Bee Network routes.", "ページには、1回乗車の「ホッパー」、1日・7日のBee Bus券、バスとトラムの複数回券、年間券、ファミリー券、学生向け券が載っています。Bee AnyBus券は一部のBee Network以外の路線もカバーします。"),
+    student: t("TfGM lists Bee Bus student tickets (all-terms and single-term). Who can buy them is set on the TfGM student-ticket page; this summary does not say that every international or language-school student is eligible, so check that page before assuming a student ticket.", "TfGMはBee Busの学生券（通年・学期別）を案内しています。購入できる人の条件はTfGMの学生券のページにあり、この要約は留学生や語学学校の学生が全員対象だとは言っていません。学生券を前提にする前に、そのページで確認してください。"),
+    links: [
+      { kind: "fares", label: t("Bee Network – Bus tickets", "Bee Network – バスの乗車券"), url: "https://tfgm.com/tickets-and-passes/bus-tickets", opened: true, read: true },
+      { kind: "payment", label: t("Bee Network – Ways to pay (smart card)", "Bee Network – 支払い方法（スマートカード）"), url: "https://tfgm.com/tickets-and-passes/ways-to-pay/smart-card", opened: false },
+      { kind: "student", label: t("Bee Network – All Terms Bee Bus student ticket (eligibility)", "Bee Network – 通年Bee Bus学生券（対象条件）"), url: "https://tfgm.com/tickets-and-passes/all-terms-bee-bus-student", opened: true, read: false },
+      { kind: "map", label: t("Bee Network – Maps", "Bee Network – 路線図"), url: "https://tfgm.com/maps", opened: true, read: true },
+    ] },
+  { cityId: "vancouver", sourceId: "translink-fares", checkedAt: "2026-10-19", read: true,
+    operator: t("TransLink (Metro Vancouver)", "TransLink（メトロ・バンクーバー）"),
+    paymentShort: t("Compass Card, or contactless debit/credit card and mobile wallet at the reader", "Compassカード、またはリーダーへのコンタクトレス決済（デビット／クレジットカード、モバイルウォレット）"),
+    modes: t("Buses, SkyTrain, SeaBus and West Coast Express in Metro Vancouver (see the official schedules and maps).", "メトロ・バンクーバーのバス、スカイトレイン、シーバス、ウェスト・コースト・エクスプレス（時刻表と路線図は公式ページ）。"),
+    payment: t("According to the TransLink fares page, you can load a Compass Card with stored value or passes, or tap a contactless debit/credit card or a mobile wallet (Apple Pay, Google Pay, Samsung Pay) at the SkyTrain gate or on the bus reader; tickets can also be bought from machines.", "TransLinkの運賃ページによると、Compassカードにチャージ（ストアド・バリュー）やパスを入れるか、スカイトレインの改札・バスのリーダーでコンタクトレスのデビット／クレジットカードやモバイルウォレット（Apple Pay・Google Pay・Samsung Pay）をタッチして支払えます。券売機でのチケット購入もあります。"),
+    zones: t("There are three fare zones in Metro Vancouver. The fare depends on when, where and how you travel; all bus trips are a single zone.", "メトロ・バンクーバーには3つの運賃ゾーンがあり、運賃は時間帯・場所・支払い方法で変わります。バスはすべて1ゾーンです。"),
+    passes: t("Compass stored value, monthly passes and day passes exist; concession fares are described for HandyCard holders, seniors and youth aged 13 to 18 with photo ID.", "Compassのストアド・バリュー、月間パス、1日パスがあります。割引運賃は、HandyCard保有者、65歳以上、13〜18歳（写真付きIDが必要）について説明されています。"),
+    student: t("TransLink’s U-Pass BC is for students of the participating public post-secondary institutions in Metro Vancouver; it is paid through student fees and each institution decides eligibility. Language-school students are not mentioned on that page, and no general student fare is described on the fares page, so check with your institution and TransLink before assuming a student pass.", "TransLinkのU-Pass BCは、メトロ・バンクーバーの参加している公立の高等教育機関の学生向けで、学費の一部として支払い、対象かどうかは各機関が決めます。語学学校の学生はそのページに記載がなく、運賃ページに一般の学生運賃の説明もないため、学生パスを前提にする前に、在籍校とTransLinkで確認してください。"),
+    links: [
+      { kind: "fares", label: t("TransLink – Pricing and fare zones", "TransLink – 運賃とゾーン"), url: "https://www.translink.ca/transit-fares/pricing-and-fare-zones", opened: true, read: true },
+      { kind: "payment", label: t("TransLink – Compass Card", "TransLink – Compassカード"), url: "https://www.translink.ca/transit-fares/compass-card", opened: false },
+      { kind: "student", label: t("TransLink – U-Pass BC (eligibility)", "TransLink – U-Pass BC（対象条件）"), url: "https://www.translink.ca/transit-fares/u-pass-bc", opened: true, read: true },
+      { kind: "map", label: t("TransLink – Transit system maps", "TransLink – 路線図"), url: "https://www.translink.ca/schedules-and-maps/transit-system-maps", opened: false },
+    ] },
+  { cityId: "london", sourceId: "tfl-fares", checkedAt: null, read: false, operator: t("Transport for London (TfL)", "ロンドン交通局（TfL）"),
     student: t("Not confirmed: check on the TfL site who can get a student or other discount.", "確認中：学生などの割引の対象は、TfLのサイトで確認してください。"),
     links: [
       { kind: "fares", label: t("TfL – Fares", "TfL – 運賃"), url: "https://tfl.gov.uk/fares", opened: false },
       { kind: "student", label: t("TfL – Free and discounted travel (eligibility)", "TfL – 無料・割引の乗車（対象条件）"), url: "https://tfl.gov.uk/fares/free-and-discounted-travel", opened: false },
       { kind: "map", label: t("TfL – Maps", "TfL – 路線図"), url: "https://tfl.gov.uk/maps", opened: false },
     ] },
-  { cityId: "melbourne", sourceId: "ptv-fares", checkedAt: null, read: false,
+  { cityId: "melbourne", sourceId: "ptv-fares", checkedAt: null, read: false, operator: t("Transport Victoria (myki)", "Transport Victoria（myki）"),
     student: t("Not confirmed: check on the Transport Victoria site who can get a concession fare.", "確認中：割引運賃の対象は、Transport Victoriaのサイトで確認してください。"),
     links: [
       { kind: "fares", label: t("Transport Victoria – Fares", "Transport Victoria – 運賃"), url: "https://transport.vic.gov.au/tickets-and-myki/fares", opened: false },
