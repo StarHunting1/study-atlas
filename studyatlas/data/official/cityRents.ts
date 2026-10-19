@@ -3,6 +3,7 @@ import { displayModeOf, rightsOfSource } from "./rights";
 import { officialSources } from "./sources";
 import type { DataPoint } from "./types";
 import { sha256 } from "./rentDigest";
+import { AU_RENT_CANDIDATES, SYDNEY_RENT_CANDIDATE, MELBOURNE_RENT_CANDIDATE } from "./auRents";
 /*
  * Public rent statistics for Toronto and London (Ver.1.5.0) – prepared, NOT published. Same rule as the Manchester ONS figure (onsRent.ts):
  *
@@ -81,11 +82,13 @@ export const LONDON_RENT_CANDIDATE: Omit<DataPoint, "status" | "checkedAt"> = {
 };
 
 export type Candidate = Omit<DataPoint, "status" | "checkedAt">;
+/** (test helper) number of Sydney/Melbourne candidates */
+export const AU_RENT_CANDIDATES_FOR_TEST = AU_RENT_CANDIDATES.length;
 /** Digest of what a person approves: the figure, its unit and period, the source and quote, the label and the statistical definition. Retrieval date and free notes are not part of it. */
 export function rentDigest(c: Candidate): string {
   return sha256(JSON.stringify([c.id, c.cityId, c.topic, c.sourceId, c.metric, c.label, c.value, c.audience, c.conditions, c.validFor, c.evidence.map((e) => [e.url, e.publisher, e.section, e.quote, e.terms ?? null]), c.collectedId ?? null]));
 }
-export const ALL_RENT_CANDIDATES: Candidate[] = [...TORONTO_RENT_CANDIDATES, LONDON_RENT_CANDIDATE];
+export const ALL_RENT_CANDIDATES: Candidate[] = [...TORONTO_RENT_CANDIDATES, LONDON_RENT_CANDIDATE, ...AU_RENT_CANDIDATES];
 const ymd = /^\d{4}-\d{2}-\d{2}$/;
 /** Why an approval cannot be used for a candidate ("" = it can). */
 export function approvalProblem(c: Candidate, a: RentApproval | undefined): string {
@@ -105,8 +108,10 @@ export function approvedRentPoints(candidates: Candidate[], approvals: Record<st
 }
 export const torontoRentPoints = (approvals: Record<string, RentApproval> = RENT_APPROVALS) => approvedRentPoints(TORONTO_RENT_CANDIDATES, approvals);
 export const londonRentPoints = (approvals: Record<string, RentApproval> = RENT_APPROVALS) => approvedRentPoints([LONDON_RENT_CANDIDATE], approvals);
+export const sydneyRentPoints = (approvals: Record<string, RentApproval> = RENT_APPROVALS) => approvedRentPoints([SYDNEY_RENT_CANDIDATE], approvals);
+export const melbourneRentPoints = (approvals: Record<string, RentApproval> = RENT_APPROVALS) => approvedRentPoints([MELBOURNE_RENT_CANDIDATE], approvals);
 /** Candidates of a city that are still waiting for an approval (their numbers are not shown). */
-export const pendingRentIds = (cityId: "toronto" | "london", approvals: Record<string, RentApproval> = RENT_APPROVALS) => ALL_RENT_CANDIDATES.filter((c) => c.cityId === cityId && !approvals[c.id]).map((c) => c.id);
+export const pendingRentIds = (cityId: "toronto" | "london" | "sydney" | "melbourne", approvals: Record<string, RentApproval> = RENT_APPROVALS) => ALL_RENT_CANDIDATES.filter((c) => c.cityId === cityId && !approvals[c.id]).map((c) => c.id);
 
 export type Check = { name: string; ok: boolean; detail: string };
 const chk = (name: string, ok: boolean, detail: string): Check => ({ name, ok, detail });
@@ -114,26 +119,34 @@ const nums = (s: string) => (s.match(/\d[\d,]*(\.\d+)?/g) ?? []).map((n) => Numb
 const notStudent = (c: Omit<DataPoint, "status" | "checkedAt">) => c.audience === "renter" && !c.housing && /not student housing/i.test(c.conditions.en) && /学生/.test(c.conditions.ja);
 
 /** Checks that need no collected data: each candidate against the source registry, the rights record and its own evidence. */
+const UNIT: Record<string, [string, string]> = { toronto: ["CAD", "month"], london: ["GBP", "month"], sydney: ["AUD", "week"], melbourne: ["AUD", "week"] };
+const AREA_NAMED: Record<string, (en: string) => boolean> = {
+  toronto: (en) => /census metropolitan area/.test(en) && /535/.test(en), london: (en) => /E12000007/.test(en) && /region/.test(en),
+  sydney: (en) => /Greater Sydney/.test(en) && /2021 Census/.test(en) && /median/i.test(en), melbourne: (en) => /Greater Melbourne/.test(en) && /2021 Census/.test(en) && /median/i.test(en),
+};
 export function reconcileStatic(): Check[] {
   const out: Check[] = [];
-  for (const c of [...TORONTO_RENT_CANDIDATES, LONDON_RENT_CANDIDATE]) {
-    const src = officialSources.find((s) => s.id === c.sourceId); const r = rightsOfSource(c.sourceId); const city = c.cityId; const amount = c.value!.amount; const who = c.id;
+  for (const c of ALL_RENT_CANDIDATES) {
+    const src = officialSources.find((s) => s.id === c.sourceId); const r = rightsOfSource(c.sourceId); const city = c.cityId; const amount = c.value!.amount; const who = c.id; const [cur, per] = UNIT[city];
     out.push(
       chk(`${who}: source registered for ${city}`, !!src && src.cityIds.includes(city), src?.publisher ?? "missing"),
       chk(`${who}: evidence page belongs to the source`, c.evidence.every((e) => src?.pages.some((u) => e.url.startsWith(u))), c.evidence.map((e) => e.url).join(" | ")),
       chk(`${who}: evidence quote contains the amount`, c.evidence.every((e) => nums(e.quote).includes(amount)), `${amount}`),
-      chk(`${who}: unit is ${city === "toronto" ? "CAD" : "GBP"} per month`, c.value!.per === "month" && c.value!.currency === (city === "toronto" ? "CAD" : "GBP"), `${c.value!.currency}/${c.value!.per}`),
+      chk(`${who}: unit is ${cur} per ${per}`, c.value!.per === per && c.value!.currency === cur, `${c.value!.currency}/${c.value!.per}`),
       chk(`${who}: licence recorded and reuse permitted`, r.reuseStatus === "permitted" && !!r.lastReviewedAt && !!r.licence, `${r.reuseStatus} · ${r.licence}`),
-      chk(`${who}: collection allowed by the rights review`, r.automation === "allowed", r.automation),
+      // Sydney/Melbourne are read by hand (no collector): "page-check-only" is fine, "blocked" is not
+      chk(`${who}: collection allowed by the rights review`, r.automation === "allowed" || (src?.cityIds.some((x) => x === "sydney" || x === "melbourne") === true && r.automation === "page-check-only"), r.automation),
       chk(`${who}: shown in full under the rights rules`, displayModeOf({ sourceId: c.sourceId, value: c.value, rights: c.rights }) === "full", displayModeOf({ sourceId: c.sourceId, value: c.value, rights: c.rights })),
       chk(`${who}: not confusable with student housing`, notStudent(c), c.audience),
-      chk(`${who}: the area is named in the conditions`, city === "toronto" ? /census metropolitan area/.test(c.conditions.en) && /535/.test(c.conditions.en) : /E12000007/.test(c.conditions.en) && /region/.test(c.conditions.en), c.metric),
+      chk(`${who}: the area is named in the conditions`, AREA_NAMED[city](c.conditions.en), c.metric),
     );
   }
   out.push(
     chk("London quote carries area code, name and month", LONDON_RENT_CANDIDATE.evidence[0].quote === LONDON_RENT_WORKBOOK_QUOTE && LONDON_RENT_WORKBOOK_QUOTE.includes(LONDON_RENT_AREA.code) && LONDON_RENT_WORKBOOK_QUOTE.includes(LONDON_RENT_AREA.name), LONDON_RENT_WORKBOOK_QUOTE),
     chk("London period is a single month", LONDON_RENT_CANDIDATE.validFor.slice(0, 7) === LONDON_RENT_MONTH, LONDON_RENT_CANDIDATE.validFor),
     chk("London metric differs from Manchester's local-authority metric", LONDON_RENT_CANDIDATE.metric !== "housing.privateRent.average", LONDON_RENT_CANDIDATE.metric),
+    chk("Sydney and Melbourne use the same Census statistic (metric, unit, year, source)", SYDNEY_RENT_CANDIDATE.metric === MELBOURNE_RENT_CANDIDATE.metric && SYDNEY_RENT_CANDIDATE.sourceId === MELBOURNE_RENT_CANDIDATE.sourceId && SYDNEY_RENT_CANDIDATE.validFor === MELBOURNE_RENT_CANDIDATE.validFor, SYDNEY_RENT_CANDIDATE.metric),
+    chk("Sydney and Melbourne quotes name their own area", SYDNEY_RENT_CANDIDATE.evidence[0].quote.startsWith("Greater Sydney;") && MELBOURNE_RENT_CANDIDATE.evidence[0].quote.startsWith("Greater Melbourne;"), "quotes"),
   );
   return out;
 }

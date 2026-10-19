@@ -15,6 +15,8 @@ type Fixed = Pick<RentBasis, "publisher" | "table" | "measure" | "area"> & { str
 const FIXED: Record<string, Fixed> = {
   "vancouver|statcan-cmhc-rents": { publisher: "CMHC via Statistics Canada", table: "34-10-0133-01", measure: "average rent of the units in the CMHC Rental Market Survey (October)", area: "census metropolitan area" },
   "toronto|statcan-cmhc-rents": { publisher: "CMHC via Statistics Canada", table: "34-10-0133-01", measure: "average rent of the units in the CMHC Rental Market Survey (October)", area: "census metropolitan area" },
+  "sydney|abs-census-rent": { publisher: "ABS", table: "2021 Census QuickStats", measure: "median weekly rent of households that rent (actual rent, rent-free dwellings excluded)", area: "ABS Greater Capital City area", structure: "all rented dwellings" },
+  "melbourne|abs-census-rent": { publisher: "ABS", table: "2021 Census QuickStats", measure: "median weekly rent of households that rent (actual rent, rent-free dwellings excluded)", area: "ABS Greater Capital City area", structure: "all rented dwellings" },
   "manchester|ons-private-rents": { publisher: "ONS", table: "PIPR Table 1", measure: "mean monthly rent of all private dwellings, new and existing tenancies", area: "local authority", structure: "all dwellings" },
   "london|ons-private-rents": { publisher: "ONS", table: "PIPR Table 1", measure: "mean monthly rent of all private dwellings, new and existing tenancies", area: "region", structure: "all dwellings" },
 };

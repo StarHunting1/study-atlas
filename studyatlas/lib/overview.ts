@@ -108,6 +108,13 @@ export function marketRentSummary(c: City): { point: DataPoint; count: number } 
   const count = (officialData(c.id)?.points ?? []).filter((p) => p.topic === "housing" && p.audience === "renter" && p.value && shown(p.status) && isFigureShown(p)).length;
   return { point: k.point, count };
 }
+/** A whole-market rent statistic that exists but is waiting for a person's approval (Ver.1.6.0): no number is shown; the headline says "being checked" and links the official statistic. */
+export function rentCheckingKey(c: City): { url: string; publisher: string } | undefined {
+  const d = officialData(c.id); if (!d) return undefined;
+  if ((d.points ?? []).some((p) => p.topic === "housing" && p.audience === "renter" && p.value)) return undefined;
+  const n = (d.notices ?? []).find((x) => x.topic === "housing" && x.why === "awaiting-approval" && x.links.length); if (!n) return undefined;
+  return { url: n.links[0].url, publisher: officialSources.find((x) => x.id === n.sourceId)?.publisher ?? n.links[0].label.en };
+}
 /** A link to the official fares page for a city whose fares are link-only (reviewed, not copied). Cities with their own fare figures keep their usual key. */
 export function transportLinkKey(c: City): Key | undefined {
   const d = officialData(c.id); if (!d || d.points.some((p) => p.topic === "transport")) return undefined;

@@ -20,7 +20,7 @@ export type LinkTarget = { url: string; where: string[]; expect?: string; skip?:
 export type Verdict = "ok" | "redirected" | "access-denied" | "broken" | "client-error" | "server-error" | "unreachable" | "robots-disallowed" | "skipped";
 export type LinkResult = { url: string; where: string[]; verdict: Verdict; status: number | null; finalUrl?: string; title?: string; contentOk: boolean | null; note?: string };
 
-const CITY_IDS = ["manchester", "vancouver", "toronto", "london"] as const;
+const CITY_IDS = ["manchester", "vancouver", "toronto", "london", "sydney", "melbourne"] as const;
 /** Words the page must contain for the link to count as "the right page". Matched case-insensitively against the page text. */
 const EXPECT: [RegExp, string][] = [
   [/gov\.uk\/student-visa/, "student visa"], [/gov\.uk\/check-uk-visa/, "visa"], [/gov\.uk\/visa-to-study-english/, "study english"],
@@ -36,6 +36,12 @@ const EXPECT: [RegExp, string][] = [
   [/sprachcaffe\.com.*vancouver|sprachcaffe\.com\/english\/adults-english-courses-canada/, "vancouver"], [/ef\.com\/ca\/ilsd\/schools\/vancouver/, "price"],
   [/ef\.com\/ca\/ilsd\/schools\/toronto/, "toronto"], [/kaplaninternational\.com\/language-schools\/canada\/toronto/, "toronto"], [/kaplaninternational\.com\/language-schools\/united-kingdom\/london/, "london"],
   [/francesking\.com.*course-prices/, "price"], [/francesking\.com/, "frances king"], [/stgiles-international\.com/, "st giles"],
+  [/homeaffairs\.gov\.au\/.*student-500/, "student"], [/homeaffairs\.gov\.au\/.*visitor-600/, "visitor"], [/homeaffairs\.gov\.au\/.*electronic-travel-authority-601/, "eta|electronic travel"],
+  [/studyaustralia\.gov\.au\/en\/plan-your-move\/your-guide-to-visas/, "visa"], [/studyaustralia\.gov\.au\/en\/plan-your-move\/overseas-student-health-cover/, "oshc|health cover"],
+  [/search\.studyaustralia\.gov\.au\/provider\/ilsc/, "ilsc"], [/search\.studyaustralia\.gov\.au\/provider\/city-language/, "city language"], [/studyaustralia\.gov\.au\/en$/, "study australia"], [/cricos\.education\.gov\.au/, "cricos"],
+  [/ilsc\.com\/language-schools\/destinations\/australia\/city\/(sydney|melbourne)/, "ilsc"], [/navitasenglish\.edu\.au/, "navitas"], [/cityenglish\.edu\.au/, "city language"],
+  [/abs\.gov\.au\/census\/find-census-data\/quickstats\/2021\/1GSYD/, "greater sydney"], [/abs\.gov\.au\/census\/find-census-data\/quickstats\/2021\/2GMEL/, "greater melbourne"], [/abs\.gov\.au\/website-privacy/, "creative commons"],
+  [/nsw\.gov\.au\/housing-and-construction\/rental-forms-surveys-and-data\/rental-bond-data/, "rental bond"],
   [/ons\.gov\.uk/, "private rent"], [/statcan\.gc\.ca|statcan/, "rent"], [/manchester\.ac\.uk/, "manchester"], [/tfgm\.com/, "tfgm|bee|ticket"],
 ];
 export const expectFor = (url: string): string | undefined => EXPECT.find(([re]) => re.test(url))?.[1];
@@ -57,7 +63,7 @@ export function linkTargets(): LinkTarget[] {
     const skip = [...blocked].some((b) => hostKey(key) === b || hostKey(key).endsWith("." + b)) ? "rights/terms: automated requests not allowed" : undefined;
     map.set(key, { url: key, where: [where], expect: expectFor(key), skip });
   };
-  for (const code of ["GBR", "CAN"]) { for (const l of visaLinks[code] ?? []) add(l.link.value, `visa:${code}`); for (const l of healthLinks[code] ?? []) add(l.link.value, `health:${code}`); }
+  for (const code of ["GBR", "CAN", "AUS"]) { for (const l of visaLinks[code] ?? []) add(l.link.value, `visa:${code}`); for (const l of healthLinks[code] ?? []) add(l.link.value, `health:${code}`); }
   for (const id of CITY_IDS) {
     const c = cities.find((x) => x.id === id)!; const edu = c.profile.education;
     for (const i of edu.languageSchools.value ?? []) { add(i.url, `school:${id}:${i.name}`); add(i.source?.url, `school-source:${id}:${i.name}`); add(i.feesUrl, `school-fees:${id}:${i.name}`); }

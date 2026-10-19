@@ -25,6 +25,7 @@ export const visaRules: VisaRule[] = []; // intentionally empty until rules are 
 /** Official government pages to check. URLs not yet opened from the development environment, so they are "unverified". */
 const unchecked = { en: "Official government page; link not yet checked by StudyAtlas.", ja: "政府の公式ページです（StudyAtlasでのリンク確認は未了）。" };
 const found = { en: "Official government page found through public search on 2026-10-15; StudyAtlas has not opened it yet.", ja: "政府の公式ページ（2026-10-15に公開検索で存在を確認。StudyAtlasでの内容・リンク確認は未了）。" };
+const opened = { en: "Official government page opened once by StudyAtlas's automated check on 2026-10-19 (HTTP 200) to confirm that the link works. Its rules, fees and conditions are not copied or summarised here; which route applies depends on nationality, course and length of stay, so check the page.", ja: "政府の公式ページです。リンクが有効かを確かめるため、2026-10-19にStudyAtlasの自動確認で1回開きました（HTTP 200）。規則・料金・条件はここに転載・要約していません。どの区分になるかは国籍・コース・滞在期間で変わるため、ページでご確認ください。" };
 export const visaLinks: Record<string, { label: Localized; link: Fact<string> }[]> = {
   GBR: [
     { label: { en: "GOV.UK – Student visa", ja: "GOV.UK – Student visa（学生ビザ）" }, link: { status: "unverified", value: "https://www.gov.uk/student-visa", note: unchecked } },
@@ -38,7 +39,10 @@ export const visaLinks: Record<string, { label: Localized; link: Fact<string> }[
     { label: { en: "IRCC – Do I need an eTA to study for less than six months?", ja: "IRCC – 6か月未満の学習にeTAは必要か" }, link: { status: "unverified", value: "https://ircc.canada.ca/english/helpcentre/answer.asp?qnum=1289&top=23", note: found } },
   ],
   AUS: [
-    { label: { en: "Department of Home Affairs – Student visa (subclass 500)", ja: "内務省 – Student visa（subclass 500）" }, link: { status: "unverified", value: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500", note: unchecked } },
+    { label: { en: "Department of Home Affairs – Student visa (subclass 500)", ja: "内務省 – Student visa（subclass 500）" }, link: { status: "unverified", value: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/student-500", note: opened } },
+    { label: { en: "Department of Home Affairs – Visitor visa (subclass 600)", ja: "内務省 – Visitor visa（subclass 600／短期の訪問者ビザ）" }, link: { status: "unverified", value: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/visitor-600", note: opened } },
+    { label: { en: "Department of Home Affairs – Electronic Travel Authority (subclass 601)", ja: "内務省 – Electronic Travel Authority（subclass 601／電子渡航認証）" }, link: { status: "unverified", value: "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/electronic-travel-authority-601", note: opened } },
+    { label: { en: "Study Australia – Your guide to visas (Student, visitor and other visas for study)", ja: "Study Australia – ビザの案内（学生ビザ・訪問者ビザなど）" }, link: { status: "unverified", value: "https://www.studyaustralia.gov.au/en/plan-your-move/your-guide-to-visas", note: opened } },
   ],
 };
 
@@ -52,5 +56,7 @@ export const healthLinks: Record<string, { label: Localized; link: Fact<string> 
     { label: { en: "Government of British Columbia – Medical Services Plan (MSP)", ja: "ブリティッシュコロンビア州政府 – 医療保険（MSP）" }, link: { status: "unverified", value: "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp", note: unchecked } },
     { label: { en: "Government of British Columbia – Health fee for international students", ja: "ブリティッシュコロンビア州政府 – 国際学生ヘルスフィー" }, link: { status: "unverified", value: "https://www2.gov.bc.ca/gov/content/health/accessing-health-care/health-fee-international-students", note: found } },
   ],
-  AUS: [],
+  AUS: [
+    { label: { en: "Study Australia – Overseas Student Health Cover (OSHC)", ja: "Study Australia – 留学生向け医療保険（OSHC）" }, link: { status: "unverified", value: "https://www.studyaustralia.gov.au/en/plan-your-move/overseas-student-health-cover-oshc", note: opened } },
+  ],
 };

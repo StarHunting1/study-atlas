@@ -136,7 +136,8 @@ export function approvalSheet(): string {
     "- [ ] 画面を切り替えたときの影響（上記）を読み、1981–2010 を履歴（`climateAlt`）に残す手順に同意した",
     "- [x] 承認の記録を書いた（2026-10-17、StarHunting1。`data/approvals.ts`）", "",
     "**Manchester**: 1991–2020 は取り込めていません（旧 1971–2000 のまま）。理由は `data/APPROVAL_CANDIDATES.md` の「気候データの承認候補」を参照。");
-  const rentDone = ALL_RENT_CANDIDATES.every((c) => !!RENT_APPROVALS[c.id]); const box = rentDone ? "x" : " ";
+  const TL = ALL_RENT_CANDIDATES.filter((c) => c.cityId === "toronto" || c.cityId === "london"); const AU = ALL_RENT_CANDIDATES.filter((c) => c.cityId === "sydney" || c.cityId === "melbourne");
+  const rentDone = TL.every((c) => !!RENT_APPROVALS[c.id]); const box = rentDone ? "x" : " ";
   L.push("", rentDone ? "## 6. Toronto・London の家賃統計（Ver.1.5.2）: 承認済み・本番反映（5件）" : "## 6. Toronto・London の家賃統計（Ver.1.5.1）: 照合済み・承認待ち（verified ではありません）", "",
     rentDone
       ? "公式データとの再照合は 2026-10-17 の GitHub Actions（run 39065320556、読み取り専用・robots.txt 順守・再試行なし）で実施し、**5つの数値すべてが公式と一致**しました。この5件（Toronto 4件・London 1件）は、2026-10-17 に StarHunting1 が数値・出典・統計定義を明示して公開を承認し、`RENT_APPROVALS` に**数値ごと**の記録を登録しました（承認した内容と違う数値・出典・期間・定義はダイジェスト不一致でビルドが失敗します）。他のデータの状態は変わっていません。"
@@ -151,7 +152,7 @@ export function approvalSheet(): string {
     "| 再利用許諾の確認日 | 2026-10-17（`data/official/RIGHTS.md`。検証状態とは別の記録） |", "",
     "### 6.1 数値ごとの照合と承認の準備", "",
     "| 数値 | 公式（2026-10-17に取得） | サイトの候補 | 照合 | 比較の基準 | 承認の状態 | 承認で記録するダイジェスト |", "|---|---|---|---|---|---|---|");
-  for (const c of ALL_RENT_CANDIDATES) {
+  for (const c of TL) {
     const b = rentBasisOf({ ...c, status: "unverified" }); const a = RENT_APPROVALS[c.id];
     L.push(`| ${c.id} | ${c.cityId === "toronto" ? "CMA 535" : "E12000007"} ・ ${c.value!.amount.toLocaleString("en-US")} ${c.value!.currency}/月 ・ ${c.validFor.split(" (")[0]} | ${c.value!.amount.toLocaleString("en-US")} ${c.value!.currency}/月 | 一致 | ${b ? `${b.area}・${b.structure}・${b.unitKey}・${b.year}` : "—"} | ${a ? `承認済み（${a.approvedBy}・${a.approvedAt}）` : "**未承認**（非表示）"} | \`${rentDigest(c)}\` |`);
   }
@@ -168,5 +169,30 @@ export function approvalSheet(): string {
     `- [${box}] CMHC ライセンス（商用利用可・出典表示必須・取消可能）と OGL v3.0 を確認した`,
     `- [${box}] 「Toronto市ではなくCMA」「London region全体であり区ではない」「学生向け住居ではない」の説明が画面に出ることを確認した`,
     `- [${box}] 承認記録を \`RENT_APPROVALS\` に書いた（数値ごと）`);
+  const auDone = AU.every((c) => !!RENT_APPROVALS[c.id]);
+  L.push("", auDone ? "## 7. Sydney・Melbourne の家賃統計（Ver.1.6.0）: 承認済み" : "## 7. Sydney・Melbourne の家賃統計（Ver.1.6.0）: 取得済み・承認待ち（verified ではありません・サイトには数値を出していません）", "",
+    "2026-10-19 に GitHub Actions（読み取り専用・robots.txt 順守・再試行なし）で ABS の QuickStats 2ページを開いて取得しました。この2件は**承認の準備だけ**です。承認記録（`RENT_APPROVALS`）に載せるまで、都市ページ・都市比較に数値は出ず、「確認中」と公式リンクだけが出ます。**ライセンスが不明な数値は、unverified でも公開しません**（ABS は CC BY 4.0 で、商用利用可）。",
+    "", "| 項目 | 内容 |", "|---|---|",
+    "| 出典 | Australian Bureau of Statistics（ABS）2021年国勢調査 All persons QuickStats：Greater Sydney／Greater Melbourne の「Median weekly rent」 |",
+    "| 定義 | 住居を借りている世帯の**週あたり**家賃の**中央値**（豪ドル）。**実際に支払われている家賃**で、新規契約の募集家賃ではない。家賃なしで占有される住戸は除く（ABSの注記）。2021年の値で、現在の家賃とは異なる可能性が高い |",
+    "| 範囲 | ABS の Greater Sydney／Greater Melbourne 全体（都心よりずっと広い）。学生寮・語学学校の滞在先・留学生の平均ではない |",
+    "| 比較 | シドニーとメルボルンは同じ統計・同じ定義・同じ年・同じ通貨と期間単位なので、承認後は互いに「比較可能」。他都市（月額・平均・別の統計）とは「参考値のみ」（換算しない） |",
+    "| 対象外とした統計 | NSW州政府の賃貸保証金（ボンド）データ（新規契約が対象。数値は読んでいない）、ビクトリア州政府の賃貸レポート（robots.txt/アクセスの都合でページを読めなかった）。定義が違うため、仮に取得しても ABS の中央値と同じ統計としては比較しない |",
+    "| ライセンス | Creative Commons Attribution 4.0 International（ABS サイトの著作権表示）。**商用利用可**。出典表示「Source: Australian Bureau of Statistics, 2021 Census QuickStats, licensed under CC BY 4.0」。確認日 2026-10-19（`data/official/RIGHTS.md`） |", "",
+    "### 7.1 数値ごとの照合と承認の準備", "",
+    "| 数値 | 公式（2026-10-19に取得） | サイトの候補 | 比較の基準 | 承認の状態 | 承認で記録するダイジェスト |", "|---|---|---|---|---|---|");
+  for (const c of AU) {
+    const b = rentBasisOf({ ...c, status: "unverified" }); const a = RENT_APPROVALS[c.id];
+    L.push(`| ${c.id} | ${c.evidence[0].url} ・ ${c.value!.amount.toLocaleString("en-US")} ${c.value!.currency}/週 ・ ${c.validFor.split(" (")[0]} | ${c.value!.amount.toLocaleString("en-US")} AUD/週 | ${b ? `${b.area}・${b.structure}・${b.year}` : "—"} | ${a ? `承認済み（${a.approvedBy}・${a.approvedAt}）` : "**未承認**（非表示）"} | \`${rentDigest(c)}\` |`);
+  }
+  L.push("", "### 7.2 承認の手順（人が行う）", "",
+    "1. 上の ABS の QuickStats ページを自分で開き、「Median weekly rent」の数値・地域・年が上表と一致すること、注記(b)（家賃なしの住戸を除く）を確認する。",
+    "2. ABS の著作権表示（CC BY 4.0）で商用利用が許されること、出典表示が画面に出ることを確認する。",
+    "3. `data/official/cityRents.ts` の `RENT_APPROVALS` に、承認する数値だけを数値ごとに追加する（`syd-abs-census-median-weekly-rent`／`mel-abs-census-median-weekly-rent`）。",
+    "4. 承認しない間は、都市ページに「公的な家賃統計：確認中」と公式リンクが出て、都市比較には数値が出ません。承認後に数値・出典・定義を変更するとダイジェストが一致せずビルドが失敗します。",
+    "### 7.3 承認チェックリスト", "",
+    `- [${auDone ? "x" : " "}] Sydney 470／Melbourne 390 AUD/週（2021年国勢調査・中央値・実際の家賃）を ABS のページと照合した`,
+    `- [${auDone ? "x" : " "}] 「2021年のデータ」「中央値」「週あたり」「Greater 全体」「学生向け住居ではない」の説明が画面に出ることを確認した`,
+    `- [${auDone ? "x" : " "}] 承認記録を \`RENT_APPROVALS\` に書いた（数値ごと）`);
   return L.join("\n") + "\n";
 }

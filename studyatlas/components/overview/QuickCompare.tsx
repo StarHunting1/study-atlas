@@ -43,6 +43,8 @@ const chip: Record<Availability, { label: keyof typeof cu; kind: "ok" | "ref" | 
   notYet: { label: "notYet", kind: "none", cls: "bg-slate-100 text-slate-500 ring-slate-200" },
 };
 /** "{fields}" filled with the names of the rent-definition parts that really differ (both languages). */
+/** Rent chip label: when the only reason there is nothing to compare is that every city's statistic waits for a person's approval, say "being checked", not "not obtained". */
+const chipLabel = (cities: City[], topic: string, av: Availability): keyof typeof cu => (topic === "rent" && av === "notYet" && cities.length > 0 && cities.every((c) => hasRentPending(c.id)) ? "checking" : chip[av].label);
 const withFields = (tpl: Localized, fields: string[]): Localized => Object.fromEntries(["en", "ja"].map((l) => [l, tpl[l].replace("{fields}", fields.map((f) => cu.rentDiff.fields[f][l]).join(l === "ja" ? "、" : "; "))]));
 const rentWhyDiffer = (keys: Key[]): Localized => { const f = rentDiffFields(keys.flatMap((k) => (k.kind === "point" ? [k.point] : []))); return f?.length ? withFields(cu.rentDiff.why, f) : cu.rentWhy.differ; };
 const rentNoteDiffer = (pts: (DataPoint | undefined)[], fallback: Localized): Localized => { const f = rentDiffFields(pts.filter((p): p is DataPoint => !!p)); return f?.length ? withFields(cu.rentDiff.note, f) : fallback; };
@@ -121,7 +123,7 @@ function Row({ id, title, cities, keys, cmp, topic, note, why, children }: { id:
   const { L } = useI18n(); const av = availability(keys, cmp); const c = cmp === "n/a" ? null : chip[av];
   return (
     <section id={`cmp-${id}`} data-testid={`cmp-${id}`} data-cmp={cmp} data-av={av} className={`${panel} space-y-3 p-4 sm:p-5`}>
-      <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold text-[#0b2a5b]">{title}</h2>{c && <span data-testid={`chip-${id}`} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ${c.cls}`}>{L(cu[c.label] as never)}</span>}</div>
+      <div className="flex flex-wrap items-center justify-between gap-2"><h2 className="text-base font-semibold text-[#0b2a5b]">{title}</h2>{c && <span data-testid={`chip-${id}`} className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ring-1 ${c.cls}`}>{L(cu[topic === "rent" ? chipLabel(cities, "rent", av) : c.label] as never)}</span>}</div>
       <p data-testid={`why-${id}`} className="-mt-1 text-xs leading-snug text-slate-500">{L(why ?? cu.why[whyKey(av, cmp)])}</p>
       {note && <p className="-mt-1 text-xs leading-snug text-slate-500" data-testid={`note-${id}`}>{L(note)}</p>}
       <Cells cities={cities} keys={keys} topic={topic} />
@@ -141,10 +143,10 @@ export default function QuickCompare({ ids }: { ids: string[] }) {
       <nav aria-label={L(cu.glanceTitle)} data-testid="glance" className={`${panel} p-4`}>
         <h2 className="text-sm font-semibold text-[#0b2a5b]">{L(cu.glanceTitle)}</h2><p className="mb-2 text-[11px] text-slate-500">{L(cu.glanceNote)}</p>
         <ul className="flex flex-wrap gap-2">{CMP_TOPICS.map((t) => { const keys = keysOf(cities, t); const av = availability(keys, cmpOf(keys, t)); const kind = chip[av].kind;
-          return <li key={t}><a href={`#cmp-${t}`} data-testid={`glance-${t}`} data-kind={kind} className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium ring-1 ${chip[av].cls}`}>{titleOf(t, L)}<span className="font-normal">· {L(cu[chip[av].label] as never)}</span></a></li>; })}</ul>
+          return <li key={t}><a href={`#cmp-${t}`} data-testid={`glance-${t}`} data-kind={kind} className={`inline-flex min-h-[36px] items-center gap-1.5 rounded-full px-3 text-xs font-medium ring-1 ${chip[av].cls}`}>{titleOf(t, L)}<span className="font-normal">· {L(cu[chipLabel(cities, t, av)] as never)}</span></a></li>; })}</ul>
       </nav>
       {CMP_TOPICS.map((t) => { const keys = keysOf(cities, t); const cmp = cmpOf(keys, t); const av = availability(keys, cmp);
-        return <Row key={t} id={t} title={titleOf(t, L)} cities={cities} keys={keys} cmp={cmp} topic={t} note={t === "housing" ? cu.studentHousingNote : undefined} why={t === "rent" && av !== "partial" && av !== "notYet" ? (cmp === "same" ? cu.rentWhy.same : rentWhyDiffer(keys)) : undefined}>
+        return <Row key={t} id={t} title={titleOf(t, L)} cities={cities} keys={keys} cmp={cmp} topic={t} note={t === "housing" ? cu.studentHousingNote : undefined} why={t === "rent" && av !== "partial" && av !== "notYet" ? (cmp === "same" ? cu.rentWhy.same : rentWhyDiffer(keys)) : t === "rent" && av === "notYet" && cities.every((c) => hasRentPending(c.id)) ? cu.rentPendingDetail : undefined}>
           {anyOfficial && <OfficialDetail cities={cities} topic={t} />}{t !== "rent" && <FactDetail cities={cities} sectionIds={[SECTION_OF[t]]} />}
           {t === "education" && <Link href="/schools" className="inline-block text-sm text-sky-700 underline">{L(ux.seeSchools)}</Link>}
         </Row>; })}
