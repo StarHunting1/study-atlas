@@ -1,6 +1,6 @@
 "use client";
 import { cities } from "@/data/cities";
-import { getSchool, isLanguage, listSchools, optionsOf, type LanguageCourse, type Price, type School, type SchoolKind, type UniversityProgram, type WeeksRange } from "@/data/schools";
+import { getSchool, isComparable, isLanguage, listSchools, optionsOf, type LanguageCourse, type Price, type School, type SchoolKind, type UniversityProgram, type WeeksRange } from "@/data/schools";
 import type { Fact } from "@/data/schema";
 import { priceIssues } from "@/data/comparability";
 import { useI18n, type Localized } from "@/lib/i18n";
@@ -10,6 +10,8 @@ import { dataText as d } from "@/locales/data";
 import { schoolsText as s } from "@/locales/my";
 import FactView, { StatusBadge } from "@/components/FactView";
 import PriceView from "@/components/PriceView";
+import Link from "next/link";
+import { up } from "@/locales/schoolCompare";
 
 const MAX = 3;
 type Pick = { schoolId: string; optionId: string };
@@ -37,6 +39,10 @@ export default function SchoolsPage() {
   });
   const setOption = (schoolId: string, optionId: string) => setPicks((all) => ({ ...all, [kind]: all[kind].map((p) => (p.schoolId === schoolId ? { ...p, optionId } : p)) }));
   const cityName = (id: string) => { const c = cities.find((x) => x.id === id); return c ? L(c.name) : id; };
+  /** A school can be compared only when it has something to compare (programmes / courses) or is an explicit sample. Listed universities without data are shown as "coming soon", and a choice made earlier is kept untouched. */
+  const comparable = isComparable;
+  const usable = selected.filter((p) => { const x = getSchool(p.schoolId); return !!x && comparable(x); }); const keptOnly = selected.length > usable.length;
+  const noneComparable = list.length > 0 && !list.some(comparable);
   const byCity = cities.map((c) => ({ city: c, schools: list.filter((x) => x.cityId === c.id) })).filter((g) => g.schools.length);
 
   return (
@@ -49,6 +55,8 @@ export default function SchoolsPage() {
         <label className="flex items-center gap-2 text-sm text-slate-600"><input type="checkbox" checked={showSamples} onChange={(e) => setShowSamples(e.target.checked)} className="h-4 w-4 accent-[#0b2a5b]" />{L(s.showSamples)}</label>
       </div>
       {showSamples && <p className="rounded-xl bg-amber-50 px-4 py-2 text-sm text-amber-800">{L(s.samplesBanner)}</p>}
+      {kind === "language" && <div className={`${panel} space-y-1 p-4`} data-testid="lang-banner"><p className="text-sm text-slate-700">{L(up.langBanner)}</p><Link href="/schools/compare" data-testid="lang-banner-link" className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-700 underline">{L(up.goLanguage)}</Link></div>}
+      {kind === "university" && noneComparable && <div role="note" className="space-y-2 rounded-2xl bg-amber-50 p-4 text-amber-900 ring-1 ring-amber-200" data-testid="uni-coming-soon"><h2 className="text-base font-semibold">{L(up.title)}</h2><p className="text-sm leading-relaxed">{L(up.lead)}</p><Link href="/schools/compare" data-testid="uni-to-language" className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-800 underline">{L(up.goLanguage)}</Link></div>}
 
       {list.length === 0 ? <p className={`p-5 text-sm text-slate-500 ${panel}`}>{L(s.none)}</p> : (
         <div className="space-y-4">
@@ -57,25 +65,28 @@ export default function SchoolsPage() {
               <h2 className="mb-2 text-sm font-semibold text-slate-500">{L(city.name)}</h2>
               <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {schools.map((sc) => {
-                  const on = has(sc.id); const n = optionsOf(sc).length;
+                  const on = has(sc.id); const n = optionsOf(sc).length; const can = comparable(sc);
                   return (
                     <li key={sc.id} className={`flex flex-col justify-between gap-3 p-4 rounded-2xl bg-white shadow-sm ${on ? "ring-2 ring-sky-500" : "ring-1 ring-slate-200"}`}>
                       <div>
                         <p className="font-semibold text-slate-800">{sc.name}</p>
                         <div className="mt-1 flex flex-wrap gap-1">{sc.demo ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800">{L(s.sample)}</span> : <StatusBadge status={sc.record.status} />}</div>
-                        <p className="mt-1 text-xs text-slate-500">{n > 0 ? `${n} ${L(isLanguage(sc) ? s.course : s.program)}` : `${L(isLanguage(sc) ? s.course : s.program)}: ${L(d.pending)}`}</p>
+                        {can ? <p className="mt-1 text-xs text-slate-500">{n > 0 ? `${n} ${L(isLanguage(sc) ? s.course : s.program)}` : `${L(isLanguage(sc) ? s.course : s.program)}: ${L(d.pending)}`}</p>
+                          : <div className="mt-1 space-y-1" data-testid="uni-listed"><p className="text-xs text-slate-500">{L(up.listed)}</p>{sc.website.value && <a href={sc.website.value} target="_blank" rel="noopener noreferrer" data-testid="uni-site" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(s.visit)} ↗ <span className="ml-1 text-[11px] font-normal text-slate-500">({L(up.linkNote)})</span></a>}</div>}
                       </div>
-                      <button disabled={!on && selected.length >= MAX} aria-pressed={on} onClick={() => toggle(sc)} className={`${pill} disabled:opacity-40 ${on ? pillOn : pillOff}`}>{on ? `✓ ${L(s.selected)}` : `+ ${L(s.add)}`}</button>
+                      {can ? <button disabled={!on && usable.length >= MAX} aria-pressed={on} onClick={() => toggle(sc)} className={`${pill} disabled:opacity-40 ${on ? pillOn : pillOff}`}>{on ? `✓ ${L(s.selected)}` : `+ ${L(s.add)}`}</button>
+                        : <span className="inline-flex min-h-[44px] items-center justify-center rounded-full bg-slate-100 px-4 text-sm text-slate-500" data-testid="uni-disabled" aria-disabled="true">{L(up.soon)} · {L(up.disabled)}</span>}
                     </li>
                   );
                 })}
               </ul>
             </section>
           ))}
-          <p className="text-sm text-slate-500">{selected.length} / {MAX} · {selected.length >= MAX ? L(s.max) : selected.length < 2 ? L(s.pickTwo) : ""}</p>
+          {!noneComparable && <p className="text-sm text-slate-500">{usable.length} / {MAX} · {usable.length >= MAX ? L(s.max) : usable.length < 2 ? L(s.pickTwo) : ""}</p>}
+          {keptOnly && <p className="text-xs text-slate-500" data-testid="uni-kept">{L(up.kept)}</p>}
         </div>
       )}
-      {selected.length >= 2 && <CompareTable kind={kind} picks={selected} setOption={setOption} remove={(id) => toggle(getSchool(id)!)} cityName={cityName} fill={(t, v) => fill(t, lang, v)} />}
+      {usable.length >= 2 && <CompareTable kind={kind} picks={usable} setOption={setOption} remove={(id) => toggle(getSchool(id)!)} cityName={cityName} fill={(t, v) => fill(t, lang, v)} />}
     </div>
   );
 }

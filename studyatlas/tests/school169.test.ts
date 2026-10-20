@@ -72,7 +72,7 @@ t("finder cards show the essentials without opening anything, never a fee, never
   assert.match(html, /data-testid="school-search"/); assert.match(html, /data-testid="city-all"/); for (const c of ["manchester", "vancouver", "toronto", "london", "sydney", "melbourne"]) assert.match(html, new RegExp(`data-testid="city-${c}"`));
   assert.ok(tx.includes("13校中 13校を表示")); assert.ok(tx.includes("未確認」は学校の質が低いという意味ではなく")); assert.ok(!/[$£€]\s?\d|\d\s?(AUD|CAD|GBP)/.test(tx), "no fee or estimate"); assert.ok(!html.includes("verified") && !/data-testid="(school-)?rank/.test(html));
   assert.ok(!/syd-ilsc|man-kaplan|data-testid=undefined|\bundefined\b|\bnull\b/.test(tx), "no internal id or developer text on screen");
-  assert.match(html, /data-kind="provider" data-state="confirmed"/); const sel = wrap(h(SchoolFinder, { all, sel: { a: "syd-ilsc", b: "", pending: "" }, onToggle() {} })); assert.match(sel, /data-school="syd-ilsc"[^>]*data-selected="1"/); assert.ok(text(sel).includes("1校目に選択中"));
+  assert.match(html, /data-testid="card-summary"[^>]*data-headline="(third|partial|own|open)"/); /* Ver.1.7.1: the item-by-item checks moved into the details (closed in static rendering; see tests/card171.test.ts) */ const sel = wrap(h(SchoolFinder, { all, sel: { a: "syd-ilsc", b: "", pending: "" }, onToggle() {} })); assert.match(sel, /data-school="syd-ilsc"[^>]*data-selected="1"/); assert.ok(text(sel).includes("1校目に選択中"));
   const none = wrap(h(SchoolFinder, { all, sel: EMPTY_SEL, onToggle() {}, initial: { q: "zzz", city: "", record: "all" } })); assert.match(none, /data-testid="no-match"/); assert.ok(text(none).includes("この条件に合う学校はありません") && text(none).includes("解除")); assert.match(none, /data-testid="clear-filters-empty"/);
 });
 

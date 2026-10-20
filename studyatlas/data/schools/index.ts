@@ -23,3 +23,6 @@ export const isLanguage = (s: School): s is LanguageSchool => s.kind === "langua
 export const isUniversity = (s: School): s is University => s.kind === "university";
 /** Options a school offers: language courses or university programmes. */
 export const optionsOf = (s: School) => (isLanguage(s) ? s.courses.map((c) => ({ id: c.id, label: c.name })) : s.programs.map((p) => ({ id: p.id, label: { en: `${p.degree.en} ${p.major.en}`, ja: `${p.degree.ja} ${p.major.ja}` } })));
+
+/** A school can be compared only when it has something to compare (programmes / courses) or is an explicit sample. A listed university without data is "coming soon". */
+export const isComparable = (s: School) => !!s.demo || optionsOf(s).length > 0;

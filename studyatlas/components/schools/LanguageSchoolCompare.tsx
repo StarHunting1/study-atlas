@@ -6,7 +6,7 @@ import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
 import { dataText as d } from "@/locales/data";
 import Link from "next/link";
-import { sc, fd, jn } from "@/locales/schoolCompare";
+import { sc, fd, jn, diffk } from "@/locales/schoolCompare";
 import { loadLastPair, parseSchoolView, plannerHref, saveLastPair, schoolViewUrl } from "@/lib/journey";
 import { EMPTY_SEL, NO_FILTER, diffRows, dismissPending, replaceWithPending, toggleSchool, CHECK_KINDS, type Diff, type Sel } from "@/data/schoolFinder";
 import { SchoolFinder, SelectionTray } from "@/components/schools/SchoolFinder";
@@ -26,6 +26,7 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
   if (!a || !b) return <p className={`p-4 text-sm text-slate-500 ${panel}`} data-testid="need-two">{L(sc.needTwo)}</p>;
   const pair = [a, b];
   const miss = <span className="text-slate-400" data-testid="missing">{L(sc.missing)}</span>;
+  const stateOf = (x: CompareSchool, k: string) => x.inst.checks?.find((c) => c.kind === k)?.state; const sameWhy = (k: string) => (stateOf(a, k) === "stated" ? L(diffk.sameStated) : L(diffk.sameBacked));
   const dd = diffRows(a, b); const badge = (d: Diff, id: string) => <span data-testid={`diff-${id}`} data-diff={d} className={`ml-2 inline-block rounded-full px-2 py-0.5 align-middle text-[11px] font-medium ring-1 ${d === "same" ? "bg-slate-100 text-slate-700 ring-slate-200" : d === "differ" ? "bg-sky-50 text-sky-900 ring-sky-200" : d === "unconfirmed" ? "bg-amber-50 text-amber-900 ring-amber-200" : "bg-white text-slate-500 ring-slate-300"}`}>{L(fd.diff[d])}</span>;
   const row = (key: keyof typeof sc.rows, cell: (s: CompareSchool) => ReactNode) => (
     <section key={key} className="space-y-1.5" data-testid={`row-${key}`}>
@@ -47,12 +48,12 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
       {a.cityId !== b.cityId && <p className="rounded-xl bg-amber-50 px-3 py-2 text-xs text-amber-900" data-testid="cross-city">{L(sc.crossCity)}</p>}
       {row("where", (s) => (s.inst.where ? L(s.inst.where) : miss))}
       {row("courses", (s) => (s.inst.courses ? L(s.inst.courses) : miss))}
+      {row("checks", (s) => (s.inst.checks?.length ? <><ul className="space-y-1.5" data-testid="school-checks">{s.inst.checks.map((c) => <li key={c.kind} data-kind={c.kind} data-state={c.state}><span className="block text-[11px] font-medium text-slate-500">{L(sc.checkKinds[c.kind])}</span><span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${c.state === "confirmed" ? "bg-emerald-50 text-emerald-800 ring-emerald-100" : c.state === "notConfirmed" || c.state === "notChecked" ? "bg-slate-100 text-slate-600 ring-slate-200" : "bg-amber-50 text-amber-800 ring-amber-200"}`}>{L(sc.checkStates[c.state])}</span>{c.detail && <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">{L(c.detail)}</span>}</li>)}</ul><ThirdParty inst={s.inst} /></> : <span className="text-[11px] leading-snug text-slate-500" data-testid="school-checks-none">{L(sc.checksNone)}</span>))}
+      <ul className="flex flex-wrap gap-1.5" data-testid="check-diffs" aria-label={L(fd.diffTitle)}>{CHECK_KINDS.map((k) => <li key={k} className="text-[11px] text-slate-600">{L(sc.checkKinds[k]).replace(/（.*$|\(.*$/, "")}{badge(dd.kinds[k], `kind-${k}`)}{dd.kinds[k] === "same" && <span className="ml-1 text-slate-500" data-testid={`diff-kind-${k}-why`}>{sameWhy(k)}</span>}</li>)}</ul>
+      <p className="-mt-2 text-[11px] text-slate-500">{L(sc.checksNote)} {L(diffk.note)}</p>
       {row("stay", (s) => (s.inst.stay ? L(s.inst.stay) : miss))}
       {row("tuition", (s) => <>{miss}<span className="mt-1 block text-[11px] text-slate-500">{L(sc.tuitionNote)}</span>{s.inst.feesUrl && <a href={s.inst.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="fees-link" className="mt-1 inline-block py-1 text-xs text-sky-700 underline">{L(sc.feesLink)}</a>}</>)}
       <section className="rounded-xl bg-amber-50 p-3 text-xs text-amber-900" data-testid="fee-conditions"><h3 className="font-semibold">{L(sc.feeCondTitle)}</h3><ul className="mt-1 list-disc space-y-0.5 pl-4">{sc.feeConds.map((x) => <li key={x.en}>{L(x)}</li>)}</ul></section>
-      {row("checks", (s) => (s.inst.checks?.length ? <><ul className="space-y-1.5" data-testid="school-checks">{s.inst.checks.map((c) => <li key={c.kind} data-kind={c.kind} data-state={c.state}><span className="block text-[11px] font-medium text-slate-500">{L(sc.checkKinds[c.kind])}</span><span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${c.state === "confirmed" ? "bg-emerald-50 text-emerald-800 ring-emerald-100" : c.state === "notConfirmed" || c.state === "notChecked" ? "bg-slate-100 text-slate-600 ring-slate-200" : "bg-amber-50 text-amber-800 ring-amber-200"}`}>{L(sc.checkStates[c.state])}</span>{c.detail && <span className="mt-0.5 block text-[11px] leading-snug text-slate-500">{L(c.detail)}</span>}</li>)}</ul><ThirdParty inst={s.inst} /></> : <span className="text-[11px] leading-snug text-slate-500" data-testid="school-checks-none">{L(sc.checksNone)}</span>))}
-      <ul className="flex flex-wrap gap-1.5" data-testid="check-diffs" aria-label={L(fd.diffTitle)}>{CHECK_KINDS.map((k) => <li key={k} className="text-[11px] text-slate-600">{L(sc.checkKinds[k]).replace(/（.*$|\(.*$/, "")}{badge(dd.kinds[k], `kind-${k}`)}</li>)}</ul>
-      <p className="-mt-2 text-[11px] text-slate-500">{L(sc.checksNote)}</p>
       {row("status", (s) => (<div className="space-y-1"><StatusBadge status={s.status} />{s.checkedAt && <span className="block text-[11px] text-slate-500">{L(sc.checked)}: {s.checkedAt}</span>}{s.status !== "verified" && <span className="block text-[11px] text-slate-500">{L(sc.statusNote)}</span>}</div>))}
       <Disclosure level="more" testid="compare-more"><div className="space-y-3">
         <section className="space-y-1.5"><h3 className="text-xs font-semibold text-slate-500">{L(sc.details)}</h3>
