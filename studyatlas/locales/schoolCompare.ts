@@ -54,11 +54,25 @@ export const fd = {
   stateShort: { confirmed: t("two sources agree", "2つの情報源で一致"), single: t("one source", "情報源1つ"), stated: t("school's statement", "学校の記載のみ"), notConfirmed: t("not confirmed", "確認できず"), notChecked: t("not checked", "未確認") },
   add: t("Add to comparison", "比較に追加"), selectedA: t("Selected as school 1 – remove", "1校目に選択中・解除"), selectedB: t("Selected as school 2 – remove", "2校目に選択中・解除"),
   traySlot1: t("School 1", "1校目"), traySlot2: t("School 2", "2校目"), trayEmpty: t("Not chosen yet", "未選択"), trayRemove: t("Remove", "解除"), trayClear: t("Clear selection", "選択をクリア"),
-  trayOne: t("Choose one more school to compare.", "もう1校選ぶと比較できます。"), trayNone: t("Choose two schools to compare.", "比較したい学校を2校選んでください。"), trayGo: t("See the comparison ↓", "比較を見る ↓"), trayReady: t("Two schools chosen.", "2校を選択しました。"),
+  trayOne: t("Choose one more school to compare.", "もう1校選ぶと比較できます。"), trayNone: t("Choose two schools to compare.", "比較したい学校を2校選んでください。"), trayGo: t("See the comparison →", "比較を見る →"), trayReady: t("Two schools chosen.", "2校を選択しました。"),
   full: t("You can compare two schools at a time. To add “{name}”, choose which school it replaces:", "比較できるのは2校までです。「{name}」を加えるには、入れ替える学校を選んでください："),
   replace: t("Replace {name}", "{name}と入れ替える"), cancel: t("Keep my two schools", "今の2校のままにする"),
   pickList: t("Choose from a drop-down list instead", "プルダウンから選ぶ"),
   diffTitle: t("How the two schools differ", "2校の違い"),
   diff: { same: t("Same", "同じ"), differ: t("Different", "異なる"), unconfirmed: t("Includes unconfirmed", "未確認を含む"), incomparable: t("Cannot be compared", "比較できない") },
   diffNote: t("The labels only describe how the two entries relate. They are not a judgement of either school.", "ラベルは2校の情報の関係を示すだけで、どちらかの学校への評価ではありません。"),
+};
+
+/** Ver.1.7.0 – moving between choosing, comparing and planning. */
+export const jn = {
+  tabsLabel: t("Compare", "比較"), tabCities: t("Cities", "都市"), tabSchools: t("Language schools", "語学学校"),
+  resultTitle: t("Comparison of two schools", "2校の比較"), changeSelection: t("← Change the schools", "← 学校を選び直す"), changeHint: t("Your two schools are kept.", "選んだ2校は保持されます。"),
+  cityPage: t("City details →", "都市の詳細 →"), seeCityCompare: t("Compare cities →", "都市を比較する →"),
+  nextTitle: t("Next", "次のステップ"), toPlanner: t("Plan the costs →", "費用を計画する →"),
+  fromCity: t("Schools in {city}", "{city}の語学学校"), showingCity: t("Showing the schools of {city}.", "{city}の学校を表示しています。"),
+};
+export const pj = {
+  title: t("Candidates you were looking at", "検討中の候補"), note: t("For reference only: nothing here is entered into your plan, and no price is filled in for you.", "参考表示です。ここから費用が自動入力されることはなく、料金も入りません。"),
+  schools: t("Schools", "学校"), cities: t("Cities", "都市"), back: t("← Back to the school comparison", "← 学校の比較に戻る"), backCities: t("← Back to the city comparison", "← 都市の比較に戻る"),
+  details: t("Details", "詳細"), compareSchools: t("Open the school comparison", "学校の比較を開く"), compareCities: t("Open the city comparison", "都市の比較を開く"),
 };

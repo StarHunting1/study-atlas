@@ -6,11 +6,14 @@ import { useI18n } from "@/lib/i18n";
 import { MAX_COMPARE, useCompare } from "@/lib/store";
 import { panel, pill, pillOff, pillOn } from "@/lib/ui";
 import { cu } from "@/locales/compareUi";
+import CompareTabs from "@/components/CompareTabs";
+import { plannerHref } from "@/lib/journey";
 export default function ComparePage() {
   const { t, L } = useI18n(); const { ids, toggle, clear, has, full } = useCompare();
   return (
     <div className="space-y-6">
       <Link href="/" className="text-sm text-slate-500 hover:text-slate-900">← {t("home")}</Link>
+      <CompareTabs current="cities" />
       <div className="flex flex-wrap items-baseline gap-3"><h1 className="text-3xl font-bold text-[#0b2a5b]">{t("compare")}</h1><span className="text-sm text-slate-500">{ids.length} / {MAX_COMPARE}</span></div>
       <div className="flex flex-wrap gap-2">
         {cities.map((c) => <button key={c.id} aria-pressed={has(c.id)} disabled={!has(c.id) && full} onClick={() => toggle(c.id)} className={`${pill} disabled:opacity-40 ${has(c.id) ? pillOn : pillOff}`}>{has(c.id) ? "✓ " : ""}{L(c.name)}</button>)}
@@ -22,7 +25,7 @@ export default function ComparePage() {
           <li key={id} className={`${panel} min-w-0 p-3`}><p className="truncate text-xs text-slate-500">{L(c.blurb)}</p><h2 className="truncate text-base font-semibold text-[#0b2a5b]">{L(c.name)}</h2>
             <div className="mt-1 flex flex-wrap items-center gap-x-3"><Link href={`/city/${id}`} className="inline-flex min-h-[44px] items-center text-xs text-sky-700 underline">{L(cu.details)}</Link><button onClick={() => toggle(id)} className="min-h-[44px] text-xs text-slate-500 underline">{L(cu.remove)}</button></div></li>); })}</ul>}
       {ids.length >= 2 ? <QuickCompare ids={ids} /> : <p className="text-slate-500">{ids.length === 0 ? t("emptyCompare") + " " : ""}{t("maxCompare")}</p>}
-      {ids.length >= 2 && <section className={`${panel} space-y-1 p-4`} data-testid="compare-planner"><p className="text-xs leading-relaxed text-slate-600">{L(cu.toPlanner)}</p><Link href="/planner" data-testid="compare-planner-link" className="inline-flex min-h-[44px] items-center text-sm text-sky-700 underline">{L(cu.toPlannerLink)}</Link></section>}
+      {ids.length >= 2 && <section className={`${panel} space-y-1 p-4`} data-testid="compare-planner"><p className="text-xs leading-relaxed text-slate-600">{L(cu.toPlanner)}</p><Link href={plannerHref({ cities: ids })} data-testid="compare-planner-link" className="inline-flex min-h-[44px] items-center text-sm text-sky-700 underline">{L(cu.toPlannerLink)}</Link></section>}
     </div>
   );
 }

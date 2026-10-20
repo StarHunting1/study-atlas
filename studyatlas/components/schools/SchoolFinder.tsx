@@ -63,7 +63,7 @@ export function SchoolFinder({ all, sel, onToggle, initial = NO_FILTER }: { all:
 }
 
 /** The two chosen schools, what to do next, and – when a third one was clicked – the question of which one it replaces (never a silent swap). */
-export function SelectionTray({ all, sel, onRemove, onClear, onReplace, onCancel }: { all: CompareSchool[]; sel: Sel; onRemove: (slot: "a" | "b") => void; onClear: () => void; onReplace: (slot: "a" | "b") => void; onCancel: () => void }) {
+export function SelectionTray({ all, sel, onRemove, onClear, onReplace, onCancel, onGo }: { all: CompareSchool[]; sel: Sel; onRemove: (slot: "a" | "b") => void; onClear: () => void; onReplace: (slot: "a" | "b") => void; onCancel: () => void; onGo?: () => void }) {
   const { L } = useI18n(); const get = (id: string) => all.find((s) => s.id === id); const A = get(sel.a), B = get(sel.b), P = get(sel.pending);
   const slot = (S: CompareSchool | undefined, key: "a" | "b", label: string) => (
     <div className="flex min-w-0 flex-1 items-center justify-between gap-1 rounded-xl bg-slate-50 py-1 pl-2.5 pr-0.5" data-testid={`tray-${key}`} data-filled={!!S}>
@@ -79,7 +79,7 @@ export function SelectionTray({ all, sel, onRemove, onClear, onReplace, onCancel
           <button type="button" onClick={onCancel} data-testid="replace-cancel" className="inline-flex min-h-[44px] items-center px-2 text-sm underline">{L(fd.cancel)}</button></div></div>}
       <div className="flex gap-2">{slot(A, "a", L(fd.traySlot1))}{slot(B, "b", L(fd.traySlot2))}</div>
       <div className="flex flex-wrap items-center gap-x-3 gap-y-1"><p className="text-xs text-slate-600" data-testid="tray-hint">{A && B ? L(fd.trayReady) : A || B ? L(fd.trayOne) : L(fd.trayNone)}</p>
-        {A && B && <a href="#school-compare-result" data-testid="tray-go" className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-700 underline">{L(fd.trayGo)}</a>}
+        {A && B && <button type="button" onClick={onGo} data-testid="tray-go" className="inline-flex min-h-[44px] items-center rounded-full bg-[#0b2a5b] px-4 text-sm font-medium text-white">{L(fd.trayGo)}</button>}
         {(A || B) && <button type="button" onClick={onClear} data-testid="tray-clear" className="inline-flex min-h-[44px] items-center text-sm text-slate-600 underline">{L(fd.trayClear)}</button>}</div>
     </div>
   );
