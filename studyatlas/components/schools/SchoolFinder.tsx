@@ -3,30 +3,47 @@ import { useState } from "react";
 import { cities } from "@/data/cities";
 import type { CompareSchool } from "@/data/languageSchools";
 import { thirdPartyRecord } from "@/data/languageSchools";
-import { CHECK_KINDS, NO_FILTER, cityCounts, filterSchools, isFiltered, type Filters, type RecordFilter, type Sel } from "@/data/schoolFinder";
+import { CHECK_KINDS, NO_FILTER, checkSummary, cityCounts, filterSchools, isFiltered, roughArea, type Filters, type RecordFilter, type Sel } from "@/data/schoolFinder";
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
-import { fd } from "@/locales/schoolCompare";
+import { cd, fd } from "@/locales/schoolCompare";
 import { sc } from "@/locales/schoolCompare";
 import Disclosure from "@/components/Disclosure";
 
 const tone = (s: string) => (s === "confirmed" ? "bg-sky-50 text-sky-900 ring-sky-200" : s === "single" || s === "stated" ? "bg-amber-50 text-amber-900 ring-amber-200" : "bg-slate-100 text-slate-600 ring-slate-200");
 const fill = (s: string, v: Record<string, string | number>) => Object.entries(v).reduce((t, [k, x]) => t.replace(`{${k}}`, String(x)), s);
 
-/** One school: what a person needs to tell schools apart without opening anything (name, city, campus, courses, official site, what is checked), and the compare button. */
-export function SchoolCard({ s, sel, onToggle }: { s: CompareSchool; sel: Sel; onToggle: (id: string) => void }) {
-  const { L } = useI18n(); const city = cities.find((c) => c.id === s.cityId)!; const slot = sel.a === s.id ? 1 : sel.b === s.id ? 2 : 0; const tp = thirdPartyRecord(s.inst);
+const GLYPH: Record<string, string> = { third: "✓", partial: "◐", own: "○", open: "○", none: "–" };
+/** One school: what is needed to tell schools apart at a glance (name, city, area, courses, official site and fee page, how far the information is checked, compare button). Everything else – street address, each item's check and source, notes – is one click away and nothing is dropped. */
+export function SchoolCard({ s, sel, onToggle, detailsOpen = false }: { s: CompareSchool; sel: Sel; onToggle: (id: string) => void; detailsOpen?: boolean }) {
+  const { L, lang } = useI18n(); const city = cities.find((c) => c.id === s.cityId)!; const slot = sel.a === s.id ? 1 : sel.b === s.id ? 2 : 0; const tp = thirdPartyRecord(s.inst); const cs = checkSummary(s); const area = roughArea(s.inst.where, lang);
   return (
     <li className={`${panel} flex min-w-0 flex-col gap-2 p-3 sm:p-4 ${slot ? "ring-2 ring-[#0b2a5b]" : ""}`} data-testid="school-card" data-school={s.id} data-city={s.cityId} data-selected={slot || undefined}>
-      <div><p className="text-[11px] font-medium text-slate-500" data-testid="card-city">{L(city.name)}</p><h3 className="break-words text-base font-semibold text-[#0b2a5b]">{s.inst.name}</h3></div>
-      <p className="text-xs leading-snug text-slate-600" data-testid="card-where"><span className="font-medium text-slate-500">{L(fd.address)}: </span>{s.inst.where ? <span className="line-clamp-3">{L(s.inst.where)}</span> : L(fd.noAddress)}</p>
+      <div><p className="text-[11px] font-medium text-slate-500" data-testid="card-city">{L(city.name)}</p><h3 className="break-words text-base font-semibold leading-snug text-[#0b2a5b]">{s.inst.name}</h3></div>
+      <p className="text-xs leading-snug text-slate-600" data-testid="card-where"><span className="font-medium text-slate-500">{L(cd.area)}: </span>{area || L(fd.noAddress)}</p>
       <p className="text-xs leading-snug text-slate-600" data-testid="card-courses"><span className="font-medium text-slate-500">{L(fd.course)}: </span>{s.inst.courses ? <span className="line-clamp-2">{L(s.inst.courses)}</span> : L(fd.noCourse)}</p>
-      {s.inst.checks?.length ? <ul className="grid grid-cols-2 gap-1" data-testid="card-checks" aria-label={L(fd.checksShort)}>{CHECK_KINDS.map((k) => { const c = s.inst.checks!.find((x) => x.kind === k); return c ? <li key={k} data-kind={k} data-state={c.state} className={`rounded-lg px-2 py-1 text-[11px] leading-tight ring-1 ${tone(c.state)}`}><span className="block font-medium">{L(fd.kindShort[k])}</span><span className="block">{L(fd.stateShort[c.state])}</span></li> : null; })}</ul> : null}
+      <div className="rounded-lg bg-slate-50 px-2.5 py-1.5 text-[11px] leading-snug text-slate-700" data-testid="card-summary" data-headline={cs.headline}>
+        <p className="font-medium"><span aria-hidden>{GLYPH[cs.headline]} </span>{L(cd.headline[cs.headline])}</p>
+        {cs.total > 0 && <p className="text-slate-600">{fill(L(cd.counts), { third: cs.third, own: cs.own, open: cs.open })} {fill(L(cd.of), { n: cs.total })}</p>}
+        {cs.conflict && <p className="font-medium text-amber-900" data-testid="card-conflict">⚠ {L(cd.conflict)}</p>}
+      </div>
       <div className="flex flex-wrap gap-x-3">
         {s.inst.url && <a href={s.inst.url} target="_blank" rel="noopener noreferrer" data-testid="card-site" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(sc.website)} ↗</a>}
         {s.inst.feesUrl && <a href={s.inst.feesUrl} target="_blank" rel="noopener noreferrer" data-testid="card-fees" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(sc.feesLink)}</a>}
-        {tp && <a href={tp.url} target="_blank" rel="noopener noreferrer" data-testid="card-record" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{tp.publisher} ↗</a>}
       </div>
+      <Disclosure level="more" label={L(cd.details)} openLabel={L(cd.detailsClose)} testid="card-details" defaultOpen={detailsOpen}>
+        <div className="space-y-3 text-xs leading-relaxed text-slate-700" data-testid="card-details-body">
+          {s.inst.where && <div><p className="font-semibold text-slate-500">{L(cd.address)}</p><p data-testid="card-address">{L(s.inst.where)}</p></div>}
+          {s.inst.courses && <div><p className="font-semibold text-slate-500">{L(cd.allCourses)}</p><p data-testid="card-courses-full">{L(s.inst.courses)}</p></div>}
+          {s.inst.stay && <div><p className="font-semibold text-slate-500">{L(cd.stay)}</p><p>{L(s.inst.stay)}</p></div>}
+          {s.inst.checks?.length ? <div><p className="font-semibold text-slate-500">{L(cd.checkTitle)}</p><ul className="mt-1 space-y-2" data-testid="card-checks">{CHECK_KINDS.map((k) => { const c = s.inst.checks!.find((x) => x.kind === k); return c ? <li key={k} data-kind={k} data-state={c.state}><span className="block font-medium text-slate-600">{L(sc.checkKinds[k])}</span><span className={`inline-block rounded-full px-2 py-0.5 text-[11px] font-medium ring-1 ${tone(c.state)}`}>{L(sc.checkStates[c.state])}</span>{c.detail && <span className="mt-0.5 block text-slate-500">{L(c.detail)}</span>}</li> : null; })}</ul></div> : null}
+          <div className="space-y-1"><p className="font-semibold text-slate-500">{L(cd.sources)}</p>
+            {tp ? <a href={tp.url} target="_blank" rel="noopener noreferrer" data-testid="card-record" className="inline-flex min-h-[44px] items-center font-medium text-sky-700 underline">{L(sc.thirdParty)}: {tp.publisher} ↗</a> : <p data-testid="card-record-none" className="text-slate-500">{L(sc.thirdPartyNone)}</p>}
+            {s.inst.source && !tp && <p><a href={s.inst.source.url} target="_blank" rel="noopener noreferrer" className="text-sky-700 underline">{L(sc.sourceLabel)}: {s.inst.source.publisher} ↗</a></p>}</div>
+          {s.inst.note && <p className="text-slate-500" data-testid="card-note">{L(s.inst.note)}</p>}
+          <p className="text-[11px] text-slate-500">{L(cd.moreDetail)}</p>
+        </div>
+      </Disclosure>
       <button type="button" onClick={() => onToggle(s.id)} aria-pressed={!!slot} data-testid="card-compare" className={`mt-auto inline-flex min-h-[44px] items-center justify-center rounded-full px-4 py-2 text-sm font-medium ${slot ? "bg-[#0b2a5b] text-white" : "bg-white text-slate-800 ring-1 ring-slate-300 hover:bg-slate-50"}`}>
         {slot === 1 ? L(fd.selectedA) : slot === 2 ? L(fd.selectedB) : L(fd.add)}</button>
     </li>
@@ -56,7 +73,7 @@ export function SchoolFinder({ all, sel, onToggle, initial = NO_FILTER }: { all:
           {isFiltered(f) && <button type="button" onClick={() => setF(NO_FILTER)} data-testid="clear-filters" className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-700 underline">{L(fd.clear)}</button>}</div>
         <p className="text-[11px] leading-snug text-slate-500" data-testid="not-quality">{L(fd.notQuality)}</p>
       </div>
-      {shown.length ? <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="school-cards">{shown.map((s) => <SchoolCard key={s.id} s={s} sel={sel} onToggle={onToggle} />)}</ul>
+      {shown.length ? <ul className="grid items-start gap-3 sm:grid-cols-2 xl:grid-cols-3" data-testid="school-cards">{shown.map((s) => <SchoolCard key={s.id} s={s} sel={sel} onToggle={onToggle} />)}</ul>
         : <div className={`${panel} space-y-2 p-4`} data-testid="no-match"><p className="text-sm font-medium text-slate-700">{L(fd.noMatch)}</p><p className="text-xs text-slate-500">{L(fd.noMatchHint)}</p><button type="button" onClick={() => setF(NO_FILTER)} data-testid="clear-filters-empty" className="inline-flex min-h-[44px] items-center rounded-full bg-white px-4 text-sm font-medium ring-1 ring-slate-300">{L(fd.clear)}</button></div>}
     </section>
   );

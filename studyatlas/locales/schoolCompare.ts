@@ -76,3 +76,23 @@ export const pj = {
   schools: t("Schools", "学校"), cities: t("Cities", "都市"), back: t("← Back to the school comparison", "← 学校の比較に戻る"), backCities: t("← Back to the city comparison", "← 都市の比較に戻る"),
   details: t("Details", "詳細"), compareSchools: t("Open the school comparison", "学校の比較を開く"), compareCities: t("Open the city comparison", "都市の比較を開く"),
 };
+
+/** Ver.1.7.1 – compact card, details, university preparation notice. */
+export const cd = {
+  area: t("Area", "エリア"), details: t("School information and sources", "学校情報と出典を見る"), detailsClose: t("Hide school information", "学校情報を閉じる"),
+  address: t("Address and notes", "住所と補足"), allCourses: t("Courses in full", "コースの詳細"), stay: t("Accommodation", "滞在先の手配"), sources: t("Sources", "出典"), checkTitle: t("What has been checked, and against what", "確認状況（何と照らしたか）"),
+  headline: { third: t("School information: backed by a register or directory", "学校情報：登録簿・ディレクトリの記録あり"), partial: t("School information: partly backed by a register or directory", "学校情報：一部のみ登録簿等の記録あり"), own: t("School information: the school's own statements", "学校情報：学校自身の記載のみ"), open: t("School information: not confirmed", "学校情報：未確認"), none: t("School information: not checked item by item", "学校情報：項目ごとの確認はまだ") },
+  counts: t("{third} backed by a record · {own} school's statement only · {open} not confirmed", "記録あり {third}・学校の記載のみ {own}・未確認 {open}"), of: t("of {n} items", "（{n}項目中）"),
+  conflict: t("Sources disagree on at least one item (see the details).", "情報源の間で食い違う項目があります（詳細を参照）。"),
+  moreDetail: t("The details show each item and where it comes from. This is not a rating of the school.", "詳細では項目ごとの出どころを確認できます。学校の評価ではありません。"),
+};
+export const diffk = { note: t("These labels compare how far each item has been checked, not whether the schools are alike.", "ラベルは項目ごとの確認の度合いの比較で、学校の内容が同じという意味ではありません。"),
+  sameStated: t("Same: both only state it themselves", "同じ：どちらも学校の記載のみ"), sameBacked: t("Same: both backed by a record", "同じ：どちらも記録あり") };
+/** Universities (Ver.1.7.1): listed, not yet comparable. */
+export const up = {
+  title: t("University comparison: coming soon", "大学比較：準備中"),
+  lead: t("Only the name, the city and a link to the university's own site are listed so far. Programmes, tuition, entry requirements and deadlines have not been collected, so there is nothing to compare yet. The list is shown so you can find each university; language schools can be compared now.", "現在は、大学名・都市・大学公式サイトへのリンクだけを掲載しています。学部・授業料・入学条件・出願時期はまだ収集しておらず、比較できる情報はありません。大学を探す手がかりとして一覧を表示しています。語学学校は今すぐ比較できます。"),
+  soon: t("Planned", "今後対応予定"), disabled: t("Comparison coming soon", "比較は準備中"), listed: t("Listed information: name, city, official site", "掲載情報：大学名・都市・公式サイト"), linkNote: t("Link not yet checked", "リンクは未確認"),
+  kept: t("Universities you chose earlier are kept and will appear in the comparison when the data is ready.", "以前に選んだ大学の選択は保存されており、データが整い次第、比較に表示されます。"),
+  goLanguage: t("Compare language schools now →", "語学学校を今すぐ比較する →"), langBanner: t("The 13 language schools StudyAtlas lists can be compared on their own page.", "StudyAtlasに掲載している語学学校13校は、専用の比較ページで比べられます。"),
+};

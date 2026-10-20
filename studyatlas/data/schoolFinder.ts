@@ -58,3 +58,20 @@ export function diffRows(a: CompareSchool, b: CompareSchool) {
     tuition: "incomparable" as Diff, // fees are never copied or compared here
     checks, kinds, links: (a.inst.url && b.inst.url && (!!a.inst.feesUrl === !!b.inst.feesUrl) ? "same" : "incomparable") as Diff };
 }
+
+/* ---------- Ver.1.7.1: what the card says first ---------- */
+/** The part of the location text before the street ("Manchester city centre", "Sydney CBD", "マンチェスター中心部"), taken from the existing wording; the street address stays in the details. */
+export function roughArea(where: Localized | undefined, lang: string): string {
+  const t = where?.[lang] ?? where?.en ?? ""; if (!t) return "";
+  const head = lang === "ja" ? (t.split("：")[0] ?? t) : (t.split(" – ")[0] ?? t); const cut = head.split(lang === "ja" ? "（" : " (")[0];
+  return cut.trim().slice(0, 48);
+}
+export type CheckSummary = { /** items backed by a register / directory record (two sources agree, or one source) */ third: number; /** items that only the school states */ own: number; /** items looked for but not confirmed, or not looked at */ open: number; total: number; headline: "third" | "partial" | "own" | "open" | "none"; /** the school and a directory disagree on an item (read from the existing check wording) */ conflict: boolean };
+/** A compact reading of the four items. It describes where the information comes from, not how good a school is. */
+export function checkSummary(s: CompareSchool): CheckSummary {
+  const cs = s.inst.checks ?? []; if (!cs.length) return { third: 0, own: 0, open: 0, total: 0, headline: "none", conflict: false };
+  const third = cs.filter((c) => c.state === "confirmed" || c.state === "single").length, own = cs.filter((c) => c.state === "stated").length, open = cs.filter((c) => c.state === "notConfirmed" || c.state === "notChecked").length;
+  const conflict = cs.some((c) => /disagree|食い違/i.test(`${c.detail?.en ?? ""} ${c.detail?.ja ?? ""}`));
+  const headline = third === cs.length ? "third" : third > 0 ? "partial" : own > 0 ? "own" : "open";
+  return { third, own, open, total: cs.length, headline, conflict };
+}
