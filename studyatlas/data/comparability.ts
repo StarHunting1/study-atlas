@@ -18,11 +18,13 @@ export function moneyComparability(facts: Fact<Money>[]): Comparability {
 }
 
 /** Why school fees for several options cannot be compared at face value. Empty array = comparable. */
-export type PriceIssue = "notVerified" | "currency" | "unit" | "feeYear" | "tax" | "applicability" | "includes" | "duration";
-export function priceIssues(prices: Fact<Price>[], durations: Fact<WeeksRange>[] = []): PriceIssue[] {
+export type PriceIssue = "notVerified" | "currency" | "unit" | "feeYear" | "tax" | "applicability" | "includes" | "duration" | "degree";
+/** `levels`: the degree level of each programme (university fees). Fees of different levels, or of a programme whose level is not recorded, are not comparable. */
+export function priceIssues(prices: Fact<Price>[], durations: Fact<WeeksRange>[] = [], levels: (string | undefined)[] = []): PriceIssue[] {
   const withValue = prices.filter((f) => f.value);
   if (withValue.length < 2) return [];
   const v = withValue.map((f) => f.value!); const out: PriceIssue[] = [];
+  if (levels.length > 1 && (levels.some((x) => !x) || new Set(levels).size > 1)) out.push("degree");
   const differs = (k: (p: Price) => string) => new Set(v.map(k)).size > 1;
   if (withValue.some((f) => f.status !== "verified")) out.push("notVerified");
   if (differs((p) => p.currency)) out.push("currency");

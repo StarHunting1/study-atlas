@@ -91,8 +91,19 @@ export const diffk = { note: t("These labels compare how far each item has been 
 /** Universities (Ver.1.7.1): listed, not yet comparable. */
 export const up = {
   title: t("University comparison: coming soon", "大学比較：準備中"),
-  lead: t("Only the name, the city and a link to the university's own site are listed so far. Programmes, tuition, entry requirements and deadlines have not been collected, so there is nothing to compare yet. The list is shown so you can find each university; language schools can be compared now.", "現在は、大学名・都市・大学公式サイトへのリンクだけを掲載しています。学部・授業料・入学条件・出願時期はまだ収集しておらず、比較できる情報はありません。大学を探す手がかりとして一覧を表示しています。語学学校は今すぐ比較できます。"),
+  lead: t("So far only the name, the city, a link to the university's own site, and an unverified editorial entry of the formal name and main campuses are listed. Programmes, tuition, entry requirements and deadlines have not been collected, so there is nothing to compare yet. The list is shown so you can find each university; language schools can be compared now.", "現在は、大学名・都市・大学公式サイトへのリンクと、正式名称・主なキャンパス（編集者による未確認の記載）を掲載しています。学部・授業料・入学条件・出願時期はまだ収集しておらず、比較できる情報はありません。大学を探す手がかりとして一覧を表示しています。語学学校は今すぐ比較できます。"),
   soon: t("Planned", "今後対応予定"), disabled: t("Comparison coming soon", "比較は準備中"), listed: t("Listed information: name, city, official site", "掲載情報：大学名・都市・公式サイト"), linkNote: t("Link not yet checked", "リンクは未確認"),
   kept: t("Universities you chose earlier are kept and will appear in the comparison when the data is ready.", "以前に選んだ大学の選択は保存されており、データが整い次第、比較に表示されます。"),
   goLanguage: t("Compare language schools now →", "語学学校を今すぐ比較する →"), langBanner: t("The 13 language schools StudyAtlas lists can be compared on their own page.", "StudyAtlasに掲載している語学学校13校は、専用の比較ページで比べられます。"),
+};
+
+/** Ver.1.7.2 – what is recorded about a university. */
+export const uinfo = {
+  open: t("University information and official pages", "大学の基本情報と公式ページ"), close: t("Hide university information", "大学の基本情報を閉じる"),
+  counts: t("Confirmed {v} of {n} items · programmes recorded: {p}", "確認済み {v}／{n}項目・登録済みプログラム：{p}件"),
+  officialName: t("Formal name", "正式名称"), campuses: t("Main campuses", "主なキャンパス"), pages: t("Official pages for students", "留学生向けの公式ページ"),
+  kinds: { programSearch: t("Programme search", "プログラム検索"), internationalAdmissions: t("International admissions", "留学生向け入学案内"), tuition: t("International tuition", "留学生向け授業料"), deadlines: t("Deadlines", "出願時期・締切"), english: t("English-language requirements", "英語要件"), scholarships: t("Scholarships", "奨学金") },
+  pagePending: t("Not entered yet – waiting for a person to supply and open the official page", "未登録（公式ページの手動確認待ち）"), openPage: t("Open the page", "ページを開く"),
+  pageNote: t("An entered link only says where to look; the content of the page is not confirmed by it.", "登録されたリンクは確認先を示すだけで、ページの内容を確認済みにするものではありません。"),
+  programsNote: t("Tuition, entry requirements and deadlines are recorded per programme, from an official source, with their year, currency and billing unit. None has been recorded yet, so nothing is estimated or compared.", "授業料・入学条件・出願時期は、公式資料に基づき、年度・通貨・課金単位とともにプログラム単位で記録します。まだ登録がないため、推定や比較は行いません。"),
 };

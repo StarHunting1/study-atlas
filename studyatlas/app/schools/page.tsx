@@ -12,6 +12,7 @@ import FactView, { StatusBadge } from "@/components/FactView";
 import PriceView from "@/components/PriceView";
 import Link from "next/link";
 import { up } from "@/locales/schoolCompare";
+import UniversityInfo from "@/components/schools/UniversityInfo";
 
 const MAX = 3;
 type Pick = { schoolId: string; optionId: string };
@@ -34,7 +35,7 @@ export default function SchoolsPage() {
   const has = (id: string) => selected.some((p) => p.schoolId === id);
   const toggle = (sc: School) => setPicks((all) => {
     const cur = all[kind].filter((p) => list.some((x) => x.id === p.schoolId));
-    const next = cur.some((p) => p.schoolId === sc.id) ? cur.filter((p) => p.schoolId !== sc.id) : cur.length >= MAX ? cur : [...cur, { schoolId: sc.id, optionId: optionsOf(sc)[0]?.id ?? "" }];
+    const next = cur.some((p) => p.schoolId === sc.id) ? cur.filter((p) => p.schoolId !== sc.id) : cur.filter((p) => { const x = getSchool(p.schoolId); return !!x && isComparable(x); }).length >= MAX ? cur : /* choices kept from before (a university that cannot be compared yet) do not use up the slots */ [...cur, { schoolId: sc.id, optionId: optionsOf(sc)[0]?.id ?? "" }];
     return { ...all, [kind]: next };
   });
   const setOption = (schoolId: string, optionId: string) => setPicks((all) => ({ ...all, [kind]: all[kind].map((p) => (p.schoolId === schoolId ? { ...p, optionId } : p)) }));
@@ -71,6 +72,7 @@ export default function SchoolsPage() {
                       <div>
                         <p className="font-semibold text-slate-800">{sc.name}</p>
                         <div className="mt-1 flex flex-wrap gap-1">{sc.demo ? <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[11px] font-medium text-amber-800">{L(s.sample)}</span> : <StatusBadge status={sc.record.status} />}</div>
+                        {sc.kind === "university" && <UniversityInfo u={sc} />}
                         {can ? <p className="mt-1 text-xs text-slate-500">{n > 0 ? `${n} ${L(isLanguage(sc) ? s.course : s.program)}` : `${L(isLanguage(sc) ? s.course : s.program)}: ${L(d.pending)}`}</p>
                           : <div className="mt-1 space-y-1" data-testid="uni-listed"><p className="text-xs text-slate-500">{L(up.listed)}</p>{sc.website.value && <a href={sc.website.value} target="_blank" rel="noopener noreferrer" data-testid="uni-site" className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-700 underline">{L(s.visit)} ↗ <span className="ml-1 text-[11px] font-normal text-slate-500">({L(up.linkNote)})</span></a>}</div>}
                       </div>
@@ -111,10 +113,12 @@ function CompareTable({ kind, picks, setOption, remove, cityName, fill }: { kind
   ] : [
     [s.rows.location, (c) => <>{cityName(c.sc.cityId)}<div className="text-xs text-slate-500">{text(c.sc.address)}</div></>],
     [s.rows.years, (c) => num(uni(c)?.years, s.yearsN)], [s.rows.tuitionIntl, (c) => price(uni(c)?.tuitionInternational)],
-    [s.rows.entry, (c) => (uni(c) ? text(uni(c)!.entryRequirements) : pend)], [s.rows.apply, (c) => (uni(c) ? text(uni(c)!.applicationPeriod) : pend)], [s.rows.website, (c) => site(c.sc)],
+    [s.rows.entry, (c) => (uni(c) ? text(uni(c)!.entryRequirements) : pend)], [s.rows.apply, (c) => (uni(c) ? text(uni(c)!.applicationPeriod) : pend)],
+    ...((["campus", "intake", "englishRequirement", "prerequisites"] as const).filter((f) => cols.some((c) => uni(c)?.[f])).map((f): Row => [s.rows[f === "englishRequirement" ? "english" : f === "prerequisites" ? "prereq" : f], (c) => (uni(c)?.[f] ? text(uni(c)![f]) : pend)])),
+    [s.rows.website, (c) => site(c.sc)],
   ];
   const tuitionFacts = cols.map((c) => (kind === "language" ? lang(c)?.tuition : uni(c)?.tuitionInternational)).filter(Boolean) as Fact<Price>[];
-  const issues = priceIssues(tuitionFacts, kind === "language" ? (cols.map((c) => lang(c)?.duration).filter(Boolean) as Fact<WeeksRange>[]) : []);
+  const issues = priceIssues(tuitionFacts, kind === "language" ? (cols.map((c) => lang(c)?.duration).filter(Boolean) as Fact<WeeksRange>[]) : [], kind === "university" ? cols.map((c) => uni(c)?.level) : []);
   return (
     <section className="space-y-3">
       {issues.length > 0 && <div role="note" className="rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-900"><p className="font-semibold">⚠ {L(s.rows.tuition)}</p><ul className="mt-1 list-disc space-y-0.5 pl-5">{issues.map((i) => <li key={i}>{L(s.issues[i])}</li>)}</ul></div>}

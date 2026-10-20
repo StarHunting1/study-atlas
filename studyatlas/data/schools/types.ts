@@ -33,13 +33,24 @@ export type LanguageCourse = {
   materialsFee: Fact<Price>;
 };
 
+/** Degree level, kept as a code so that programmes of different levels are never compared at face value ("bachelor" and "master" tuition are different things). */
+export type DegreeLevel = "bachelor" | "master" | "doctorate" | "diploma" | "other";
 export type UniversityProgram = {
   id: string; degree: Localized; major: Localized;
+  /** Ver.1.7.2: the level behind `degree`, set by the person who records the programme */
+  level?: DegreeLevel;
   years: Fact<number>;
   tuitionInternational: Fact<Price>;
+  /** Applies to THIS programme only: never read as a requirement of the whole university */
   entryRequirements: Fact<Localized>;
   applicationPeriod: Fact<Localized>;
+  /** Ver.1.7.2 (all optional; an absent field is simply not recorded): campus, intake month(s), English-language requirement (e.g. IELTS / TOEFL score), required prior study */
+  campus?: Fact<Localized>; intake?: Fact<Localized>; englishRequirement?: Fact<Localized>; prerequisites?: Fact<Localized>;
 };
+
+/** The official pages a student needs, per university. A page is recorded only with its URL as a Fact: "pending" until a person has supplied it; a link that exists is not a page whose content was checked. */
+export const UNI_PAGE_KINDS = ["programSearch", "internationalAdmissions", "tuition", "deadlines", "english", "scholarships"] as const;
+export type UniPageKind = (typeof UNI_PAGE_KINDS)[number];
 
 type SchoolBase = {
   id: string; name: string; cityId: string;
@@ -51,6 +62,6 @@ type SchoolBase = {
   record: Fact<Localized>;
 };
 export type LanguageSchool = SchoolBase & { kind: "language"; accommodation: Fact<Localized>; courses: LanguageCourse[] };
-export type University = SchoolBase & { kind: "university"; programs: UniversityProgram[] };
+export type University = SchoolBase & { kind: "university"; programs: UniversityProgram[]; /** formal name and main campuses (institution-level facts) */ officialName?: Fact<Localized>; campuses?: Fact<Localized>; officialPages?: Record<UniPageKind, Fact<string>> };
 export type School = LanguageSchool | University;
 export type SchoolKind = School["kind"];
