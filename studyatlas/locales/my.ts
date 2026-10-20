@@ -78,7 +78,8 @@ export const schoolsText = {
     location: t("Location", "所在地"), hours: t("Hours per week", "週あたりの授業時間"), duration: t("Course length", "コース期間"), tuition: t("Tuition", "授業料"),
     registration: t("Registration fee", "登録料"), materials: t("Materials fee", "教材費"), accommodation: t("Accommodation", "滞在施設"), website: t("Official website", "公式サイト"),
     checked: t("Last checked", "情報確認日"), degree: t("Degree / major", "学位・専攻"), years: t("Years of study", "修業年数"), tuitionIntl: t("International tuition", "留学生向け授業料"),
-    entry: t("Entry requirements", "入学条件"), apply: t("Application period", "出願時期"),
+    entry: t("Entry requirements (this programme only)", "入学条件（このプログラムのみ）"), apply: t("Application period", "出願時期"),
+    campus: t("Campus", "キャンパス"), intake: t("Intake", "入学時期"), english: t("English requirement (this programme)", "英語要件（このプログラム）"), prereq: t("Prerequisites (this programme)", "前提条件（このプログラム）"), level: t("Degree level", "学位区分"),
   },
   weeks: t("weeks", "週"), weeksRange: t("{min}–{max} weeks", "{min}〜{max}週"), weeksMin: t("from {min} weeks", "{min}週〜"), hours: t("{n} h", "{n}時間"), yearsN: t("{n} years", "{n}年"),
   unit: { week: t("/ week", "／週"), month: t("/ month", "／月"), term: t("/ term", "／学期"), year: t("/ year", "／年"), course: t("/ course", "／コース"), once: t("one-off", "（1回）") },
@@ -93,6 +94,7 @@ export const schoolsText = {
     applicability: t("Different fee categories (who the price applies to).", "適用区分（対象者）が異なります。"),
     includes: t("Different items included.", "含まれる費用が異なります。"),
     duration: t("Course lengths differ.", "コース期間が異なります。"),
+    degree: t("Different degree levels (e.g. bachelor and master), or a level is not recorded: these fees are not comparable.", "学位の区分が異なる（学士と修士など）か、区分が未記録です。授業料は比較できません。"),
   },
   visit: t("Visit", "公式サイトへ"),
 };

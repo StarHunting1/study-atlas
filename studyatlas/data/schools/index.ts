@@ -1,5 +1,6 @@
 import { checkProfile } from "../validate";
 import { sampleLanguageSchools, sampleUniversities } from "./samples";
+import { UNIVERSITY_PROGRAMS, programIssues } from "./universityPrograms";
 import { universities } from "./universities";
 import type { LanguageSchool, School, SchoolKind, University } from "./types";
 export type * from "./types";
@@ -8,7 +9,11 @@ export type * from "./types";
  * so the source can later move to a database without touching the screens.
  * Real language schools have not been researched yet, so there are none (no invented entries).
  */
-const real: School[] = [...universities];
+// Programmes recorded in universityPrograms.ts are attached by university id; an incomplete record fails the build.
+const real: School[] = universities.map((u) => ({ ...u, programs: [...u.programs, ...(UNIVERSITY_PROGRAMS[u.id] ?? [])] }));
+const programProblems = universities.flatMap((u) => (UNIVERSITY_PROGRAMS[u.id] ?? []).flatMap((p) => programIssues(u.id, p)));
+if (programProblems.length) throw new Error("University programme data problems:\n" + programProblems.join("\n"));
+for (const id of Object.keys(UNIVERSITY_PROGRAMS)) if (!universities.some((u) => u.id === id)) throw new Error(`Programmes for unknown university "${id}"`);
 const samples: School[] = [...sampleLanguageSchools, ...sampleUniversities];
 
 const problems = [...real, ...samples].flatMap((s) => checkProfile(s.id, s as unknown as Parameters<typeof checkProfile>[1]));
