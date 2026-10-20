@@ -104,6 +104,8 @@ export const uinfo = {
   officialName: t("Formal name", "正式名称"), campuses: t("Main campuses", "主なキャンパス"), pages: t("Official pages for students", "留学生向けの公式ページ"),
   kinds: { programSearch: t("Programme search", "プログラム検索"), internationalAdmissions: t("International admissions", "留学生向け入学案内"), tuition: t("International tuition", "留学生向け授業料"), deadlines: t("Deadlines", "出願時期・締切"), english: t("English-language requirements", "英語要件"), scholarships: t("Scholarships", "奨学金") },
   pagePending: t("Not entered yet – waiting for a person to supply and open the official page", "未登録（公式ページの手動確認待ち）"), openPage: t("Open the page", "ページを開く"),
+  research: t("Programmes under research (content not published)", "調査中のプログラム（内容は未公開）"),
+  researchNote: t("Only the name and the university's official page are shown. Fees, English scores, deadlines and entry conditions were found by a research draft but are not published until a person has checked them and the university's reuse terms. Please read the official page.", "プログラム名と大学公式ページのリンクのみ表示しています。授業料・英語スコア・締切・入学条件は調査で候補が見つかっていますが、人による確認と大学の再利用条件の確認が済むまで公開しません。公式ページをご確認ください。"),
   pageNote: t("An entered link only says where to look; the content of the page is not confirmed by it.", "登録されたリンクは確認先を示すだけで、ページの内容を確認済みにするものではありません。"),
   programsNote: t("Tuition, entry requirements and deadlines are recorded per programme, from an official source, with their year, currency and billing unit. None has been recorded yet, so nothing is estimated or compared.", "授業料・入学条件・出願時期は、公式資料に基づき、年度・通貨・課金単位とともにプログラム単位で記録します。まだ登録がないため、推定や比較は行いません。"),
 };

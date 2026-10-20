@@ -26,30 +26,114 @@ Every university host below is **unconfirmed** for the access guard (no rights r
 |---|---|---|---|---|---|---|
 | University of British Columbia | vancouver | ubc.ca | forbidden / forbidden | unverified / unverified | 0/6 | 0 |
 | Simon Fraser University | vancouver | sfu.ca | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
-| University of Toronto **(priority)** | toronto | utoronto.ca | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
+| University of Toronto **(priority)** | toronto | utoronto.ca | unconfirmed / unconfirmed | unverified / unverified | 3/6 | 0 |
 | York University | toronto | yorku.ca | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
-| University of Manchester **(priority)** | manchester | manchester.ac.uk | allowed / forbidden | unverified / unverified | 0/6 | 0 |
+| University of Manchester **(priority)** | manchester | manchester.ac.uk | allowed / forbidden | unverified / unverified | 2/6 | 0 |
 | Manchester Metropolitan University | manchester | mmu.ac.uk | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
-| UCL **(priority)** | london | ucl.ac.uk | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
+| UCL **(priority)** | london | ucl.ac.uk | unconfirmed / unconfirmed | unverified / unverified | 2/6 | 0 |
 | King's College London | london | kcl.ac.uk | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
 | Imperial College London | london | imperial.ac.uk | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
 | University of Sydney | sydney | sydney.edu.au | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
 | UNSW Sydney | sydney | unsw.edu.au | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
-| University of Melbourne **(priority)** | melbourne | unimelb.edu.au | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
+| University of Melbourne **(priority)** | melbourne | unimelb.edu.au | unconfirmed / unconfirmed | unverified / unverified | 4/6 | 0 |
 | Monash University | melbourne | monash.edu | unconfirmed / unconfirmed | unverified / unverified | 0/6 | 0 |
 
 ## Still to be supplied for each university
 
 - **University of British Columbia** (ubc): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **Simon Fraser University** (sfu): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
-- **University of Toronto** (uoft, priority): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
+- **University of Toronto** (uoft, priority): programme search · international admissions · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **York University** (yorku): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
-- **University of Manchester** (uom, priority): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
+- **University of Manchester** (uom, priority): international admissions · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **Manchester Metropolitan University** (mmu): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
-- **UCL** (ucl, priority): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
+- **UCL** (ucl, priority): international admissions · international tuition · deadlines · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **King's College London** (kcl): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **Imperial College London** (imperial): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **University of Sydney** (usyd): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **UNSW Sydney** (unsw): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
-- **University of Melbourne** (unimelb, priority): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
+- **University of Melbourne** (unimelb, priority): international admissions · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
 - **Monash University** (monash): programme search · international admissions · international tuition · deadlines · English-language requirements · scholarships; programmes with tuition, English requirement, deadline, intake, campus and prerequisites.
+
+## Research candidates (internal; none is published)
+
+Source: the 2026-10-20 research dossier. A candidate is **not** an approval, a rights clearance or a collection permission. A field is shown to users only with (1) no open issue, (2) a human accuracy approval in `PROGRAM_APPROVALS` and (3) a rights clearance in `PROGRAM_RIGHTS` (`data/schools/universityPrograms.ts`); the key is `<university>/<programme>/<field>`. Wrong-year figures are listed under *never publish* and are not fields at all.
+
+### uom / bsc-management — BSc Management (bachelor, 2027 entry)
+
+- Codes: ucas N201, institution M20 · researched 2026-10-20 by ChatGPT research dossier (a candidate list; NOT an approval, a rights clearance or a collection permission) · confirmation: **candidate-only** · publishable fields: **0/4**
+- Official page: https://www.manchester.ac.uk/study/undergraduate/courses/2027/03519/bsc-management/all-content/ (guard: forbidden; read by a person only)
+
+| field | candidate value | source | period | applies to | blockers |
+|---|---|---|---|---|---|
+| years | 3 | https://www.manchester.ac.uk/study/undergraduate/courses/2027/03519/bsc-management/all-content/ | 2027 entry | BSc Management, UCAS N201 | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| tuitionInternational | GBP 35,300 per year, fee year 2027 entry | https://www.manchester.ac.uk/study/undergraduate/courses/2027/03519/bsc-management/course-details/ | 2027 entry | International fee status, 2027 entrants | open issue: The course-details page is the intended authority, but the programme overview page carries an outdated / unset fee statement; a person must confirm which page governs before this figure is approved.; needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| englishRequirement | IELTS 6.5 overall, at least 6.0 in each component, or an approved alternative | https://www.manchester.ac.uk/study/undergraduate/courses/2027/03519/bsc-management/all-content/ | 2027 entry | This programme | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| entryRequirements | Typical offer: A-level AAA; IB 36 points with 6/6/6 at Higher Level | https://www.manchester.ac.uk/study/undergraduate/courses/2027/03519/bsc-management/all-content/ | 2027 entry | Applicants holding A-levels or the IB only; other qualifications are not covered | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+
+Research still to do:
+- Which Manchester page governs the 2027 international fee (course-details vs overview)?
+- Campus, intake month and the application deadline are not in the dossier.
+
+### ucl / management-science-bsc — Management Science BSc (bachelor, 2027 entry)
+
+- Codes: ucas N991, option UBSENG00071A · researched 2026-10-20 by ChatGPT research dossier (a candidate list; NOT an approval, a rights clearance or a collection permission) · confirmation: **candidate-only** · publishable fields: **0/5**
+- Official page: https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/management-science-bsc?option=UBSENG00071A (guard: unconfirmed; read by a person only)
+
+| field | candidate value | source | period | applies to | blockers |
+|---|---|---|---|---|---|
+| years | 3 | https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/management-science-bsc?option=UBSENG00071A | 2027 entry | 3 academic years, full time | open issue: The 4-year Year in Industry variant also exists; a person must confirm that this page and option code are the 3-year programme.; needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| tuitionInternational | GBP 44,400 per year, fee year 2027/28 | https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/management-science-bsc?option=UBSENG00071A | 2027/28 | Overseas fee status | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| intake | September 2027, full time | https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/management-science-bsc?option=UBSENG00071A | 2027 entry | This programme | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| applicationPeriod | Equal-consideration deadline: 13 January 2027, 18:00 UK time (late applications may be considered separately) | https://www.ucl.ac.uk/study/prospective-students/undergraduate/courses/management-science-bsc?option=UBSENG00071A | 2027 entry | Equal-consideration round only | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| englishRequirement | UCL Level 4: IELTS 7.5 overall, at least 7.0 in each component | https://www.ucl.ac.uk/study/prospective-students/undergraduate/how-apply/english-language-requirements | 2027 entry | UCL English level 4 (general table) | open issue: Which English level this programme requires is NOT confirmed; the table value must not be attached to the programme until a person confirms it.; needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+
+Research still to do:
+- Which UCL English level applies to Management Science BSc?
+- Is the page the 3-year programme or the Year in Industry variant?
+- Campus (Canary Wharf or Bloomsbury) is unclear.
+
+### uoft / rotman-commerce — Rotman Commerce (bachelor, Fall 2027)
+
+- Codes: none given · researched 2026-10-20 by ChatGPT research dossier (a candidate list; NOT an approval, a rights clearance or a collection permission) · confirmation: **candidate-only** · publishable fields: **0/3**
+- Official page: https://rotmancommerce.utoronto.ca/future-students/important-dates/ (guard: unconfirmed; read by a person only)
+
+| field | candidate value | source | period | applies to | blockers |
+|---|---|---|---|---|---|
+| intake | Fall 2027 | https://rotmancommerce.utoronto.ca/future-students/important-dates/ | Fall 2027 | This programme | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| applicationPeriod | Early main 7 Nov 2026 · early supplementary 1 Dec 2026 · final main 15 Jan 2027 · final supplemental/documents 1 Feb 2027 (all 23:59 EST) | https://rotmancommerce.utoronto.ca/future-students/important-dates/ | Fall 2027 | Four different application stages | open issue: Four deadlines of different application categories; a person must choose which are shown and how they are labelled. They are never merged into one date.; needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| englishRequirement | IELTS Academic 6.5 overall, at least 6.0 in each band (exceptions apply) | https://future.utoronto.ca/english-language-requirements | Fall 2027 | General undergraduate requirement of the university | open issue: Rotman Commerce's own English requirement is not confirmed; the university-wide value must not be shown as the programme's requirement.; needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+
+Research still to do:
+- Fall 2027 international tuition amount (only the structure is known: first year = Arts & Science fee, later years = Rotman Commerce fee).
+- Rotman Commerce-specific English requirement.
+- Duration, campus and entry requirements are not in the dossier.
+
+Never publish as current:
+- tuition, first year: CAD 63,570 (2025/26) — 2025/26 indicative brochure figure; not a 2027 fee; includes an insurance item and excludes ancillary fees
+- tuition, years 2–4: CAD 72,260 (2025/26) — 2025/26 indicative brochure figure; not a 2027 fee; includes an insurance item and excludes ancillary fees
+
+### unimelb / bachelor-of-commerce — Bachelor of Commerce (bachelor, 2027)
+
+- Codes: none given · researched 2026-10-20 by ChatGPT research dossier (a candidate list; NOT an approval, a rights clearance or a collection permission) · confirmation: **candidate-only** · publishable fields: **0/5**
+- Official page: https://study.unimelb.edu.au/find/courses/undergraduate/bachelor-of-commerce/ (guard: unconfirmed; read by a person only)
+
+| field | candidate value | source | period | applies to | blockers |
+|---|---|---|---|---|---|
+| years | 3 | https://study.unimelb.edu.au/find/courses/undergraduate/bachelor-of-commerce/ | 2027 | Full time | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| campus | Parkville | https://study.unimelb.edu.au/find/courses/undergraduate/bachelor-of-commerce/ | 2027 | This programme | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| intake | February and July | https://study.unimelb.edu.au/find/courses/undergraduate/bachelor-of-commerce/ | 2027 | This programme | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| englishRequirement | IELTS Academic 6.5 overall, at least 6.0 in each band | https://study.unimelb.edu.au/how-to-apply/english-language-requirements/undergraduate-english-language-requirements | 2027 | Bachelor of Commerce (course-specific) | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+| applicationPeriod | Semester 1 2027: 30 Nov 2026 · Semester 2 2027: 31 May 2027 | https://study.unimelb.edu.au/how-to-apply/undergraduate-study/international-applications/applications | 2027 | Direct international applications only; the VTAC route has different dates | needs a human accuracy approval (PROGRAM_APPROVALS); needs a rights clearance for republication (PROGRAM_RIGHTS, scope "fact") |
+
+Research still to do:
+- 2027 international tuition for the Bachelor of Commerce: the fee depends on discipline band, subjects and load, so there is no flat figure; the amount is unconfirmed (the domestic CSP is not an international fee).
+- Seven majors (Accounting, Actuarial Studies, Business Analytics, Economics, Finance, Management, Marketing): a major-level record is not made yet.
+
+### Approval / rights templates (a person fills these; do not copy a name from here)
+
+```ts
+// PROGRAM_APPROVALS (accuracy)  — who read the official page, when, and what was compared
+// "uom/bsc-management/years": { by: "<your name>", at: "YYYY-MM-DD", compared: "<official page and what you compared>" },
+// PROGRAM_RIGHTS (republication) — who read the site terms, when, on what basis, and the scope (fact = a bare figure/date, text = sentences/table)
+// "uom/bsc-management/years": { by: "<your name>", at: "YYYY-MM-DD", basis: "<terms page and clause>", scope: "fact" },
+```

@@ -4,11 +4,12 @@ import Disclosure from "@/components/Disclosure";
 import { useI18n } from "@/lib/i18n";
 import type { University } from "@/data/schools/types";
 import { UNI_PAGE_KINDS } from "@/data/schools/types";
+import { PROGRAMS_UNDER_RESEARCH } from "@/data/schools/universityLinks";
 import { uinfo } from "@/locales/schoolCompare";
 
 /** Institution-level facts of a university and the state of each official page. Counts only what a person has confirmed; an entered link is not a checked page. */
 export const universityInfoCounts = (u: University) => {
-  const facts = [u.officialName, u.campuses, ...UNI_PAGE_KINDS.map((k) => u.officialPages?.[k])].filter(Boolean); return { verified: facts.filter((f) => f!.status === "verified").length, total: facts.length, pagesPending: UNI_PAGE_KINDS.filter((k) => !u.officialPages?.[k] || u.officialPages[k].status === "pending").length, programs: u.programs.length };
+  const facts = [u.officialName, u.campuses, ...UNI_PAGE_KINDS.map((k) => u.officialPages?.[k])].filter(Boolean); return { verified: facts.filter((f) => f!.status === "verified").length, total: facts.length, pagesPending: UNI_PAGE_KINDS.filter((k) => !u.officialPages?.[k] || u.officialPages[k].status === "pending").length, underResearch: (PROGRAMS_UNDER_RESEARCH[u.id] ?? []).length, programs: u.programs.length };
 };
 export default function UniversityInfo({ u, defaultOpen = false }: { u: University; defaultOpen?: boolean }) {
   const { L } = useI18n(); const c = universityInfoCounts(u); if (!c.total) return null;
@@ -23,6 +24,9 @@ export default function UniversityInfo({ u, defaultOpen = false }: { u: Universi
             <li key={k} data-kind={k} data-state={f?.status ?? "pending"} className="flex flex-wrap items-center gap-x-2"><span className="font-medium text-slate-600">{L(uinfo.kinds[k])}</span>
               {f?.value ? <><a href={f.value} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center text-sky-700 underline">{L(uinfo.openPage)} ↗</a><StatusBadge status={f.status} /></> : <span className="text-slate-500">{L(uinfo.pagePending)}</span>}</li>); })}</ul>
           <p className="mt-1 text-[11px] text-slate-500">{L(uinfo.pageNote)}</p></div>
+        {(PROGRAMS_UNDER_RESEARCH[u.id] ?? []).length > 0 && <div data-testid="uni-research"><p className="font-semibold text-slate-500">{L(uinfo.research)}</p>
+          <ul className="mt-1 space-y-1">{PROGRAMS_UNDER_RESEARCH[u.id].map((p) => <li key={p.id} data-program={p.id} className="flex flex-wrap items-center gap-x-2"><span className="font-medium text-slate-600">{L(p.name)}</span><a href={p.url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center text-sky-700 underline">{L(uinfo.openPage)} ↗</a></li>)}</ul>
+          <p className="mt-1 text-[11px] text-slate-500">{L(uinfo.researchNote)}</p></div>}
         <p className="text-[11px] text-slate-500">{L(uinfo.programsNote)}</p>
       </div>
     </Disclosure>

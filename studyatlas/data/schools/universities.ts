@@ -2,6 +2,7 @@ import { pending } from "../schema";
 import { UNI_PAGE_KINDS, type UniPageKind, type University } from "./types";
 import type { Fact } from "../schema";
 import type { Localized } from "@/lib/i18n";
+import { OFFICIAL_PAGE_LINKS, RESEARCH_DATE } from "./universityLinks";
 /*
  * Real universities named in StudyAtlas Ver.1.0 city summaries. Names and website links have NOT been
  * checked against an official source in this version, so they are "unverified"; programmes, fees,
@@ -15,12 +16,13 @@ const linkNote = { en: "Link not yet checked.", ja: "リンク先は未確認で
  * and opened it, because a guessed link is not a source. Programmes are in universityPrograms.ts (none yet).
  */
 const editorial: Localized = { en: "Editorial entry from general knowledge; not yet matched to the university's own site.", ja: "編集者が一般的な知識から記載したもので、大学公式サイトとの照合はまだです。" };
-const pages = (): Record<UniPageKind, Fact<string>> => Object.fromEntries(UNI_PAGE_KINDS.map((k) => [k, pending<string>()])) as Record<UniPageKind, Fact<string>>;
+const linkSupplied: Localized = { en: `Link named by a research dossier (${RESEARCH_DATE}); not opened or checked by StarHunting, not an approval or a permission to collect from the site.`, ja: `調査資料（${RESEARCH_DATE}）が示したリンクです。StarHuntingでは未確認で、承認でも、サイトからの自動収集の許可でもありません。` };
+const pages = (id: string): Record<UniPageKind, Fact<string>> => Object.fromEntries(UNI_PAGE_KINDS.map((k) => { const x = OFFICIAL_PAGE_LINKS[id]?.[k]; return [k, x ? { status: "unverified", value: x.url, note: linkSupplied } : pending<string>()]; })) as Record<UniPageKind, Fact<string>>;
 const uni = (id: string, name: string, cityId: string, url: string, official: Localized, campuses: Localized): University => ({
   kind: "university", id, name, cityId,
   record: { status: "unverified", value: { en: "Listed university", ja: "掲載大学" }, note },
   address: pending(), website: { status: "unverified", value: url, note: linkNote }, programs: [],
-  officialName: { status: "unverified", value: official, note: editorial }, campuses: { status: "unverified", value: campuses, note: editorial }, officialPages: pages(),
+  officialName: { status: "unverified", value: official, note: editorial }, campuses: { status: "unverified", value: campuses, note: editorial }, officialPages: pages(id),
 });
 const l = (en: string, ja: string): Localized => ({ en, ja });
 export const universities: University[] = [
