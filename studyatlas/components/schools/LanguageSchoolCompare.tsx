@@ -5,8 +5,10 @@ import { getCompareSchool, listCompareSchools, thirdPartyRecord, type CompareSch
 import { useI18n } from "@/lib/i18n";
 import { panel } from "@/lib/ui";
 import { dataText as d } from "@/locales/data";
-import { sc, fd } from "@/locales/schoolCompare";
-import { EMPTY_SEL, diffRows, dismissPending, replaceWithPending, toggleSchool, CHECK_KINDS, type Diff, type Sel } from "@/data/schoolFinder";
+import Link from "next/link";
+import { sc, fd, jn } from "@/locales/schoolCompare";
+import { loadLastPair, parseSchoolView, plannerHref, saveLastPair, schoolViewUrl } from "@/lib/journey";
+import { EMPTY_SEL, NO_FILTER, diffRows, dismissPending, replaceWithPending, toggleSchool, CHECK_KINDS, type Diff, type Sel } from "@/data/schoolFinder";
 import { SchoolFinder, SelectionTray } from "@/components/schools/SchoolFinder";
 import Disclosure from "@/components/Disclosure";
 import { StatusBadge } from "@/components/FactView";
@@ -34,7 +36,7 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
     <div className="space-y-4" data-testid="school-compare" data-cross-city={a.cityId !== b.cityId}>
       <div className="grid grid-cols-2 gap-3">{pair.map((s) => (
         <div key={s.id} className="min-w-0 rounded-xl bg-white p-3 ring-1 ring-slate-200" data-testid="school-head">
-          <p className="text-[11px] text-slate-500">{cityName(s.cityId)}</p>
+          <p className="text-[11px] text-slate-500">{cityName(s.cityId)} · <Link href={`/city/${s.cityId}`} data-testid="school-city-link" className="inline-flex min-h-[44px] items-center text-sky-700 underline">{L(jn.cityPage)}</Link></p>
           <h2 className="break-words text-base font-semibold text-[#0b2a5b]">{s.inst.name}</h2>{s.inst.officialName && s.inst.officialName !== s.inst.name && <p className="mt-0.5 break-words text-[11px] text-slate-500" data-testid="official-name">{L(sc.officialName)}: {s.inst.officialName}</p>}
           <div className="mt-1"><StatusBadge status={s.status} /></div>
           <div className="mt-2 flex flex-wrap gap-x-3">
@@ -69,11 +71,34 @@ export function SchoolCompareView({ a, b }: { a?: CompareSchool; b?: CompareScho
 }
 
 export default function LanguageSchoolCompare() {
-  const { L } = useI18n(); const all = listCompareSchools(); const [sel, setSel] = useState<Sel>(EMPTY_SEL);
-  useEffect(() => { const q = new URLSearchParams(window.location.search); const x = getCompareSchool(q.get("a")), y = getCompareSchool(q.get("b")); setSel({ a: x?.id ?? "", b: y && y.id !== x?.id ? y.id : "", pending: "" }); }, []);
-  const apply = (n: Sel) => { setSel(n); try { const q = new URLSearchParams(); if (n.a) q.set("a", n.a); if (n.b) q.set("b", n.b); window.history.replaceState(null, "", q.toString() ? `?${q}` : window.location.pathname); } catch {} };
+  const { L, lang } = useI18n(); const all = listCompareSchools(); const [sel, setSel] = useState<Sel>(EMPTY_SEL); const [pick, setPick] = useState(true); const [city, setCity] = useState(""); const [ready, setReady] = useState(false);
+  const read = () => parseSchoolView(window.location.search);
+  // The URL (a, b, city, pick) is the source of truth: a direct link, a reload and the browser's back button all land on the same view. Only ids are in it.
+  useEffect(() => {
+    const v = read(); const last = !v.a && !v.b ? loadLastPair() : { a: "", b: "" };
+    if (last.a || last.b) { setSel({ a: last.a, b: last.b, pending: "" }); setPick(true); setCity(v.city); try { window.history.replaceState(null, "", schoolViewUrl({ a: last.a, b: last.b, city: v.city, pick: true })); } catch {} }
+    else { setSel({ a: v.a, b: v.b, pending: "" }); setPick(v.pick); setCity(v.city); }
+    setReady(true);
+    const onPop = () => { const n = read(); setSel({ a: n.a, b: n.b, pending: "" }); setPick(n.pick); setCity(n.city); };
+    window.addEventListener("popstate", onPop); return () => window.removeEventListener("popstate", onPop);
+  }, []);
+  useEffect(() => { if (ready) saveLastPair(sel.a, sel.b); }, [sel.a, sel.b, ready]);
+  const url = (n: Sel, p: boolean) => schoolViewUrl({ a: n.a, b: n.b, city, pick: p && true });
+  /** Changing the selection rewrites the current history entry; switching between the list and the comparison adds one, so Back returns to the other view. */
+  const apply = (n: Sel) => { setSel(n); try { window.history.replaceState(null, "", url(n, true) || window.location.pathname); } catch {} };
+  const show = (p: boolean) => { setPick(p); try { window.history.pushState(null, "", url(sel, p) || window.location.pathname); window.scrollTo({ top: 0 }); } catch {} };
   const choose = (which: "a" | "b", id: string) => apply({ ...sel, [which]: id, pending: "" });
   if (!all.length) return <p className={`p-4 text-sm text-slate-500 ${panel}`}>{L(sc.none)}</p>;
+  const A = getCompareSchool(sel.a), B = getCompareSchool(sel.b); const both = !!(A && B); const cityOf = (id: string) => L(cities.find((c) => c.id === id)!.name);
+  const planner = plannerHref({ schools: [sel.a, sel.b].filter(Boolean), cities: [...new Set([A?.cityId, B?.cityId].filter(Boolean) as string[])] });
+  const plannerBlock = (<section className="space-y-1 rounded-2xl bg-white p-4 ring-1 ring-slate-200" data-testid="school-planner"><p className="text-xs leading-relaxed text-slate-600">{L(sc.toPlanner)}</p><Link href={planner} data-testid="school-planner-link" className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-700 underline">{L(sc.toPlannerLink)}</Link></section>);
+  if (!pick && both) return (
+    <div className="space-y-4" data-testid="result-view">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-1"><button type="button" onClick={() => show(true)} data-testid="change-selection" className="inline-flex min-h-[44px] items-center rounded-full bg-white px-4 text-sm font-medium text-slate-800 ring-1 ring-slate-300 hover:bg-slate-50">{L(jn.changeSelection)}</button><p className="text-xs text-slate-500">{L(jn.changeHint)}</p></div>
+      <SchoolCompareView a={A} b={B} />
+      {plannerBlock}
+      <p className="text-xs text-slate-600"><Link href="/compare" data-testid="to-city-compare" className="inline-flex min-h-[44px] items-center text-sky-700 underline">{L(jn.seeCityCompare)}</Link></p>
+    </div>);
   const select = (which: "a" | "b", value: string, other: string) => (
     <label className="block min-w-0 text-sm"><span className="mb-1 block text-xs font-semibold text-slate-500">{L(which === "a" ? sc.pickA : sc.pickB)}</span>
       <select value={value} data-testid={`pick-${which}`} onChange={(e) => choose(which, e.target.value)} className="min-h-[44px] w-full rounded-xl border border-slate-200 bg-white px-3 text-sm">
@@ -81,11 +106,12 @@ export default function LanguageSchoolCompare() {
         {cities.map((c) => { const g = all.filter((s) => s.cityId === c.id && s.id !== other); return g.length ? <optgroup key={c.id} label={L(c.name)}>{g.map((s) => <option key={s.id} value={s.id}>{s.inst.name}</option>)}</optgroup> : null; })}
       </select></label>);
   return (
-    <div className="space-y-5">
-      <SchoolFinder all={all} sel={sel} onToggle={(id) => apply(toggleSchool(sel, id))} />
-      <SelectionTray all={all} sel={sel} onRemove={(slot) => apply({ ...sel, [slot]: "", pending: "" })} onClear={() => apply(EMPTY_SEL)} onReplace={(slot) => apply(replaceWithPending(sel, slot))} onCancel={() => apply(dismissPending(sel))} />
+    <div className="space-y-5" data-testid="pick-view">
+      {city && <p className="text-xs text-slate-600" data-testid="from-city">{L(jn.showingCity).replace("{city}", cityOf(city))}</p>}
+      {ready && <SchoolFinder all={all} sel={sel} onToggle={(id) => apply(toggleSchool(sel, id))} initial={{ ...NO_FILTER, city }} />}
+      <SelectionTray all={all} sel={sel} onRemove={(slot) => apply({ ...sel, [slot]: "", pending: "" })} onClear={() => apply(EMPTY_SEL)} onReplace={(slot) => apply(replaceWithPending(sel, slot))} onCancel={() => apply(dismissPending(sel))} onGo={() => show(false)} />
       <Disclosure level="more" label={L(fd.pickList)} testid="pick-by-list"><div className="grid gap-3 sm:grid-cols-2">{select("a", sel.a, sel.b)}{select("b", sel.b, sel.a)}</div></Disclosure>
-      <div id="school-compare-result" className="scroll-mt-4"><SchoolCompareView a={getCompareSchool(sel.a)} b={getCompareSchool(sel.b)} /></div>
+      {plannerBlock}
     </div>
   );
 }

@@ -9,6 +9,8 @@ import CityPhoto, { PhotoCredit, useCityPhoto } from "@/components/CityPhoto";
 import { hasInAppHistory } from "@/lib/history";
 import { officialData } from "@/data/official";
 import CityOverview from "@/components/overview/CityOverview";
+import { listCompareSchools } from "@/data/languageSchools";
+import { jn } from "@/locales/schoolCompare";
 export default function CityPage() {
   const { id } = useParams<{ id: string }>(); const { t, L } = useI18n(); const { has, toggle, full } = useCompare(); const router = useRouter();
   const c = getCity(id); const [photo, onError] = useCityPhoto(c);
@@ -34,6 +36,7 @@ export default function CityPage() {
       <div className="flex flex-wrap gap-3">
         <button disabled={!on && full} onClick={() => toggle(c.id)} aria-pressed={on} className={`${pill} disabled:opacity-40 ${on ? pillOn : pillOff}`}>{on ? `✓ ${t("remove")}` : `+ ${t("addCompare")}`}</button>
         <Link href="/compare" className={`${pill} bg-sky-100 text-sky-800 hover:bg-sky-200`}>{t("goCompare")}</Link>
+        {listCompareSchools().some((x) => x.cityId === c.id) && <Link href={`/schools/compare?city=${c.id}`} data-testid="city-schools-link" className={`${pill} bg-sky-100 text-sky-800 hover:bg-sky-200`}>{L(jn.fromCity).replace("{city}", L(c.name))}</Link>}
         <a href={c.officialUrl} target="_blank" rel="noopener noreferrer" className={`${pill} ${pillOff}`}>{t("official")} ↗</a>
       </div>
       {!on && full && <p className="text-sm text-slate-500">{t("compareFull")}</p>}
