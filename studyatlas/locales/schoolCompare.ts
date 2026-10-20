@@ -36,3 +36,29 @@ export const sc = {
   feesLink: t("Open the school’s fee information ↗", "学校の料金案内を開く ↗"),
   swap: t("Swap", "入れ替え"),
 };
+
+/** Ver.1.6.9 – finding and choosing schools. */
+export const fd = {
+  findTitle: t("Find a school", "学校を探す"),
+  lead: t("All language schools StudyAtlas lists, by city. Pick two to see their differences side by side.", "StudyAtlasに掲載している語学学校の一覧です。2校を選ぶと、違いを並べて見られます。"),
+  search: t("Search by school or city name", "学校名・都市名で検索"), searchPh: t("e.g. Kaplan, Sydney", "例：Kaplan、シドニー"),
+  cityAll: t("All cities", "すべての都市"), cityLabel: t("City", "都市"),
+  recordLabel: t("Where the checks come from", "確認の出どころ"), recordAll: t("All", "すべて"), recordThird: t("Register / directory record found", "登録簿・ディレクトリの記録あり"), recordOwn: t("School's own pages only", "学校自身のページのみ"),
+  moreFilters: t("More filters", "さらに絞り込む"), lessFilters: t("Fewer filters", "絞り込みを閉じる"),
+  count: t("Showing {n} of {total} schools", "{total}校中 {n}校を表示"), clear: t("Show all schools", "すべて表示に戻す"),
+  noMatch: t("No school matches these conditions.", "この条件に合う学校はありません。"), noMatchHint: t("Clear the search or the filters to see every school again.", "検索や絞り込みを解除すると、すべての学校が表示されます。"),
+  notQuality: t("“Not confirmed” does not mean a school is worse; it only says that StudyAtlas has not matched that item with a register or directory. Schools are not ranked.", "「未確認」は学校の質が低いという意味ではなく、登録簿やディレクトリと照合できていないという意味です。学校の順位付けはしていません。"),
+  address: t("Campus", "キャンパス"), course: t("Courses", "コース"), noCourse: t("Courses: see the school's site", "コース：学校の公式サイトで確認"), noAddress: t("Address: see the school's site", "所在地：学校の公式サイトで確認"),
+  checksShort: t("Checks", "確認状況"),
+  kindShort: { provider: t("Registration", "機関登録"), campus: t("Campus", "所在地"), course: t("Courses", "コース"), accreditation: t("Accreditation", "認定・加盟") },
+  stateShort: { confirmed: t("two sources agree", "2つの情報源で一致"), single: t("one source", "情報源1つ"), stated: t("school's statement", "学校の記載のみ"), notConfirmed: t("not confirmed", "確認できず"), notChecked: t("not checked", "未確認") },
+  add: t("Add to comparison", "比較に追加"), selectedA: t("Selected as school 1 – remove", "1校目に選択中・解除"), selectedB: t("Selected as school 2 – remove", "2校目に選択中・解除"),
+  traySlot1: t("School 1", "1校目"), traySlot2: t("School 2", "2校目"), trayEmpty: t("Not chosen yet", "未選択"), trayRemove: t("Remove", "解除"), trayClear: t("Clear selection", "選択をクリア"),
+  trayOne: t("Choose one more school to compare.", "もう1校選ぶと比較できます。"), trayNone: t("Choose two schools to compare.", "比較したい学校を2校選んでください。"), trayGo: t("See the comparison ↓", "比較を見る ↓"), trayReady: t("Two schools chosen.", "2校を選択しました。"),
+  full: t("You can compare two schools at a time. To add “{name}”, choose which school it replaces:", "比較できるのは2校までです。「{name}」を加えるには、入れ替える学校を選んでください："),
+  replace: t("Replace {name}", "{name}と入れ替える"), cancel: t("Keep my two schools", "今の2校のままにする"),
+  pickList: t("Choose from a drop-down list instead", "プルダウンから選ぶ"),
+  diffTitle: t("How the two schools differ", "2校の違い"),
+  diff: { same: t("Same", "同じ"), differ: t("Different", "異なる"), unconfirmed: t("Includes unconfirmed", "未確認を含む"), incomparable: t("Cannot be compared", "比較できない") },
+  diffNote: t("The labels only describe how the two entries relate. They are not a judgement of either school.", "ラベルは2校の情報の関係を示すだけで、どちらかの学校への評価ではありません。"),
+};
