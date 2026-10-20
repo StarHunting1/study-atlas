@@ -11,7 +11,7 @@ export default function LanguageSchoolComparePage() {
   return (
     <div className="space-y-6">
       <Link href="/schools" className="text-sm text-slate-500 hover:text-slate-900">← {L(s.title)}</Link>
-      <div><h1 className="text-3xl font-bold text-[#0b2a5b]">{L(sc.title)}</h1><p className="mt-1 text-slate-500">{L(sc.intro)}</p></div>
+      <div><h1 className="text-2xl font-bold text-[#0b2a5b] sm:text-3xl">{L(sc.title)}</h1><p className="mt-1 hidden text-slate-500 sm:block">{L(sc.intro)}</p></div>
       <CompareTabs current="schools" />
       <LanguageSchoolCompare />
     </div>
