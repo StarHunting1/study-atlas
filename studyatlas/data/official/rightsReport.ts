@@ -1,5 +1,6 @@
 import { allOfficialData } from "./index";
 import { officialSources } from "./sources";
+import { ACCESS_REVIEWS, PENDING_SOURCES } from "./accessReviews";
 import { RIGHTS, displayModeOf, displayModeOfClimate, type ReuseStatus } from "./rights";
 /** Developer-facing overview of what every source permits (generated into data/official/RIGHTS.md by `npm run rights`; a test keeps the file current). */
 const LABEL: Record<ReuseStatus, string> = { permitted: "permitted", restricted: "restricted", "needs-review": "needs-review", unknown: "unknown" };
@@ -27,6 +28,9 @@ export function rightsMarkdown(): string {
     if (r.robotsException) L.push(`- robots.txt exception: \`${r.robotsException.urlPrefix}\` — ${r.robotsException.reason} (${r.robotsException.policyUrl})`);
     L.push(`- review notes: ${r.reviewNotes.en}`, "- pages read:", ...(r.reviewed.length ? r.reviewed.map((x) => `  - ${x.url} (${x.reviewedAt}) — ${x.scope}`) : ["  - none yet"]), "");
   }
+  L.push("## Human access reviews (new sources)", "", "A source that no rights record covers can be requested by the collector only after a person reviews its terms and records the result in `data/official/accessReviews.ts` (procedure: `collector/README.md`, \"Source access review\"). Access and republishing are recorded separately. A review never lifts a block above.", "");
+  if (ACCESS_REVIEWS.length) { L.push("| id | service | hosts | automation | methods | reviewed | by | next review | republishing |", "|---|---|---|---|---|---|---|---|---|"); ACCESS_REVIEWS.forEach((r) => L.push(`| ${r.id} | ${r.service} | ${r.hosts.join(", ")} | ${r.automation} | ${r.methods.join(", ")} | ${r.reviewedAt} | ${r.reviewedBy} | ${r.nextReviewDue} | ${r.redistribution.status} |`)); } else L.push("No review record yet: every source below is still held back (fail closed).");
+  L.push("", "Waiting for a person's review (nothing is allowed meanwhile):", "", ...PENDING_SOURCES.map((p) => `- ${p.service} (${p.hosts.join(", ")}) — ${p.purpose}`), "");
   L.push("## Not covered by this review", "", "- Ver.1.3 profile summaries and school data under `data/profiles` and `data/schools` (text written by StudyAtlas, mostly `unverified` or sample): their sources are not official figure sources; they are shown with their own status and sources.", "- Sources listed as planned in `collector/sources/index.ts` (ONS, Met Office DataHub, TfGM Open Data, TransLink Open API) are not fetched.", "");
   return L.join("\n");
 }

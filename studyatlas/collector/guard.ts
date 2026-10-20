@@ -15,10 +15,11 @@
  */
 import { RIGHTS, type Rights } from "../data/official/rights";
 import { officialSources, type OfficialSource } from "../data/official/sources";
+import { ACCESS_REVIEWS, inScope, isExpired, validateReview, type AccessReview } from "../data/official/accessReviews";
 
 export type AccessKind = "html" | "api" | "dataset" | "robots" | "status-only";
 export type AccessState = "allowed" | "conditional" | "forbidden" | "unconfirmed";
-export type AccessDecision = { allow: boolean; state: AccessState; kind: AccessKind; url: string; reason: string; recordIds: string[] };
+export type AccessDecision = { allow: boolean; state: AccessState; kind: AccessKind; url: string; reason: string; recordIds: string[]; /** set when a human review (data/official/accessReviews.ts) is what allows this request */ reviewId?: string; rate?: { minIntervalMs: number; maxRequestsPerRun: number } };
 
 /** Hosts that were blocked before the rights records could express it; kept so that removing a record can never re-open them. */
 const LEGACY_BLOCKED = ["ubc.ca", "translink.ca"];
@@ -26,7 +27,7 @@ export const hostKey = (u: string) => new URL(u).hostname.toLowerCase().replace(
 const sameOrSub = (h: string, base: string) => h === base || h.endsWith("." + base);
 const noHash = (u: string) => u.replace(/#.*$/, "");
 
-type Ctx = { rights: Record<string, Rights>; sources: OfficialSource[] };
+type Ctx = { rights: Record<string, Rights>; sources: OfficialSource[]; /** human source reviews; defaults to ACCESS_REVIEWS */ reviews?: AccessReview[]; /** YYYY-MM-DD used for expiry; defaults to today */ today?: string };
 const DEFAULT: Ctx = { rights: RIGHTS, sources: officialSources };
 
 /** Hosts of publishers whose rights record blocks automation. Only the publisher's own site (`sourceUrl`) counts: a third-party catalogue that merely lists a dataset is judged on its own. */
@@ -57,6 +58,19 @@ export function decideAccess(url: string, kind: AccessKind, ctx: Ctx = DEFAULT):
     return d(false, "forbidden", `the rights record${ids.length ? ` (${ids.join(", ")})` : ""} blocks automated requests to ${host}; robots.txt permission does not change that`, ids);
   }
   const ev = evidence(url, ctx); const ids = ev.map((e) => e.id);
+  const today = ctx.today ?? new Date().toISOString().slice(0, 10); const reviews = (ctx.reviews ?? ACCESS_REVIEWS).filter((r) => r.hosts.includes(host));
+  // a human review that says "forbidden" or is suspended refuses even where a rights record would allow; it never widens a rights record
+  const refusal = reviews.find((r) => r.status === "suspended" || r.automation === "forbidden"); if (refusal) return { ...d(false, "forbidden", `the human review "${refusal.id}" ${refusal.status === "suspended" ? "is suspended" : "records that automated access is not allowed"}`, [refusal.id]), reviewId: refusal.id };
+  if (!ev.length && reviews.length) {
+    const valid = reviews.filter((r) => validateReview(r, { rights: ctx.rights, today }).length === 0);
+    if (!valid.length) return d(false, "unconfirmed", `the review record for ${host} is incomplete (${validateReview(reviews[0], { rights: ctx.rights, today })[0]}): it grants nothing`, reviews.map((r) => r.id));
+    const live = valid.filter((r) => !isExpired(r, today));
+    if (!live.length) return d(false, "unconfirmed", `the review of ${host} expired on ${valid[0].nextReviewDue}: it must be re-reviewed by a person before any request`, valid.map((r) => r.id));
+    const isRobots = kind === "robots" && new URL(url).pathname === "/robots.txt";
+    const hit = live.find((r) => (isRobots ? r.methods.some((m) => m !== "robots") || r.methods.includes("robots") : r.methods.includes(kind) && inScope(r, url)));
+    if (!hit) return d(false, "forbidden", `outside the reviewed scope: ${kind} ${kind === "robots" ? "" : "on this URL "}is not covered by the review of ${host}`, live.map((r) => r.id));
+    return { ...d(true, "conditional", `human review "${hit.id}" (${hit.reviewedAt}, due ${hit.nextReviewDue}) allows ${kind} within its URL range`, [hit.id]), reviewId: hit.id, rate: hit.rateLimit };
+  }
   if (!ev.length) return d(false, "unconfirmed", `no rights record covers ${host}: automated access is held back until its terms are reviewed`);
   const reviewed = ev.filter((e) => e.r.lastReviewedAt);
   if (!reviewed.length) return d(false, "unconfirmed", `the terms of ${host} were never reviewed (lastReviewedAt = null)`, ids);
@@ -83,25 +97,37 @@ export class AccessDenied extends Error {
 }
 
 /* ---------- ledger, budget, pacing ---------- */
-export type LedgerEntry = { at: string; kind: AccessKind; url: string; state: AccessState; allowed: boolean };
-const ledger: LedgerEntry[] = []; const lastByHost = new Map<string, number>();
+export type LedgerEntry = { at: string; kind: AccessKind; url: string; state: AccessState; allowed: boolean; reviewId?: string; hop?: number };
+const ledger: LedgerEntry[] = []; const lastByHost = new Map<string, number>(); const countByHost = new Map<string, number>();
 let budget = Number(process.env.STUDYATLAS_MAX_REQUESTS) || 400; let sent = 0;
 export const accessLedger = () => ledger.slice();
-export function resetGuard(opts: { maxRequests?: number } = {}) { ledger.length = 0; lastByHost.clear(); sent = 0; budget = opts.maxRequests ?? (Number(process.env.STUDYATLAS_MAX_REQUESTS) || 400); }
+export function resetGuard(opts: { maxRequests?: number } = {}) { ledger.length = 0; lastByHost.clear(); countByHost.clear(); sent = 0; budget = opts.maxRequests ?? (Number(process.env.STUDYATLAS_MAX_REQUESTS) || 400); }
 export const requestsSent = () => sent;
-/** Throws AccessDenied before anything is sent. Every attempt (also a retry) counts against the budget. */
-export function assertAccess(url: string, kind: AccessKind, ctx: Ctx = DEFAULT): AccessDecision {
-  const dec = decideAccess(url, kind, ctx); ledger.push({ at: new Date().toISOString(), kind, url, state: dec.state, allowed: dec.allow });
+/** Throws AccessDenied before anything is sent. Every attempt (also a retry or a redirect hop) counts against the budget, and a reviewed source also against its own per-run cap. */
+export function assertAccess(url: string, kind: AccessKind, ctx: Ctx = DEFAULT, hop = 0): AccessDecision {
+  const dec = decideAccess(url, kind, ctx); ledger.push({ at: new Date().toISOString(), kind, url, state: dec.state, allowed: dec.allow, reviewId: dec.reviewId, hop: hop || undefined });
   if (!dec.allow) throw new AccessDenied(dec);
   if (sent >= budget) throw new Error(`request budget of ${budget} reached: ${url} not requested`);
+  if (dec.rate) { const h = hostKey(url), c = countByHost.get(h) ?? 0; if (c >= dec.rate.maxRequestsPerRun) throw new Error(`the reviewed cap of ${dec.rate.maxRequestsPerRun} requests per run to ${h} is reached: ${url} not requested`); countByHost.set(h, c + 1); }
   sent++; return dec;
 }
 export type Transport = (url: string, init?: RequestInit) => Promise<Response>;
-const PACE_MS = 1000; const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
-/** The ONLY place that touches the network. `transport` and `ctx` can be replaced in tests; the rights check always runs first. */
+const PACE_MS = 1000; const MAX_HOPS = 5; const pause = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/**
+ * The ONLY place that touches the network. `transport` and `ctx` can be replaced in tests; the rights check always runs first.
+ * Redirects are followed here, one hop at a time, and EVERY target is judged again (a redirect to an unreviewed host or outside the reviewed range is refused before it is requested).
+ */
 export async function guardedFetch(url: string, kind: AccessKind, init?: RequestInit, opts: { transport?: Transport; ctx?: Ctx; paceMs?: number } = {}): Promise<Response> {
-  assertAccess(url, kind, opts.ctx);
-  const host = hostKey(url), gap = opts.paceMs ?? PACE_MS, wait = (lastByHost.get(host) ?? 0) + gap - Date.now(); if (wait > 0 && gap > 0) await pause(wait);
-  lastByHost.set(host, Date.now());
-  return (opts.transport ?? fetch)(url, init);
+  const follow = (init?.redirect ?? "follow") === "follow"; let cur = url, method = init?.method, body = init?.body;
+  for (let hop = 0; ; hop++) {
+    const dec = assertAccess(cur, kind, opts.ctx, hop);
+    const host = hostKey(cur), gap = Math.max(opts.paceMs ?? PACE_MS, opts.paceMs === 0 ? 0 : dec.rate?.minIntervalMs ?? 0), wait = (lastByHost.get(host) ?? 0) + gap - Date.now(); if (wait > 0 && gap > 0) await pause(wait);
+    lastByHost.set(host, Date.now());
+    const res = await (opts.transport ?? fetch)(cur, { ...init, method, body, redirect: follow ? "manual" : init?.redirect });
+    const loc = res.headers.get("location");
+    if (!follow || !loc || ![301, 302, 303, 307, 308].includes(res.status)) return res;
+    if (hop >= MAX_HOPS) throw new Error(`more than ${MAX_HOPS} redirects from ${url}: stopped`);
+    await res.body?.cancel().catch(() => undefined); cur = new URL(loc, cur).toString();
+    if (res.status === 303 || ((res.status === 301 || res.status === 302) && method && method !== "GET" && method !== "HEAD")) { method = "GET"; body = undefined; }
+  }
 }
