@@ -10,7 +10,7 @@ import { listCompareSchools, getCompareSchool } from "@/data/languageSchools";
 import { EMPTY_SEL, checkSummary, diffRows, roughArea, toggleSchool } from "@/data/schoolFinder";
 import { SchoolCard } from "@/components/schools/SchoolFinder";
 import { SchoolCompareView } from "@/components/schools/LanguageSchoolCompare";
-import { isComparable, listSchools, optionsOf } from "@/data/schools";
+import { isComparable, isUniversity, listSchools, optionsOf } from "@/data/schools";
 import { parseSchoolView, schoolViewUrl } from "@/lib/journey";
 import { PLANS_KEY } from "@/lib/planner";
 import { RENT_APPROVALS } from "../data/official/cityRents";
@@ -70,7 +70,7 @@ t("6. comparison labels match the data: two unconfirmed items are 'includes unco
 });
 
 t("7+8. universities: none of the 13 listed universities has data to compare, so they are 'coming soon'; samples stay comparable; the page, its storage keys and the university data are intact", () => {
-  const real = listSchools("university", { includeSamples: false }); assert.equal(real.length, 13); for (const u of real) { assert.equal(isComparable(u), false, u.id); assert.equal(optionsOf(u).length, 0); assert.equal(u.record.status, "unverified"); assert.equal(u.address.status, "pending"); assert.ok(u.website.value?.startsWith("https://")); }
+  const real = listSchools("university", { includeSamples: false }).filter(isUniversity); assert.equal(real.length, 13); for (const u of real) { assert.equal(isComparable(u), false, u.id); assert.equal(optionsOf(u).length, 0); assert.equal(u.record.status, "unverified"); assert.equal(u.address.status, "pending"); assert.ok(u.website.value?.startsWith("https://")); }
   const samples = listSchools("university", { includeSamples: true }).filter((u) => u.demo); assert.ok(samples.length >= 2 && samples.every(isComparable), "explicit samples can still be compared");
   assert.equal(sha(real.map((u) => [u.id, u.name, u.cityId, u.record.status, u.website.value, u.programs])), "1c6196154eca81a210f6fffb8592439233efd1cc001466d24baa723f2a03f2fd", "the 13 universities (names, cities, status, links) are exactly those of Ver.1.7.0");
   const page = readFileSync("app/schools/page.tsx", "utf8"); for (const k of ["studyatlas.schools.kind", "studyatlas.schools.compare", "studyatlas.schools.samples"]) assert.ok(page.includes(k), `storage key ${k} kept`);
