@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-14T15:27:40.929Z",
+  "updatedAt": "2026-10-26T04:54:57.263Z",
   "records": {
     "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8": {
       "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
@@ -1126,6 +1126,64 @@
       "status": "unverified",
       "review": "standard"
     },
+    "page:mel-abs-census-median-weekly-rent": {
+      "id": "page:mel-abs-census-median-weekly-rent",
+      "sourceId": "page:abs-census-rent",
+      "country": "AUS",
+      "cityId": "melbourne",
+      "field": "official.mel-abs-census-median-weekly-rent",
+      "label": {
+        "en": "Median weekly rent – households that rent (2021 Census, Greater Melbourne) — still on the official page",
+        "ja": "週あたり家賃の中央値・賃貸世帯（2021年国勢調査・グレーター・メルボルン） — 公式ページに掲載あり"
+      },
+      "value": {
+        "text": "found",
+        "number": 390,
+        "currency": "AUD",
+        "unit": "week"
+      },
+      "period": "2021 (ABS 2021 Census; latest Census release shown on the QuickStats page)",
+      "sourceUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL",
+      "apiUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL",
+      "retrievedAt": "2026-10-26T04:54:57.263Z",
+      "evidence": {
+        "path": "page text (value-found)",
+        "quote": "Greater Melbourne; Median weekly rent; 2021: 390"
+      },
+      "contentHash": "1ce9a9bb179f7e19",
+      "licence": "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "page:syd-abs-census-median-weekly-rent": {
+      "id": "page:syd-abs-census-median-weekly-rent",
+      "sourceId": "page:abs-census-rent",
+      "country": "AUS",
+      "cityId": "sydney",
+      "field": "official.syd-abs-census-median-weekly-rent",
+      "label": {
+        "en": "Median weekly rent – households that rent (2021 Census, Greater Sydney) — still on the official page",
+        "ja": "週あたり家賃の中央値・賃貸世帯（2021年国勢調査・グレーター・シドニー） — 公式ページに掲載あり"
+      },
+      "value": {
+        "text": "found",
+        "number": 470,
+        "currency": "AUD",
+        "unit": "week"
+      },
+      "period": "2021 (ABS 2021 Census; latest Census release shown on the QuickStats page)",
+      "sourceUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD",
+      "apiUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD",
+      "retrievedAt": "2026-10-26T04:54:57.263Z",
+      "evidence": {
+        "path": "page text (value-found)",
+        "quote": "Greater Sydney; Median weekly rent; 2021: 470"
+      },
+      "contentHash": "c48e234bfa9bdb6c",
+      "licence": "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
+      "status": "unverified",
+      "review": "standard"
+    },
     "page:van-daypass-adult": {
       "id": "page:van-daypass-adult",
       "sourceId": "page:translink-fares",
@@ -1583,16 +1641,16 @@
     "govuk-content": {
       "sourceId": "govuk-content",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 2,
-      "lastSuccessAt": "2026-10-14T15:27:40.929Z"
+      "lastSuccessAt": "2026-10-26T04:54:57.263Z"
     },
     "canada-open-gov": {
       "sourceId": "canada-open-gov",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 2,
-      "lastSuccessAt": "2026-10-14T15:27:40.929Z"
+      "lastSuccessAt": "2026-10-26T04:54:57.263Z"
     },
     "ons-api": {
       "sourceId": "ons-api",
@@ -1604,14 +1662,14 @@
     "met-office-datahub": {
       "sourceId": "met-office-datahub",
       "ok": false,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
     "tfgm-open-data": {
       "sourceId": "tfgm-open-data",
       "ok": false,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
@@ -1632,62 +1690,62 @@
     "translink-open-api": {
       "sourceId": "translink-open-api",
       "ok": false,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
     "statcan-cmhc-rents": {
       "sourceId": "statcan-cmhc-rents",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
-      "skipped": "not due (checked every 30 days; due in 30 day(s))",
+      "skipped": "not due (checked every 30 days; due in 19 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "eccc-climate-normals": {
       "sourceId": "eccc-climate-normals",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
-      "skipped": "not due (checked every 180 days; due in 180 day(s))",
+      "skipped": "not due (checked every 180 days; due in 169 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:tfgm-fares": {
       "sourceId": "page:tfgm-fares",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
-      "skipped": "not due (checked every 30 days; due in 30 day(s))",
+      "skipped": "not due (checked every 30 days; due in 19 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:translink-fares": {
       "sourceId": "page:translink-fares",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
-      "skipped": "blocked by the rights review: The website terms name “information in all forms” as the exclusive property of TransLink: the website and its content “may not be copied, imitated, reproduced, republished, uploaded, posted, transmitted, modified or distributed in any way, in whole or in part, without the express prior written consent of TransLink”, and information may be copied “for personal, non-commercial use” only. Whether a single fare figure falls under this is a legal question. Until TransLink consents or a professional confirms that bare fares may be shown, StudyAtlas keeps the recorded figures in its data but does not display or collect them: the Vancouver transport card links to TransLink's official pages. (TransLink's separate Open API / GTFS terms licence only data obtained through an approved API key; fares are not part of it.)",
+      "skipped": "blocked by the rights review: The website terms name “information in all forms” as the exclusive property of TransLink: the website and its content “may not be copied, imitated, reproduced, republished, uploaded, posted, transmitted, modified or distributed in any way, in whole or in part, without the express prior written consent of TransLink”, and information may be copied “for personal, non-commercial use” only. Whether a single fare figure falls under this is a legal question. Until TransLink consents or a professional confirms that bare fares may be shown, StudyAtlas keeps the recorded figures in its data but does not display or collect them: the Vancouver transport card links to TransLink's official pages. (TransLink's separate Open API / GTFS terms licence only data obtained through an approved API key; fares are not part of it.) Ver.1.6.5 (correction): an Actions probe on 2026-10-19 requested three TransLink pages once each although this record blocks automated requests (robots.txt did not forbid them). That was a mistake: nothing from those pages is used, and the Vancouver guide stays link-only. The pages are not requested again.",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:uom-cost-of-living": {
       "sourceId": "page:uom-cost-of-living",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
-      "skipped": "not due (checked every 60 days; due in 60 day(s))",
+      "skipped": "not due (checked every 60 days; due in 49 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:uom-accommodation": {
       "sourceId": "page:uom-accommodation",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
-      "skipped": "not due (checked every 60 days; due in 60 day(s))",
+      "skipped": "not due (checked every 60 days; due in 49 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "metoffice-station-data": {
       "sourceId": "metoffice-station-data",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
       "records": 0,
       "skipped": "blocked by the rights review: data.gov.uk lists this dataset (publisher: Met Office) under the UK Open Government Licence, and the Met Office website terms license site content under OGL v3.0 with the attribution above. The same terms say that, “save for any APIs that we provide or expressly authorise”, no robot, spider, deep-link or page-scrape may be used to monitor or copy site content. The Ringway file is a static historical file (the station closed in 2004), so the scheduled automatic re-download is switched off: the recorded values are shown with attribution, nothing is requested again. A person can re-read the file when needed.",
       "lastSuccessAt": "2026-10-14T12:24:54.854Z"
@@ -1695,9 +1753,17 @@
     "ons-private-rents": {
       "sourceId": "ons-private-rents",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
-      "records": 1,
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
+      "records": 0,
+      "skipped": "not due (checked every 30 days; due in 19 day(s))",
       "lastSuccessAt": "2026-10-14T15:27:40.929Z"
+    },
+    "page:abs-census-rent": {
+      "sourceId": "page:abs-census-rent",
+      "ok": true,
+      "attemptedAt": "2026-10-26T04:54:57.263Z",
+      "records": 2,
+      "lastSuccessAt": "2026-10-26T04:54:57.263Z"
     }
   }
 }
