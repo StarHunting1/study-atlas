@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-10-14T15:27:40.929Z",
+  "updatedAt": "2026-11-16T05:43:12.639Z",
   "records": {
     "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8": {
       "id": "canada-open-gov:51dbf91e-509c-437b-ab9e-eca6d0bf6fa8",
@@ -396,6 +396,65 @@
       "status": "unverified",
       "review": "standard"
     },
+    "ons-private-rents:london:rental-price": {
+      "id": "ons-private-rents:london:rental-price",
+      "sourceId": "ons-private-rents",
+      "country": "GBR",
+      "cityId": "london",
+      "field": "housing.privateRentAverage",
+      "label": {
+        "en": "Average monthly private rent, all dwellings (London, ONS PIPR)",
+        "ja": "平均月額民間家賃・全住宅（London、ONS PIPR）"
+      },
+      "value": {
+        "number": 2338,
+        "currency": "GBP",
+        "unit": "month",
+        "text": "£2,338 per month, mean rent of all privately rented dwellings in London region (E12000007), 2026-09; new and existing tenancies. Not university halls or student housing."
+      },
+      "period": "2026-09",
+      "sourceUrl": "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics",
+      "apiUrl": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/21october2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
+      "sourcePublishedAt": "2026-10-21",
+      "sourceUpdatedAt": "2026-10-21",
+      "evidence": {
+        "path": "Table 1 row 1836, column H (Rental price)",
+        "quote": "London E12000007 2026-09-01 Rental price 2338"
+      },
+      "contentHash": "8de206477984e9b2",
+      "licence": "Open Government Licence v3.0 (ONS website terms)",
+      "status": "unverified",
+      "review": "standard",
+      "meta": {
+        "areaCode": "E12000007",
+        "areaName": "London",
+        "region": "[z]",
+        "edition": "2026-10-21",
+        "workbook": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/21october2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
+        "attribution": "Source: Office for National Statistics licensed under the Open Government Licence v3.0.",
+        "scope": {
+          "en": "Mean monthly private rent of ALL privately rented dwellings in the London region (Greater London, 33 local authorities; new and existing tenancies). A region-wide average: not the City of London alone, not a borough, not university halls or student housing, not an average for international students, not by bedroom or property type.",
+          "ja": "ロンドン地域（ロンドン広域圏＝33の自治体）の民間賃貸住宅すべての月額家賃の平均（新規契約と既存契約）。地域全体の平均であり、シティ・オブ・ロンドンだけでも特定の区でもなく、大学寮・学生向け住居・留学生の平均ではなく、寝室数や物件タイプ別でもありません。"
+        },
+        "unit": "GBP per month, rounded to the nearest £1",
+        "statisticalStatus": "official statistics in development",
+        "monthsInWorkbook": 141,
+        "areaKind": "region",
+        "checks": {
+          "valueIsWholePounds": true,
+          "monthIsFirstOfMonth": true,
+          "areaCodeMatchesName": true,
+          "publishedDateCrossChecked": true,
+          "unitConfirmedInNotes": true,
+          "definitionConfirmedInCover": true,
+          "indexBaseConfirmedInNotes": true,
+          "licenceRecorded": true
+        },
+        "unconfirmed": [],
+        "fairUse": "ONS fair use policy (last updated 30 April 2026): bots must follow the technical guidance and identify themselves with a contact in the User-Agent."
+      }
+    },
     "ons-private-rents:manchester:rental-price": {
       "id": "ons-private-rents:manchester:rental-price",
       "sourceId": "ons-private-rents",
@@ -407,22 +466,22 @@
         "ja": "平均月額民間家賃・全住宅（Manchester、ONS PIPR）"
       },
       "value": {
-        "number": 1373,
+        "number": 1380,
         "currency": "GBP",
         "unit": "month",
-        "text": "£1,373 per month, mean rent of all privately rented dwellings in Manchester local authority (E08000003), 2026-08; new and existing tenancies. Not university halls or student housing."
+        "text": "£1,380 per month, mean rent of all privately rented dwellings in Manchester local authority (E08000003), 2026-09; new and existing tenancies. Not university halls or student housing."
       },
-      "period": "2026-08",
+      "period": "2026-09",
       "sourceUrl": "https://www.ons.gov.uk/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics",
-      "apiUrl": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/16september2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
-      "retrievedAt": "2026-10-14T15:27:40.929Z",
-      "sourcePublishedAt": "2026-09-16",
-      "sourceUpdatedAt": "2026-09-16",
+      "apiUrl": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/21october2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
+      "sourcePublishedAt": "2026-10-21",
+      "sourceUpdatedAt": "2026-10-21",
       "evidence": {
-        "path": "Table 1 row 34163, column H (Rental price)",
-        "quote": "Manchester E08000003 2026-08-01 Rental price 1373"
+        "path": "Table 1 row 34407, column H (Rental price)",
+        "quote": "Manchester E08000003 2026-09-01 Rental price 1380"
       },
-      "contentHash": "20880743318b70db",
+      "contentHash": "3bbb6b6a85576a2c",
       "licence": "Open Government Licence v3.0 (ONS website terms)",
       "status": "unverified",
       "review": "standard",
@@ -430,8 +489,8 @@
         "areaCode": "E08000003",
         "areaName": "Manchester",
         "region": "North West",
-        "edition": "2026-09-16",
-        "workbook": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/16september2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
+        "edition": "2026-10-21",
+        "workbook": "https://www.ons.gov.uk/file?uri=/economy/inflationandpriceindices/datasets/priceindexofprivaterentsukmonthlypricestatistics/21october2026/priceindexofprivaterentsukmonthlypricestatistics.xlsx",
         "attribution": "Source: Office for National Statistics licensed under the Open Government Licence v3.0.",
         "scope": {
           "en": "Mean monthly private rent of ALL privately rented dwellings in Manchester local authority (new and existing tenancies). Not university halls, not student housing, not an average for international students, not by bedroom or property type.",
@@ -439,7 +498,8 @@
         },
         "unit": "GBP per month, rounded to the nearest £1",
         "statisticalStatus": "official statistics in development",
-        "manchesterMonthsInWorkbook": 140,
+        "monthsInWorkbook": 141,
+        "areaKind": "local authority",
         "checks": {
           "valueIsWholePounds": true,
           "monthIsFirstOfMonth": true,
@@ -1126,6 +1186,64 @@
       "status": "unverified",
       "review": "standard"
     },
+    "page:mel-abs-census-median-weekly-rent": {
+      "id": "page:mel-abs-census-median-weekly-rent",
+      "sourceId": "page:abs-census-rent",
+      "country": "AUS",
+      "cityId": "melbourne",
+      "field": "official.mel-abs-census-median-weekly-rent",
+      "label": {
+        "en": "Median weekly rent – households that rent (2021 Census, Greater Melbourne) — still on the official page",
+        "ja": "週あたり家賃の中央値・賃貸世帯（2021年国勢調査・グレーター・メルボルン） — 公式ページに掲載あり"
+      },
+      "value": {
+        "text": "found",
+        "number": 390,
+        "currency": "AUD",
+        "unit": "week"
+      },
+      "period": "2021 (ABS 2021 Census; latest Census release shown on the QuickStats page)",
+      "sourceUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL",
+      "apiUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/2GMEL",
+      "retrievedAt": "2026-10-26T04:54:57.263Z",
+      "evidence": {
+        "path": "page text (value-found)",
+        "quote": "Greater Melbourne; Median weekly rent; 2021: 390"
+      },
+      "contentHash": "1ce9a9bb179f7e19",
+      "licence": "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "page:syd-abs-census-median-weekly-rent": {
+      "id": "page:syd-abs-census-median-weekly-rent",
+      "sourceId": "page:abs-census-rent",
+      "country": "AUS",
+      "cityId": "sydney",
+      "field": "official.syd-abs-census-median-weekly-rent",
+      "label": {
+        "en": "Median weekly rent – households that rent (2021 Census, Greater Sydney) — still on the official page",
+        "ja": "週あたり家賃の中央値・賃貸世帯（2021年国勢調査・グレーター・シドニー） — 公式ページに掲載あり"
+      },
+      "value": {
+        "text": "found",
+        "number": 470,
+        "currency": "AUD",
+        "unit": "week"
+      },
+      "period": "2021 (ABS 2021 Census; latest Census release shown on the QuickStats page)",
+      "sourceUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD",
+      "apiUrl": "https://www.abs.gov.au/census/find-census-data/quickstats/2021/1GSYD",
+      "retrievedAt": "2026-10-26T04:54:57.263Z",
+      "evidence": {
+        "path": "page text (value-found)",
+        "quote": "Greater Sydney; Median weekly rent; 2021: 470"
+      },
+      "contentHash": "c48e234bfa9bdb6c",
+      "licence": "Creative Commons Attribution 4.0 International (ABS website copyright notice)",
+      "status": "unverified",
+      "review": "standard"
+    },
     "page:van-daypass-adult": {
       "id": "page:van-daypass-adult",
       "sourceId": "page:translink-fares",
@@ -1462,6 +1580,122 @@
       "status": "unverified",
       "review": "standard"
     },
+    "statcan-cmhc-rents:toronto:1br": {
+      "id": "statcan-cmhc-rents:toronto:1br",
+      "sourceId": "statcan-cmhc-rents",
+      "country": "CAN",
+      "cityId": "toronto",
+      "field": "housing.marketRent.1br",
+      "label": {
+        "en": "Average rent, one bedroom units (Toronto, Ontario, CMHC)",
+        "ja": "平均家賃：1ベッドルーム（Toronto, Ontario、CMHC）"
+      },
+      "value": {
+        "number": 1807,
+        "currency": "CAD",
+        "unit": "month"
+      },
+      "period": "2025",
+      "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+      "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
+      "sourceUpdatedAt": "2025-12-17T08:30",
+      "evidence": {
+        "path": "vector v3822971 (125.3.2.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Toronto, Ontario; Row and apartment structures of three units and over; One bedroom units; 2025: 1807"
+      },
+      "contentHash": "e9e55cb7372f5fb5",
+      "licence": "Statistics Canada Open Licence",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "statcan-cmhc-rents:toronto:2br": {
+      "id": "statcan-cmhc-rents:toronto:2br",
+      "sourceId": "statcan-cmhc-rents",
+      "country": "CAN",
+      "cityId": "toronto",
+      "field": "housing.marketRent.2br",
+      "label": {
+        "en": "Average rent, two bedroom units (Toronto, Ontario, CMHC)",
+        "ja": "平均家賃：2ベッドルーム（Toronto, Ontario、CMHC）"
+      },
+      "value": {
+        "number": 2364,
+        "currency": "CAD",
+        "unit": "month"
+      },
+      "period": "2025",
+      "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+      "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
+      "sourceUpdatedAt": "2025-12-17T08:30",
+      "evidence": {
+        "path": "vector v3823105 (125.3.3.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Toronto, Ontario; Row and apartment structures of three units and over; Two bedroom units; 2025: 2364"
+      },
+      "contentHash": "1737355dca6710f2",
+      "licence": "Statistics Canada Open Licence",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "statcan-cmhc-rents:toronto:3br": {
+      "id": "statcan-cmhc-rents:toronto:3br",
+      "sourceId": "statcan-cmhc-rents",
+      "country": "CAN",
+      "cityId": "toronto",
+      "field": "housing.marketRent.3br",
+      "label": {
+        "en": "Average rent, three bedroom units (Toronto, Ontario, CMHC)",
+        "ja": "平均家賃：3ベッドルーム（Toronto, Ontario、CMHC）"
+      },
+      "value": {
+        "number": 2820,
+        "currency": "CAD",
+        "unit": "month"
+      },
+      "period": "2025",
+      "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+      "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
+      "sourceUpdatedAt": "2025-12-17T08:30",
+      "evidence": {
+        "path": "vector v3823239 (125.3.4.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Toronto, Ontario; Row and apartment structures of three units and over; Three bedroom units; 2025: 2820"
+      },
+      "contentHash": "550dd02f1db6b601",
+      "licence": "Statistics Canada Open Licence",
+      "status": "unverified",
+      "review": "standard"
+    },
+    "statcan-cmhc-rents:toronto:bachelor": {
+      "id": "statcan-cmhc-rents:toronto:bachelor",
+      "sourceId": "statcan-cmhc-rents",
+      "country": "CAN",
+      "cityId": "toronto",
+      "field": "housing.marketRent.bachelor",
+      "label": {
+        "en": "Average rent, bachelor units (Toronto, Ontario, CMHC)",
+        "ja": "平均家賃：ワンルーム（バチェラー）（Toronto, Ontario、CMHC）"
+      },
+      "value": {
+        "number": 1667,
+        "currency": "CAD",
+        "unit": "month"
+      },
+      "period": "2025",
+      "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
+      "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
+      "sourceUpdatedAt": "2025-12-17T08:30",
+      "evidence": {
+        "path": "vector v3822837 (125.3.1.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Toronto, Ontario; Row and apartment structures of three units and over; Bachelor units; 2025: 1667"
+      },
+      "contentHash": "494629e663a60da9",
+      "licence": "Statistics Canada Open Licence",
+      "status": "unverified",
+      "review": "standard"
+    },
     "statcan-cmhc-rents:vancouver:1br": {
       "id": "statcan-cmhc-rents:vancouver:1br",
       "sourceId": "statcan-cmhc-rents",
@@ -1473,20 +1707,20 @@
         "ja": "平均家賃：1ベッドルーム（Vancouver, British Columbia、CMHC）"
       },
       "value": {
-        "number": 1807,
+        "number": 1761,
         "currency": "CAD",
         "unit": "month"
       },
       "period": "2025",
       "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
       "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
-      "retrievedAt": "2026-10-14T09:13:56.486Z",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
       "sourceUpdatedAt": "2025-12-17T08:30",
       "evidence": {
-        "path": "vector v3822971 (184.3.2.0.0.0.0.0.0.0) refPer 2025-01-01",
-        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; One bedroom units; 2025: 1807"
+        "path": "vector v3822969 (184.3.2.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; One bedroom units; 2025: 1761"
       },
-      "contentHash": "e9e55cb7372f5fb5",
+      "contentHash": "62ac8e112200c1f8",
       "licence": "Statistics Canada Open Licence",
       "status": "unverified",
       "review": "standard"
@@ -1502,20 +1736,20 @@
         "ja": "平均家賃：2ベッドルーム（Vancouver, British Columbia、CMHC）"
       },
       "value": {
-        "number": 2364,
+        "number": 2045,
         "currency": "CAD",
         "unit": "month"
       },
       "period": "2025",
       "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
       "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
-      "retrievedAt": "2026-10-14T09:13:56.486Z",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
       "sourceUpdatedAt": "2025-12-17T08:30",
       "evidence": {
-        "path": "vector v3823105 (184.3.3.0.0.0.0.0.0.0) refPer 2025-01-01",
-        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Two bedroom units; 2025: 2364"
+        "path": "vector v3823103 (184.3.3.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Two bedroom units; 2025: 2045"
       },
-      "contentHash": "1737355dca6710f2",
+      "contentHash": "41a9d156658de602",
       "licence": "Statistics Canada Open Licence",
       "status": "unverified",
       "review": "standard"
@@ -1531,20 +1765,20 @@
         "ja": "平均家賃：3ベッドルーム（Vancouver, British Columbia、CMHC）"
       },
       "value": {
-        "number": 2820,
+        "number": 2294,
         "currency": "CAD",
         "unit": "month"
       },
       "period": "2025",
       "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
       "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
-      "retrievedAt": "2026-10-14T09:13:56.486Z",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
       "sourceUpdatedAt": "2025-12-17T08:30",
       "evidence": {
-        "path": "vector v3823239 (184.3.4.0.0.0.0.0.0.0) refPer 2025-01-01",
-        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Three bedroom units; 2025: 2820"
+        "path": "vector v3823237 (184.3.4.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Three bedroom units; 2025: 2294"
       },
-      "contentHash": "550dd02f1db6b601",
+      "contentHash": "49058f40dd7c3634",
       "licence": "Statistics Canada Open Licence",
       "status": "unverified",
       "review": "standard"
@@ -1560,20 +1794,20 @@
         "ja": "平均家賃：ワンルーム（バチェラー）（Vancouver, British Columbia、CMHC）"
       },
       "value": {
-        "number": 1667,
+        "number": 1491,
         "currency": "CAD",
         "unit": "month"
       },
       "period": "2025",
       "sourceUrl": "https://www150.statcan.gc.ca/t1/tbl1/en/tv.action?pid=3410013301",
       "apiUrl": "https://www150.statcan.gc.ca/t1/wds/rest/getDataFromCubePidCoordAndLatestNPeriods",
-      "retrievedAt": "2026-10-14T09:13:56.486Z",
+      "retrievedAt": "2026-11-16T05:43:12.639Z",
       "sourceUpdatedAt": "2025-12-17T08:30",
       "evidence": {
-        "path": "vector v3822837 (184.3.1.0.0.0.0.0.0.0) refPer 2025-01-01",
-        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Bachelor units; 2025: 1667"
+        "path": "vector v3822835 (184.3.1.0.0.0.0.0.0.0) refPer 2025-01-01",
+        "quote": "Vancouver, British Columbia; Row and apartment structures of three units and over; Bachelor units; 2025: 1491"
       },
-      "contentHash": "494629e663a60da9",
+      "contentHash": "6fc60d6aa7e1afe5",
       "licence": "Statistics Canada Open Licence",
       "status": "unverified",
       "review": "standard"
@@ -1583,16 +1817,16 @@
     "govuk-content": {
       "sourceId": "govuk-content",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 2,
-      "lastSuccessAt": "2026-10-14T15:27:40.929Z"
+      "lastSuccessAt": "2026-11-16T05:43:12.639Z"
     },
     "canada-open-gov": {
       "sourceId": "canada-open-gov",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 2,
-      "lastSuccessAt": "2026-10-14T15:27:40.929Z"
+      "lastSuccessAt": "2026-11-16T05:43:12.639Z"
     },
     "ons-api": {
       "sourceId": "ons-api",
@@ -1604,14 +1838,14 @@
     "met-office-datahub": {
       "sourceId": "met-office-datahub",
       "ok": false,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
     "tfgm-open-data": {
       "sourceId": "tfgm-open-data",
       "ok": false,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
@@ -1632,62 +1866,60 @@
     "translink-open-api": {
       "sourceId": "translink-open-api",
       "ok": false,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
       "skipped": "not implemented (needs-key)"
     },
     "statcan-cmhc-rents": {
       "sourceId": "statcan-cmhc-rents",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
-      "records": 0,
-      "skipped": "not due (checked every 30 days; due in 30 day(s))",
-      "lastSuccessAt": "2026-10-14T09:13:56.486Z"
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
+      "records": 8,
+      "lastSuccessAt": "2026-11-16T05:43:12.639Z"
     },
     "eccc-climate-normals": {
       "sourceId": "eccc-climate-normals",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
-      "skipped": "not due (checked every 180 days; due in 180 day(s))",
+      "skipped": "not due (checked every 180 days; due in 148 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:tfgm-fares": {
       "sourceId": "page:tfgm-fares",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
-      "records": 0,
-      "skipped": "not due (checked every 30 days; due in 30 day(s))",
-      "lastSuccessAt": "2026-10-14T09:13:56.486Z"
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
+      "records": 9,
+      "lastSuccessAt": "2026-11-16T05:43:12.639Z"
     },
     "page:translink-fares": {
       "sourceId": "page:translink-fares",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
-      "skipped": "blocked by the rights review: The website terms name “information in all forms” as the exclusive property of TransLink: the website and its content “may not be copied, imitated, reproduced, republished, uploaded, posted, transmitted, modified or distributed in any way, in whole or in part, without the express prior written consent of TransLink”, and information may be copied “for personal, non-commercial use” only. Whether a single fare figure falls under this is a legal question. Until TransLink consents or a professional confirms that bare fares may be shown, StudyAtlas keeps the recorded figures in its data but does not display or collect them: the Vancouver transport card links to TransLink's official pages. (TransLink's separate Open API / GTFS terms licence only data obtained through an approved API key; fares are not part of it.)",
+      "skipped": "blocked by the rights review: The website terms name “information in all forms” as the exclusive property of TransLink: the website and its content “may not be copied, imitated, reproduced, republished, uploaded, posted, transmitted, modified or distributed in any way, in whole or in part, without the express prior written consent of TransLink”, and information may be copied “for personal, non-commercial use” only. Whether a single fare figure falls under this is a legal question. Until TransLink consents or a professional confirms that bare fares may be shown, StudyAtlas keeps the recorded figures in its data but does not display or collect them: the Vancouver transport card links to TransLink's official pages. (TransLink's separate Open API / GTFS terms licence only data obtained through an approved API key; fares are not part of it.) Ver.1.6.5 (correction): an Actions probe on 2026-10-19 requested three TransLink pages once each although this record blocks automated requests (robots.txt did not forbid them). That was a mistake: nothing from those pages is used, and the Vancouver guide stays link-only. The pages are not requested again.",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:uom-cost-of-living": {
       "sourceId": "page:uom-cost-of-living",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
-      "skipped": "not due (checked every 60 days; due in 60 day(s))",
+      "skipped": "not due (checked every 60 days; due in 28 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "page:uom-accommodation": {
       "sourceId": "page:uom-accommodation",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
-      "skipped": "not due (checked every 60 days; due in 60 day(s))",
+      "skipped": "not due (checked every 60 days; due in 28 day(s))",
       "lastSuccessAt": "2026-10-14T09:13:56.486Z"
     },
     "metoffice-station-data": {
       "sourceId": "metoffice-station-data",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
       "records": 0,
       "skipped": "blocked by the rights review: data.gov.uk lists this dataset (publisher: Met Office) under the UK Open Government Licence, and the Met Office website terms license site content under OGL v3.0 with the attribution above. The same terms say that, “save for any APIs that we provide or expressly authorise”, no robot, spider, deep-link or page-scrape may be used to monitor or copy site content. The Ringway file is a static historical file (the station closed in 2004), so the scheduled automatic re-download is switched off: the recorded values are shown with attribution, nothing is requested again. A person can re-read the file when needed.",
       "lastSuccessAt": "2026-10-14T12:24:54.854Z"
@@ -1695,9 +1927,17 @@
     "ons-private-rents": {
       "sourceId": "ons-private-rents",
       "ok": true,
-      "attemptedAt": "2026-10-14T15:27:40.929Z",
-      "records": 1,
-      "lastSuccessAt": "2026-10-14T15:27:40.929Z"
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
+      "records": 2,
+      "lastSuccessAt": "2026-11-16T05:43:12.639Z"
+    },
+    "page:abs-census-rent": {
+      "sourceId": "page:abs-census-rent",
+      "ok": true,
+      "attemptedAt": "2026-11-16T05:43:12.639Z",
+      "records": 0,
+      "skipped": "not due (checked every 180 days; due in 159 day(s))",
+      "lastSuccessAt": "2026-10-26T04:54:57.263Z"
     }
   }
 }
